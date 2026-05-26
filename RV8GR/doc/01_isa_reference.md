@@ -1,82 +1,109 @@
 # RV8-GR — ISA Reference
 
-**21 instructions. RISC-V naming. ~80% compatible with RV8.**
+**15 instructions. Direct-encoded. 16-bit jump via Page Register.**
 
 ---
 
 ## Encoding (2 bytes per instruction)
 
-### Byte 0 — Control (8 bits, drives hardware):
-```
-Bit 7: ALU_SUB      0=ADD, 1=SUB
-Bit 6: XOR_MODE     1=XOR result → AC
-Bit 5: MUX_SEL      0=ALU→AC, 1=IBUS→AC
-Bit 4: AC_WR        1=write to AC
-Bit 3: SOURCE_TYPE  0=immediate, 1=register(RAM)
-Bit 2: STORE        1=write AC to RAM
-Bit 1: BRANCH       1=conditional jump
-Bit 0: JUMP         1=unconditional jump
-```
-
-### Byte 1 — Operand (8 bits):
-- Immediate value (0-255) when SOURCE_TYPE=0
-- Register/memory address when SOURCE_TYPE=1 or STORE=1
-- Branch/jump target address when BRANCH=1 or JUMP=1
+    Byte 0 — Control: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP
+    Byte 1 — Operand: immediate value, RAM address, or jump target (8-bit)
 
 ---
 
 ## Instructions
 
-### ALU (AC = AC op source)
-
-| Control byte | Mnemonic | Operation |
-|:------------:|----------|-----------|
-| $18 | `ADD a0, a0, rs` | AC = AC + RAM[rs] |
-| $98 | `SUB a0, a0, rs` | AC = AC - RAM[rs] |
-| $48 | `XOR a0, a0, rs` | AC = AC ^ RAM[rs] |
-| $10 | `ADDI a0, a0, imm` | AC = AC + imm |
-| $90 | `SUBI a0, a0, imm` | AC = AC - imm |
-| $50 | `XORI a0, a0, imm` | AC = AC ^ imm |
-| $10 | `SLL a0, a0, 1` | AC = AC + AC (shift left, use ADDI with self... actually ADD a0,a0) |
-
-### Load/Move
-
-| Control byte | Mnemonic | Operation |
-|:------------:|----------|-----------|
-| $30 | `LI a0, imm` | AC = imm (MUX_SEL=1, AC_WR=1) |
-| $38 | `MV a0, rs` | AC = RAM[rs] (MUX_SEL=1, SOURCE=1, AC_WR=1) |
-| $04 | `MV rd, a0` | RAM[rd] = AC (STORE=1) |
-| $3C | `LB a0, addr` | AC = RAM[addr] (MUX_SEL=1, SOURCE=1, AC_WR=1) |
-| $04 | `SB a0, addr` | RAM[addr] = AC (STORE=1) |
-
-### Branch/Jump
-
-| Control byte | Mnemonic | Operation |
-|:------------:|----------|-----------|
-| $02 | `BEQ a0, zero, addr` | if Z=1, PC = addr |
-| $82 | `BNE a0, zero, addr` | if Z=0, PC = addr (SUB bit as invert) |
-| $01 | `J addr` | PC = addr |
-| $11 | `JAL ra, addr` | RAM[$07]=PC, PC = addr (AC_WR saves PC... needs work) |
-
-### System
-
-| Control byte | Mnemonic | Operation |
-|:------------:|----------|-----------|
-| $00 | `NOP` | nothing |
-| $01 | `HLT` | PC = same address (loop) |
+| Hex | Mnemonic | Binary | Operation |
+|:---:|----------|:------:|-----------|
+| $00 | NOP | 00000000 | no operation |
+| $10 | ADDI imm | 00010000 | AC = AC + imm |
+| $18 | ADD rs | 00011000 | AC = AC + RAM[rs] |
+| $90 | SUBI imm | 10010000 | AC = AC - imm |
+| $98 | SUB rs | 10011000 | AC = AC - RAM[rs] |
+| $70 | XORI imm | 01110000 | AC = AC ^ imm |
+| $78 | XOR rs | 01111000 | AC = AC ^ RAM[rs] |
+| $30 | LI imm | 00110000 | AC = imm |
+| $38 | MV a0,rs | 00111000 | AC = RAM[rs] |
+| $04 | MV rd,a0 | 00000100 | RAM[rd] = AC |
+| $02 | BEQ addr | 00000010 | if Z=1: PC = {PG, addr} |
+| $82 | BNE addr | 10000010 | if Z=0: PC = {PG, addr} |
+| $01 | J addr | 00000001 | PC = {PG, addr} |
+| $20 | SETPG imm | 00100000 | PageReg = imm |
+| $28 | SETPG_R rs | 00101000 | PageReg = RAM[rs] |
 
 ---
 
-## What's missing vs RV8:
+## Aliases
 
-| RV8 instruction | RV8-GR | Workaround |
-|-----------------|:------:|-----------|
-| AND/ANDI | ❌ | Subroutine (~20 instr) |
-| OR/ORI | ❌ | Subroutine (~25 instr) |
-| SRL (shift right) | ❌ | Subroutine (~15 instr) |
-| SLT/SLTI | ❌ | SUB + check Z |
-| BLT/BGE | ❌ | SUB + BEQ/BNE |
-| Relative branch | ❌ | Absolute address (assembler resolves) |
-| BEQ rs1,rs2 | ❌ | SUB rs1,rs2 then BEQ |
+    LB addr   = MV a0,rs ($38)    — load byte from RAM
+    SB addr   = MV rd,a0 ($04)    — store byte to RAM
+    SLL a0,1  = ADD a0,a0 ($18)   — shift left (add self)
+    HLT       = J self ($01)      — halt (jump to own address)
 
-## Compatibility: ~80% of RV8 programs run if they avoid AND/OR/SRL.
+---
+
+## Control Byte Decode
+
+| Bit | Name | =0 | =1 |
+|:---:|------|----|----|
+| 7 | ALU_SUB | ADD mode | SUB mode (invert + Cin=1) |
+| 6 | XOR_MODE | XOR B = ALU_SUB | XOR B = AC (for XOR instr) |
+| 5 | MUX_SEL | AC ← Adder result | AC ← XOR output |
+| 4 | AC_WR | AC unchanged | AC latches new value |
+| 3 | SOURCE_TYPE | IBUS = IRL (immediate) | IBUS = RAM[IRL] |
+| 2 | STORE | — | RAM[IRL] = AC |
+| 1 | BRANCH | — | Conditional PC load (check Z) |
+| 0 | JUMP | — | Unconditional PC load |
+
+---
+
+## Derived Signals
+
+    ADDR_MODE = SRC OR STR          → address mux selects IRL
+    PC_INC = T0 OR T1               → PC counts during fetch
+    /IRL_OE = NAND(T2, /ADDR_MODE)  → IRL drives IBUS
+    /AC_BUF = NAND(T2, STORE)       → AC drives IBUS + RAM write
+    /PC_LD = NAND(T2, PC_LOAD_COND) → PC loads jump target
+    PC_LOAD_COND = JUMP OR (BRANCH AND Z_match)
+    Z_match = Z_flag XOR ALU_SUB    → BEQ: Z=1, BNE: Z=0
+    PG_Load = T2 AND MUX_SEL AND NOT(AC_WR)
+
+---
+
+## IBUS Driver Rules
+
+Only ONE driver active during T2:
+
+| Condition | Driver | Signal |
+|-----------|--------|--------|
+| SRC=0, STR=0 | U6 (IRL immediate) | /IRL_OE=0 |
+| SRC=1, STR=0 | U7 (RAM read) | BUF_OE_N=0 |
+| STR=1 | U14 (AC buffer) | /AC_BUF=0 |
+
+During T0/T1 (fetch): U7 always enabled (BUF_OE_N=0), reads ROM/RAM.
+
+---
+
+## Subroutine Pattern (Software)
+
+    ; CALL sub at page P, address A:
+    LI lo(return)       ; $30, ret_lo
+    MV $07, a0          ; $04, $07
+    SETPG P             ; $20, P
+    J A                 ; $01, A
+
+    ; RET (at end of sub, return address known at compile time):
+    SETPG ret_page      ; $20, ret_pg
+    J ret_lo            ; $01, ret_lo
+
+---
+
+## What's Missing vs RV8
+
+| Feature | Status | Workaround |
+|---------|:------:|-----------|
+| AND/OR | ❌ | Software subroutine |
+| SRL | ❌ | Software loop |
+| JAL/JALR | ❌ | Software CALL/RET |
+| Relative branch | ❌ | Absolute (assembler) |
+| Interrupts | ❌ | Polling |

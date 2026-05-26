@@ -47,3 +47,42 @@
 | 2026-05-15 | RV8 microcode working (8/8) |
 | 2026-05-16 | All 4 variants traced and verified |
 | 2026-05-17 | **RV8-GR: full toolchain (Verilog + assembler + test) ready for build** |
+
+## Day 8 (2026-05-27) — RV8-GR Complete Redesign
+
+### Problem: Original 21-chip design had critical bugs
+- No XOR chips for ALU (SUB/XOR broken)
+- Bus conflict when SOURCE_TYPE=1 (IRL + RAM both drive IBUS)
+- Only 256-byte jump range (no page register)
+- ROM/RAM not in shared 64K space (operation-based chip select)
+
+### Solution: Full redesign from scratch
+- 29 logic chips (was 21)
+- Full 64K address space: ROM $8000-$FFFF, RAM $0000-$7FFF
+- A15-based chip select (ROM /CE = NOT(A15), RAM /CE = A15)
+- 16-bit address mux (4× 74HC157 for A0-A15)
+- Page Register (74HC574) for 16-bit jump
+- XOR B-input mux (2× 74HC157) for SUB inversion + XOR instruction
+- AC input mux (2× 74HC157) selects adder vs XOR output
+- Ring counter (74HC164) for T0/T1/T2
+- U7 DIR gated with T2+STORE (prevents bus conflict)
+- U7 /OE = NOT(/IRL_OE) (prevents IBUS conflict)
+- Can execute code from RAM (PC < $8000)
+- Expandable: ROM bank (A16), RAM pages (A8-A14) via bus
+
+### ISA changes
+- XORI=$70, XOR=$78 (was $50/$58 — needed MUX_SEL=1 for data path)
+- Added SETPG $20, SETPG_R $28
+- Removed hardware JAL (software subroutine only)
+- 15 instructions total
+
+### Verification
+- New Verilog model: rv8gr_cpu.v (behavioral)
+- New testbench: tb_rv8gr_full.v (all ISA + 64K jump + subroutine)
+- ALL TESTS PASSED (127 cycles)
+
+### Documentation (all rewritten)
+- Construct.md: pin-by-pin, bus-centric (source of truth)
+- 00_design.md, 01_isa_reference.md, 02_instruction_trace.md
+- 03_wiring_guide.md, 04_understand_by_module.md (Thai)
+- 05_bank_switch.md (expansion via bus)

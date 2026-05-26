@@ -1,136 +1,121 @@
-# RV8-GR — Bank Switch (Run Code from RAM)
+# RV8-GR — Bank Switch (Memory Expansion via Bus)
 
-**+1 chip (74HC86). Enables loading and running programs from RAM.**
+**CPU board: 29 chips, unchanged. Expansion plugs into address bus.**
 
 ---
 
-## How it works:
+## Current Memory Map (no expansion)
 
+    $0000-$7FFF  RAM 62256 (32KB), /CE = A15
+    $8000-$FFFF  ROM SST39SF010A (32KB visible), /CE = /A15
+
+    Data access during T2: address = $00xx (A8-A15 muxed to GND)
+    → only 256 bytes of RAM accessible for data ($0000-$00FF)
+
+---
+
+## ROM Expansion (32KB → 128KB)
+
+SST39SF010A has 17 address lines (A0-A16 = 128KB).
+CPU uses A0-A14 (32KB). A15 is used for /CE. A16 is NC.
+
+**Expansion board** (1 chip: 74HC574 latch):
+
+    CPU writes bank number to RAM[$FF] → expansion board latches D0 → ROM A16
+
+    ROM A16 = 0: lower 32KB of flash (bank 0)
+    ROM A16 = 1: upper 32KB of flash (bank 1)
+
+Software:
 ```
-BANK=0 (boot, default):
-  Fetch: PC → ROM ($8000+)
-  Data:  operand → RAM ($0000+)
-  Registers: $0000-$0007 (safe in RAM)
-
-BANK=1 (after loading program):
-  Fetch: PC XOR'd → RAM ($0100+)
-  Data:  operand → RAM ($0000+) (unchanged!)
-  Registers: $0000-$0007 (still safe, data path unchanged)
-```
-
-## Hardware:
-
-```
-U22 (74HC86, new chip):
-  Gate 1: PC_A15 XOR BANK → address bus A15 (during fetch only)
-  Gates 2-4: spare
-
-BANK bit: stored in U20 spare FF (or U14 spare bit)
-  Set by: special control byte (e.g., $03 = JUMP + BRANCH = "set bank + jump")
-  Clear by: reset (/RST clears BANK to 0)
-```
-
-## Memory map (BANK=1):
-
-```
-RAM:
-  $0000-$0007: registers (always, data path)
-  $0008-$00FF: stack + variables (data path)
-  $0100-$7FFF: user program (fetch path, loaded from SD/PC)
-
-ROM:
-  $8000-$FFFF: boot loader + system routines
-  (still accessible via BANK=0 or system call)
+LI $01          ; select bank 1
+MV $FF, a0      ; write to $00FF → expansion latch captures D0
+; now ROM $8000-$FFFF shows upper 32KB of 128KB flash
 ```
 
-## Boot sequence:
-
+Hardware on expansion board:
 ```
-1. Power on → BANK=0, PC=$8000 (ROM)
-2. ROM boot code initializes hardware
-3. ROM code reads program from SD (via Programmer board I/O)
-4. ROM code writes program to RAM at $0100+
-5. ROM code sets BANK=1
-6. ROM code jumps to $8100 (XOR'd = $0100 in RAM)
-7. User program runs from RAM!
-8. User program can call ROM routines by: clear BANK, call, set BANK
+Address decode: A0-A7 = $FF AND ADDR_MODE=1 AND /AC_BUF=0 → latch CLK
+74HC574 pin11(CLK) ← decode output
+74HC574 pin2(D1) ← D0 (DBUS)
+74HC574 pin19(Q1) → ROM A16
 ```
 
-## Calling ROM from RAM:
+---
 
-```asm
-; In RAM program, need to call ROM routine:
-    ; Save BANK state, clear BANK, call ROM, restore BANK
-    ; Simplified: use a "syscall" trap that ROM handles
-    li    $FF         ; syscall number
-    j     $80        ; jump to syscall handler (in ROM, BANK=0 area)
+## RAM Expansion (256B data → 32KB data)
+
+During T2 data access, A8-A14 = GND (from U29-U30 B-inputs).
+Replace GND with a latch to select RAM pages.
+
+**Expansion board** (1 chip: 74HC574 latch):
+
+    CPU writes page number to RAM[$FE] → expansion board latches D[6:0] → RAM A8-A14
+
+    Page 0: RAM $0000-$00FF (registers + stack)
+    Page 1: RAM $0100-$01FF
+    ...
+    Page 127: RAM $7F00-$7FFF
+
+Software:
+```
+LI $05          ; select page 5
+MV $FE, a0      ; write to $00FE → expansion latch captures D[6:0]
+; now data access reads/writes RAM page 5 ($0500-$05FF)
 ```
 
-Actually simpler: ROM routines at $0000-$00FF are in RAM space too. Put a **jump table** at $00F0-$00FF in RAM that ROM fills at boot:
-
+Hardware on expansion board:
 ```
-RAM[$F0] = jump to print_char (in ROM)
-RAM[$F2] = jump to read_key (in ROM)
+Address decode: A0-A7 = $FE AND ADDR_MODE=1 AND /AC_BUF=0 → latch CLK
+74HC574 pin11(CLK) ← decode output
+74HC574 pin2-8(D1-D7) ← D0-D6 (DBUS)
+74HC574 pin19-13(Q1-Q7) → override U29/U30 B-inputs (cut GND, insert latch)
+```
+
+**Note**: Changing page loses access to registers ($00-$07) unless page 0 is active.
+Convention: always return to page 0 before accessing registers.
+
+---
+
+## Safe Register Scheme (optional)
+
+Split RAM address space so registers are always accessible:
+
+    $00-$07: always page 0 (registers) — hardwire A8-A14=0 for these addresses
+    $08-$FF: banked (page selectable)
+
+Requires 1 extra gate on expansion board:
+```
+If A0-A7 < $08: force A8-A14 = 0 (bypass page latch)
+If A0-A7 >= $08: use page latch for A8-A14
+```
+
+---
+
+## Execute from RAM
+
+PC in $0000-$7FFF fetches from RAM (A15=0 → RAM /CE=0).
+No expansion needed — works with base CPU board.
+
+To load and run a program from RAM:
+```
+; In ROM ($8000+): loader copies program to RAM
+LI $42          ; example: write instruction bytes to RAM
+MV $00, a0      ; RAM[$0000] = $42 (first byte of program)
 ...
+; Jump to RAM:
+SETPG $00       ; page = $00
+J $00           ; PC = $0000 → fetches from RAM
 ```
-
-User program calls: `j $F0` → executes jump table → reaches ROM routine.
-
-## Chip count:
-
-```
-RV8-GR base: 21 logic chips
-+ U22 (74HC86): bank switch XOR = +1
-Total: 22 logic chips + ROM + RAM = 24 packages
-```
-
-## Revised comparison:
-
-| Feature | Without bank | With bank (+1 chip) |
-|---------|:---:|:---:|
-| Run from ROM | ✅ | ✅ |
-| Run from RAM | ❌ | ✅ |
-| Load from SD | ❌ | ✅ |
-| Registers safe | ✅ | ✅ |
-| Chips | 21 | **22** |
-| Total | 23 | **24** |
-
-## Optional — not required for basic build. Add later when SD card support is needed.
 
 ---
 
-## PREFERRED: Bank switch on TRAINER BOARD (not CPU board)
+## Summary
 
-**CPU board stays at 21 chips. Bank switch lives on Trainer board.**
+| Expansion | Chips on expansion board | Result |
+|-----------|:------------------------:|--------|
+| ROM bank (A16) | 1× 74HC574 + decode | 128KB ROM (2 × 32KB) |
+| RAM pages (A8-A14) | 1× 74HC574 + decode | 32KB data (128 × 256B) |
+| Execute from RAM | 0 (built-in) | PC < $8000 → RAM |
 
-```
-CPU Board (21 chips, pure, simple):
-  PC → A[15:0] → RV8-Bus (no bank logic)
-
-Trainer Board (via RV8-Bus):
-  Intercepts A15 on bus
-  XOR(A15, BANK) → routes to ROM/RAM
-  BANK flip-flop set by I/O write ($FF00)
-  SD card (SPI) for loading programs
-  LEDs, step button, etc.
-```
-
-### How CPU sets BANK (via I/O write on bus):
-```asm
-li    $01
-sb    $FF         ; write to Trainer I/O address → BANK=1
-j     $00         ; PC=$8100, XOR'd by Trainer → fetches from RAM $0100
-```
-
-### Why this is better:
-- CPU board is universal (works with or without Trainer)
-- No CPU hardware change for bank switch
-- Trainer board adds features non-invasively via bus
-- Same CPU board works with Programmer board (no bank needed)
-- SD card, bank switch, LEDs all on one expansion board
-
-### Memorize for future Trainer board design:
-- Bank switch XOR on A15 (1 gate from 74HC86)
-- BANK flip-flop (1 FF from 74HC74) set by bus write to $FF00
-- SD card SPI interface (directly on Trainer board)
-- Load sequence: Trainer reads SD → writes to RAM via bus → sets BANK → releases CPU
+**CPU board stays at 29 chips. All expansion on the bus.**

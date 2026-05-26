@@ -1,28 +1,31 @@
 # RV8 Project — Changelog
 
-## RV8-GR v1.0 — 2026-05-17
-- Verilog model: 11/11 unit tests pass
-- Assembler: rv8gr_asm.py (all 21 instructions, labels, .org)
-- Assembly integration test: full pipeline verified (asm→bin→CPU→correct results)
-- VCD waveform dump for gtkwave
-- Full doc set: design, ISA reference, instruction trace, WiringGuide, understand_by_module
-- Bank switch design (for Trainer board, future)
-- Honest chip count: 21 logic + ROM + RAM = 23 packages
+## 2026-05-27 — RV8-GR Complete Redesign (v2.0)
 
-## RV8 v0.5 — 2026-05-16
-- Microcode-driven Verilog (8/8 pass)
-- Microcode generator (Python)
-- WiringGuide (bus-centric, 27 chips)
-- Understand by Module (Thai + English)
+- **Architecture**: 29 logic chips, full 64K, A15 chip select, execute from RAM
+- **ISA**: 15 instructions (XORI=$70, XOR=$78, SETPG=$20, SETPG_R=$28)
+- **Removed**: hardware JAL (software subroutine only)
+- **Added**: Page Register (16-bit jump), ring counter (74HC164)
+- **Fixed**: XOR data path, bus conflicts, U7 DIR gating, address mux 16-bit
+- **Verilog**: rv8gr_cpu.v — ALL TESTS PASSED (127 cycles)
+- **Docs**: Construct.md (pin-level), ISA ref, traces, wiring, modules (Thai), bank switch
 
-## RV8-R v0.1 — 2026-05-16
-- Design + instruction trace (18 chips verified)
-- WiringGuide (bus-centric)
+## 2026-05-16 — RV8-GR Initial Design (v1.0)
 
-## RV8-G v0.1 — 2026-05-16
-- Design + trace verification (28 chips)
-- WiringGuide (bus-centric)
+- 21 logic chips, ROM at $8000, 256-byte jump range
+- Verilog 11/11 tests pass
+- Assembler (rv8gr_asm.py)
+- Full doc set (design, ISA, trace, wiring, modules, bank switch)
 
-## Programmer Board v1.0 — 2026-05-14
-- ESP32 + TXB0108 level shifters
-- PROG mode + RUN mode (UART terminal)
+## 2026-05-15 — RV8 Family Architecture
+
+- RV8: 27 chips, microcode, Verilog 8/8 pass
+- RV8-R: 18 chips concept
+- RV8-G: 28 chips concept
+- RV8-GR: 21 chips concept
+
+## 2026-05-10 to 2026-05-14 — Project Start
+
+- Original designs explored and archived
+- Programmer board (ESP32 + TXB0108) complete
+- Reference study: Gigatron, SAP-1, Nand2Tetris

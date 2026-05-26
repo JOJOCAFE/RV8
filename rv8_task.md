@@ -1,64 +1,45 @@
 # RV8 Project — Task Tracker
 
-**Last updated**: 2026-05-17 00:17
-**Focus**: RV8-GR — READY FOR PHYSICAL BUILD
+**Last updated**: 2026-05-27
+**Focus**: RV8-GR — REDESIGNED, VERIFIED, READY FOR BUILD
 
 ---
 
 ## ✅ Completed (RV8-GR)
 
-- [x] Design (21 chips, traced, verified)
-- [x] ISA (21 instructions, control byte encoding)
-- [x] Verilog model (11/11 pass)
-- [x] Assembly integration test (full pipeline pass)
-- [x] Assembler (rv8gr_asm.py)
-- [x] WiringGuide (bus-centric, no conflicts)
-- [x] Instruction trace (verified every signal)
-- [x] Understand by Module (4 modules)
-- [x] ISA reference (with control byte table)
-- [x] Bank switch design (Trainer board, future)
-- [x] VCD waveform support
+- [x] Architecture redesign (29 chips, full 64K, A15 chip select)
+- [x] ISA (15 instructions, verified encodings, no conflicts)
+- [x] Construct.md (pin-level wiring, bus-centric, source of truth)
+- [x] Verilog model (rv8gr_cpu.v, all tests pass, 127 cycles)
+- [x] Testbench (tb_rv8gr_full.v, all ISA + 64K jump + subroutine)
+- [x] Instruction trace (7 pin-level traces + 27-step test program)
+- [x] Wiring guide (signal routing quick reference)
+- [x] Module guide (Thai, 8 modules)
+- [x] ISA reference (encoding + derived signals + IBUS rules)
+- [x] Design document (architecture + data path + key decisions)
+- [x] Bank switch doc (ROM/RAM expansion via bus)
 
 ---
 
-## ⬜ TODO — Physical Build
+## ⬜ TODO — Next Steps
 
 | # | Task | Priority |
 |:-:|------|:--------:|
-| 1 | Order parts (~฿575) | **NOW** |
-| 2 | Build Programmer board (ESP32 + TXB0108) | **NOW** |
-| 3 | Build RV8-GR on breadboard | HIGH |
-| 4 | Flash test program to ROM | HIGH |
-| 5 | First LED blink / Fibonacci | HIGH |
-| 6 | Debug (compare scope with VCD waveform) | MEDIUM |
-
-## ⬜ TODO — After Hardware Works
-
-| Task | Priority |
-|------|:--------:|
-| BASIC interpreter (in ROM) | MEDIUM |
-| Trainer board (LEDs, step, SD, bank switch) | MEDIUM |
-| Video circuit (Apple II style) | LOW |
-| Thai documentation (labs) | LOW |
+| 1 | Assembler (Python, .asm → .bin) | HIGH |
+| 2 | Order parts (29 chips + ROM + RAM) | HIGH |
+| 3 | Build Programmer board (ESP32) | HIGH |
+| 4 | Build RV8-GR on breadboard | HIGH |
+| 5 | First program on real hardware | HIGH |
+| 6 | BASIC interpreter (ROM) | MEDIUM |
+| 7 | Simple game (ROM) | MEDIUM |
+| 8 | PCB layout (KiCad) | LOW |
 
 ---
 
-## Parts List (RV8-GR)
+## Other Variants
 
-| Part | Qty | Source |
-|------|:---:|--------|
-| 74HC574 (DIP-20) | 3 | บ้านหม้อ |
-| 74HC283 (DIP-16) | 2 | Mouser/Shopee |
-| 74HC86 (DIP-14) | 2 | บ้านหม้อ |
-| 74HC157 (DIP-16) | 4 | บ้านหม้อ |
-| 74HC161 (DIP-16) | 5 | บ้านหม้อ |
-| 74HC541 (DIP-20) | 2 | Shopee |
-| 74HC245 (DIP-20) | 1 | บ้านหม้อ |
-| 74HC74 (DIP-14) | 1 | บ้านหม้อ |
-| 74HC32 (DIP-14) | 1 | บ้านหม้อ |
-| SST39SF010A (PDIP-32) | 1 | Mouser |
-| 62256 (DIP-28) | 1 | Shopee |
-| Crystal 3.5MHz | 1 | บ้านหม้อ |
-| Breadboard ×2 | 2 | Shopee |
-| LED + 330Ω ×10 | 10 | บ้านหม้อ |
-| **Total** | | **~฿575** |
+| Variant | Status |
+|---------|--------|
+| RV8 (27 chips) | ✅ Designed, Verilog pass, docs done |
+| RV8-R (18 chips) | ⬜ Concept only |
+| RV8-G (28 chips) | ⬜ Concept only |

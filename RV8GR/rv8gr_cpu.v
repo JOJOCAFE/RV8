@@ -1,122 +1,98 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// 21 logic chips, no microcode, 3-cycle execution
-// AC (accumulator) hardwired to ALU A, registers in RAM ($00-$07)
+// Matches Construct.md: 29 logic chips, A15-based chip select
+// Memory: ROM $8000-$FFFF, RAM $0000-$7FFF, PC starts $8000
+// 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 
 module rv8gr_cpu (
-    input  wire        clk,
-    input  wire        rst_n,
-    output reg  [15:0] addr_bus,
-    output reg         rom_ce_n,
-    output reg         ram_ce_n,
-    output reg         ram_we_n,
-    inout  wire [7:0]  data_bus,
-    output wire        halted
+    input  wire clk,
+    input  wire rst_n,
+    output wire halted
 );
-
-    // State counter: 2-bit, 3 states (00, 01, 10)
-    localparam STATE_FETCH_CTRL = 2'b00;
-    localparam STATE_FETCH_OPER = 2'b01;
-    localparam STATE_EXECUTE    = 2'b10;
+    localparam T0 = 2'd0, T1 = 2'd1, T2 = 2'd2;
 
     reg [1:0]  state;
     reg [15:0] pc;
-    reg [7:0]  ac;
-    reg [7:0]  ir_high;
-    reg [7:0]  ir_low;
-    reg        z_flag;
-    reg        halt;
+    reg [7:0]  ac, ir_high, ir_low, page_reg;
+    reg        z_flag, halt;
 
-    // Control byte decode
-    wire alu_sub     = ir_high[7];
-    wire xor_mode    = ir_high[6];
-    wire mux_sel     = ir_high[5];
-    wire ac_wr       = ir_high[4];
+    // Memory: ROM at $8000-$FFFF, RAM at $0000-$7FFF
+    reg [7:0] rom [0:32767];
+    reg [7:0] ram [0:32767];
+
+    // Control decode
+    wire alu_sub = ir_high[7];
+    wire xor_mode = ir_high[6];
+    wire mux_sel = ir_high[5];
+    wire ac_wr = ir_high[4];
     wire source_type = ir_high[3];
-    wire store       = ir_high[2];
-    wire branch      = ir_high[1];
-    wire jump        = ir_high[0];
+    wire store = ir_high[2];
+    wire branch = ir_high[1];
+    wire jump = ir_high[0];
 
-    // ROM and RAM
-    reg [7:0] rom [0:65535];
-    reg [7:0] ram [0:255];
+    // Derived
+    wire z_match = z_flag ^ alu_sub;
+    wire br_taken = branch & z_match;
+    wire pc_load = jump | br_taken;
+    wire pg_load = mux_sel & ~ac_wr;
 
-    // Data bus (active low accent)
-    reg [7:0] data_out;
-    reg       data_oe;
-    assign data_bus = data_oe ? data_out : 8'bz;
+    // Memory read (fetch): A15 selects ROM or RAM
+    wire [7:0] mem_read = pc[15] ? rom[pc[14:0]] : ram[pc[14:0]];
+
+    // IBUS during T2: data access always at $00xx (RAM low page)
+    wire [7:0] ibus = source_type ? ram[{7'b0, ir_low}] : ir_low;
+
+    // ALU
+    wire [7:0] xor_b = xor_mode ? ac : {8{alu_sub}};
+    wire [7:0] xor_out = ibus ^ xor_b;
+    wire [8:0] adder_full = {1'b0, ac} + {1'b0, xor_out} + {8'b0, alu_sub};
+    wire [7:0] adder_sum = adder_full[7:0];
+    wire [7:0] ac_mux = mux_sel ? xor_out : adder_sum;
+
+    // Halt: J to self
+    wire is_halt = jump & ~branch & ~store & ~ac_wr &
+                   (ir_low == (pc[7:0] - 8'd2)) & (page_reg == pc[15:8]);
+
     assign halted = halt;
-
-    // Combinational: IBUS value during execute
-    wire [7:0] ibus = source_type ? ram[ir_low] : ir_low;
-
-    // ALU combinational
-    wire [7:0] xor_b = alu_sub ? (ibus ^ 8'hFF) : ibus;
-    wire [7:0] adder_result = ac + xor_b + {7'b0, alu_sub};
-    wire [7:0] xor_result = ac ^ ibus;
-    wire [7:0] alu_result = xor_mode ? xor_result : adder_result;
-    wire [7:0] ac_d_input = mux_sel ? ibus : alu_result;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            state <= STATE_FETCH_CTRL;
+            state <= T0;
             pc <= 16'h8000;
             ac <= 8'h00;
             ir_high <= 8'h00;
             ir_low <= 8'h00;
+            page_reg <= 8'h80;  // start in ROM page
             z_flag <= 1'b1;
             halt <= 1'b0;
-            data_oe <= 1'b0;
-            data_out <= 8'h00;
-            addr_bus <= 16'h0000;
-            rom_ce_n <= 1'b1;
-            ram_ce_n <= 1'b1;
-            ram_we_n <= 1'b1;
         end else if (!halt) begin
             case (state)
-                STATE_FETCH_CTRL: begin
-                    ir_high <= rom[pc[15:0] - 16'h8000];
+                T0: begin
+                    ir_high <= mem_read;
                     pc <= pc + 1;
-                    state <= STATE_FETCH_OPER;
+                    state <= T1;
                 end
-
-                STATE_FETCH_OPER: begin
-                    ir_low <= rom[pc[15:0] - 16'h8000];
+                T1: begin
+                    ir_low <= mem_read;
                     pc <= pc + 1;
-                    state <= STATE_EXECUTE;
+                    state <= T2;
                 end
-
-                STATE_EXECUTE: begin
-                    // ECALL (halt)
-                    if (ir_high == 8'h00 && ir_low == 8'h00) begin
-                        halt <= 1'b1;
-                    end else begin
-                        // Store: write AC to RAM
-                        if (store)
-                            ram[ir_low] <= ac;
-
-                        // AC write
-                        if (ac_wr) begin
-                            ac <= ac_d_input;
-                            z_flag <= (ac_d_input == 8'h00);
-                        end
-
-                        // Branch: ALU_SUB inverts condition (BEQ: Z=1, BNE: Z=0)
-                        if (branch) begin
-                            if (z_flag ^ alu_sub)
-                                pc <= {8'h80, ir_low};
-                        end
-
-                        // Jump: unconditional
-                        if (jump)
-                            pc <= {8'h80, ir_low};
+                T2: begin
+                    if (store)
+                        ram[{7'b0, ir_low}] <= ac;
+                    if (ac_wr) begin
+                        ac <= ac_mux;
+                        z_flag <= (ac_mux == 8'h00);
                     end
-
-                    state <= STATE_FETCH_CTRL;
+                    if (pg_load)
+                        page_reg <= ibus;
+                    if (pc_load)
+                        pc <= {page_reg, ir_low};
+                    if (is_halt)
+                        halt <= 1'b1;
+                    state <= T0;
                 end
-
-                default: state <= STATE_FETCH_CTRL;
+                default: state <= T0;
             endcase
         end
     end
-
 endmodule
