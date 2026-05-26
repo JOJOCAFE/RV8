@@ -21,18 +21,20 @@
 
 ---
 
-## ⬜ TODO — Next Steps
+## ⬜ TODO — Roadmap to Physical Build
 
-| # | Task | Priority |
-|:-:|------|:--------:|
-| 1 | Assembler (Python, .asm → .bin) | HIGH |
-| 2 | Order parts (29 chips + ROM + RAM) | HIGH |
-| 3 | Build Programmer board (ESP32) | HIGH |
-| 4 | Build RV8-GR on breadboard | HIGH |
-| 5 | First program on real hardware | HIGH |
-| 6 | BASIC interpreter (ROM) | MEDIUM |
-| 7 | Simple game (ROM) | MEDIUM |
-| 8 | PCB layout (KiCad) | LOW |
+| # | Task | Priority | Notes |
+|:-:|------|:--------:|-------|
+| 1 | ~~Assembler~~ | ✅ DONE | rv8gr_asm.py, labels, macros, .bin |
+| 2 | ~~Test ROM image~~ | ✅ DONE | testrom.bin, 10 tests, 187 cycles |
+| 3 | Parts list (exact part numbers) | **NOW** | DIP packages, speed grades |
+| 4 | Programmer board test | **NOW** | Verify ESP32 flashes SST39SF010A |
+| 5 | Breadboard layout plan | HIGH | 4-5 boards, bus routing |
+| 6 | Physical build | HIGH | Module by module, test each stage |
+| 7 | First program on hardware | HIGH | LED blink or counter |
+| 8 | BASIC interpreter | MEDIUM | Threaded interpreter in ROM |
+| 9 | Simple game | MEDIUM | Pong-style, ROM only |
+| 10 | PCB layout (KiCad) | LOW | After breadboard verified |
 
 ---
 

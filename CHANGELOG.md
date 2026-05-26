@@ -8,6 +8,8 @@
 - **Added**: Page Register (16-bit jump), ring counter (74HC164)
 - **Fixed**: XOR data path, bus conflicts, U7 DIR gating, address mux 16-bit
 - **Verilog**: rv8gr_cpu.v — ALL TESTS PASSED (127 cycles)
+- **Assembler**: rv8gr_asm.py — labels, macros, .bin output
+- **Test ROM**: testrom.bin — 10 test groups, 187 cycles, ALL PASS
 - **Docs**: Construct.md (pin-level), ISA ref, traces, wiring, modules (Thai), bank switch
 
 ## 2026-05-16 — RV8-GR Initial Design (v1.0)

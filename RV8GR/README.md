@@ -95,3 +95,17 @@ gtkwave rv8gr_test.vcd
 - ✅ Expandable (ROM bank, RAM pages via bus)
 - ⬜ Assembler
 - ⬜ Physical build
+
+---
+
+## Roadmap to Physical Build
+
+| # | Task | Status | Notes |
+|:-:|------|:------:|-------|
+| 1 | Assembler (Python) | ✅ | labels, macros, .bin output |
+| 2 | Test ROM image (.bin) | ✅ | 10 test groups, 187 cycles pass |
+| 3 | Parts list | ⬜ | Exact part numbers, DIP packages |
+| 4 | Programmer board test | ⬜ | Verify ESP32 can flash SST39SF010A |
+| 5 | Breadboard layout plan | ⬜ | 4-5 boards, minimize wire length |
+| 6 | Physical build | ⬜ | Module by module, test each stage |
+| 7 | First program running | ⬜ | LED blink or counter on real hardware |

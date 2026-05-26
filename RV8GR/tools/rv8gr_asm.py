@@ -1,195 +1,229 @@
 #!/usr/bin/env python3
-"""RV8-GR Assembler — translates RISC-V-like assembly to binary."""
+"""RV8-GR Assembler — .asm → .bin
+Usage: python3 rv8gr_asm.py input.asm [-o output.bin] [-f hex|bin]
+"""
 
-import sys, re
+import sys, re, argparse
 
-# Control byte bit positions
-ALU_SUB    = 0x80
-XOR_MODE   = 0x40
-MUX_SEL    = 0x20
-AC_WR      = 0x10
-SOURCE_TYPE= 0x08
-STORE      = 0x04
-BRANCH     = 0x02
-JUMP       = 0x01
-
-# Register names → RAM addresses
-REGS = {'zero':0,'r0':0, 'a0':1,'r1':1, 'a1':2,'r2':2,
-         't0':3,'r3':3, 't1':4,'r4':4, 's0':5,'r5':5,
-         's1':6,'r6':6, 'sp':7,'ra':7,'r7':7}
-
-# Instruction definitions: mnemonic → (control_byte, operand_type)
-# operand_type: 'imm'=immediate, 'reg'=register addr, 'addr'=target address, 'none'=0
-INSTRUCTIONS = {
-    'li':    (MUX_SEL | AC_WR, 'imm'),
-    'addi':  (AC_WR, 'imm'),
-    'subi':  (ALU_SUB | AC_WR, 'imm'),
-    'xori':  (XOR_MODE | AC_WR, 'imm'),
-    'add':   (AC_WR | SOURCE_TYPE, 'reg'),
-    'sub':   (ALU_SUB | AC_WR | SOURCE_TYPE, 'reg'),
-    'xor':   (XOR_MODE | AC_WR | SOURCE_TYPE, 'reg'),
-    'mv_to': (STORE, 'reg'),          # MV rd, a0 (store AC to register)
-    'mv_from':(MUX_SEL | AC_WR | SOURCE_TYPE, 'reg'),  # MV a0, rs
-    'lb':    (MUX_SEL | AC_WR | SOURCE_TYPE, 'addr'),   # LB a0, [addr]
-    'sb':    (STORE, 'addr'),          # SB a0, [addr]
-    'beq':   (BRANCH, 'addr'),
-    'bne':   (ALU_SUB | BRANCH, 'addr'),  # SUB bit as invert for BNE
-    'j':     (JUMP, 'addr'),
-    'jal':   (AC_WR | JUMP, 'addr'),  # saves PC to AC (simplified)
-    'nop':   (0x00, 'none'),
-    'hlt':   (JUMP, 'none'),           # jump to self
-    'sll':   (AC_WR | SOURCE_TYPE, 'self'),  # ADD a0, a0 (shift left)
+# Opcode table: mnemonic → control byte
+OPCODES = {
+    'NOP':     0x00,
+    'ADDI':    0x10,
+    'ADD':     0x18,
+    'SUBI':    0x90,
+    'SUB':     0x98,
+    'XORI':    0x70,
+    'XOR':     0x78,
+    'LI':      0x30,
+    'LB':      0x38,
+    'MV':      None,  # special: MV a0,rs ($38) or MV rd,a0 ($04)
+    'SB':      0x04,
+    'BEQ':     0x02,
+    'BNE':     0x82,
+    'J':       0x01,
+    'JMP':     None,  # macro: SETPG hi + J lo
+    'SETPG':   0x20,
+    'SETPG_R': 0x28,
+    'HLT':     None,  # macro: J self
+    'CALL':    None,  # macro
+    'RET':     None,  # macro
 }
 
-def parse_operand(op_str, op_type, labels, current_addr):
-    """Parse operand string to byte value."""
-    op_str = op_str.strip()
-    if op_type == 'none':
-        return current_addr & 0xFF  # HLT: jump to self (low byte)
-    if op_type == 'self':
-        return REGS.get('a0', 1)  # SLL = ADD a0, a0 → read a0 from RAM[$01]
-    if op_type == 'imm':
-        return parse_number(op_str)
-    if op_type == 'reg':
-        if op_str in REGS:
-            return REGS[op_str]
-        return parse_number(op_str)
-    if op_type == 'addr':
-        if op_str in labels:
-            return labels[op_str] & 0xFF
-        return parse_number(op_str)
-    return 0
-
-def parse_number(s, mask=0xFF):
-    """Parse number: $FF, 0xFF, 0b1010, or decimal."""
-    s = s.strip()
+def parse_value(s, labels, pc):
+    """Parse numeric value or label."""
+    s = s.strip().rstrip(',')
+    if s in labels:
+        return labels[s]
     if s.startswith('$'):
-        return int(s[1:], 16) & mask
+        return int(s[1:], 16)
     if s.startswith('0x'):
-        return int(s, 16) & mask
-    if s.startswith('0b'):
-        return int(s, 2) & mask
-    return int(s) & mask
+        return int(s, 16)
+    if s.startswith('%'):
+        return int(s[1:], 2)
+    if s.startswith("hi(") and s.endswith(")"):
+        v = parse_value(s[3:-1], labels, pc)
+        return (v >> 8) & 0xFF
+    if s.startswith("lo(") and s.endswith(")"):
+        v = parse_value(s[3:-1], labels, pc)
+        return v & 0xFF
+    return int(s)
 
-def assemble(source, org=0x8000):
-    """Assemble source code to binary."""
-    lines = source.strip().split('\n')
+def assemble(source, base_addr=0x8000):
+    lines = source.split('\n')
     labels = {}
-    instructions = []
-    addr = org
+    code = []  # list of (pc, bytes, source_line)
 
-    # Pass 1: collect labels
+    # Pass 1: collect labels and calculate addresses
+    pc = base_addr
     for line in lines:
-        line = line.split(';')[0].strip()  # remove comments
+        line = line.split(';')[0].strip()
         if not line:
             continue
         if line.endswith(':'):
-            labels[line[:-1]] = addr
+            labels[line[:-1]] = pc
             continue
-        # Count instruction (2 bytes each)
-        parts = line.split(None, 1)
-        mnemonic = parts[0].lower()
-        if mnemonic in INSTRUCTIONS:
-            addr += 2
-        elif mnemonic == 'mv':
-            addr += 2
-        elif mnemonic == '.org':
-            addr = parse_number(parts[1], 0xFFFF)
+        # Count bytes this instruction will produce
+        parts = line.split()
+        mnem = parts[0].upper()
+        if mnem == 'JMP':
+            pc += 4  # SETPG + J
+        elif mnem == 'HLT':
+            pc += 2
+        elif mnem == 'CALL':
+            pc += 8  # LI + SB + SETPG + J
+        elif mnem == 'RET':
+            pc += 4  # SETPG + J (assembler fills return addr)
+        elif mnem == '.ORG':
+            pc = parse_value(parts[1], labels, pc)
+        elif mnem == '.DB':
+            pc += len(parts) - 1
+        else:
+            pc += 2
 
-    # Pass 2: generate bytes
-    addr = org
-    output = []
-    for line in lines:
+    # Pass 2: generate code
+    pc = base_addr
+    for line_num, line in enumerate(lines, 1):
+        orig = line
         line = line.split(';')[0].strip()
         if not line or line.endswith(':'):
-            continue
-        parts = line.split(None, 1)
-        mnemonic = parts[0].lower()
-        operand_str = parts[1] if len(parts) > 1 else ''
-
-        if mnemonic == '.org':
-            addr = parse_number(operand_str, 0xFFFF)
+            if line.endswith(':'):
+                pc = labels[line[:-1]]
             continue
 
-        # Handle MV (two forms)
-        if mnemonic == 'mv':
-            args = [a.strip() for a in operand_str.split(',')]
-            if args[0].lower() in ('a0', 'r1') or args[0].lower() == 'a0':
-                # MV a0, rs → load from register
-                mnemonic = 'mv_from'
-                operand_str = args[1]
+        parts = line.split()
+        mnem = parts[0].upper()
+
+        if mnem == '.ORG':
+            pc = parse_value(parts[1], labels, pc)
+            continue
+
+        if mnem == '.DB':
+            for b in parts[1:]:
+                code.append((pc, [parse_value(b, labels, pc) & 0xFF], orig))
+                pc += 1
+                orig = ''
+            continue
+
+        if mnem == 'HLT':
+            lo = pc & 0xFF
+            code.append((pc, [0x01, lo], orig))
+            pc += 2
+            continue
+
+        if mnem == 'JMP':
+            # JMP label → SETPG hi(label) + J lo(label)
+            target = parse_value(parts[1], labels, pc)
+            hi = (target >> 8) & 0xFF
+            lo = target & 0xFF
+            code.append((pc, [0x20, hi, 0x01, lo], orig))
+            pc += 4
+            continue
+
+        if mnem == 'CALL':
+            # CALL label → LI lo(ret) + SB $07 + SETPG hi(target) + J lo(target)
+            target = parse_value(parts[1], labels, pc)
+            ret_addr = pc + 8  # return point is after CALL
+            code.append((pc, [
+                0x30, ret_addr & 0xFF,       # LI lo(return)
+                0x04, 0x07,                   # MV $07, a0
+                0x20, (target >> 8) & 0xFF,   # SETPG hi(target)
+                0x01, target & 0xFF,          # J lo(target)
+            ], orig))
+            pc += 8
+            continue
+
+        if mnem == 'RET':
+            # RET → SETPG ret_page + J ret_lo (caller must set RAM[6]=page, RAM[7]=lo)
+            # Simple version: assembler needs return label
+            if len(parts) > 1:
+                target = parse_value(parts[1], labels, pc)
+                code.append((pc, [0x20, (target >> 8) & 0xFF, 0x01, target & 0xFF], orig))
             else:
-                # MV rd, a0 → store to register
-                mnemonic = 'mv_to'
-                operand_str = args[0]
-
-        if mnemonic not in INSTRUCTIONS:
-            print(f"ERROR: unknown instruction '{mnemonic}' at ${addr:04X}")
+                # Generic RET using SETPG_R + J (needs indirect — not supported)
+                # Fallback: emit placeholder
+                code.append((pc, [0x28, 0x06, 0x01, 0x00], orig + " ; WARNING: needs known return"))
+            pc += 4
             continue
 
-        ctrl, op_type = INSTRUCTIONS[mnemonic]
-        operand = parse_operand(operand_str, op_type, labels, addr)
+        # Regular 2-byte instructions
+        if mnem == 'MV':
+            # MV a0, $xx → LB ($38) or MV $xx, a0 → SB ($04)
+            args = ' '.join(parts[1:]).replace(' ', '')
+            if args.startswith('a0,') or args.startswith('A0,'):
+                # MV a0, rs
+                operand = parse_value(args.split(',')[1], labels, pc)
+                code.append((pc, [0x38, operand & 0xFF], orig))
+            else:
+                # MV rd, a0
+                operand = parse_value(args.split(',')[0], labels, pc)
+                code.append((pc, [0x04, operand & 0xFF], orig))
+            pc += 2
+            continue
 
-        output.append((addr, ctrl, operand))
-        addr += 2
+        opcode = OPCODES.get(mnem)
+        if opcode is None:
+            print(f"ERROR line {line_num}: unknown mnemonic '{mnem}'", file=sys.stderr)
+            sys.exit(1)
 
-    return output, labels
-
-def write_bin(output, filename, org=0x8000, size=0x8000):
-    """Write binary file (fills with NOP=$00)."""
-    data = bytearray(size)
-    for addr, ctrl, operand in output:
-        offset = addr - org
-        if 0 <= offset < size - 1:
-            data[offset] = ctrl
-            data[offset + 1] = operand
-    with open(filename, 'wb') as f:
-        f.write(data)
-
-def write_hex(output, filename):
-    """Write hex listing."""
-    with open(filename, 'w') as f:
-        for addr, ctrl, operand in output:
-            f.write(f"${addr:04X}: {ctrl:02X} {operand:02X}\n")
-
-# === MAIN ===
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <source.asm> [-o output.bin] [-hex output.hex]")
-        print(f"\nExample:")
-        print(f"  {sys.argv[0]} test.asm -o test.bin")
-        sys.exit(1)
-
-    src_file = sys.argv[1]
-    bin_file = None
-    hex_file = None
-
-    i = 2
-    while i < len(sys.argv):
-        if sys.argv[i] == '-o' and i+1 < len(sys.argv):
-            bin_file = sys.argv[i+1]; i += 2
-        elif sys.argv[i] == '-hex' and i+1 < len(sys.argv):
-            hex_file = sys.argv[i+1]; i += 2
+        if len(parts) > 1:
+            operand = parse_value(parts[1], labels, pc) & 0xFF
         else:
-            i += 1
+            operand = 0x00
 
-    with open(src_file) as f:
+        code.append((pc, [opcode, operand], orig))
+        pc += 2
+
+    return code, labels
+
+def make_bin(code, base_addr=0x8000, size=32768):
+    """Create binary image (32KB ROM at base_addr)."""
+    rom = bytearray(size)
+    for pc, bytes_list, _ in code:
+        for i, b in enumerate(bytes_list):
+            offset = (pc + i) - base_addr
+            if 0 <= offset < size:
+                rom[offset] = b
+    return rom
+
+def make_hex(code):
+    """Create hex listing."""
+    out = []
+    for pc, bytes_list, src in code:
+        hex_str = ' '.join(f'${b:02X}' for b in bytes_list)
+        out.append(f"${pc:04X}: {hex_str:20s} ; {src}")
+    return '\n'.join(out)
+
+def main():
+    parser = argparse.ArgumentParser(description='RV8-GR Assembler')
+    parser.add_argument('input', help='Input .asm file')
+    parser.add_argument('-o', '--output', help='Output file')
+    parser.add_argument('-f', '--format', choices=['bin', 'hex'], default='bin')
+    parser.add_argument('-b', '--base', default='0x8000', help='Base address (default $8000)')
+    args = parser.parse_args()
+
+    base = int(args.base, 0)
+
+    with open(args.input) as f:
         source = f.read()
 
-    output, labels = assemble(source)
+    code, labels = assemble(source, base)
 
-    if not bin_file and not hex_file:
-        hex_file = src_file.rsplit('.', 1)[0] + '.hex'
+    if args.format == 'hex' or not args.output:
+        print(make_hex(code))
+        if labels:
+            print("\n; Labels:")
+            for name, addr in sorted(labels.items(), key=lambda x: x[1]):
+                print(f";   {name} = ${addr:04X}")
 
-    if bin_file:
-        write_bin(output, bin_file)
-        print(f"Binary: {bin_file} ({len(output)*2} bytes)")
+    if args.output:
+        if args.format == 'bin':
+            rom = make_bin(code, base)
+            with open(args.output, 'wb') as f:
+                f.write(rom)
+            print(f"Written {len(rom)} bytes to {args.output}", file=sys.stderr)
+        else:
+            with open(args.output, 'w') as f:
+                f.write(make_hex(code))
 
-    if hex_file:
-        write_hex(output, hex_file)
-        print(f"Hex listing: {hex_file}")
-
-    print(f"Assembled {len(output)} instructions, {len(labels)} labels")
-    if labels:
-        for name, addr in labels.items():
-            print(f"  {name}: ${addr:04X}")
+if __name__ == '__main__':
+    main()

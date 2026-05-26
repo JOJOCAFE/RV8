@@ -48,9 +48,25 @@
 | 2026-05-16 | All 4 variants traced and verified |
 | 2026-05-17 | **RV8-GR: full toolchain (Verilog + assembler + test) ready for build** |
 
-## Day 8 (2026-05-27) — RV8-GR Complete Redesign
+## Day 8 (2026-05-27) — RV8-GR Complete Redesign + Assembler
 
-### Problem: Original 21-chip design had critical bugs
+### Assembler (rv8gr_asm.py):
+- Labels, forward/backward references
+- hi()/lo() address functions
+- .ORG directive
+- HLT, JMP, CALL macros
+- MV auto-detect (a0,rs vs rd,a0)
+- Output: .bin (32KB ROM image) or hex listing
+- Full pipeline: .asm → assembler → .bin → Verilog sim → PASS
+
+### Test ROM (testrom.bin):
+- 10 test groups covering all 15 instructions
+- Cross-page jump ($8000→$9000→$8070)
+- Software subroutine call/return
+- 187 cycles, ALL PASS
+- Ready to flash to real hardware
+
+### Architecture redesign (same session):
 - No XOR chips for ALU (SUB/XOR broken)
 - Bus conflict when SOURCE_TYPE=1 (IRL + RAM both drive IBUS)
 - Only 256-byte jump range (no page register)
