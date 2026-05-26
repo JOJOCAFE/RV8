@@ -1,16 +1,23 @@
 # RV8 Project — Changelog
 
-## 2026-05-27 — RV8-GR Complete Redesign (v2.0)
+## 2026-05-27 — RV8-GR v2.0 + RV8-G Construct
 
+### RV8-GR Complete
 - **Architecture**: 29 logic chips, full 64K, A15 chip select, execute from RAM
 - **ISA**: 15 instructions (XORI=$70, XOR=$78, SETPG=$20, SETPG_R=$28)
-- **Removed**: hardware JAL (software subroutine only)
-- **Added**: Page Register (16-bit jump), ring counter (74HC164)
-- **Fixed**: XOR data path, bus conflicts, U7 DIR gating, address mux 16-bit
-- **Verilog**: rv8gr_cpu.v — ALL TESTS PASSED (127 cycles)
+- **Verilog**: ALL TESTS PASSED (127 cycles)
 - **Assembler**: rv8gr_asm.py — labels, macros, .bin output
 - **Test ROM**: testrom.bin — 10 test groups, 187 cycles, ALL PASS
-- **Docs**: Construct.md (pin-level), ISA ref, traces, wiring, modules (Thai), bank switch
+- **Docs**: Construct (pin-level), ISA, traces, wiring, modules (Thai), bank switch
+
+### RV8-G Construct
+- **Architecture**: 38 logic chips, full 35-instruction ISA, no microcode
+- **4-cycle**: T0=fetch, T1=operand, T2=load B, T3=execute
+- **Full ALU**: ADD/SUB/AND/OR/XOR/SLL/SRL/SLT
+- **Branches**: BEQ/BNE/BLT/BGE comparing two registers
+- **JAL/JALR**: hardware subroutine call/return
+- **PUSH/POP**: hardware stack pointer
+- **Status**: Construct done, Verilog next
 
 ## 2026-05-16 — RV8-GR Initial Design (v1.0)
 

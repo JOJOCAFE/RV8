@@ -40,8 +40,22 @@
 
 ## Other Variants
 
-| Variant | Status |
-|---------|--------|
-| RV8 (27 chips) | ✅ Designed, Verilog pass, docs done |
-| RV8-R (18 chips) | ⬜ Concept only |
-| RV8-G (28 chips) | ⬜ Concept only |
+### RV8-G (38 chips, full ISA, no microcode)
+
+| # | Task | Status |
+|:-:|------|:------:|
+| 1 | Construct.md (pin-level) | ✅ |
+| 2 | Verilog model | ⬜ |
+| 3 | Testbench (all 35 instructions) | ⬜ |
+| 4 | Assembler | ⬜ |
+| 5 | ISA reference doc | ⬜ |
+| 6 | Instruction trace | ⬜ |
+
+### RV8 (27 chips, microcode)
+
+- ✅ Designed, Verilog pass, docs done
+- ⬜ Physical build
+
+### RV8-R (18 chips)
+
+- ⬜ Concept only

@@ -8,14 +8,14 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 
 | | **RV8** | **RV8-R** | **RV8-G** | **RV8-GR** |
 |--|:---:|:---:|:---:|:---:|
-| **Logic chips** | 27 | **18** | 28 | **29** |
-| **Total** | 29 | 21 | 30 | 31 |
-| **MIPS @10MHz** | 1.25 | 1.0 | **1.7** | **3.3** |
+| **Logic chips** | 27 | **18** | **38** | **29** |
+| **Total** | 29 | 21 | 40 | 31 |
+| **MIPS @10MHz** | 1.25 | 1.0 | **2.5** | **3.3** |
 | **ISA** | Full (35) | Full (35) | Full (35) | 15 instr |
 | **Microcode** | Yes | Yes | **No** | **No** |
 | **AND/OR/XOR** | ✅ | ✅ | ✅ | XOR only |
 | **64K address** | ✅ | ✅ | ✅ | ✅ |
-| **Execute RAM** | ❌ | ❌ | ❌ | **✅** |
+| **Execute RAM** | ❌ | ❌ | ✅ | **✅** |
 | **Games** | ✅ | ✅ | ✅ | ✅ |
 | **Verilog verified** | ✅ | ⬜ | ⬜ | **✅** |
 
@@ -61,12 +61,13 @@ RV8/
 
 | | RV8 | RV8-R | RV8-G | RV8-GR |
 |--|:---:|:---:|:---:|:---:|
-| Instruction trace | ✅ | ✅ | ✅ | ✅ |
+| Instruction trace | ✅ | ✅ | ⬜ | ✅ |
 | Verilog | ✅ 8/8 | ⬜ | ⬜ | ✅ (127 cycles) |
-| Construct (pin-level) | ✅ | ⬜ | ⬜ | ✅ |
-| Wiring Guide | ✅ | ✅ | ✅ | ✅ |
-| Module guide (Thai) | ✅ | ⬜ | ✅ | ✅ |
+| Construct (pin-level) | ✅ | ⬜ | ✅ | ✅ |
+| Wiring Guide | ✅ | ✅ | ⬜ | ✅ |
+| Module guide (Thai) | ✅ | ⬜ | ⬜ | ✅ |
 | ISA reference | ✅ | ⬜ | ⬜ | ✅ |
-| Assembler | ⬜ | ⬜ | ⬜ | ⬜ |
+| Assembler | ⬜ | ⬜ | ⬜ | ✅ |
+| Test ROM | ⬜ | ⬜ | ⬜ | ✅ |
 | Programmer | ✅ | ✅ | ✅ | ✅ |
 | Physical build | ⬜ | ⬜ | ⬜ | ⬜ |

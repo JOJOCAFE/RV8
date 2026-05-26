@@ -66,6 +66,14 @@
 - 187 cycles, ALL PASS
 - Ready to flash to real hardware
 
+### RV8-G Construct designed (same session):
+- 38 logic chips, full 35-instruction ISA, no microcode
+- 4-cycle execution with B-register
+- AND/OR/SLL/SRL/SLT + BEQ/BNE/BLT/BGE rs1,rs2 + JAL/JALR + PUSH/POP
+- 74HC138 decoder for ALU operation select
+- Pin-level Construct.md written (1087 lines)
+- Next: Verilog model + testbench
+
 ### Architecture redesign (same session):
 - No XOR chips for ALU (SUB/XOR broken)
 - Bus conflict when SOURCE_TYPE=1 (IRL + RAM both drive IBUS)
