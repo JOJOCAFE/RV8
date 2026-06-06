@@ -1,6 +1,6 @@
 # RV8-GR — No Microcode, Full 64K, 16-bit Jump
 
-**29 logic chips + ROM + RAM = 31 packages. Verilog verified.**
+**30 logic chips + ROM + RAM = 32 packages. Verilog verified.**
 
 ---
 
@@ -8,9 +8,9 @@
 
 | Spec | Value |
 |------|-------|
-| Logic chips | 29 (74HC series) |
-| Total packages | 31 (29 + ROM + RAM) |
-| ISA | 15 instructions |
+| Logic chips | 30 (74HC series) |
+| Total packages | 32 (30 + ROM + RAM) |
+| ISA | 17 instructions (15 + EI/DI) |
 | Speed | 3.3 MIPS @ 10 MHz |
 | Address space | 64KB (ROM $8000-$FFFF, RAM $0000-$7FFF) |
 | Registers | 8 in RAM ($00-$07) |
@@ -28,6 +28,7 @@
     $78  XOR rs        $30  LI imm        $38  MV a0,rs
     $04  MV rd,a0      $02  BEQ addr      $82  BNE addr
     $01  J addr        $20  SETPG imm     $28  SETPG_R rs
+    $08  EI            $48  DI
 
 ---
 
@@ -55,6 +56,7 @@
 | U26-U27 | 74HC00 ×2 | NAND gates |
 | U28 | 74HC86 | Z_match + /T2 + WR_DIR |
 | U29-U30 | 74HC157 ×2 | Address mux A8-A15 |
+| U31 | 74HC74 | IRQ_FF + IE_FF |
 
 ---
 
@@ -88,7 +90,7 @@ gtkwave rv8gr_test.vcd
 ## Status
 
 - ✅ Construct (pin-level, bus-centric, verified)
-- ✅ Verilog (127 cycles, all 15 instructions pass)
+- ✅ Verilog (127 cycles + IRQ tests, all 17 instructions pass)
 - ✅ Full 64K address space (ROM + RAM)
 - ✅ 16-bit jump (Page Register)
 - ✅ Execute from RAM

@@ -24,16 +24,24 @@ OPCODES = {
     'JMP':     None,  # macro: SETPG hi + J lo
     'SETPG':   0x20,
     'SETPG_R': 0x28,
+    'EI':      0x08,
+    'DI':      0x48,
     'HLT':     None,  # macro: J self
+    'SLL':     None,  # macro: MV $00,a0 + ADD $00
     'CALL':    None,  # macro
     'RET':     None,  # macro
 }
+
+# Register aliases → RAM address
+REGS = {'a0':0,'a1':1,'a2':2,'t0':3,'t1':4,'t2':5,'s0':6,'ra':7}
 
 def parse_value(s, labels, pc):
     """Parse numeric value or label."""
     s = s.strip().rstrip(',')
     if s in labels:
         return labels[s]
+    if s.lower() in REGS:
+        return REGS[s.lower()]
     if s.startswith('$'):
         return int(s[1:], 16)
     if s.startswith('0x'):
@@ -73,6 +81,8 @@ def assemble(source, base_addr=0x8000):
             pc += 8  # LI + SB + SETPG + J
         elif mnem == 'RET':
             pc += 4  # SETPG + J (assembler fills return addr)
+        elif mnem == 'SLL':
+            pc += 4  # MV $00,a0 + ADD $00
         elif mnem == '.ORG':
             pc = parse_value(parts[1], labels, pc)
         elif mnem == '.DB':
@@ -108,6 +118,12 @@ def assemble(source, base_addr=0x8000):
             lo = pc & 0xFF
             code.append((pc, [0x01, lo], orig))
             pc += 2
+            continue
+
+        if mnem == 'SLL':
+            # Shift left logical: MV $00,a0 + ADD $00 (a0 = a0 + a0)
+            code.append((pc, [0x04, 0x00, 0x18, 0x00], orig))
+            pc += 4
             continue
 
         if mnem == 'JMP':

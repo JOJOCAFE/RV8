@@ -1,6 +1,6 @@
 # RV8-GR Construction Guide
 
-**29 logic chips + ROM + RAM = 31 packages**
+**30 logic chips + ROM + RAM = 32 packages**
 **No microcode. Full 64K address. 16-bit jump. Verilog verified (127 cycles).**
 
 ---
@@ -11,7 +11,7 @@
     $8000-$FFFF  ROM (32KB visible, bankable to 128KB)
     PC starts at $8000 after reset
 
-## ISA (15 instructions)
+## ISA (17 instructions)
 
     Byte 0 Control: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP
     Byte 1 Operand: immediate value, RAM address, or jump target (8-bit)
@@ -673,6 +673,41 @@ U30-14(4A)  <-- PC15(U4-11)    U30-13(4B) --> GND    U30-12(4Y) --> A15 → RAM 
 U30-8 (GND) --> GND    U30-15(/E) --> GND    U30-16(VCC) --> VCC
 
 *******************************************
+U31 74HC74 — Dual D Flip-Flop (IRQ_FF + IE_FF)
+// FF-A: IE (interrupt enable) — set by EI decode, cleared by DI or IRQ-ack
+// FF-B: IRQ_FF (interrupt latch) — set by /IRQ edge, cleared by IRQ-ack
+// IRQ-ack = T2 AND IRQ_FF AND IE AND NOT(PC_LOAD_COND)
+// On ack: force PC = $FF00, save PC to RAM[$0E:$0F], clear IE
+*******************************************
+
+// EI decode: ir_high = $08 → SOURCE_TYPE=1, all else 0
+// DI decode: ir_high = $48 → XOR_MODE=1, SOURCE_TYPE=1, all else 0
+// (Both are harmless no-ops to datapath — SRC selects RAM but no latch fires)
+
+// FF-A: IE flag
+U31-1 (/CLR1) <-- DI_decode OR IRQ_ack (via spare gate)
+U31-2 (D1)    --> VCC
+U31-3 (CLK1)  <-- EI_decode (T2 AND ir_high=$08)
+U31-4 (/PR1)  --> VCC
+U31-5 (Q1)    --> IE signal → IRQ-ack gate
+U31-6 (/Q1)   --> NC
+
+// FF-B: IRQ latch
+U31-7 (GND)   --> GND
+U31-8 (/CLR2) <-- IRQ_ack
+U31-9 (D2)    --> VCC
+U31-10(CLK2)  <-- /IRQ (external pin, active-low falling edge sets FF)
+U31-11(/PR2)  --> VCC
+U31-12(Q2)    --> IRQ_FF → IRQ-ack gate
+U31-13(/Q2)   --> NC
+U31-14(VCC)   --> VCC
+
+// IRQ-ack logic (uses spare gates from U26/U27/U28):
+// IRQ_ack = T2 AND IE(U31-5) AND IRQ_FF(U31-12) AND /PC_LOAD_COND
+// On ack: force page_reg=$FF, ir_low=$00, assert /PC_LD
+// PC save: force RAM write addr=$0E/$0F during ack (extra bus cycle)
+
+*******************************************
 ROM — SST39SF010A (128KB Flash)
 // Program storage. Visible at $8000-$FFFF.
 // A16 optional: bank switch via expansion board for 128KB.
@@ -703,7 +738,7 @@ RAM /WE    <-- /AC_BUF (U26-8)
 
 ---
 
-## ISA Decode Verification (all 15 instructions)
+## ISA Decode Verification (all 17 instructions)
 
 | Instr | IBUS | XOR B-mux | AC mux | Result | Bus |
 |-------|------|-----------|--------|--------|:---:|
@@ -722,8 +757,11 @@ RAM /WE    <-- /AC_BUF (U26-8)
 | J $01 | IRL* | — | — | PC load | ✓ |
 | SETPG $20 | IRL | — | — | PG←IBUS | ✓ |
 | SETPG_R $28| RAM | — | — | PG←IBUS | ✓ |
+| EI $08 | RAM* | — | — | IE←1 | ✓ |
+| DI $48 | RAM* | — | — | IE←0 | ✓ |
 
 *IRL drives IBUS but AC_WR=0, harmless. No bus conflicts. ✓
+*RAM selected by SRC=1 but no latch enabled, harmless. ✓
 
 ---
 

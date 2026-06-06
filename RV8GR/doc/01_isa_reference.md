@@ -1,6 +1,6 @@
 # RV8-GR — ISA Reference
 
-**15 instructions. Direct-encoded. 16-bit jump via Page Register.**
+**17 instructions. Direct-encoded. 16-bit jump via Page Register. IRQ.**
 
 ---
 
@@ -30,6 +30,8 @@
 | $01 | J addr | 00000001 | PC = {PG, addr} |
 | $20 | SETPG imm | 00100000 | PageReg = imm |
 | $28 | SETPG_R rs | 00101000 | PageReg = RAM[rs] |
+| $08 | EI | 00001000 | IE = 1 (enable interrupts) |
+| $48 | DI | 01001000 | IE = 0 (disable interrupts) |
 
 ---
 
@@ -106,4 +108,4 @@ During T0/T1 (fetch): U7 always enabled (BUF_OE_N=0), reads ROM/RAM.
 | SRL | ❌ | Software loop |
 | JAL/JALR | ❌ | Software CALL/RET |
 | Relative branch | ❌ | Absolute (assembler) |
-| Interrupts | ❌ | Polling |
+| Interrupts | ✅ | EI/DI + fixed vector $FF00 |

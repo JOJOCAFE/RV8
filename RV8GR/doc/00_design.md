@@ -1,6 +1,6 @@
 # RV8-GR — Design Document
 
-**29 logic chips. No microcode. Full 64K. 16-bit jump. Verified.**
+**30 logic chips. No microcode. Full 64K. 16-bit jump. IRQ. Verified.**
 
 ---
 
@@ -46,7 +46,7 @@
                            ▼
                       U9 (AC)
 
-## Chip List (29 logic)
+## Chip List (30 logic)
 
 | U# | Chip | Function |
 |:--:|------|----------|
@@ -70,6 +70,7 @@
 | U26-U27 | 74HC00 ×2 | NAND gates (×8) |
 | U28 | 74HC86 | XOR (Z_match, /T2, WR_DIR) |
 | U29-U30 | 74HC157 ×2 | Address mux A8-A15 |
+| U31 | 74HC74 | IRQ_FF + IE_FF |
 
 ## Key Design Decisions
 
@@ -85,6 +86,59 @@
 
 ## Verification
 
-- Verilog: `rv8gr_cpu.v` — all tests pass (127 cycles)
+- Verilog: `rv8gr_cpu.v` — all tests pass (127 cycles + IRQ tests)
 - Testbench: `tb/tb_rv8gr_full.v` — covers all ISA + 64K jump + subroutine
+- Testbench: `tb/tb_rv8gr_irq.v` — EI/DI, IRQ fire, PC save, nested prevention
 - Source of truth: `doc/Construct.md` (pin-level wiring)
+
+## Interrupt (IRQ)
+
+**1 extra chip: U31 (74HC74) — dual flip-flop for IRQ_FF + IE_FF.**
+
+### Signals
+
+| Signal | Direction | Description |
+|--------|-----------|-------------|
+| /IRQ | Input (active-low) | Edge-triggered interrupt request |
+| IE | Internal | Interrupt Enable flag (U31 FF-A) |
+| IRQ_FF | Internal | Latched pending interrupt (U31 FF-B) |
+
+### Instructions
+
+| Hex | Mnemonic | Operation |
+|:---:|----------|-----------|
+| $08 | EI | Set IE=1 (enable interrupts) |
+| $48 | DI | Clear IE=0 (disable interrupts) |
+
+### Behavior
+
+1. Falling edge of /IRQ latches IRQ_FF=1
+2. At end of T2, if IRQ_FF=1 AND IE=1 AND no jump in progress:
+   - Save PC to RAM[$0E] (low) and RAM[$0F] (high)
+   - Jump to vector $FF00
+   - Clear IE (prevent nesting)
+   - Clear IRQ_FF
+3. If a jump/branch is in progress, IRQ is deferred to next instruction
+
+### ISR Pattern
+
+```asm
+; ISR at $FF00
+    SB $08          ; save AC
+    ; ... handle device ...
+    LB $08          ; restore AC
+    ; Return to saved PC:
+    LB $0F          ; load saved PC high
+    SETPG_R $0F     ; page = saved high (via register)
+    EI              ; re-enable before return
+    LB $0E          ; load saved PC low to AC... 
+    ; (needs indirect jump — use known return or SETPG+J)
+```
+
+### Hardware Notes
+
+- U31 pin A: IE flip-flop — SET by EI decode, CLR by IRQ-ack or DI decode
+- U31 pin B: IRQ latch — SET by /IRQ falling edge, CLR by IRQ-ack
+- IRQ-ack = T2 AND IRQ_FF AND IE AND NOT(pc_load)
+- PC force: gates page_reg load ($FF) and ir_low force ($00) during ack
+- PC save: extra RAM write cycle using spare gate timing (or force address mux)

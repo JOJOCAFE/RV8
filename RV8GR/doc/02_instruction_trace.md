@@ -1,6 +1,6 @@
 # RV8-GR — Instruction Trace (Pin-Level)
 
-**Based on Construct.md (29 chips, ROM $8000+, A15 chip select)**
+**Based on Construct.md (30 chips, ROM $8000+, A15 chip select)**
 
 ---
 
@@ -292,7 +292,7 @@ Setup: RAM[$0003]=$AA, PC=$8014, PageReg=$80
 | 7 | MV a0,rs | $38 | AC = RAM[rs] ✓ |
 
 All signals traced pin-by-pin through U-numbers. No assumptions.
-Matches Construct.md (29 chips, ROM $8000+, A15 chip select, WR_DIR gated).
+Matches Construct.md (30 chips, ROM $8000+, A15 chip select, WR_DIR gated).
 
 ---
 
@@ -300,7 +300,7 @@ Matches Construct.md (29 chips, ROM $8000+, A15 chip select, WR_DIR gated).
 
 ```
 ; RV8-GR Full ISA Test — ROM at $8000, PC starts $8000
-; Tests all 15 instructions + 64K jump + subroutine
+; Tests all 17 instructions + 64K jump + subroutine + IRQ
 ; Expected final state: halt at $8034, AC=$00, Z=1
 
 ; --- ALU immediate tests ---

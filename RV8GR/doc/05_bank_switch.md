@@ -1,6 +1,6 @@
 # RV8-GR — Bank Switch (Memory Expansion via Bus)
 
-**CPU board: 29 chips, unchanged. Expansion plugs into address bus.**
+**CPU board: 30 chips, unchanged. Expansion plugs into address bus.**
 
 ---
 
@@ -118,4 +118,4 @@ J $00           ; PC = $0000 → fetches from RAM
 | RAM pages (A8-A14) | 1× 74HC574 + decode | 32KB data (128 × 256B) |
 | Execute from RAM | 0 (built-in) | PC < $8000 → RAM |
 
-**CPU board stays at 29 chips. All expansion on the bus.**
+**CPU board stays at 30 chips. All expansion on the bus.**

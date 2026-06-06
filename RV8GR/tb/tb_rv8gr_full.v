@@ -5,7 +5,7 @@ module tb_rv8gr;
     reg clk, rst_n;
     wire halted;
 
-    rv8gr_cpu cpu(.clk(clk), .rst_n(rst_n), .halted(halted));
+    rv8gr_cpu cpu(.clk(clk), .rst_n(rst_n), .irq_n(1'b1), .halted(halted));
 
     // Clock: 100MHz (10ns period)
     always #5 clk = ~clk;

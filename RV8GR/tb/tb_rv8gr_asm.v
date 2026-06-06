@@ -5,7 +5,7 @@ module tb_rv8gr_asm;
     reg clk, rst_n;
     wire halted;
 
-    rv8gr_cpu cpu(.clk(clk), .rst_n(rst_n), .halted(halted));
+    rv8gr_cpu cpu(.clk(clk), .rst_n(rst_n), .irq_n(1'b1), .halted(halted));
 
     always #5 clk = ~clk;
     integer cycle_count;
