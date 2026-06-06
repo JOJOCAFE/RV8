@@ -1,42 +1,69 @@
 # RV8 Project — Development History
 
-## Day 1-5 (2026-05-10 to 2026-05-14)
+## 2026-05-10 to 2026-05-14 — Project Start
 - Original designs explored and archived
-- Programmer board complete
+- Programmer board complete (ESP32 + TXB0108)
 
-## Day 6 (2026-05-15)
-- RV8 redesigned (RISC-V, microcode, 27 chips)
-- RV8-G and RV8-GR concepts
-
-## Day 7 (2026-05-16-17) — Final Architecture + Implementation
-
-### Designs verified (all traced):
+## 2026-05-15 — RV8 Family Architecture
 - RV8: 27 chips, microcode, Verilog 8/8 pass
-- RV8-R: 18 chips, microcode, RAM registers, traced
-- RV8-G: 28 chips, no microcode, full ISA, traced
-- RV8-GR: 21 chips, no microcode, reduced ISA, **Verilog 11/11 + assembler + assembly test pass**
+- RV8-R: 18 chips concept
+- RV8-G: 28 chips concept
+- RV8-GR: 21 chips concept
 
-### RV8-GR fully implemented:
-- Verilog model (11/11 unit tests pass)
-- Assembler (rv8gr_asm.py, working)
-- Assembly integration test (full pipeline: asm→bin→CPU→pass)
-- VCD waveform support (gtkwave)
-- Full doc set (design, ISA, trace, wiring, modules, bank switch)
+## 2026-05-16 to 2026-05-17 — RV8-GR Initial Design (v1.0)
+- 21 logic chips, ROM at $8000, 256-byte jump range
+- All 4 variants traced and verified
+- Verilog 11/11 unit tests pass
+- Assembler (rv8gr_asm.py)
+- Assembly integration test passes
+- Full doc set complete
 
-### Bank switch design:
-- Run code from RAM via XOR on A15 (fetch path only)
-- Registers ($0000-$0007) always safe (data path unchanged)
-- Decision: bank switch lives on TRAINER BOARD (not CPU board)
-- CPU board stays pure at 21 chips
+## 2026-05-27 — RV8-GR v2.0 Complete Redesign + RV8-G Construct
 
-### Key lessons:
-1. Every trace finds 1-2 more chips than claimed
-2. Full ISA always costs ~27 chips regardless of approach
-3. RAM registers save ~10 chips (proven)
-4. "No microcode" doesn't save chips for full ISA (saves for reduced)
-5. Bank switch belongs on expansion board, not CPU
+### RV8-GR Complete (v2.0)
+- Architecture: 29 logic chips, full 64K, A15 chip select
+- Execute from RAM (PC < $8000)
+- 16-bit jump via Page Register
+- ISA: 15 instructions (XORI=$70, XOR=$78, SETPG=$20, SETPG_R=$28)
+- Verilog: ALL TESTS PASSED (127 cycles)
+- Assembler: rv8gr_asm.py — labels, macros, .bin output
+- Test ROM: testrom.bin — 10 test groups, 187 cycles
+- Docs: Construct (pin-level), ISA, traces, wiring, modules, bank switch
 
----
+### RV8-G Construct
+- 38 logic chips, full 35-instruction ISA, no microcode
+- 4-cycle execution with B-register
+- Full ALU: ADD/SUB/AND/OR/XOR/SLL/SRL/SLT
+- Branches: BEQ/BNE/BLT/BGE rs1,rs2
+- JAL/JALR, PUSH/POP
+- Construct.md written
+
+## 2026-06-06 — RV8-GR v3.0: IRQ + Python Simulation + Codeberg
+
+### IRQ Support
+- Added EI ($08) and DI ($48) instructions
+- IRQ latch (74HC74 U31-B) for edge detection
+- IE flag (74HC74 U31-A) for enable/disable
+- Fixed vector $FF00, auto-save PC to RAM[$0E:$0F]
+- No nesting (IE cleared on entry)
+- 30 logic chips total (+1 from v2.0)
+- 17 instructions total (+2 from v2.0)
+- tb_rv8gr_irq.v — 6 tests: EI/DI, IRQ fire, PC save, defer past jumps
+
+### Python Gate-Level Simulation
+- sim/gate_sim.py — simplified chip models
+- Ring counter, registers, ALU components
+- Trace timing: T0→T1→T2
+- Educational tool for understanding CPU behavior
+
+### Test Infrastructure
+- tb_rv8gr_tasks.v — milestone tests (1-9)
+- tools/test_rv8gr_asm.py — assembler unit tests
+- doc/task_test_plan.md — test milestones
+
+### Repository
+- Moved from GitHub to Codeberg
+- https://codeberg.org/JOJOCAFE/RV8
 
 ## Key Milestones
 
@@ -44,69 +71,15 @@
 |------|-----------|
 | 2026-05-10 | Project started |
 | 2026-05-14 | Programmer board complete |
-| 2026-05-15 | RV8 microcode working (8/8) |
 | 2026-05-16 | All 4 variants traced and verified |
-| 2026-05-17 | **RV8-GR: full toolchain (Verilog + assembler + test) ready for build** |
+| 2026-05-17 | RV8-GR v1.0: toolchain ready |
+| 2026-05-27 | RV8-GR v2.0: complete redesign, full 64K |
+| 2026-06-06 | RV8-GR v3.0: IRQ + sim + Codeberg |
 
-## Day 8 (2026-05-27) — RV8-GR Complete Redesign + Assembler
+## Lessons Learned
 
-### Assembler (rv8gr_asm.py):
-- Labels, forward/backward references
-- hi()/lo() address functions
-- .ORG directive
-- HLT, JMP, CALL macros
-- MV auto-detect (a0,rs vs rd,a0)
-- Output: .bin (32KB ROM image) or hex listing
-- Full pipeline: .asm → assembler → .bin → Verilog sim → PASS
-
-### Test ROM (testrom.bin):
-- 10 test groups covering all 15 instructions
-- Cross-page jump ($8000→$9000→$8070)
-- Software subroutine call/return
-- 187 cycles, ALL PASS
-- Ready to flash to real hardware
-
-### RV8-G Construct designed (same session):
-- 38 logic chips, full 35-instruction ISA, no microcode
-- 4-cycle execution with B-register
-- AND/OR/SLL/SRL/SLT + BEQ/BNE/BLT/BGE rs1,rs2 + JAL/JALR + PUSH/POP
-- 74HC138 decoder for ALU operation select
-- Pin-level Construct.md written (1087 lines)
-- Next: Verilog model + testbench
-
-### Architecture redesign (same session):
-- No XOR chips for ALU (SUB/XOR broken)
-- Bus conflict when SOURCE_TYPE=1 (IRL + RAM both drive IBUS)
-- Only 256-byte jump range (no page register)
-- ROM/RAM not in shared 64K space (operation-based chip select)
-
-### Solution: Full redesign from scratch
-- 29 logic chips (was 21)
-- Full 64K address space: ROM $8000-$FFFF, RAM $0000-$7FFF
-- A15-based chip select (ROM /CE = NOT(A15), RAM /CE = A15)
-- 16-bit address mux (4× 74HC157 for A0-A15)
-- Page Register (74HC574) for 16-bit jump
-- XOR B-input mux (2× 74HC157) for SUB inversion + XOR instruction
-- AC input mux (2× 74HC157) selects adder vs XOR output
-- Ring counter (74HC164) for T0/T1/T2
-- U7 DIR gated with T2+STORE (prevents bus conflict)
-- U7 /OE = NOT(/IRL_OE) (prevents IBUS conflict)
-- Can execute code from RAM (PC < $8000)
-- Expandable: ROM bank (A16), RAM pages (A8-A14) via bus
-
-### ISA changes
-- XORI=$70, XOR=$78 (was $50/$58 — needed MUX_SEL=1 for data path)
-- Added SETPG $20, SETPG_R $28
-- Removed hardware JAL (software subroutine only)
-- 15 instructions total
-
-### Verification
-- New Verilog model: rv8gr_cpu.v (behavioral)
-- New testbench: tb_rv8gr_full.v (all ISA + 64K jump + subroutine)
-- ALL TESTS PASSED (127 cycles)
-
-### Documentation (all rewritten)
-- Construct.md: pin-by-pin, bus-centric (source of truth)
-- 00_design.md, 01_isa_reference.md, 02_instruction_trace.md
-- 03_wiring_guide.md, 04_understand_by_module.md (Thai)
-- 05_bank_switch.md (expansion via bus)
+1. Every trace finds 1-2 more chips than initially claimed
+2. Full ISA always costs ~27-30 chips regardless of approach
+3. RAM registers save ~10 chips (proven)
+4. "No microcode" doesn't save chips for full ISA
+5. Bank switch belongs on expansion board, not CPU

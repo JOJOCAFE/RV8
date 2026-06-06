@@ -1,37 +1,76 @@
 # RV8 Project — Changelog
 
-## 2026-05-27 — RV8-GR v2.0 + RV8-G Construct
+## 2026-06-06 — v3.0: IRQ + Python Simulation + Codeberg
 
-### RV8-GR Complete
-- **Architecture**: 29 logic chips, full 64K, A15 chip select, execute from RAM
-- **ISA**: 15 instructions (XORI=$70, XOR=$78, SETPG=$20, SETPG_R=$28)
-- **Verilog**: ALL TESTS PASSED (127 cycles)
-- **Assembler**: rv8gr_asm.py — labels, macros, .bin output
-- **Test ROM**: testrom.bin — 10 test groups, 187 cycles, ALL PASS
-- **Docs**: Construct (pin-level), ISA, traces, wiring, modules (Thai), bank switch
+### Features
+- **IRQ Support**: Added EI ($08) and DI ($48) instructions
+- **Interrupt Controller**: 74HC74 (U31) for IRQ latch and IE flag
+- **Vectored Interrupt**: Fixed vector $FF00, auto-save PC to RAM[$0E:$0F]
+- **Python Simulation**: sim/gate_sim.py — gate-level educational model
 
-### RV8-G Construct
-- **Architecture**: 38 logic chips, full 35-instruction ISA, no microcode
-- **4-cycle**: T0=fetch, T1=operand, T2=load B, T3=execute
-- **Full ALU**: ADD/SUB/AND/OR/XOR/SLL/SRL/SLT
-- **Branches**: BEQ/BNE/BLT/BGE comparing two registers
-- **JAL/JALR**: hardware subroutine call/return
-- **PUSH/POP**: hardware stack pointer
-- **Status**: Construct done, Verilog next
+### Changes
+- Logic chips: 29 → 30 (+1 for IRQ flip-flop)
+- Instructions: 15 → 17 (+EI, +DI)
 
-## 2026-05-16 — RV8-GR Initial Design (v1.0)
+### New Files
+- `RV8GR/tb/tb_rv8gr_irq.v` — IRQ testbench (6 tests)
+- `RV8GR/tb/tb_rv8gr_tasks.v` — milestone tests
+- `RV8GR/sim/gate_sim.py` — Python chip simulation
+- `RV8GR/tools/test_rv8gr_asm.py` — assembler unit tests
+- `RV8GR/doc/task_test_plan.md` — test milestones
+
+### Documentation Updates
+- All docs updated: 30 chips, 17 instructions, IRQ section
+- Construct.md: U31 wiring, EI/DI in ISA table
+
+### Repository
+- Moved to Codeberg: https://codeberg.org/JOJOCAFE/RV8
+
+## 2026-05-27 — v2.0: RV8-GR Complete Redesign
+
+### Features
+- **Full 64K**: A15 chip select (ROM $8000-$FFFF, RAM $0000-$7FFF)
+- **16-bit Jump**: Page Register for full address space
+- **Execute from RAM**: PC in $0000-$7FFF fetches from RAM
+- **Expandable**: ROM bank (A16), RAM pages via bus
+
+### Architecture (29 chips)
+- PC: 4× 74HC161
+- IR: 2× 74HC574 (control + operand)
+- Page Reg: 74HC574
+- Accumulator: 74HC574
+- ALU: 2× 74HC283 (adder) + 2× 74HC86 (XOR)
+- Muxes: 8× 74HC157 (address, AC, XOR B-input)
+- Control: 74HC245, 74HC164, 74HC541, 74HC74, 74HC688, 74HC04, 74HC32, 4× 74HC00, 74HC86
+
+### ISA (15 instructions)
+- ALU: ADDI, ADD, SUBI, SUB, XORI, XOR
+- Move: LI, LB (MV a0,rs), SB (MV rd,a0)
+- Control: BEQ, BNE, J, SETPG, SETPG_R
+
+### Verification
+- Verilog: 127 cycles, ALL TESTS PASSED
+- Assembler: rv8gr_asm.py with labels, macros, .bin output
+- Test ROM: testrom.bin — 10 test groups, 187 cycles
+
+### Documentation
+- Construct.md: pin-by-pin, bus-centric (source of truth)
+- 00_design.md, 01_isa_reference.md, 02_instruction_trace.md
+- 03_wiring_guide.md, 04_understand_by_module.md, 05_bank_switch.md
+
+## 2026-05-16 to 2026-05-17 — v1.0: Initial RV8-GR
 
 - 21 logic chips, ROM at $8000, 256-byte jump range
-- Verilog 11/11 tests pass
-- Assembler (rv8gr_asm.py)
-- Full doc set (design, ISA, trace, wiring, modules, bank switch)
+- Verilog 11/11 unit tests pass
+- Assembler with basic features
+- Full documentation set
 
-## 2026-05-15 — RV8 Family Architecture
+## 2026-05-15 — RV8 Family
 
-- RV8: 27 chips, microcode, Verilog 8/8 pass
-- RV8-R: 18 chips concept
-- RV8-G: 28 chips concept
-- RV8-GR: 21 chips concept
+- **RV8**: 27 chips, microcode, Verilog 8/8 pass
+- **RV8-R**: 18 chips concept (RAM registers)
+- **RV8-G**: 28 chips concept (full ISA, no microcode)
+- **RV8-GR**: 21 chips concept (reduced ISA, no microcode)
 
 ## 2026-05-10 to 2026-05-14 — Project Start
 
