@@ -204,34 +204,75 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 ## PC Software
 
+### Tools (in `tools/` directory)
+
+| Tool | Purpose | File |
+|------|---------|------|
+| rv8flash.py | Flash ROM | rv8flash.py |
+| rv8ram-boot.py | Upload to RAM via bootloader | rv8ram-boot.py |
+| rv8term.py | Terminal bridge | rv8term.py |
+
 ### Workflow (assemble → flash → run → interact)
 
 ```bash
-# 1. Write your program
-vim hello.asm
+# 1. List available ports
+python3 Programmer/tools/rv8flash.py -pl
 
-# 2. Assemble to binary
-python3 RV8/tools/rv8asm.py hello.asm -f bin -o hello.bin
+# 2. Assemble your program (from RV8GR/tools)
+python3 RV8GR/tools/rv8gr_asm.py hello.asm -f bin -o hello.bin
 
 # 3. Flip switch to PROG → flash ROM
-python3 Programmer/tools/rv8flash.py /dev/ttyUSB0 hello.bin
-# Output: "Flashing 128 bytes... OK"
+python3 Programmer/tools/rv8flash.py -w hello.bin
+# Output: "Flashing hello.bin (xxx bytes)... [██████████] 100% Done."
 
-# 4. Flip switch to RUN → CPU boots, open terminal
-python3 Programmer/tools/rv8term.py /dev/ttyUSB0
-# Output: "Hello World!"
+# 4. Flip switch to RUN → CPU boots
+python3 Programmer/tools/rv8term.py
+# Output: "Hello World!" from CPU
 # Type to send input to CPU. Ctrl+C to exit.
 ```
 
-### Commands
+### Quick Reference
 
 ```bash
-# Flash ROM
-python3 Programmer/tools/rv8flash.py /dev/ttyUSB0 program.bin
+# List ports
+python3 Programmer/tools/rv8flash.py -pl
 
-# Terminal mode (or just use: screen /dev/ttyUSB0 115200)
-python3 Programmer/tools/rv8term.py /dev/ttyUSB0
+# Check connection
+python3 Programmer/tools/rv8flash.py -c
+
+# Flash ROM (PROG mode)
+python3 Programmer/tools/rv8flash.py -w program.bin          # auto port 0
+python3 Programmer/tools/rv8flash.py -p 0 -w program.bin    # explicit port
+
+# Read ROM
+python3 Programmer/tools/rv8flash.py -r backup.bin
+
+# Verify ROM
+python3 Programmer/tools/rv8flash.py -v program.bin
+
+# Upload to RAM (via bootloader)
+python3 Programmer/tools/rv8ram-boot.py program.bin
+
+# Terminal (RUN mode)
+python3 Programmer/tools/rv8term.py
+python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 ```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `-h` | Show help |
+| `-pl` | List ports |
+| `-p N` | Use port N (default: 0) |
+| `-c` | Check connection |
+| `-w FILE` | Write to ROM |
+| `-r FILE` | Read from ROM |
+| `-v FILE` | Verify ROM |
+| `-d` | Debug mode |
+| `-q` | Quiet mode |
+| `-t N` | Retry N times |
+| `-R` | Reset CPU after flash |
 
 ---
 

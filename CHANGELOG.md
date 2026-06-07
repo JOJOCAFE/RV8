@@ -1,5 +1,51 @@
 # RV8 Project — Changelog
 
+## 2026-06-08 — v3.1: Programmer Tools Complete
+
+### Features
+- **rv8flash.py**: Flash ROM via ESP32 (540 lines, 16 tests)
+- **rv8ram-boot.py**: Upload to RAM via bootloader (430 lines, 15 tests)
+- **rv8term.py**: Terminal bridge PC↔CPU (289 lines, 15 tests)
+- **Test suites**: 46 tests, all passing
+
+### Requirements Documents
+- rv8flash-requirement.md — Full specification
+- rv8ram-boot-requirement.md — Bootloader protocol
+- rv8term-requirement.md — Terminal mode
+- rv8_programmer-requirement.md — ESP32 firmware spec
+
+### Documentation Updates
+- README.md — Updated PC Software section with tool reference
+- schematic.md — Added Section 6: Software (protocol, tools, tests)
+
+### Files Added
+```
+Programmer/tools/
+├── rv8flash.py           # ROM flash tool
+├── rv8ram-boot.py        # RAM upload tool
+├── rv8term.py            # Terminal tool
+├── test_rv8flash.py      # 16 unit tests
+├── test_rv8ram-boot.py   # 15 unit tests
+├── test_rv8term.py       # 15 unit tests
+├── rv8flash-requirement.md
+├── rv8ram-boot-requirement.md
+└── rv8term-requirement.md
+
+Programmer/firmware/
+└── rv8_programmer-requirement.md
+```
+
+### Serial Protocol
+| Command | Action |
+|---------|--------|
+| `?` | Check connection → `Connected` |
+| `F` + len + data | Flash ROM |
+| `V` | Read ROM (32KB) |
+| `R` | Reset CPU |
+
+### VirtualESP32 Class
+All tools use VirtualESP32 class at top for pin definitions (NodeMCU-32S defaults).
+
 ## 2026-06-06 — v3.0: IRQ + Python Simulation + Codeberg
 
 ### Features

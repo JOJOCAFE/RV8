@@ -240,3 +240,52 @@ ESP32 GPIO ──(3.3V)──► TXB0108 A-side ──(5V)──► 40-pin Bus �
 
 ESP32 GPIO ──(3.3V)──► 74HC595 ──(3.3V)──► TXB0108 #3 A-side ──(5V)──► Bus A[14:8]
 ```
+
+---
+
+## 6. Software
+
+### Python Tools (Programmer/tools/)
+
+| Tool | Purpose | Lines | Tests |
+|------|---------|:-----:|:-----:|
+| rv8flash.py | Flash ROM via ESP32 | 540 | 16 ✅ |
+| rv8ram-boot.py | Upload to RAM via bootloader | 430 | 15 ✅ |
+| rv8term.py | Terminal bridge PC↔CPU | 289 | 15 ✅ |
+
+### Serial Protocol
+
+| PC → ESP32 | Format | ESP32 → PC |
+|------------|--------|------------|
+| `?` | check | `Connected\n` |
+| `F` + len_hi + len_lo + data | flash ROM | `OK\n`, then `OK\n` or `ERROR:msg\n` |
+| `V` | read ROM | 32768 bytes |
+| `R` | reset CPU | `OK\n` |
+
+### Bootloader Protocol (rv8ram-boot.py)
+
+| PC → ESP32 | Format | ESP32 → PC |
+|------------|--------|------------|
+| `B` | enter boot mode | `R\n` (ready) |
+| `U` + len_hi + len_lo + data | upload to RAM | `K\n`, then `D\n` |
+| `X` | exit boot mode | (enter terminal) |
+
+### Firmware
+
+| File | Purpose | Lines |
+|------|---------|:-----:|
+| rv8_programmer.ino | Main ESP32 firmware | 303 |
+| bootloader.asm | CPU bootloader (for RAM upload) | 91 |
+
+### Requirements
+
+```bash
+pip install pyserial
+```
+
+### Test
+
+```bash
+cd Programmer/tools
+python3 -m unittest test_rv8flash test_rv8ram-boot test_rv8term
+# Expected: 46 tests, all passing

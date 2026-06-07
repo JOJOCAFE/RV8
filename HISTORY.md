@@ -1,5 +1,14 @@
 # RV8 Project — Development History
 
+## 2026-06-08 — v3.1: Programmer Tools
+
+- Created rv8flash.py (540 lines, 16 tests) — Flash ROM via ESP32
+- Created rv8ram-boot.py (430 lines, 15 tests) — Upload to RAM via bootloader
+- Created rv8term.py (289 lines, 15 tests) — Terminal bridge PC↔CPU
+- Created test suites: 46 tests total, all passing
+- Created requirement documents for all tools
+- Updated README.md and schematic.md with software documentation
+
 ## 2026-05-10 to 2026-05-14 — Project Start
 - Original designs explored and archived
 - Programmer board complete (ESP32 + TXB0108)

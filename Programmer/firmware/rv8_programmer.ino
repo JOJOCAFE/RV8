@@ -10,20 +10,20 @@
 
 // --- Pin Definitions ---
 
-// Data bus D[7:0] — bidirectional, directly connected via level shifters
+// Data bus D[7:0] — bidirectional, via TXB0108 level shifters
 const int DATA_PINS[8] = {32, 33, 25, 26, 27, 14, 12, 13};
 
-// Address bus A[7:0] — directly driven in PROG mode
-const int ADDR_PINS[8] = {15, 16, 17, 18, 19, 21, 22, 23};
+// Address bus A[7:0] — directly driven in PROG mode (matches schematic)
+const int ADDR_PINS[8] = {15, 2, 4, 16, 17, 5, 18, 19};
 
-// 74HC595 shift register for A[8:14]
-// Hardware: tie 595 RCLK to SRCLK (outputs update on each clock edge)
-#define PIN_SR_DATA  4   // SER (pin 14 on 595)
-#define PIN_SR_CLK   5   // SRCLK + RCLK (pins 11,12 on 595)
+// 74HC595 shift register for A[14:8] (matches schematic)
+#define PIN_SR_DATA  23  // SER (pin 14 on 595) → ESP32 GPIO23
+#define PIN_SR_CLK   18  // SRCLK (pin 11 on 595) → ESP32 GPIO18
+#define PIN_SR_LATCH 5   // RCLK (pin 12 on 595) → ESP32 GPIO5
 
-// Control signals
-#define PIN_nWE   0   // /WE to ROM — active low (GPIO0: HIGH at boot = safe)
-#define PIN_nRST  2   // /RST to CPU — active low (GPIO2: LOW at boot = CPU reset = safe)
+// Control signals (matches schematic)
+#define PIN_nWE   21  // /WE to ROM — active low, direct to ROM in PROG mode
+#define PIN_nRST  0   // /RST to CPU — active low, via TXB0108 to bus pin 28
 
 // Input-only pins (GPIO 34-39)
 #define PIN_nSLOT 34  // /SLOT1 — goes LOW when CPU accesses I/O slot
@@ -73,20 +73,20 @@ void addrRelease() {
 
 // Set full 15-bit address: A[7:0] direct, A[14:8] via shift register
 void setAddress(uint16_t addr) {
-  // A[7:0] — direct GPIO
+  // A[7:0] — direct GPIO (matches schematic: A0=GPIO15, A1=GPIO2, etc.)
   for (int i = 0; i < 8; i++) {
     digitalWrite(ADDR_PINS[i], (addr >> i) & 1);
   }
-  // A[14:8] — shift out via 74HC595 (MSB first, Q0=A8 .. Q6=A14)
-  uint8_t hi = (addr >> 8) & 0x7F;
+  // A[14:8] — shift out via 74HC595 (MSB first: Q6=A14 .. Q0=A8)
+  uint8_t hi = (addr >> 8) & 0x7F;  // 7 bits: A14..A8
   for (int i = 6; i >= 0; i--) {
     digitalWrite(PIN_SR_DATA, (hi >> i) & 1);
     digitalWrite(PIN_SR_CLK, HIGH);
     digitalWrite(PIN_SR_CLK, LOW);
   }
-  // One extra clock to push bit 0 into Q0 position
-  // (We shifted 7 bits MSB-first: first bit shifted is Q6 after 7 clocks)
-  // Actually with 7 shifts, bit6 is in Q6, bit0 is in Q0. Correct.
+  // Latch the 7 bits to outputs (single pulse on RCLK)
+  digitalWrite(PIN_SR_LATCH, HIGH);
+  digitalWrite(PIN_SR_LATCH, LOW);
 }
 
 // --- ROM Write (PROG mode) ---
@@ -251,10 +251,13 @@ void setup() {
   pinMode(PIN_nRST, OUTPUT);
   digitalWrite(PIN_nRST, LOW);  // hold reset initially
 
-  // Shift register
+  // Shift register (74HC595 for A[14:8])
   pinMode(PIN_SR_DATA, OUTPUT);
   pinMode(PIN_SR_CLK, OUTPUT);
+  pinMode(PIN_SR_LATCH, OUTPUT);
+  digitalWrite(PIN_SR_DATA, LOW);
   digitalWrite(PIN_SR_CLK, LOW);
+  digitalWrite(PIN_SR_LATCH, LOW);
 
   // Input-only pins
   pinMode(PIN_nSLOT, INPUT);

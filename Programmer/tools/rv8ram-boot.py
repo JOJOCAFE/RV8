@@ -1,29 +1,26 @@
 #!/usr/bin/env python3
 """
-rv8flash.py — Flash, read, and verify ROM images for RV8 family CPUs
+rv8ram-boot.py — Upload program to RV8 CPU RAM via bootloader
 
-Usage: python3 rv8flash.py [options]
+Usage: python3 rv8ram-boot.py [options] file.bin
 
 Options:
   -h, --help          Show help
   -pl, --portlist     List available serial ports
   -p N, --port N      Use port N (default: 0)
-  -c, --check         Check programmer connection
-  -w FILE, --write FILE   Write binary file to ROM
-  -r FILE, --read FILE    Read ROM to binary file
-  -v FILE, --verify FILE  Verify ROM against file
-  -f, --force         Overwrite existing file (for read)
   -d, --debug         Show serial traffic
   -t N, --retry N     Retry N times (default: 3)
-  -R, --reset         Pulse /RST after flash
-  --format FORMAT     File format: bin or hex (default: bin)
   -q, --quiet         Minimal output
+  --format FORMAT     File format: bin or hex (default: bin)
+  -f, --force         Overwrite existing file
+  -R, --reset         Pulse /RST after upload
 """
 
 import sys
 import argparse
 import os
 import serial
+import time
 
 # =============================================================================
 # VIRTUAL ESP32 BOARD DEFINITION
@@ -44,20 +41,9 @@ class VirtualESP32:
     # Address bus A[7:0] — directly driven
     ADDR_LOW_PINS = [15, 2, 4, 16, 17, 5, 18, 19]  # A0-A7
 
-    # Shift register (74HC595) for A[14:8]
-    SR_DATA_PIN = 23   # SER
-    SR_CLK_PIN = 18    # SRCLK
-    SR_LATCH_PIN = 5   # RCLK
-
     # Control signals
     PIN_nWE = 21       # /WE to ROM (active low)
     PIN_nRST = 0       # /RST to CPU (active low)
-
-    # Input-only pins
-    PIN_nSLOT = 34     # /SLOT1 (slot detection)
-    PIN_nRD = 35       # /RD (read cycle)
-    PIN_nWR = 36       # /WR (write cycle)
-    PIN_MODE = 39      # PROG/RUN switch
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -72,18 +58,15 @@ class Options:
     def __init__(self):
         self.port_index = 0
         self.port_name = None
-        self.check = False
-        self.write = None
-        self.read = None
-        self.verify = None
         self.help = False
         self.port_list = False
-        self.force = False
+        self.file = None
         self.debug = False
         self.retry = 3
-        self.auto_reset = False
-        self.format = 'bin'
         self.quiet = False
+        self.force = False
+        self.format = 'bin'
+        self.auto_reset = False
 
 
 # =============================================================================
@@ -109,16 +92,13 @@ def parse_intel_hex(file_path: str) -> bytes:
             if not line.startswith(':'):
                 continue
 
-            # Parse Intel HEX line
             byte_count = int(line[1:3], 16)
             addr = int(line[3:7], 16) + base_addr
             rec_type = int(line[7:9], 16)
 
             if rec_type == 0x00:  # Data
-                # Extend data array if needed
                 while len(data) < addr:
                     data.append(0)
-                # Add data bytes
                 for i in range(byte_count):
                     data.append(int(line[9 + i*2:11 + i*2], 16))
 
@@ -144,13 +124,6 @@ def load_file(path: str, fmt: str = 'bin') -> bytes:
     else:
         with open(path, 'rb') as f:
             return f.read()
-
-
-def save_file(path: str, data: bytes):
-    """Save data to file."""
-    mode = 'wb' if not os.path.exists(path) or os.path.exists(path) else 'wb'
-    with open(path, 'wb') as f:
-        f.write(data)
 
 
 def progress_bar(current: int, total: int, width: int = 40, quiet: bool = False) -> str:
@@ -223,37 +196,41 @@ class SerialPort:
 
 
 # =============================================================================
-# PROGRAMMER COMMANDS
+# BOOTLOADER PROTOCOL
 # =============================================================================
 
-def cmd_check(port: SerialPort, debug: bool = False) -> bool:
-    """Check programmer connection."""
-    port.write(b'?')
-    if debug:
-        print(f"[DEBUG] TX: 3F")
-    response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
-    if debug:
-        print(f"[DEBUG] RX: {hex_dump(response.encode())}")
-    return response == "Connected"
+def wait_for_ready(port: SerialPort, timeout: float = 10.0, debug: bool = False) -> bool:
+    """Wait for bootloader ready signal 'R'."""
+    start = time.time()
+    while time.time() - start < timeout:
+        if port.available() > 0:
+            byte = port.read(1)
+            if byte == b'R':
+                if debug:
+                    print(f"[DEBUG] RX: 52")
+                return True
+        time.sleep(0.01)
+    return False
 
 
-def cmd_flash(port: SerialPort, data: bytes, retry: int = 3, debug: bool = False, quiet: bool = False) -> bool:
-    """Flash data to ROM."""
+def upload_data(port: SerialPort, data: bytes, delay: float = 0.006,
+                retry: int = 3, debug: bool = False, quiet: bool = False) -> bool:
+    """Upload data to RAM via bootloader."""
     length = len(data)
 
     for attempt in range(retry):
-        # Send flash command with length
-        cmd = b'F' + bytes([(length >> 8) & 0xFF, length & 0xFF]) + data
-        port.write(cmd)
+        # Send length (hi + lo)
+        port.write(bytes([(length >> 8) & 0xFF, length & 0xFF]))
         if debug:
-            print(f"[DEBUG] TX: {hex_dump(cmd[:3])} + {len(data)} bytes")
+            print(f"[DEBUG] TX: {hex_dump(bytes([(length >> 8) & 0xFF, length & 0xFF]))}")
 
         # Wait for ACK
-        response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
+        response = port.read_until(b'\n')
         if debug:
             print(f"[DEBUG] RX: {response}")
+        response = response.strip()
 
-        if response == "K" or response == "OK":
+        if response == b'K' or response == b'OK':
             break
         elif attempt < retry - 1:
             if not quiet:
@@ -261,52 +238,31 @@ def cmd_flash(port: SerialPort, data: bytes, retry: int = 3, debug: bool = False
             continue
         else:
             if not quiet:
-                print(f"Error: Flash failed")
+                print(f"Error: Bootloader not ready")
             return False
 
-    # Send data
-    # For large data, send in chunks
-    chunk_size = 256
+    # Send data byte by byte with delay
     addr = 0
     total = len(data)
 
-    while addr < total:
-        chunk = data[addr:addr + chunk_size]
-        port.write(chunk)
-        addr += len(chunk)
-
-        if debug:
-            print(f"[DEBUG] TX: {hex_dump(chunk[:8])}... ({len(chunk)} bytes)")
+    for byte in data:
+        port.write(bytes([byte]))
+        if debug and (addr % 16 == 0):
+            print(f"[DEBUG] TX: {hex_dump(bytes([byte]))}")
+        time.sleep(delay)  # 6ms per byte
+        addr += 1
 
         # Progress
         print(f"\r{progress_bar(addr, total, quiet=quiet)}", end='', flush=True)
 
-    # Wait for completion
-    response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
-    if debug:
-        print(f"\n[DEBUG] RX: {response}")
-
-    print()  # New line after progress
-    return response == "D" or response == "Done" or response == "OK"
-
-
-def cmd_read(port: SerialPort, size: int = 32768, debug: bool = False) -> bytes:
-    """Read ROM data."""
-    port.write(b'V')
-    if debug:
-        print(f"[DEBUG] TX: 56")
-
-    # Read all data
-    data = b''
-    while len(data) < size:
-        chunk = port.read(size - len(data))
-        if not chunk:
-            break
-        data += chunk
-        print(f"\r{progress_bar(len(data), size, quiet=True)}", end='', flush=True)
-
     print()  # New line
-    return data
+
+    # Wait for done signal
+    response = port.read_until(b'\n')
+    if debug:
+        print(f"[DEBUG] RX: {response}")
+
+    return response.strip() == b'D' or response.strip() == b'Done'
 
 
 def cmd_reset(port: SerialPort, debug: bool = False) -> bool:
@@ -318,27 +274,6 @@ def cmd_reset(port: SerialPort, debug: bool = False) -> bool:
     if debug:
         print(f"[DEBUG] RX: {response}")
     return response == "K" or response == "OK"
-
-
-def cmd_verify(port: SerialPort, file_data: bytes, debug: bool = False) -> bool:
-    """Verify ROM against file (Option A: PC reads ROM, calculates checksum, compares)."""
-    # Read ROM
-    rom_data = cmd_read(port, len(file_data), debug=debug)
-
-    # Compare byte by byte
-    for i, (r, f) in enumerate(zip(rom_data, file_data)):
-        if r != f:
-            if not debug:
-                print(f"Mismatched at address 0x{i:04X}: ROM=0x{r:02X} File=0x{f:02X}")
-            else:
-                print(f"[DEBUG] Mismatch at 0x{i:04X}: ROM={r:02X} File={f:02X}")
-            return False
-
-    # File might be smaller than ROM (32KB)
-    if len(rom_data) != len(file_data):
-        print(f"Warning: ROM size ({len(rom_data)}) != file size ({len(file_data)})")
-
-    return True
 
 
 # =============================================================================
@@ -360,7 +295,7 @@ def get_serial_ports():
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description='Flash, read, and verify ROM images for RV8 family CPUs',
+        description='Upload program to RV8 CPU RAM via bootloader',
         add_help=False
     )
 
@@ -371,44 +306,37 @@ def parse_args():
     port_group = parser.add_argument_group('Port selection')
     port_group.add_argument('-p', '--port', type=int, default=0, dest='port_index')
 
-    # Operations (mutually exclusive)
-    op_group = parser.add_argument_group('Operations')
-    op_group.add_argument('-c', '--check', action='store_true')
-    op_group.add_argument('-w', '--write', metavar='FILE', dest='write')
-    op_group.add_argument('-r', '--read', metavar='FILE', dest='read')
-    op_group.add_argument('-v', '--verify', metavar='FILE', dest='verify')
-
     # Options
     opt_group = parser.add_argument_group('Options')
-    opt_group.add_argument('-f', '--force', action='store_true')
     opt_group.add_argument('-d', '--debug', action='store_true')
     opt_group.add_argument('-t', '--retry', type=int, default=3)
-    opt_group.add_argument('-R', '--reset', action='store_true', dest='auto_reset')
-    opt_group.add_argument('--format', choices=['bin', 'hex', 'auto'], default='bin')
     opt_group.add_argument('-q', '--quiet', action='store_true')
+    opt_group.add_argument('--format', choices=['bin', 'hex', 'auto'], default='bin')
+    opt_group.add_argument('-f', '--force', action='store_true')
+    opt_group.add_argument('-R', '--reset', action='store_true', dest='auto_reset')
+
+    # Positional argument
+    parser.add_argument('file', nargs='?', default=None)
 
     args = parser.parse_args()
 
     opts = Options()
-    opts.port_index = args.port_index
-    opts.check = args.check
-    opts.write = args.write
-    opts.read = args.read
-    opts.verify = args.verify
+    opts.port_index = args.port
     opts.help = args.help
     opts.port_list = args.portlist
-    opts.force = args.force
+    opts.file = args.file
     opts.debug = args.debug
     opts.retry = args.retry
-    opts.auto_reset = args.auto_reset
-    opts.format = args.format
     opts.quiet = args.quiet
+    opts.format = args.format
+    opts.force = args.force
+    opts.auto_reset = args.auto_reset
 
     return opts
 
 
-def rv8flash(opts: Options) -> int:
-    """Main flash operation."""
+def rv8ram_boot(opts: Options) -> int:
+    """Main bootloader upload operation."""
     # Help
     if opts.help:
         print(__doc__)
@@ -420,6 +348,16 @@ def rv8flash(opts: Options) -> int:
         for i, p in enumerate(ports):
             print(f"[{i}] {p}")
         return 0
+
+    # Check file argument
+    if not opts.file:
+        print("Error: No file specified")
+        print("Usage: python3 rv8ram-boot.py [options] file.bin")
+        return 1
+
+    if not os.path.exists(opts.file):
+        print(f"Error: File not found: {opts.file}")
+        return 1
 
     # Get port
     ports = get_serial_ports()
@@ -435,89 +373,42 @@ def rv8flash(opts: Options) -> int:
 
     try:
         with SerialPort(port_name) as port:
-            # Check connection
-            if not opts.port_list:
-                if opts.debug:
-                    print(f"Using port: {port_name}")
-                if not cmd_check(port, opts.debug):
-                    print("Error: Programmer not responding")
-                    return 1
+            if opts.debug:
+                print(f"Using port: {port_name}")
 
-            # Check
-            if opts.check:
-                if cmd_check(port, opts.debug):
-                    print("Connected")
-                else:
-                    print("Not Connected")
-                return 0
+            # Load file
+            data = load_file(opts.file, opts.format)
+            size = len(data)
+            max_size = 15871  # $C000 - $FDFF
 
-            # Write
-            if opts.write:
-                if not os.path.exists(opts.write):
-                    print(f"Error: File not found: {opts.write}")
-                    return 1
+            if size > max_size:
+                print(f"Error: max {max_size} bytes (RAM $C000-$FDFF)")
+                return 1
 
-                data = load_file(opts.write, opts.format)
-                size = len(data)
-                max_size = 32768  # AT28C256
+            if not opts.quiet:
+                print(f"Uploading {opts.file} ({size} bytes)...")
+                print("Waiting for bootloader ready signal...")
 
-                if size > max_size:
-                    print(f"Error: File too large ({size} > {max_size})")
-                    return 1
+            # Wait for ready signal
+            if not wait_for_ready(port, debug=opts.debug):
+                print("Error: Timeout waiting for bootloader (send 'B' to enter boot mode)")
+                return 1
 
+            if not opts.quiet:
+                print("Got 'R'. Sending data...")
+
+            # Upload data
+            if upload_data(port, data, retry=opts.retry, debug=opts.debug, quiet=opts.quiet):
                 if not opts.quiet:
-                    print(f"Flashing {opts.write} ({size} bytes)...")
+                    print(f"Done. {size} bytes uploaded.")
 
-                if cmd_flash(port, data, opts.retry, opts.debug, opts.quiet):
+                if opts.auto_reset:
                     if not opts.quiet:
-                        print(f"Done. {size} bytes written.")
-
-                    if opts.auto_reset:
-                        if not opts.quiet:
-                            print("Auto-resetting CPU...")
-                        cmd_reset(port, opts.debug)
-                else:
-                    print("Flash failed")
-                    return 1
-
-            # Read
-            if opts.read:
-                if os.path.exists(opts.read) and not opts.force:
-                    print(f"Error: File exists (use -f to overwrite): {opts.read}")
-                    return 1
-
-                if not opts.quiet:
-                    print(f"Reading ROM (32768 bytes)...")
-
-                data = cmd_read(port, 32768, opts.debug)
-
-                if len(data) == 0:
-                    print("Error: Read failed (no data received)")
-                    return 1
-
-                save_file(opts.read, data)
-
-                if not opts.quiet:
-                    print(f"Done. {len(data)} bytes saved to {opts.read}")
-
-            # Verify
-            if opts.verify:
-                if not os.path.exists(opts.verify):
-                    print(f"Error: File not found: {opts.verify}")
-                    return 1
-
-                file_data = load_file(opts.verify, opts.format)
-
-                if not opts.quiet:
-                    print(f"Verifying...")
-
-                if cmd_verify(port, file_data, opts.debug):
-                    if not opts.quiet:
-                        print("Verified")
-                    return 0
-                else:
-                    print("Verification failed")
-                    return 1
+                        print("Auto-resetting CPU...")
+                    cmd_reset(port, opts.debug)
+            else:
+                print("Upload failed")
+                return 1
 
     except serial.SerialException as e:
         print(f"Error: Serial port error: {e}")
@@ -532,7 +423,7 @@ def rv8flash(opts: Options) -> int:
 def main():
     """Entry point."""
     opts = parse_args()
-    sys.exit(rv8flash(opts))
+    sys.exit(rv8ram_boot(opts))
 
 
 if __name__ == '__main__':
