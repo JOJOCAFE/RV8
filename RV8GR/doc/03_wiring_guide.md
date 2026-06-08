@@ -18,6 +18,34 @@ Reset → $8000
 
 ---
 
+## Timing Note (Critical for ROM Selection)
+
+**U5/U6 latch on rising edge of T0/T1** (= CLK edge that creates the phase).
+
+ROM access window depends on when ADDR_MODE returns to 0 (PC on ABUS):
+
+| Previous Instruction | ADDR_MODE during T2 | ROM access time available |
+|---------------------|:-------------------:|:-------------------------:|
+| LI, ADDI, SUBI, XORI, J, BEQ, BNE, SETPG, SETDP, EI, DI, NOP | 0 (PC on ABUS) | T2 + prop delay = ~115ns |
+| LB, ADD, SUB, XOR, SETPG_R, SB | 1 (IRL on ABUS) | prop delay only = ~15ns ❌ |
+
+**Issue**: After a data-access instruction (SRC=1 or STR=1), the address mux switches from IRL back to PC at T2→T0 transition. ROM then needs 150ns from new address — but U5 latches ~15ns later!
+
+**Resolution**: The PC address was already on ABUS during T0+T1 of the CURRENT instruction. The ROM at that address was read and latched into U5/U6. For the NEXT instruction, PC has been incremented and the NEW address appears only after T2→T0 switch.
+
+**Actually the correct model**: 
+- U5 latches at T0↑ = captures data that ROM output during PREVIOUS T2/T0 overlap
+- The design relies on: PC doesn't change during T2 (PC_INC=0), so ROM address stays valid
+
+**Safe ROM timing**:
+- AT28C256-150ns: works if ADDR_MODE=0 during previous T2 (most cases)
+- After LB/SB/ADD/SUB/XOR: address switches late → may need extra cycle or faster ROM
+
+**Recommendation**: Use **AT28C256-100ns** or **SST39SF010A-70ns** for reliable 10MHz operation.
+For breadboard testing: start at **5 MHz** with 150ns ROM, verify timing with oscilloscope.
+
+---
+
 ## RV8-Bus (40-pin System Bus)
 
 CPU board ↔ Expansion/Programmer ผ่าน 40-pin IDC connector
