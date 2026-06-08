@@ -1,6 +1,6 @@
 # RV8-GR — Design Sign-off v1.0
 
-**Horizontal-control 8-bit CPU. 30 chips. Deterministic. Ready for build.**
+**Horizontal-control 8-bit CPU. 31 chips. 32KB RAM. Deterministic. Ready for build.**
 
 ---
 
@@ -8,8 +8,8 @@
 
 ```
 Opcode = Control Word (no decoder)
-17 instructions, 3 cycles each, 3.3 MIPS @ 10 MHz
-64KB address, IRQ, 40-pin system bus
+18 instructions, 3 cycles each, 3.3 MIPS @ 10 MHz
+64KB address, 32KB data RAM, IRQ, 40-pin system bus
 ```
 
 ---
@@ -49,8 +49,8 @@ Opcode = Control Word (no decoder)
 
 | Metric | Value |
 |--------|-------|
-| Logic chips | 30 |
-| Instructions | 17 (+ NOT free) |
+| Logic chips | 31 |
+| Instructions | 18 (+ NOT free) |
 | Opcode space used | 6.6% |
 | Expansion room | 68.4% |
 | System bus | 40-pin (A16+D8+CLK+ctrl) |

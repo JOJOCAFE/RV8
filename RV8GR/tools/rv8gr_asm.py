@@ -24,6 +24,7 @@ OPCODES = {
     'JMP':     None,  # macro: SETPG hi + J lo
     'SETPG':   0x20,
     'SETPG_R': 0x28,
+    'SETDP':   0x40,
     'EI':      0x08,
     'DI':      0x48,
     'HLT':     None,  # macro: J self

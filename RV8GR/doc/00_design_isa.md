@@ -1,6 +1,6 @@
 # RV8-GR — Design & ISA Reference (Stable)
 
-**30 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
+**31 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
 
 ---
 
@@ -56,27 +56,30 @@ Byte 1 (Operand): immediate, RAM address, or jump target
 
 ---
 
-## Instructions (17)
+## Instructions (18)
 
 | Hex | Binary | Mnemonic | Operation |
 |:---:|:------:|----------|-----------|
 | $00 | 00000000 | NOP | No operation |
 | $01 | 00000001 | J addr | PC = {PG, addr} |
 | $02 | 00000010 | BEQ addr | if Z: PC = {PG, addr} |
-| $04 | 00000100 | SB addr | RAM[addr] = AC |
+| $04 | 00000100 | SB addr | RAM[{DP, addr}] = AC |
 | $08 | 00001000 | EI | IE = 1 |
 | $10 | 00010000 | ADDI imm | AC = AC + imm |
-| $18 | 00011000 | ADD rs | AC = AC + RAM[rs] |
+| $18 | 00011000 | ADD rs | AC = AC + RAM[{DP, rs}] |
 | $20 | 00100000 | SETPG imm | PageReg = imm |
-| $28 | 00101000 | SETPG_R rs | PageReg = RAM[rs] |
+| $28 | 00101000 | SETPG_R rs | PageReg = RAM[{DP, rs}] |
 | $30 | 00110000 | LI imm | AC = imm |
-| $38 | 00111000 | LB rs | AC = RAM[rs] |
+| $38 | 00111000 | LB rs | AC = RAM[{DP, rs}] |
+| $40 | 01000000 | SETDP imm | DataPageReg = imm |
 | $48 | 01001000 | DI | IE = 0 |
 | $70 | 01110000 | XORI imm | AC = AC ^ imm |
-| $78 | 01111000 | XOR rs | AC = AC ^ RAM[rs] |
+| $78 | 01111000 | XOR rs | AC = AC ^ RAM[{DP, rs}] |
 | $82 | 10000010 | BNE addr | if !Z: PC = {PG, addr} |
 | $90 | 10010000 | SUBI imm | AC = AC - imm |
-| $98 | 10011000 | SUB rs | AC = AC - RAM[rs] |
+| $98 | 10011000 | SUB rs | AC = AC - RAM[{DP, rs}] |
+
+DP = Data Page Register (7 bits). Data address = {DP[6:0], operand} = 15-bit (32KB RAM).
 
 ---
 
@@ -118,7 +121,7 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 
 ---
 
-## Chip List (30)
+## Chip List (31)
 
 | U# | Chip | Role |
 |:--:|------|------|
@@ -136,13 +139,14 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 | U19-U20 | 74HC157 ×2 | XOR B-input mux |
 | U21 | 74HC74 | Z flag FF |
 | U22 | 74HC688 | Zero detect |
-| U23 | 74HC574 | Page Register |
+| U23 | 74HC574 | Page Register (jump) |
 | U24 | 74HC04 | Inverters |
 | U25 | 74HC32 | OR gates + bus guard |
 | U26-U27 | 74HC00 ×2 | NAND gates |
 | U28 | 74HC86 | Z_match, /T2, WR_DIR |
 | U29-U30 | 74HC157 ×2 | Addr mux A[15:8] |
 | U31 | 74HC74 | IRQ_FF + IE_FF |
+| U32 | 74HC574 | Data Page Register |
 
 ---
 
@@ -158,6 +162,7 @@ BUF_OE_SAFE  = BUF_OE_N | STR        ← SRC+STR guard
 PC_LOAD_COND = JMP | (BR & Z_match)
 Z_match      = Z_flag XOR SUB
 PG_Load_N    = /T2 | /PG_cond
+DP_Load      = T2 AND is_setdp        ← Data Page latch
 ```
 
 ---

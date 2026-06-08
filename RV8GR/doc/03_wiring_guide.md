@@ -1,6 +1,6 @@
 # RV8-GR — Wiring Guide (Official)
 
-**30 logic chips + ROM + RAM = 32 packages. Source of truth for physical build.**
+**31 logic chips + ROM + RAM = 33 packages. Source of truth for physical build.**
 
 ---
 
@@ -540,23 +540,23 @@ U28-12 → NC   U28-13 → NC   U28-11 → NC
 U28-7 (GND) → GND   U28-14(VCC) → VCC
 ```
 
-### U29-U30 74HC157 — Address Mux A[15:8] (PC high vs GND)
+### U29-U30 74HC157 — Address Mux A[15:8] (PC high vs Data Page)
 
 ```
-SEL=0: PC high, SEL=1: GND (data at $00xx)
+SEL=0: PC high, SEL=1: Data Page Register (U32 Q outputs)
 
 U29-1 (SEL) ← ADDR_MODE        U29-15(/E) → GND
-U29-2 (1A) ← PC8    U29-3 (1B) → GND   U29-4 (1Y) → A8
-U29-5 (2A) ← PC9    U29-6 (2B) → GND   U29-7 (2Y) → A9
-U29-11(3A) ← PC10   U29-10(3B) → GND   U29-9 (3Y) → A10
-U29-14(4A) ← PC11   U29-13(4B) → GND   U29-12(4Y) → A11
+U29-2 (1A) ← PC8    U29-3 (1B) ← DP0 (U32-19)   U29-4 (1Y) → A8
+U29-5 (2A) ← PC9    U29-6 (2B) ← DP1 (U32-18)   U29-7 (2Y) → A9
+U29-11(3A) ← PC10   U29-10(3B) ← DP2 (U32-17)   U29-9 (3Y) → A10
+U29-14(4A) ← PC11   U29-13(4B) ← DP3 (U32-16)   U29-12(4Y) → A11
 U29-8 (GND) → GND   U29-16(VCC) → VCC
 
 U30-1 (SEL) ← ADDR_MODE        U30-15(/E) → GND
-U30-2 (1A) ← PC12   U30-3 (1B) → GND   U30-4 (1Y) → A12
-U30-5 (2A) ← PC13   U30-6 (2B) → GND   U30-7 (2Y) → A13
-U30-11(3A) ← PC14   U30-10(3B) → GND   U30-9 (3Y) → A14
-U30-14(4A) ← PC15   U30-13(4B) → GND   U30-12(4Y) → A15 → RAM /CE, U24-5
+U30-2 (1A) ← PC12   U30-3 (1B) ← DP4 (U32-15)   U30-4 (1Y) → A12
+U30-5 (2A) ← PC13   U30-6 (2B) ← DP5 (U32-14)   U30-7 (2Y) → A13
+U30-11(3A) ← PC14   U30-10(3B) ← DP6 (U32-13)   U30-9 (3Y) → A14
+U30-14(4A) ← PC15   U30-13(4B) ← GND             U30-12(4Y) → A15 → RAM /CE, U24-5
 U30-8 (GND) → GND   U30-16(VCC) → VCC
 ```
 
@@ -584,6 +584,44 @@ U31-14(VCC)   → VCC
 IRQ_ack = T2 AND IE AND IRQ_FF AND /PC_LOAD_COND
 On ack: force PG=$FF, IRL=$00, assert /PC_LD, save PC to RAM[$0E:$0F]
 ```
+
+---
+
+### U32 74HC574 — Data Page Register
+
+```
+U32-1 (/OE) → GND
+U32-2 (D1) ← IB0   U32-3 (D2) ← IB1
+U32-4 (D3) ← IB2   U32-5 (D4) ← IB3
+U32-6 (D5) ← IB4   U32-7 (D6) ← IB5
+U32-8 (D7) ← IB6   U32-9 (D8) ← IB7
+U32-10(GND) → GND
+U32-11(CLK) ← DP_Load (decode: T2 AND SETDP)
+U32-12(Q8) → NC (bit 7 unused, A15 always from mux)
+U32-13(Q7) → DP6 → U30-10 (A14 B-input)
+U32-14(Q6) → DP5 → U30-6 (A13 B-input)
+U32-15(Q5) → DP4 → U30-2 (A12 B-input, was U30-3)
+U32-16(Q4) → DP3 → U29-14 (A11 B-input, was U29-13)
+U32-17(Q3) → DP2 → U29-10 (A10 B-input)
+U32-18(Q2) → DP1 → U29-6 (A9 B-input)
+U32-19(Q1) → DP0 → U29-3 (A8 B-input)
+U32-20(VCC) → VCC
+
+SETDP decode: ir_high = $40 (XOR_MODE=1, all others=0)
+DP_Load = T2 AND XOR_MODE AND NOT(MUX_SEL) AND NOT(AC_WR) AND NOT(SRC) ...
+Simplified: use spare gate U28-D as part of decode
+  U28-12 ← XOR_MODE (U5-13)
+  U28-13 ← (something to distinguish from XORI $70)
+  Or: compare ir_high == $40 using specific gate combination
+
+Practical: SETDP = XOR_MODE=1 AND MUX_SEL=0 AND AC_WR=0 AND SRC=0 AND STR=0
+  = bit6=1 AND bit5=0 AND bit4=0 AND bit3=0 AND bit2=0 AND bit1=0 AND bit0=0
+  Only $40 and $C0 match (SUB doesn't matter for latch)
+  → DP_Load = T2 AND XOR_MODE AND NOT(MUX_SEL) AND NOT(source_type)
+  Use spare gates or add 1 gate for decode
+```
+
+Note: A15 (U30 pin 13 B-input) stays GND — ensures data access is always in RAM ($0000-$7FFF).
 
 ---
 

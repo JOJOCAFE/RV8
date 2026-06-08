@@ -1,9 +1,11 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// Matches 03_wiring_guide.md: 30 logic chips (incl. U31 74HC74 for IRQ)
+// Matches 03_wiring_guide.md: 31 logic chips (incl. U31 IRQ, U32 Data Page)
 // Memory: ROM $8000-$FFFF, RAM $0000-$7FFF, PC starts $8000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
+// 18 instructions (17 + SETDP)
 // IRQ: fixed vector $FF00, IE flag, auto-save PC to RAM[$0E:$0F]
 // Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25 gate 3 → U7-19)
+// Data Page: U32 74HC574, SETDP $40 → full 32KB RAM access
 
 module rv8gr_cpu (
     input  wire clk,
@@ -15,7 +17,7 @@ module rv8gr_cpu (
 
     reg [1:0]  state;
     reg [15:0] pc;
-    reg [7:0]  ac, ir_high, ir_low, page_reg;
+    reg [7:0]  ac, ir_high, ir_low, page_reg, data_page_reg;
     reg        z_flag, halt;
     reg        ie, irq_ff;  // interrupt enable, IRQ latch (74HC74)
 
@@ -33,24 +35,28 @@ module rv8gr_cpu (
     wire branch = ir_high[1];
     wire jump = ir_high[0];
 
-    // EI/DI decode: source_type=1, no ac_wr/store/branch/jump
-    wire is_ei = (ir_high == 8'h08);  // EI: $08
-    wire is_di = (ir_high == 8'h48);  // DI: $48
+    // EI/DI/SETDP decode
+    wire is_ei = (ir_high == 8'h08);    // EI: $08
+    wire is_di = (ir_high == 8'h48);    // DI: $48
+    wire is_setdp = (ir_high == 8'h40); // SETDP: $40 (XOR_MODE=1 only)
 
     // Derived
     wire z_match = z_flag ^ alu_sub;
     wire br_taken = branch & z_match;
     wire pc_load = jump | br_taken;
-    wire pg_load = mux_sel & ~ac_wr;
+    wire pg_load = mux_sel & ~ac_wr & ~xor_mode; // exclude SETDP ($40 has XOR=1)
 
-    // IRQ condition: pending IRQ + interrupts enabled + at instruction boundary
+    // IRQ condition
     wire irq_pending = irq_ff & ie;
 
     // Memory read (fetch): A15 selects ROM or RAM
     wire [7:0] mem_read = pc[15] ? rom[pc[14:0]] : ram[pc[14:0]];
 
-    // IBUS during T2: data access always at $00xx (RAM low page)
-    wire [7:0] ibus = source_type ? ram[{7'b0, ir_low}] : ir_low;
+    // Data address: {data_page_reg[6:0], ir_low} — full 32KB RAM
+    wire [14:0] data_addr = {data_page_reg[6:0], ir_low};
+
+    // IBUS during T2: data access uses data_page_reg for A[14:8]
+    wire [7:0] ibus = source_type ? ram[data_addr] : ir_low;
 
     // ALU
     wire [7:0] xor_b = xor_mode ? ac : {8{alu_sub}};
@@ -65,7 +71,7 @@ module rv8gr_cpu (
 
     assign halted = halt;
 
-    // Latch IRQ on falling edge of irq_n (active-low input)
+    // Latch IRQ on falling edge of irq_n
     reg irq_n_prev;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -73,14 +79,14 @@ module rv8gr_cpu (
             irq_n_prev <= 1'b1;
         end else begin
             irq_n_prev <= irq_n;
-            if (irq_n_prev & ~irq_n)  // falling edge detect
+            if (irq_n_prev & ~irq_n)
                 irq_ff <= 1'b1;
-            // Clear when IRQ is acknowledged (at T2 end, entering ISR)
             if (state == T2 && irq_pending && !pc_load)
                 irq_ff <= 1'b0;
         end
     end
 
+    // Store uses data_page_reg for address
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state <= T0;
@@ -89,9 +95,10 @@ module rv8gr_cpu (
             ir_high <= 8'h00;
             ir_low <= 8'h00;
             page_reg <= 8'h80;
+            data_page_reg <= 8'h00;  // data page 0 on reset
             z_flag <= 1'b1;
             halt <= 1'b0;
-            ie <= 1'b0;       // interrupts disabled on reset
+            ie <= 1'b0;
         end else if (!halt) begin
             case (state)
                 T0: begin
@@ -105,15 +112,17 @@ module rv8gr_cpu (
                     state <= T2;
                 end
                 T2: begin
-                    // Normal execution
+                    // Store: RAM[{data_page[6:0], ir_low}] = AC
                     if (store)
-                        ram[{7'b0, ir_low}] <= ac;
+                        ram[data_addr] <= ac;
                     if (ac_wr) begin
                         ac <= ac_mux;
                         z_flag <= (ac_mux == 8'h00);
                     end
                     if (pg_load)
                         page_reg <= ibus;
+                    if (is_setdp)
+                        data_page_reg <= ir_low;
                     if (pc_load)
                         pc <= {page_reg, ir_low};
 
@@ -121,15 +130,13 @@ module rv8gr_cpu (
                     if (is_ei) ie <= 1'b1;
                     if (is_di) ie <= 1'b0;
 
-                    // IRQ: fire at end of instruction if pending and no jump
+                    // IRQ
                     if (irq_pending && !pc_load) begin
-                        // Save PC to RAM[$0E] (low) and RAM[$0F] (high)
                         ram[8'h0E] <= pc[7:0];
                         ram[8'h0F] <= pc[15:8];
-                        // Jump to vector $FF00
                         page_reg <= 8'hFF;
                         pc <= 16'hFF00;
-                        ie <= 1'b0;  // disable nested IRQ
+                        ie <= 1'b0;
                     end
 
                     if (is_halt)

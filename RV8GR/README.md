@@ -8,11 +8,12 @@
 
 | Spec | Value |
 |------|-------|
-| Logic chips | 30 (74HC series, DIP) |
-| Total packages | 32 (+ ROM + RAM) |
-| ISA | 17 instructions |
+| Logic chips | 31 (74HC series, DIP) |
+| Total packages | 33 (+ ROM + RAM) |
+| ISA | 18 instructions |
 | Clock | 10 MHz |
 | Speed | 3.3 MIPS |
+| Gate count | ~1,250 (logic only, excl. ROM/RAM) |
 | Address | 64KB (ROM $8000+, RAM $0000+) |
 | Bus | RV8-Bus 40-pin (A16+D8+control) |
 | Registers | 8 in RAM ($00-$07) |
@@ -29,9 +30,9 @@
 $00  NOP         $01  J addr       $02  BEQ addr
 $04  SB addr     $08  EI           $10  ADDI imm
 $18  ADD rs      $20  SETPG imm    $28  SETPG_R rs
-$30  LI imm      $38  LB rs        $48  DI
-$70  XORI imm    $78  XOR rs       $82  BNE addr
-$90  SUBI imm    $98  SUB rs
+$30  LI imm      $38  LB rs        $40  SETDP imm
+$48  DI           $70  XORI imm    $78  XOR rs
+$82  BNE addr    $90  SUBI imm     $98  SUB rs
 ```
 
 Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
@@ -45,7 +46,7 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 | Part | Qty | Function |
 |------|:---:|----------|
 | 74HC161 | 4 | PC counter |
-| 74HC574 | 6 | IR, AC, Page Reg |
+| 74HC574 | 7 | IR, AC, Page Reg, Data Page |
 | 74HC245 | 1 | Bus buffer |
 | 74HC164 | 1 | Ring counter |
 | 74HC283 | 2 | Adder |
