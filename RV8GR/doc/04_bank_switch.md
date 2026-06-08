@@ -43,7 +43,7 @@ Latch D0 ← DBUS D0
 ```asm
 SETDP $FF       ; I/O page
 LI $01          ; bank 1
-SB $F0          ; write to I/O latch → ROM A16=1 (upper 32KB)
+SB $10          ; write to $FF10 → /SLOT1 active → latch captures D0 → ROM A16=1
 ```
 
 ---

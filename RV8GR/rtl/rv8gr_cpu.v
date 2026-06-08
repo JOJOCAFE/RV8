@@ -3,7 +3,7 @@
 // Memory: ROM $8000-$FFFF, RAM $0000-$7FFF, PC starts $8000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 // 18 instructions (17 + SETDP)
-// IRQ: fixed vector $FF00, IE flag, auto-save PC to RAM[$0E:$0F]
+// IRQ: fixed vector $FF00, IE flag. PC save: software (v1.0), behavioral model saves for testing.
 // Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25 gate 3 → U7-19)
 // Data Page: U32 74HC574, SETDP $40 → full 64KB data access (ROM+RAM)
 
