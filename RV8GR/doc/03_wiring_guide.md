@@ -8,8 +8,11 @@
 
 ```
 $0000-$7FFF  RAM 32KB (registers $00-$07, data, executable)
-$8000-$FFFF  ROM 32KB (bankable to 128KB)
-$FF00        IRQ vector
+$8000-$FEFF  ROM 32KB (bankable to 128KB)
+$FF00-$FF0F  ROM: IRQ vector + ISR entry
+$FF10-$FF1F  I/O Slot 1 (/SLOT1 on bus)
+$FF20-$FF2F  I/O Slot 2 (/SLOT2 on bus)
+$FF30-$FFFF  ROM: ISR code
 Reset → $8000
 ```
 

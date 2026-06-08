@@ -9,8 +9,8 @@
 ```
 $0000-$7FFF  RAM 32KB (/CE = A15) — read/write via SETDP $00-$7F
 $8000-$FEFF  ROM 32KB (/CE = /A15) — read via SETDP $80-$FE
-$FF00-$FF0F  I/O Slot 1 (/SLOT1 on RV8-Bus)
-$FF10-$FF1F  I/O Slot 2 (/SLOT2 on RV8-Bus)
+$FF10-$FF1F  I/O Slot 1 (/SLOT1 on RV8-Bus)
+$FF20-$FF2F  I/O Slot 2 (/SLOT2 on RV8-Bus)
 ```
 
 ### Data Access (built-in, no expansion needed)

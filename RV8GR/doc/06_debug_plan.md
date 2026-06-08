@@ -340,8 +340,8 @@ Pin 26:    /RST จาก reset circuit
 Pin 27:    /WR = /AC_BUF (U26-8)
 Pin 28:    /RD (ใช้ NOT(T2) หรือ fetch indicator)
 Pin 29:    /IRQ ← input จาก peripheral (ต่อ U31-10)
-Pin 30:    /SLOT1 ← address decode ($FF0x)
-Pin 31:    /SLOT2 ← address decode ($FF1x)
+Pin 30:    /SLOT1 ← address decode ($FF1x)
+Pin 31:    /SLOT2 ← address decode ($FF2x)
 Pin 32:    T2 (U8-5)
 Pin 39:    VCC (+5V)
 Pin 40:    GND
@@ -360,12 +360,12 @@ Pin 40:    GND
 
 **ทดสอบ I/O Slot:**
 ```asm
-; Test SLOT1 ($FF00):
+; Test SLOT1 ($FF10):
 SETPG $FF       ; page = $FF
 LI $42          ; AC = $42
-SB $00          ; write to $FF00 → /SLOT1 should go LOW
+SB $10          ; write to $FF10 → /SLOT1 should go LOW
 ```
-- [ ] /SLOT1 (pin 30) goes LOW during SB $00 at page $FF
+- [ ] /SLOT1 (pin 30) goes LOW during SB $10 at page $FF
 
 ---
 

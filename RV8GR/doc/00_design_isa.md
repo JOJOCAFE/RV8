@@ -20,9 +20,10 @@ Control byte bits → hardware signals (no microcode ROM)
 ```
 $0000-$7FFF  RAM 32KB (registers, data, executable)
 $8000-$FEFF  ROM 32KB (bankable to 128KB)
-$FF00-$FF0F  I/O Slot 1 (via /SLOT1 on RV8-Bus)
-$FF10-$FF1F  I/O Slot 2 (via /SLOT2 on RV8-Bus)
-$FF00        IRQ vector
+$FF00-$FF0F  ROM: IRQ vector + ISR entry
+$FF10-$FF1F  I/O Slot 1 (via /SLOT1 on RV8-Bus)
+$FF20-$FF2F  I/O Slot 2 (via /SLOT2 on RV8-Bus)
+$FF30-$FFFF  ROM: ISR code
 Reset → $8000
 ```
 
@@ -98,6 +99,7 @@ DP = Data Page Register (8 bits). Data address = {DP, operand} = 16-bit (full 64
 | CLR | LI $00 | Clear AC |
 | INC | ADDI $01 | Increment |
 | DEC | SUBI $01 | Decrement |
+| $C0 imm | = SETDP imm | Alias (SUB bit ignored by decode) |
 
 ---
 
