@@ -144,7 +144,25 @@ RV8GR/
 | 1 | Assembler | ✅ |
 | 2 | Test ROM | ✅ |
 | 3 | Parts list | ✅ |
-| 4 | Programmer test | ⬜ |
-| 5 | Breadboard layout | ⬜ |
-| 6 | Physical build | ⬜ |
-| 7 | First program | ⬜ |
+| 4 | Design sign-off | ✅ |
+| 5 | Programmer tools | ✅ |
+| 6 | Gate-level simulator (chip_sim.py) | ⬜ |
+| 7 | Breadboard layout plan | ⬜ |
+| 8 | Physical build (5 MHz) | ⬜ |
+| 9 | Verify at 10 MHz | ⬜ |
+| 10 | BASIC interpreter | ⬜ |
+| 11 | Simple game | ⬜ |
+
+### Task 6: Gate-Level Simulator (Next)
+
+Pin-accurate Python simulation of all 35 chips. Design: `sim/chip_sim_design.md`
+
+```
+sim/
+├── chips/base.py           — Chip + TristateBus + Simulator engine
+├── chips/sequential.py     — HC574, HC161, HC164, HC74
+├── chips/combinational.py  — HC04, HC00, HC32, HC86, HC157, HC283, HC245, HC541, HC688, HC21
+├── chips/memory.py         — ROM, RAM
+├── wiring.py               — All connections from 03_wiring_guide.md
+└── chip_sim.py             — Main entry + probe + LED-style testing
+```
