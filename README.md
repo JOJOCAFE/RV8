@@ -8,7 +8,7 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 
 | | **RV8** | **RV8-R** | **RV8-G** | **RV8-GR** |
 |--|:---:|:---:|:---:|:---:|
-| **Logic chips** | 27 | **18** | **38** | **30** |
+| **Logic chips** | 27 | **18** | **38** | **31** |
 | **Total** | 29 | 21 | 40 | 32 |
 | **MIPS @10MHz** | 1.25 | 1.0 | **2.5** | **3.3** |
 | **ISA** | Full (35) | Full (35) | Full (35) | 18 instr |

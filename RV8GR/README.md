@@ -1,6 +1,6 @@
 # RV8-GR — No Microcode, Full 64K, IRQ (Stable)
 
-**30 logic chips + ROM + RAM = 32 packages. Verilog verified.**
+**31 logic chips + ROM + RAM = 33 packages. Verilog verified.**
 
 ---
 
@@ -24,7 +24,7 @@
 
 ---
 
-## ISA (17 instructions)
+## ISA (18 instructions)
 
 ```
 $00  NOP         $01  J addr       $02  BEQ addr
@@ -41,7 +41,7 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 ## BOM
 
-### Logic (30 chips)
+### Logic (31 chips)
 
 | Part | Qty | Function |
 |------|:---:|----------|
