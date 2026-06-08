@@ -9,7 +9,7 @@
 ```
 Opcode = Control Word (no decoder)
 18 instructions, 3 cycles each, 3.3 MIPS @ 10 MHz
-64KB address, 32KB data RAM, IRQ, 40-pin system bus
+64KB address, 64KB data access (ROM+RAM), IRQ, 40-pin system bus
 ```
 
 ---
@@ -19,7 +19,7 @@ Opcode = Control Word (no decoder)
 | Category | Status |
 |----------|:------:|
 | Datapath correctness | ✅ Verilog 127 cycles |
-| ISA (17 instructions) | ✅ All verified |
+| ISA (18 instructions) | ✅ All verified |
 | IRQ | ✅ 6 tests pass |
 | Memory Map | ✅ ROM $8000+, RAM $0000+ |
 | Timing @ 10 MHz | ✅ All paths safe |
@@ -52,8 +52,8 @@ Opcode = Control Word (no decoder)
 |--------|-------|
 | Logic chips | 31 |
 | Instructions | 18 (+ NOT free) |
-| Opcode space used | 6.6% |
-| Expansion room | 68.4% |
+| Opcode space used | 7.0% |
+| Expansion room | 68.0% |
 | System bus | 40-pin (A16+D8+CLK+ctrl) |
 | Max cable | 30cm @ 10MHz |
 | Forbidden opcodes | 64 (blocked by guard) |

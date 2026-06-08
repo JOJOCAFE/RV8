@@ -97,7 +97,7 @@ Decode:
 | Class | Pattern | Count | Behavior |
 |-------|---------|:-----:|----------|
 | Valid ISA | 18 defined | 18 | Specified |
-| Illegal safe | NOT (opcode & $0C)==$0C | 175 | Deterministic |
+| Illegal safe | NOT (opcode & $0C)==$0C | 174 | Deterministic |
 | Forbidden | (opcode & $0C)==$0C | 64 | Blocked by guard |
 
 ---
