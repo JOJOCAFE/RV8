@@ -25,6 +25,7 @@ Opcode = Control Word (no decoder)
 | Timing @ 10 MHz | ✅ All paths safe |
 | Bus guard (SRC+STR) | ✅ Applied |
 | Opcode hazard (256 codes) | ✅ All deterministic |
+| SETDP decode | ✅ No conflict with SETPG/DI |
 | ALU modes (8 modes) | ✅ All deterministic |
 | RV8-Bus (40-pin) | ✅ Defined |
 | Signal integrity | ✅ Cable <30cm |

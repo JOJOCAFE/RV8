@@ -258,23 +258,38 @@ LI $42: ต้องการ AC = $42
 
 **ปัญหา**: CPU ต้องใช้ address bus 2 แบบ:
 1. **Fetch**: ชี้ไป ROM ตาม PC (อ่านคำสั่ง)
-2. **Data access**: ชี้ไป RAM ตาม operand (อ่าน/เขียนข้อมูล)
+2. **Data access**: ชี้ไป RAM/ROM ตาม operand (อ่าน/เขียนข้อมูล)
 
 **Mux เลือก:**
 
 ```
-ADDR_MODE=0 (T0, T1): A[15:0] = PC      → อ่าน ROM/RAM ตาม PC
-ADDR_MODE=1 (T2):     A[7:0]  = IRL     → อ่าน/เขียน RAM ที่ $00xx
-                       A[15:8] = $00
+ADDR_MODE=0 (T0, T1): A[15:0] = PC          → อ่าน ROM/RAM ตาม PC
+ADDR_MODE=1 (T2):     A[7:0]  = IRL         → low byte จาก operand
+                       A[15:8] = Data Page   → high byte จาก U32
 ```
+
+**Data Page Register (U32):**
+```
+SETDP $10     → Data Page = $10
+LB $05        → อ่าน RAM[$1005] (ไม่ใช่ $0005!)
+SB $20        → เขียน RAM[$1020]
+
+SETDP $80     → Data Page = $80
+LB $00        → อ่าน ROM[$8000] (lookup table!)
+
+SETDP $00     → กลับมาที่ registers ($0000-$00FF)
+```
+
+**ทำไมต้องมี Data Page?**
+- Operand มีแค่ 8 บิต → เข้าถึงได้แค่ 256 ตำแหน่ง
+- Data Page เพิ่ม high byte → เข้าถึงได้ทั้ง **64KB!**
+- ไม่มี Data Page → ทำ BASIC หรือ game ไม่ได้ (256 bytes ไม่พอ!)
 
 **Chip Select จาก A15:**
 ```
-A15=1 → ROM ทำงาน (address $8000+)
-A15=0 → RAM ทำงาน (address $0000+)
+A15=1 → ROM ทำงาน (address $8000+) — อ่านได้อย่างเดียว
+A15=0 → RAM ทำงาน (address $0000+) — อ่านและเขียนได้
 ```
-
-ง่ายมาก — สายเส้นเดียว (A15) ตัดสินว่าเป็น ROM หรือ RAM!
 
 ---
 
@@ -544,7 +559,8 @@ CPU เขียน SB $00 ที่ page $FF → ข้อมูลไปถึ
 | NAND | U26-U27 (74HC00) | 2 | สร้าง control |
 | XOR misc | U28 (74HC86) | 1 | Z_match, WR_DIR |
 | IRQ | U31 (74HC74) | 1 | IE + IRQ latch |
-| **รวม** | | **30** | |
+| Data Page | U32 (74HC574) | 1 | Data address high byte |
+| **รวม** | | **31** | |
 
 ---
 

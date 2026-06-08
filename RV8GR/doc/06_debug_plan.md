@@ -238,15 +238,28 @@ After T2:  AC = $42 ← LI $42 ทำงานแล้ว!
 
 ---
 
-## ขั้นที่ 11: RAM (62256)
+## ขั้นที่ 11: RAM (62256) + Data Page (U32)
 
-**ต่ออะไร**: RAM, ต่อ ABUS, DBUS, /CE ← A15, /WE ← /AC_BUF
+**ต่ออะไร**: RAM, U32 (74HC574), ต่อ ABUS, DBUS, /CE ← A15, /WE ← /AC_BUF
 
-**ทดสอบ SB $03 (store)**:
-- [ ] AC=$AA, SB $03 → RAM[$0003] = $AA
+**U32 wiring**:
+- D[7:0] ← IBUS
+- Q[6:0] → U29/U30 B-inputs (A[14:8])
+- Q[7] → U30-13 (A15 B-input)
+- CLK ← DP_Load decode (T2 AND ir_high==$40)
+
+**ทดสอบ page 0 (SETDP $00)**:
+- [ ] SETDP $00, AC=$AA, SB $03 → RAM[$0003] = $AA
 - [ ] LB $03 → AC = $AA (read back)
 
-**LED**: 8 ดวงบน DBUS (ดูค่าที่อ่าน/เขียน)
+**ทดสอบ page $10 (SETDP $10)**:
+- [ ] SETDP $10, LI $55, SB $00 → RAM[$1000] = $55
+- [ ] LB $00 → AC = $55 (read from page $10)
+
+**ทดสอบ ROM read (SETDP $80)**:
+- [ ] SETDP $80, LB $00 → AC = ROM[$8000] = first opcode
+
+**LED**: 8 ดวงบน U32 Q outputs (ดู data page value)
 
 ---
 

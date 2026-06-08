@@ -18,6 +18,7 @@
 | 8 | BR+JMP overlap | 🟢 | = unconditional jump |
 | 9 | T2→T0 bus switch | 🟢 | U14 off before U7 on |
 | 10 | Bus signal integrity | 🟡 | Safe with cable <30cm |
+| 11 | SETDP vs SETPG conflict | 🟢 | XOR_MODE distinguishes |
 
 ---
 
@@ -61,6 +62,21 @@ Result: STR=1 → U7 always disabled → STORE wins → no bus fight.
 | 1 | 1 | 1 | ❌ | AC ^ IBUS (= mode 011) |
 
 **No undefined behavior.** Mode 101 = free NOT instruction ($B0/$B8).
+
+---
+
+## #11: SETDP vs SETPG Conflict
+
+**SETDP** ($40) = XOR_MODE=1, MUX=0, SRC=0
+**SETPG** ($20) = XOR_MODE=0, MUX=1, SRC=0
+**DI** ($48) = XOR_MODE=1, SRC=1
+
+Decode:
+- pg_load = MUX AND NOT(AC_WR) AND NOT(XOR_MODE) → SETPG only ✓
+- dp_load = (ir_high == $40) → SETDP only ✓
+- DI = (ir_high == $48) → different from $40 ✓
+
+**No conflicts.** Each uses unique bit pattern.
 
 ---
 
