@@ -1,5 +1,29 @@
 # RV8 Project — Changelog
 
+## 2026-06-09 — v3.2: RV8-GR Design Sign-off
+
+### Design Review
+- **Risk analysis**: 10 hazards analyzed, all resolved
+- **SRC+STR guard**: Hardware fix applied (U25 gate 3 → U7-19)
+- **Bus definition**: RV8-Bus v2 (40-pin, CLK, /IRQ, /SLOT1-2)
+- **Design sign-off**: Approved for physical build
+
+### Documentation Rewrite (Stable)
+- Merged 00_design + 01_isa_reference → `00_design_isa.md`
+- Merged Construct.md → `03_wiring_guide.md` (official source of truth)
+- Rewrote `02_instruction_trace.md` (compact, 7 traces)
+- Rewrote `05_understand_by_module.md` (Thai tutorial, 15 sections + design rationale)
+- Created `06_debug_plan.md` (14-step physical build guide)
+- Created `07_risk_analysis.md` (10 hazards)
+- Created `08_design_signoff.md` (final sign-off)
+- Moved rv8gr_cpu.v → `rtl/` folder
+- Removed obsolete files (Construct.md, tb_rv8gr_cpu.v, TASKS.md)
+
+### Key Discoveries
+- **Free NOT instruction** ($B0/$B8): ALU mode 101 = NOT(operand), 0 hardware cost
+- **Opcode space**: 17 used (6.6%), 175 deterministic (68.4%), 64 forbidden (25%)
+- **All 256 opcodes** produce deterministic behavior (horizontal control)
+
 ## 2026-06-08 — v3.1: Programmer Tools Complete
 
 ### Features

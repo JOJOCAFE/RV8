@@ -34,7 +34,7 @@ module tb_rv8gr_tasks;
         cpu.rom[0] = 8'h30; cpu.rom[1] = 8'h42;
         step; if (cpu.ir_high !== 8'h30) begin $display("FAIL: IR=%02X", cpu.ir_high); errors++; end else $display("PASS: T0 latches control = $30");
         if (cpu.pc !== 16'h8001) begin $display("FAIL: PC=%04X", cpu.pc); errors++; end else $display("PASS: PC after T0 = $8001");
-        step; if (cpu.ir_high.q[0] !== 8'h42.q[0] && cpu.ir_high !== 8'h42) begin $display("FAIL: IRL=%02X", cpu.ir_high); errors++; end else $display("PASS: T1 latches operand = $42");
+        step; if (cpu.ir_low !== 8'h42) begin $display("FAIL: IRL=%02X", cpu.ir_low); errors++; end else $display("PASS: T1 latches operand = $42");
         if (cpu.pc !== 16'h8002) begin $display("FAIL: PC=%04X", cpu.pc); errors++; end else $display("PASS: PC after T1 = $8002");
         step; if (cpu.ac !== 8'h42) begin $display("FAIL: AC=%02X", cpu.ac); errors++; end else $display("PASS: T2 executes LI = $42");
         if (cpu.pc !== 16'h8002) begin $display("FAIL: PC=%04X", cpu.pc); errors++; end else $display("PASS: PC stable after T2 = $8002");

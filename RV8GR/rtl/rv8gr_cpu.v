@@ -1,8 +1,9 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// Matches Construct.md: 30 logic chips (incl. U31 74HC74 for IRQ)
+// Matches 03_wiring_guide.md: 30 logic chips (incl. U31 74HC74 for IRQ)
 // Memory: ROM $8000-$FFFF, RAM $0000-$7FFF, PC starts $8000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 // IRQ: fixed vector $FF00, IE flag, auto-save PC to RAM[$0E:$0F]
+// Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25 gate 3 → U7-19)
 
 module rv8gr_cpu (
     input  wire clk,

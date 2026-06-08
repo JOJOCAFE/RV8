@@ -1,5 +1,15 @@
 # RV8 Project — Development History
 
+## 2026-06-09 — v3.2: RV8-GR Design Sign-off
+
+- Complete design review and risk analysis (10 hazards)
+- SRC+STR hardware guard applied (spare gate, 0 chips added)
+- RV8-Bus v2 defined (40-pin: A16+D8+CLK+/WR+/RD+/IRQ+/SLOT)
+- Documentation rewrite: merged and compacted all docs
+- Created debug plan (14 steps for physical build)
+- Discovered free NOT instruction ($B0/$B8)
+- Design signed off for physical build
+
 ## 2026-06-08 — v3.1: Programmer Tools
 
 - Created rv8flash.py (540 lines, 16 tests) — Flash ROM via ESP32
