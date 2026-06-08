@@ -217,7 +217,7 @@ class CPU:
     # DEBUG OUTPUT
     # =========================================================================
 
-    def trace(self):
+    def trace(self, verbose=False):
         """Print current state."""
         phase_names = ['T0', 'T1', 'T2']
         s = self.signals
@@ -226,6 +226,49 @@ class CPU:
               f"PG=${self.page_reg:02X} DP=${self.data_page:02X} | "
               f"ABUS=${self.abus:04X} DBUS=${self.dbus:02X} IBUS=${self.ibus:02X} | "
               f"IR=${self.ir_high:02X},{self.ir_low:02X}")
+
+        if verbose and s:
+            print(f"       U1-U4: PC=${self.pc:04X} PC_INC={s['PC_INC']} /PC_LD={s['/PC_LD']}")
+            print(f"       U5:    IR_HIGH=${self.ir_high:02X} → SUB={s['SUB']} XOR={s['XOR_MODE']} MUX={s['MUX_SEL']} "
+                  f"AC_WR={s['AC_WR']} SRC={s['SRC']} STR={s['STR']} BR={s['BR']} JMP={s['JMP']}")
+            print(f"       U6:    IR_LOW=${self.ir_low:02X} /OE={s['/IRL_OE']}")
+            print(f"       U7:    DIR={s['WR_DIR']} /OE={s['BUF_OE_SAFE']} {'WRITE' if s['WR_DIR'] else 'READ'}")
+            print(f"       U8:    phase={phase_names[self.phase]} T0={1 if self.phase==0 else 0} "
+                  f"T1={1 if self.phase==1 else 0} T2={1 if self.phase==2 else 0}")
+            print(f"       U9:    AC=${self.ac:02X}")
+            # ALU (U10-U13, U19-U20)
+            if self.phase == 2:
+                xor_b = self.ac if s['XOR_MODE'] else (0xFF if s['SUB'] else 0x00)
+                xor_out = self.ibus ^ xor_b
+                adder_sum = (self.ac + xor_out + s['SUB']) & 0xFF
+                ac_mux = xor_out if s['MUX_SEL'] else adder_sum
+                print(f"       U10-11: Adder A(AC)=${self.ac:02X} + B(XOR)=${xor_out:02X} + Cin={s['SUB']} = ${adder_sum:02X}")
+                print(f"       U12-13: XOR A(IBUS)=${self.ibus:02X} ^ B(mux)=${xor_b:02X} = ${xor_out:02X}")
+                print(f"       U17-18: AC_mux SEL={s['MUX_SEL']} → ${ac_mux:02X}")
+                print(f"       U19-20: XOR_B_mux SEL={s['XOR_MODE']} → ${xor_b:02X}")
+            print(f"       U14:   /OE={s['/AC_BUF']} {'(driving IBUS=AC)' if not s['/AC_BUF'] else '(disabled)'}")
+            print(f"       U15-16: Addr_lo SEL={s['ADDR_MODE']} → ${self.abus & 0xFF:02X}")
+            print(f"       U21:   Z_flag={self.z_flag}")
+            print(f"       U22:   AC==0? {'YES' if self.ac==0 else 'NO'}")
+            print(f"       U23:   PG=${self.page_reg:02X}")
+            print(f"       U24:   /A15={'0' if self.abus>=0x8000 else '1'}→ROM_CE "
+                  f"/JUMP={1-s['JMP']} /AC_WR={1-s['AC_WR']} BUF_OE_N={s['BUF_OE_N']}")
+            print(f"       U25:   ADDR_MODE={s['ADDR_MODE']} PC_INC={s['PC_INC']} "
+                  f"BUF_OE_SAFE={s['BUF_OE_SAFE']} PG_Load={'1' if s['PG_LOAD'] else '0'}")
+            print(f"       U26:   /IRL_OE={s['/IRL_OE']} /AC_BUF={s['/AC_BUF']} /PC_LD={s['/PC_LD']}")
+            print(f"       U27:   BR_TAKEN={s['BR_TAKEN']} PC_LOAD_COND={s['PC_LOAD_COND']} "
+                  f"ACC_LOAD={'1' if s.get('ACC_LOAD') else '0'}")
+            print(f"       U28:   Z_match={s['Z_match']} WR_DIR={s['WR_DIR']}")
+            print(f"       U29-30: Addr_hi SEL={s['ADDR_MODE']} → ${(self.abus>>8)&0xFF:02X} A15={1 if self.abus>=0x8000 else 0}")
+            print(f"       U31:   IE={self.ie} IRQ_FF={self.irq_ff}")
+            print(f"       U32:   DP=${self.data_page:02X}")
+            print(f"       U33:   DP_LOAD={'1' if s['DP_LOAD'] else '0'}")
+            print(f"       ROM:   /CE={'0(active)' if self.abus>=0x8000 else '1(off)'} "
+                  f"D=${self.rom[self.abus-0x8000] if self.abus>=0x8000 else 0:02X}")
+            print(f"       RAM:   /CE={'0(active)' if self.abus<0x8000 else '1(off)'} "
+                  f"D=${self.ram[self.abus] if self.abus<0x8000 else 0:02X} "
+                  f"/WE={s['/AC_BUF']}")
+            print()
 
 
 # =============================================================================
@@ -345,13 +388,29 @@ def test_jump():
 # =============================================================================
 
 if __name__ == '__main__':
+    import sys
+    verbose = '-v' in sys.argv
+
     print("RV8-GR Soft Debug — Pin-Level Logic Simulation")
-    print("Verifying wiring correctness with slow-clock trace\n")
+    print(f"Mode: {'VERBOSE (all 35 chips)' if verbose else 'compact'}")
+    print(f"Usage: python3 soft_debug.py [-v]")
+    print()
 
     test_basic()
     test_setdp()
     test_rom_read()
     test_jump()
+
+    if verbose:
+        print("=" * 80)
+        print("VERBOSE TRACE: ADDI $05 (all 35 chip signals)")
+        print("=" * 80)
+        cpu = CPU()
+        cpu.load_rom(bytes([0x10, 0x05, 0x01, 0x02]))  # ADDI $05, HLT
+        cpu.ac = 0x10  # pre-set AC
+        for _ in range(3):
+            cpu.tick()
+            cpu.trace(verbose=True)
 
     print("=" * 80)
     print("ALL SOFT DEBUG TESTS PASSED ✅")
