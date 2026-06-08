@@ -1,58 +1,50 @@
 # RV8-GR — Bank Switch & Memory Expansion (Stable)
 
-**CPU stays 30 chips. All expansion on the bus via 74HC574 latches.**
+**CPU has 31 chips with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
 
 ---
 
 ## Base Memory Map
 
 ```
-$0000-$7FFF  RAM 32KB (/CE = A15)
-$8000-$FEFF  ROM 32KB (/CE = /A15)
+$0000-$7FFF  RAM 32KB (/CE = A15) — read/write via SETDP $00-$7F
+$8000-$FEFF  ROM 32KB (/CE = /A15) — read via SETDP $80-$FE
 $FF00-$FF0F  I/O Slot 1 (/SLOT1 on RV8-Bus)
 $FF10-$FF1F  I/O Slot 2 (/SLOT2 on RV8-Bus)
-Data access: $00xx (A8-A15 = GND during T2)
 ```
+
+### Data Access (built-in, no expansion needed)
+
+```asm
+SETDP $00       ; page 0: registers ($0000-$00FF)
+SETDP $10       ; page $10: data at $1000-$10FF
+SETDP $7F       ; page $7F: RAM at $7F00-$7FFF
+SETDP $80       ; page $80: ROM read at $8000-$80FF
+SETDP $FF       ; page $FF: ROM/IO at $FF00-$FFFF
+```
+
+Full 64KB accessible. No expansion chip needed.
 
 ---
 
-## ROM Bank (32KB → 128KB)
+## ROM Bank Expansion (32KB → 128KB)
+
+AT28C256 = 32KB. To get more ROM: use SST39SF010A (128KB) + bank latch.
 
 Extra chip: 1× 74HC574 on expansion board.
 
 ```
 ROM A16 ← latch Q0 (selects bank 0 or 1)
-Latch CLK ← address decode ($FF + STORE)
+Latch CLK ← address decode (write to specific I/O address)
 Latch D0 ← DBUS D0
 ```
 
 **Software:**
 ```asm
+SETDP $FF       ; I/O page
 LI $01          ; bank 1
-SB $FF          ; latch captures D0 → ROM A16=1
+SB $F0          ; write to I/O latch → ROM A16=1 (upper 32KB)
 ```
-
----
-
-## RAM Pages (256B → 32KB data)
-
-Extra chip: 1× 74HC574 on expansion board.
-
-Replace U29/U30 B-inputs (GND) with latch outputs for A8-A14.
-
-```
-Latch Q[6:0] → A8-A14 (override GND on U29/U30 B-inputs)
-Latch CLK ← address decode ($FE + STORE)
-Latch D[6:0] ← DBUS D[6:0]
-```
-
-**Software:**
-```asm
-LI $05          ; page 5
-SB $FE          ; latch captures → data at $0500-$05FF
-```
-
-Note: Page 0 = registers ($00-$07). Return to page 0 before register access.
 
 ---
 
@@ -61,7 +53,6 @@ Note: Page 0 = registers ($00-$07). Return to page 0 before register access.
 No expansion needed. PC < $8000 → fetches from RAM.
 
 ```asm
-; Load program to RAM, then:
 SETPG $00
 J $00           ; PC=$0000, fetches from RAM
 ```
@@ -70,8 +61,8 @@ J $00           ; PC=$0000, fetches from RAM
 
 ## Summary
 
-| Feature | Extra Chips | Result |
-|---------|:-----------:|--------|
-| ROM bank | 1× 74HC574 | 128KB (2 banks) |
-| RAM pages | 1× 74HC574 | 32KB data (128 pages) |
-| Execute RAM | 0 | Built-in |
+| Feature | Chips | How |
+|---------|:-----:|-----|
+| Full 64KB data access | 0 (built-in) | SETDP instruction (U32) |
+| ROM bank (128KB) | +1 (74HC574) | Expansion board latch |
+| Execute from RAM | 0 (built-in) | PC < $8000 |
