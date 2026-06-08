@@ -1,6 +1,6 @@
 # RV8-GR — Design Sign-off v1.0
 
-**Horizontal-control 8-bit CPU. 31 chips. 32KB RAM. Deterministic. Ready for build.**
+**Horizontal-control 8-bit CPU. 31 chips. 64KB data. Deterministic. Ready for build.**
 
 ---
 
@@ -18,7 +18,7 @@ Opcode = Control Word (no decoder)
 
 | Category | Status |
 |----------|:------:|
-| Datapath correctness | ✅ Verilog 127 cycles |
+| Datapath correctness | ✅ Verilog 127+160 cycles |
 | ISA (18 instructions) | ✅ All verified |
 | IRQ | ✅ 6 tests pass |
 | Memory Map | ✅ ROM $8000+, RAM $0000+ |
@@ -69,7 +69,7 @@ $0x [N J B . S . . . E . . . ⛔⛔⛔⛔]
 $1x [A A . . . . . . . . . . ⛔⛔⛔⛔]
 $2x [P P . . . . . . . . . . ⛔⛔⛔⛔]
 $3x [L L . . . . . . . . . . ⛔⛔⛔⛔]
-$4x [. D . . . . . . . . . . ⛔⛔⛔⛔]
+$4x [D . . . . . . . I . . . ⛔⛔⛔⛔]  D=SETDP I=DI
 $7x [X X . . . . . . . . . . ⛔⛔⛔⛔]
 $8x [. . B . . . . . . . . . ⛔⛔⛔⛔]
 $9x [S S . . . . . . . . . . ⛔⛔⛔⛔]
@@ -81,7 +81,8 @@ $Bx [★ ★ . . . . . . . . . . ⛔⛔⛔⛔]  ★=NOT (free)
 ## Final Statement
 
 ```
-RV8-GR: 30-chip horizontal-control CPU
+RV8-GR: 31-chip horizontal-control CPU
+- 18 instructions, full 64KB code + data access
 - All 256 opcodes produce deterministic behavior
 - Single electrical hazard eliminated by spare gate
 - 68% opcode space available for expansion at 0 cost

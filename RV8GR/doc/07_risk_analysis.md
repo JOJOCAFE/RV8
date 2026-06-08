@@ -1,6 +1,6 @@
 # RV8-GR — Risk Analysis (Final)
 
-**10 hazards analyzed. 1 fixed in hardware. All others safe or deterministic.**
+**11 hazards analyzed. 1 fixed in hardware. All others safe or deterministic.**
 
 ---
 
