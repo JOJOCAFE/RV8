@@ -78,6 +78,88 @@ class Chip:
 
 ---
 
+## Bus Architecture (matches 03_wiring_guide)
+
+### Internal Buses
+
+```
+DBUS[7:0]  — External data bus (ROM, RAM, U7 A-side)
+IBUS[7:0]  — Internal data bus (U7 B-side, U6*, U14*, U12/U13, U5, U23, U32)
+ABUS[15:0] — Address bus (U15/U16/U29/U30 outputs → ROM, RAM)
+```
+
+### Tristate Bus Resolution
+
+IBUS has 3 possible drivers (only one active at a time):
+
+```python
+class TristateBus:
+    """Bus with multiple tristate drivers."""
+    def __init__(self, name: str, width: int):
+        self.name = name
+        self.width = width
+        self.drivers = {}   # {name: (value, enabled)}
+
+    def drive(self, name: str, value: int, enabled: bool):
+        """A chip asserts/releases the bus."""
+        self.drivers[name] = (value, enabled)
+
+    def read(self) -> int:
+        """Resolve bus value. Error if multiple drivers."""
+        active = [(n,v) for n,(v,e) in self.drivers.items() if e]
+        if len(active) == 0:
+            return 0xFF  # floating (pulled high)
+        if len(active) == 1:
+            return active[0][1]
+        # BUS CONFLICT!
+        raise BusConflictError(f"{self.name}: multiple drivers {[n for n,v in active]}")
+```
+
+### Bus Instances
+
+```python
+# From 03_wiring_guide.md:
+dbus = TristateBus('DBUS', 8)   # D0-D7: ROM out, RAM bidir, U7 A-side
+ibus = TristateBus('IBUS', 8)   # IB0-IB7: U7 B, U6 Q*, U14 Y*
+abus = Bus('ABUS', 16)          # A0-A15: driven by mux only (no tristate)
+```
+
+### IBUS Drivers (from 03_wiring_guide)
+
+```python
+# U7 (74HC245 B-side): drives IBUS when BUF_OE_SAFE=0
+ibus.drive('U7', dbus_value, enabled=(buf_oe_safe == 0))
+
+# U6 (74HC574 Q outputs): drives IBUS when /IRL_OE=0
+ibus.drive('U6', irl_value, enabled=(irl_oe_n == 0))
+
+# U14 (74HC541 Y outputs): drives IBUS when /AC_BUF=0
+ibus.drive('U14', ac_value, enabled=(ac_buf_n == 0))
+```
+
+### DBUS Drivers
+
+```python
+# ROM: drives DBUS when ROM /CE=0 AND /OE=0
+dbus.drive('ROM', rom_data, enabled=(rom_ce_n == 0))
+
+# RAM: drives DBUS when RAM /CE=0 AND /OE=0 AND /WE=1 (read mode)
+dbus.drive('RAM', ram_data, enabled=(ram_ce_n == 0 and ram_we_n == 1))
+
+# U7 (74HC245 A-side): drives DBUS when DIR=1 AND /OE=0 (write mode)
+dbus.drive('U7', ibus_value, enabled=(wr_dir == 1 and buf_oe_safe == 0))
+```
+
+### ABUS (no tristate — always driven by mux)
+
+```python
+# U15-U16: A[7:0] from mux (PC low or IRL)
+# U29-U30: A[15:8] from mux (PC high or Data Page)
+abus.value = (addr_hi << 8) | addr_lo
+```
+
+---
+
 ## Wire Net
 
 ```python
