@@ -612,14 +612,19 @@ U32-20(VCC) → VCC
 ```
 U33-1  (1A) ← T2 (U8-5)
 U33-2  (1B) ← XOR_MODE (U5-13)
+U33-3  (NC)
 U33-4  (1C) ← /ADDR_MODE (U26-6)
 U33-5  (1D) ← /AC_WR (U24-10)
 U33-6  (1Y) → DP_Load → U32-11
 U33-7  (GND) → GND
-U33-9  (2A) → VCC (unused gate, tie high)
+U33-8  (2Y) → NC
+U33-9  (2A) → VCC (unused gate, tie inputs high)
 U33-10 (2B) → VCC
+U33-11 (NC)
 U33-12 (2C) → VCC
 U33-13 (2D) → VCC
+U33-14 (VCC) → VCC
+```
 U33-8  (2Y) → NC
 U33-14 (VCC) → VCC
 ```
@@ -742,7 +747,7 @@ RAM (62256)
 | WR_DIR | U28-8 | U7-1 |
 | A15 | U30-12 | RAM /CE, U24-5 |
 | PG_Load_N | U25-13 | U23-11 |
-| DP_Load | Decode logic | U32-11 |
+| DP_Load | U33-6 | U32-11 |
 
 ---
 

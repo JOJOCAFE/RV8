@@ -165,7 +165,7 @@ BUF_OE_SAFE  = BUF_OE_N | STR        ← SRC+STR guard
 PC_LOAD_COND = JMP | (BR & Z_match)
 Z_match      = Z_flag XOR SUB
 PG_Load_N    = /T2 | /PG_cond
-DP_Load      = T2 AND is_setdp        ← Data Page latch
+DP_Load      = T2 & XOR_MODE & /ADDR_MODE & /AC_WR  ← U33
 ```
 
 ---
