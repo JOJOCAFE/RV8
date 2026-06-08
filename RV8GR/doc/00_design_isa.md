@@ -188,7 +188,8 @@ Guard: STR=1 → U7 disabled via BUF_OE_SAFE
 
 ```
 /IRQ pin (falling edge) → IRQ_FF latch
-At T2 end: if IRQ_FF=1 AND IE=1 AND no jump → IRQ-ack:
+At T2 end: if IRQ_FF=1 AND IE=1 AND NOT(PC_LOAD_COND) → IRQ-ack:
+  (NOT(PC_LOAD_COND) = no jump/branch in progress)
   - Force PC = $FF00
   - Clear IE, clear IRQ_FF
 ```

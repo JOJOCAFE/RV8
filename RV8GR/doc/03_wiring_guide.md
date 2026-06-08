@@ -584,7 +584,11 @@ U31-12(Q2)    → IRQ_FF → IRQ-ack gate
 U31-13(/Q2)   → NC
 U31-14(VCC)   → VCC
 
-IRQ_ack = T2 AND IE AND IRQ_FF AND /PC_LOAD_COND
+IRQ_ack = T2 AND IE(U31-5) AND IRQ_FF(U31-12) AND NOT(PC_LOAD_COND(U27-6))
+// NOT(PC_LOAD_COND) = NOT( JMP | (BR & Z_match) )
+// = CPU is NOT jumping/branching this cycle
+// ≠ /PC_LD signal (which is NAND(T2, PC_LOAD_COND))
+// IRQ_ack uses the raw combinational PC_LOAD_COND, inverted
 On ack: force PG=$FF, IRL=$00, assert /PC_LD → PC=$FF00, clear IE+IRQ_FF
 PC save: software (v1.0) or hardware (v2.0, see IRQ Save-PC section below)
 ```
@@ -629,9 +633,6 @@ U33-12 (2C) → VCC
 U33-13 (2D) → VCC
 U33-14 (VCC) → VCC
 ```
-U33-8  (2Y) → NC
-U33-14 (VCC) → VCC
-```
 
 Decode verification:
 | Opcode | T2 | XOR | /ADDR | /AC_WR | DP_Load |
@@ -656,7 +657,13 @@ During IRQ-ack, CPU must:
 **Implementation**: IRQ-ack reuses existing STORE path with forced address.
 
 ```
-IRQ_ack = T2 AND IRQ_FF(U31-12) AND IE(U31-5) AND NOT(PC_LOAD_COND)
+IRQ_ack = T2(U8-5) AND IRQ_FF(U31-12) AND IE(U31-5) AND NOT(PC_LOAD_COND(U27-6))
+
+Note: NOT(PC_LOAD_COND) means the instruction is NOT a jump/branch.
+This is NOT the same as /PC_LD (which = NAND(T2, PC_LOAD_COND)).
+IRQ_ack needs the raw PC_LOAD_COND inverted:
+  PC_LOAD_COND=0 → NOT=1 → IRQ can fire
+  PC_LOAD_COND=1 → NOT=0 → IRQ deferred (jump in progress)
 
 During IRQ-ack (extra 2 cycles inserted by hardware):
 
