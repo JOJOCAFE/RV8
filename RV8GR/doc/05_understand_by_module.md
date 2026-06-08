@@ -631,13 +631,22 @@ XOR(A, B) = A^B      → คำนวณ XOR (ใช้กับ XOR instruction
 - Lower half ($0000+) = RAM → ใช้ NOT(A15)
 - ไม่ต้องมี decoder! ใช้แค่ inverter 1 gate (U24)
 
-### ทำไม Data Access ใช้ A[15:8] = $00?
+### ทำไม Data Access ใช้ Data Page Register?
 
 **ปัญหา**: Operand มีแค่ 8 บิต → address ได้แค่ 256 ตำแหน่ง
-**วิธีแก้**: Mux ใส่ GND เข้า A[15:8] ตอน T2 → address = $00xx
-- A15=0 → RAM active (ไม่ใช่ ROM)
-- Registers อยู่ที่ $0000-$0007 → เข้าถึงได้เสมอ
-- ข้อจำกัด: data access ได้แค่ 256 bytes (แก้ด้วย bank switch)
+**วิธีแก้**: เพิ่ม U32 (Data Page Register) เป็น high byte ของ data address
+
+```
+Data address = {Data Page (8 bit), Operand (8 bit)} = 16 bit = 64KB!
+```
+
+- SETDP $00 → data at $0000-$00FF (registers)
+- SETDP $10 → data at $1000-$10FF (array page 1)
+- SETDP $80 → data at $8000-$80FF (read ROM!)
+
+**ทำไมไม่ใช้ GND?**
+- ถ้าใส่ GND → เข้าถึงได้แค่ 256 bytes → ทำ BASIC/game ไม่ได้!
+- Data Page Register ให้ full 64KB → เขียนโปรแกรมจริงได้
 
 ### ทำไม Z flag ใช้ async preset?
 
