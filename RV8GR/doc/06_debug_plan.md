@@ -289,10 +289,39 @@ fail: HLT     ; failure
 
 **ต่ออะไร**: U31 (74HC74), /IRQ pin, decode logic
 
+**v1.0: IRQ ใช้ software save-PC** (ไม่มี hardware auto-save)
+
+ก่อน EI ต้อง save return address ด้วย software:
+```asm
+; ก่อนเปิด interrupt:
+LI lo(return_here)
+SB $0E                  ; save low byte
+LI hi(return_here)
+SB $0F                  ; save high byte
+EI                      ; enable interrupt
+
+; ... code runs ...
+
+return_here:            ; ISR จะกลับมาตรงนี้
+```
+
+ISR at $FF00:
+```asm
+; handle interrupt ...
+SETDP $00
+LB $0F
+SETPG_R $0F             ; page = saved high byte (ผ่าน register)
+LB $0E                  ; AC = saved low byte
+; ... need indirect jump mechanism ...
+EI
+; (v1.0: return to fixed known address)
+```
+
 **ทดสอบ**:
 - [ ] EI → IE LED = ON
 - [ ] กดปุ่ม /IRQ → PC jumps to $FF00
 - [ ] DI → IE LED = OFF → IRQ ไม่ fire
+- [ ] ISR ทำงานแล้วกลับมาที่ return_here ได้
 
 **LED**: 1 ดวงบน IE (U31-5), 1 ดวงบน IRQ_FF (U31-12)
 

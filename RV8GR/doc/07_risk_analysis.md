@@ -102,6 +102,34 @@ Decode:
 
 ---
 
+## IRQ Save-PC Status
+
+| Approach | v1.0 Build | v2.0 Future |
+|----------|:----------:|:-----------:|
+| Save PC to RAM[$0E:$0F] | Software | Hardware (2-3 chips) |
+| Jump to $FF00 | ✅ Hardware | ✅ Hardware |
+| Clear IE | ✅ Hardware | ✅ Hardware |
+| Return from ISR | Software (known addr) | Hardware (indirect jump) |
+
+**v1.0**: Programmer saves return address to RAM[$0E:$0F] before calling EI.
+ISR reads RAM[$0E:$0F] and returns to known address.
+
+**v2.0**: Add PC→DBUS mux + forced address logic for automatic save.
+
+---
+
+## SETDP ROM Lookup (Design Strength)
+
+```asm
+SETDP $90       ; point to ROM page $90
+LB $10          ; AC = ROM[$9010] — lookup table!
+```
+
+Enables memory-mapped constant tables (fonts, sin, tiles) with zero extra hardware.
+Same LB instruction reads RAM or ROM depending on DP value.
+
+---
+
 ## Conclusion
 
 - **1 critical hazard** (SRC+STR): Fixed with spare gate, 0 chips added
