@@ -187,10 +187,12 @@ Guard: STR=1 → U7 disabled via BUF_OE_SAFE
 ```
 /IRQ pin (falling edge) → IRQ_FF latch
 At T2 end: if IRQ_FF=1 AND IE=1 AND no jump → IRQ-ack:
-  - Save PC → RAM[$0E:$0F]
   - Force PC = $FF00
   - Clear IE, clear IRQ_FF
 ```
+
+**PC save**: v1.0 = software (programmer saves return addr to RAM[$0E:$0F] before EI).
+v2.0 = hardware auto-save (requires 2-3 extra chips).
 
 ---
 

@@ -130,7 +130,8 @@ module rv8gr_cpu (
                     if (is_ei) ie <= 1'b1;
                     if (is_di) ie <= 1'b0;
 
-                    // IRQ
+                    // IRQ: behavioral model does hardware save-PC
+                    // Physical v1.0: software save (see 03_wiring_guide.md)
                     if (irq_pending && !pc_load) begin
                         ram[8'h0E] <= pc[7:0];
                         ram[8'h0F] <= pc[15:8];

@@ -582,7 +582,8 @@ U31-13(/Q2)   → NC
 U31-14(VCC)   → VCC
 
 IRQ_ack = T2 AND IE AND IRQ_FF AND /PC_LOAD_COND
-On ack: force PG=$FF, IRL=$00, assert /PC_LD, save PC to RAM[$0E:$0F]
+On ack: force PG=$FF, IRL=$00, assert /PC_LD → PC=$FF00, clear IE+IRQ_FF
+PC save: software (v1.0) or hardware (v2.0, see IRQ Save-PC section below)
 ```
 
 ---
