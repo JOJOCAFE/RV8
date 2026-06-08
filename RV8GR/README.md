@@ -11,8 +11,8 @@
 | Logic chips | 33 (74HC series, DIP) |
 | Total packages | 35 (+ ROM + RAM) |
 | ISA | 18 instructions |
-| Clock | 10 MHz |
-| Speed | 3.3 MIPS |
+| Clock | 5 MHz (start), 10 MHz (target) |
+| Speed | 1.67 MIPS @ 5 MHz, 3.3 MIPS @ 10 MHz |
 | Gate count | ~1,260 (logic only, excl. ROM/RAM) |
 | Address | 64KB (ROM $8000+, RAM $0000+) |
 | Bus | RV8-Bus 40-pin (A16+D8+control) |
@@ -64,9 +64,9 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| AT28C256-15PU | 1 | ROM 32KB |
+| AT28C256-70 or SST39SF010A-70 | 1 | ROM 32KB, 70ns |
 | 62256-70PC | 1 | RAM 32KB |
-| 10 MHz crystal | 1 | + 2× 20pF caps |
+| 5 MHz crystal (start), 10 MHz (target) | 1 | + 2× 20pF caps |
 | 100nF capacitors | ~20 | Bypass |
 | LEDs (red, green) | 2 | Power + activity |
 | 40-pin IDC socket | 1 | RV8-Bus |

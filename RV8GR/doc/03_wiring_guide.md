@@ -41,8 +41,9 @@ ROM access window depends on when ADDR_MODE returns to 0 (PC on ABUS):
 - AT28C256-150ns: works if ADDR_MODE=0 during previous T2 (most cases)
 - After LB/SB/ADD/SUB/XOR: address switches late → may need extra cycle or faster ROM
 
-**Recommendation**: Use **AT28C256-100ns** or **SST39SF010A-70ns** for reliable 10MHz operation.
-For breadboard testing: start at **5 MHz** with 150ns ROM, verify timing with oscilloscope.
+**Recommendation**: Use **70ns ROM/RAM** + start at **5 MHz**.
+70ns parts work reliably up to 10 MHz (30ns margin worst case).
+Start at 5 MHz for debugging, increase to 10 MHz after verification.
 
 ---
 
