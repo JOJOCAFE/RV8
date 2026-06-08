@@ -8,7 +8,7 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 
 | | **RV8** | **RV8-R** | **RV8-G** | **RV8-GR** |
 |--|:---:|:---:|:---:|:---:|
-| **Logic chips** | 27 | **18** | **38** | **32** |
+| **Logic chips** | 27 | **18** | **38** | **33** |
 | **Total** | 29 | 21 | 40 | 32 |
 | **MIPS @10MHz** | 1.25 | 1.0 | **2.5** | **3.3** |
 | **ISA** | Full (35) | Full (35) | Full (35) | 18 instr |
@@ -28,7 +28,7 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 | **Learn microcode + proven** | **RV8** (27 chips) |
 | **Fewest chips + full ISA** | **RV8-R** (18 chips) |
 | **Full ISA + no microcode** | **RV8-G** (28 chips) |
-| **Fastest + execute from RAM** | **RV8-GR** (32 chips) |
+| **Fastest + execute from RAM** | **RV8-GR** (33 chips) |
 
 ---
 
@@ -39,7 +39,7 @@ RV8/
 ├── RV8/            ← 27 chips, hardware regs, microcode (proven)
 ├── RV8R/           ← 18 chips, RAM regs, microcode (fewest + full ISA)
 ├── RV8G/           ← 28 chips, full ISA, no microcode, fastest
-├── RV8GR/          ← 32 chips, 18 instr, no microcode, 64K, execute RAM, IRQ
+├── RV8GR/          ← 33 chips, 18 instr, no microcode, 64K, execute RAM, IRQ
 ├── Programmer/     ← ESP32 board (works with all)
 ├── Old_Design/     ← Archived
 ├── Reference/      ← Gigatron, SAP-1, Nand2Tetris

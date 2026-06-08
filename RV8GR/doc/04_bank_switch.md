@@ -1,6 +1,6 @@
 # RV8-GR — Bank Switch & Memory Expansion (Stable)
 
-**CPU has 32 chips with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
+**CPU has 33 chips with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
 
 ---
 

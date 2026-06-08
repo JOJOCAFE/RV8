@@ -1,6 +1,6 @@
 # RV8-GR — Design & ISA Reference (Stable)
 
-**32 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
+**33 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
 
 ---
 

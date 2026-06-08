@@ -1,6 +1,6 @@
 # RV8-GR — Wiring Guide (Official)
 
-**32 logic chips + ROM + RAM = 34 packages. Source of truth for physical build.**
+**33 logic chips + ROM + RAM = 35 packages. Source of truth for physical build.**
 
 ---
 

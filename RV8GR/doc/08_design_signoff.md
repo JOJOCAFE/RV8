@@ -1,6 +1,6 @@
 # RV8-GR — Design Sign-off v1.0
 
-**32 chips. 18 instructions. 64KB. No microcode. Hardware Design Frozen.**
+**33 chips. 18 instructions. 64KB. No microcode. Hardware Design Frozen.**
 
 ---
 
@@ -38,8 +38,8 @@ Opcode = Control Word (no decoder, no microcode ROM)
 
 | Metric | Value |
 |--------|-------|
-| Logic chips | 32 |
-| Total packages | 34 (+ ROM + RAM) |
+| Logic chips | 33 |
+| Total packages | 35 (+ ROM + RAM) |
 | Instructions | 18 (+NOT free, +$C0 alias) |
 | Gate count | ~1,260 |
 | Opcode space | 7% used, 68% expansion |
@@ -88,7 +88,7 @@ Hardware Design Frozen.
 ```
 
 *Date: 2026-06-09*
-*Chips: U1-U33 (32 logic + ROM + RAM)*
+*Chips: U1-U33 (33 logic) + ROM + RAM = 35 packages*
 *Guard: BUF_OE_SAFE (U25-8 → U7-19)*
 *Bus: RV8-Bus v2 (40-pin, Slot1=$FF10, Slot2=$FF20)*
 *IRQ: $FF00 (software save-PC for v1.0)*

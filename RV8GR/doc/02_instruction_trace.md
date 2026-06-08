@@ -1,6 +1,6 @@
 # RV8-GR — Instruction Trace (Stable)
 
-**Pin-level traces for key instructions. Based on 03_wiring_guide.md (32 chips).**
+**Pin-level traces for key instructions. Based on 03_wiring_guide.md (33 chips).**
 
 ---
 

@@ -1,6 +1,6 @@
 # RV8-GR — No Microcode, Full 64K, IRQ (Stable)
 
-**31 logic chips + ROM + RAM = 33 packages. Verilog verified.**
+**33 logic chips + ROM + RAM = 35 packages. Verilog verified.**
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Spec | Value |
 |------|-------|
-| Logic chips | 32 (74HC series, DIP) |
-| Total packages | 34 (+ ROM + RAM) |
+| Logic chips | 33 (74HC series, DIP) |
+| Total packages | 35 (+ ROM + RAM) |
 | ISA | 18 instructions |
 | Clock | 10 MHz |
 | Speed | 3.3 MIPS |
@@ -41,12 +41,12 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 ## BOM
 
-### Logic (31 chips)
+### Logic (33 chips)
 
 | Part | Qty | Function |
 |------|:---:|----------|
 | 74HC161 | 4 | PC counter |
-| 74HC574 | 7 | IR, AC, Page Reg, Data Page |
+| 74HC574 | 5 | IR, AC, Page Reg, Data Page |
 | 74HC21 | 1 | SETDP decode (4-input AND) |
 | 74HC245 | 1 | Bus buffer |
 | 74HC164 | 1 | Ring counter |
