@@ -118,7 +118,7 @@ RV8GR/
     ├── 06_debug_plan.md        Physical build debug steps
     ├── 07_risk_analysis.md     Hazard analysis
     ├── 08_design_signoff.md    Sign-off v1.0
-    └── task_test_plan.md       Test milestones
+    └── 09_task_test_plan.md    Test milestones
 ```
 
 ---

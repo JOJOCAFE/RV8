@@ -109,7 +109,19 @@
 
 ---
 
-## Task 10: Halt
+## Task 10: SETDP (Data Page Register)
+
+| Test | Expected |
+|------|----------|
+| SETDP $10, SB $00 | RAM[$1000] written |
+| SETDP $10, LB $00 | AC = RAM[$1000] |
+| SETDP $80, LB $00 | AC = ROM[$8000] |
+| SETDP $00, LB $03 | AC = RAM[$0003] (registers) |
+| Cross-page write/read (5KB) | All pages consistent |
+
+---
+
+## Task 11: Halt
 
 | Test | Expected |
 |------|----------|
@@ -121,8 +133,9 @@
 
 | File | Tasks Covered |
 |------|--------------|
-| `tb/tb_rv8gr_full.v` | 1-8, 10 (127 cycles, ALL PASS) |
+| `tb/tb_rv8gr_full.v` | 1-8, 11 (127 cycles, ALL PASS) |
 | `tb/tb_rv8gr_irq.v` | 9 (6 tests, ALL PASS) |
+| `tb/tb_rv8gr_setdp.v` | 10 (160 cycles, ALL PASS) |
 
 ---
 
@@ -137,4 +150,8 @@ vvp tb/sim_full.vvp
 iverilog -o tb/sim_irq.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v
 vvp tb/sim_irq.vvp
 # === ALL IRQ TESTS PASSED ===
+
+iverilog -o tb/sim_setdp.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_setdp.v
+vvp tb/sim_setdp.vvp
+# === SETDP TEST PASSED ===
 ```
