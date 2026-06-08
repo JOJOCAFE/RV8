@@ -125,7 +125,7 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 
 ---
 
-## Chip List (32)
+## Chip List (33)
 
 | U# | Chip | Role |
 |:--:|------|------|
