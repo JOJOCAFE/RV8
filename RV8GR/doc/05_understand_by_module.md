@@ -392,9 +392,22 @@ U28 (XOR gates): สัญญาณพิเศษ
 1. ขา /IRQ มีสัญญาณ (LOW) → IRQ_FF = 1
 2. จบคำสั่งปัจจุบัน (T2 end)
 3. ถ้า IRQ_FF=1 AND IE=1:
-   - Save PC → RAM[$0E:$0F]
    - PC = $FF00 (IRQ vector)
    - IE = 0 (ปิดรับ interrupt ชั่วคราว)
+```
+
+**PC save (v1.0 = software)**:
+```asm
+; ก่อนเปิด interrupt:
+LI lo(return_here)    ; save return address ด้วยตัวเอง
+SB $0E
+LI hi(return_here)
+SB $0F
+EI                    ; เปิด interrupt
+
+; ... CPU ทำงาน ...
+; ถ้ามี IRQ → กระโดดไป $FF00 ทันที
+; ISR อ่าน RAM[$0E:$0F] เพื่อกลับมา
 ```
 
 **คำสั่ง:**
@@ -560,7 +573,8 @@ CPU เขียน SB $00 ที่ page $FF → ข้อมูลไปถึ
 | XOR misc | U28 (74HC86) | 1 | Z_match, WR_DIR |
 | IRQ | U31 (74HC74) | 1 | IE + IRQ latch |
 | Data Page | U32 (74HC574) | 1 | Data address high byte |
-| **รวม** | | **31** | |
+| SETDP decode | U33 (74HC21) | 1 | 4-input AND for DP_Load |
+| **รวม** | | **32** | |
 
 ---
 
