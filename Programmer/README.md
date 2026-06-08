@@ -191,14 +191,56 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 ## Parts List
 
-| Part | Qty | Cost |
-|------|:---:|:----:|
-| ESP32 NodeMCU (30-pin) | 1 | ~$4 |
-| TXB0108 level shifter module (8-ch) | 3 | ~$3 |
-| 40-pin IDC connector + ribbon | 1 | ~$2 |
-| SPDT toggle switch (PROG/RUN) | 1 | ~$0.50 |
-| 74HC595 (shift register, for A8-A14) | 1 | ~$0.30 |
-| **Total** | | **~$10** |
+### Main Board
+
+| Part | Qty | Package | Notes |
+|------|:---:|:-------:|-------|
+| ESP32 NodeMCU-32S | 1 | Module | Main controller |
+| TXB0108 module (8-ch) | 3 | Module | Level shifters |
+| 40-pin IDC socket | 1 | 40DIP | RV8-Bus connection |
+| 74HC595 | 1 | 16DIP | Shift register for A8-A14 |
+
+### Switches & Connectors
+
+| Part | Qty | Package | Notes |
+|------|:---:|:-------:|-------|
+| SPDT toggle switch | 1 | - | PROG/RUN selector |
+| 10kΩ resistor | 1 | 1/4W | Pull-up for GPIO 0 |
+| Pin header 2.54mm | 20 | - | General connections |
+
+### Passive Components
+
+| Part | Qty | Notes |
+|------|:---:|-------|
+| 100nF capacitor | 6 | Bypass caps for TXB0108 |
+| 10µF capacitor | 2 | Power filtering |
+
+### Cable
+
+| Part | Qty | Notes |
+|------|:---:|-------|
+| 40-pin IDC ribbon cable | 1m | Connect to CPU board |
+| USB cable (A to micro-B) | 1 | PC to ESP32 |
+
+### Total Cost Estimate
+
+| Category | Est. Cost |
+|----------|----------:|
+| ESP32 NodeMCU | ~$4 |
+| TXB0108 ×3 | ~$3 |
+| IDC cable + socket | ~$2 |
+| 74HC595 | ~$0.30 |
+| Switch + passives | ~$1 |
+| **Total** | **~$10** |
+
+### Where to Buy
+
+| Part | Source | Notes |
+|------|--------|-------|
+| ESP32 NodeMCU-32S | AliExpress, LCSC | ~$4 |
+| TXB0108 modules | AliExpress, eBay | ~$1 each |
+| 40-pin IDC cable | AliExpress | ~$1 |
+| 74HC595 | LCSC, AliExpress | ~$0.20 |
 
 ---
 
