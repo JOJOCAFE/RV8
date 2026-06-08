@@ -5,7 +5,7 @@
 // 18 instructions (17 + SETDP)
 // IRQ: fixed vector $FF00, IE flag, auto-save PC to RAM[$0E:$0F]
 // Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25 gate 3 → U7-19)
-// Data Page: U32 74HC574, SETDP $40 → full 32KB RAM access
+// Data Page: U32 74HC574, SETDP $40 → full 64KB data access (ROM+RAM)
 
 module rv8gr_cpu (
     input  wire clk,
@@ -52,11 +52,11 @@ module rv8gr_cpu (
     // Memory read (fetch): A15 selects ROM or RAM
     wire [7:0] mem_read = pc[15] ? rom[pc[14:0]] : ram[pc[14:0]];
 
-    // Data address: {data_page_reg[6:0], ir_low} — full 32KB RAM
-    wire [14:0] data_addr = {data_page_reg[6:0], ir_low};
+    // Data address: {data_page_reg[7:0], ir_low} — full 64KB
+    wire [15:0] data_addr_full = {data_page_reg, ir_low};
 
-    // IBUS during T2: data access uses data_page_reg for A[14:8]
-    wire [7:0] ibus = source_type ? ram[data_addr] : ir_low;
+    // IBUS during T2: data access uses data_page_reg for full 64KB
+    wire [7:0] ibus = source_type ? (data_addr_full[15] ? rom[data_addr_full[14:0]] : ram[data_addr_full[14:0]]) : ir_low;
 
     // ALU
     wire [7:0] xor_b = xor_mode ? ac : {8{alu_sub}};
@@ -112,9 +112,9 @@ module rv8gr_cpu (
                     state <= T2;
                 end
                 T2: begin
-                    // Store: RAM[{data_page[6:0], ir_low}] = AC
-                    if (store)
-                        ram[data_addr] <= ac;
+                    // Store: RAM write only if address in RAM range (A15=0)
+                    if (store && !data_addr_full[15])
+                        ram[data_addr_full[14:0]] <= ac;
                     if (ac_wr) begin
                         ac <= ac_mux;
                         z_flag <= (ac_mux == 8'h00);

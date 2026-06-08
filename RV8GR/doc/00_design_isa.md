@@ -79,7 +79,9 @@ Byte 1 (Operand): immediate, RAM address, or jump target
 | $90 | 10010000 | SUBI imm | AC = AC - imm |
 | $98 | 10011000 | SUB rs | AC = AC - RAM[{DP, rs}] |
 
-DP = Data Page Register (7 bits). Data address = {DP[6:0], operand} = 15-bit (32KB RAM).
+DP = Data Page Register (8 bits). Data address = {DP, operand} = 16-bit (full 64KB).
+- DP=$00-$7F → RAM read/write ($0000-$7FFF)
+- DP=$80-$FF → ROM read only ($8000-$FFFF, SB has no effect)
 
 ---
 

@@ -556,7 +556,7 @@ U30-1 (SEL) ← ADDR_MODE        U30-15(/E) → GND
 U30-2 (1A) ← PC12   U30-3 (1B) ← DP4 (U32-15)   U30-4 (1Y) → A12
 U30-5 (2A) ← PC13   U30-6 (2B) ← DP5 (U32-14)   U30-7 (2Y) → A13
 U30-11(3A) ← PC14   U30-10(3B) ← DP6 (U32-13)   U30-9 (3Y) → A14
-U30-14(4A) ← PC15   U30-13(4B) ← GND             U30-12(4Y) → A15 → RAM /CE, U24-5
+U30-14(4A) ← PC15   U30-13(4B) ← DP7 (U32-12)    U30-12(4Y) → A15 → RAM /CE, U24-5
 U30-8 (GND) → GND   U30-16(VCC) → VCC
 ```
 
@@ -621,7 +621,7 @@ Practical: SETDP = XOR_MODE=1 AND MUX_SEL=0 AND AC_WR=0 AND SRC=0 AND STR=0
   Use spare gates or add 1 gate for decode
 ```
 
-Note: A15 (U30 pin 13 B-input) stays GND — ensures data access is always in RAM ($0000-$7FFF).
+Note: A15 from U32 bit 7 → allows data access to both ROM and RAM (full 64KB).
 
 ---
 
