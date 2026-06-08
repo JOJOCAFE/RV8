@@ -416,7 +416,7 @@ SB $10          ; write to $FF10 → /SLOT1 should go LOW
 | 8 | Z Flag | U21, U22 | Z | ☐ |
 | 9 | Jump Logic | U24-U28 | /PC_LD | ☐ |
 | 10 | Page Register | U23 | PG[7:0] | ☐ |
-| 11 | RAM | 62256 | DBUS | ☐ |
+| 11 | RAM + Data Page | 62256, U32, U33 | DBUS, DP[7:0] | ☐ |
 | 12 | Full System | all | AC, PC, Z | ☐ |
 | 13 | IRQ | U31 | IE, IRQ_FF | ☐ |
 | 14 | RV8-Bus | 40-pin IDC | CLK, /WR, /SLOT | ☐ |
