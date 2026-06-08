@@ -1,15 +1,15 @@
 # RV8-GR — Design Sign-off v1.0
 
-**Horizontal-control 8-bit CPU. 32 chips. 64KB data. Deterministic. Ready for build.**
+**32 chips. 18 instructions. 64KB. No microcode. Hardware Design Frozen.**
 
 ---
 
 ## Architecture
 
 ```
-Opcode = Control Word (no decoder)
+Opcode = Control Word (no decoder, no microcode ROM)
 18 instructions, 3 cycles each, 3.3 MIPS @ 10 MHz
-64KB address, 64KB data access (ROM+RAM), IRQ, 40-pin system bus
+64KB code + 64KB data access, IRQ, 40-pin system bus
 ```
 
 ---
@@ -18,31 +18,19 @@ Opcode = Control Word (no decoder)
 
 | Category | Status |
 |----------|:------:|
-| Datapath correctness | ✅ Verilog 127+160 cycles |
-| ISA (18 instructions) | ✅ All verified |
-| IRQ | ✅ 6 tests pass |
-| Memory Map | ✅ ROM $8000+, RAM $0000+ |
-| Timing @ 10 MHz | ✅ All paths safe |
-| Bus guard (SRC+STR) | ✅ Applied |
-| Opcode hazard (256 codes) | ✅ All deterministic |
-| SETDP decode | ✅ No conflict with SETPG/DI |
-| ALU modes (8 modes) | ✅ All deterministic |
-| RV8-Bus (40-pin) | ✅ Defined |
-| Signal integrity | ✅ Cable <30cm |
-| BOM | ✅ Finalized |
-| Programmer tools | ✅ 46 tests pass |
-| Documentation | ✅ 9 docs complete |
-
----
-
-## Action Items
-
-| # | Action | Status |
-|:-:|--------|:------:|
-| 1 | SRC+STR guard | ✅ Done |
-| 2 | Route CLK + /IRQ to bus | ⬜ At build time |
-| 3 | I/O slot decode | ⬜ Optional (1× 74HC138) |
-| 4 | Add NOT to assembler | ⬜ Optional |
+| Datapath (Verilog 127+160 cycles) | ✅ |
+| ISA (18 instructions) | ✅ |
+| SETDP decode (U33 pin-level) | ✅ |
+| IRQ entry ($FF00, software save-PC) | ✅ |
+| Memory Map (no address conflicts) | ✅ |
+| Bus guard SRC+STR (U25-8) | ✅ |
+| Opcode hazard (256 codes deterministic) | ✅ |
+| Timing @ 10 MHz | ✅ |
+| RV8-Bus (40-pin defined) | ✅ |
+| BOM finalized | ✅ |
+| Programmer tools (46 tests) | ✅ |
+| Documentation (10 docs synced) | ✅ |
+| Pin-level wiring verified | ✅ |
 
 ---
 
@@ -51,47 +39,56 @@ Opcode = Control Word (no decoder)
 | Metric | Value |
 |--------|-------|
 | Logic chips | 32 |
-| Instructions | 18 (+ NOT free) |
-| Opcode space used | 7.0% |
-| Expansion room | 68.0% |
-| System bus | 40-pin (A16+D8+CLK+ctrl) |
-| Max cable | 30cm @ 10MHz |
-| Forbidden opcodes | 64 (blocked by guard) |
-| Hardware changes | 1 wire (done) |
+| Total packages | 34 (+ ROM + RAM) |
+| Instructions | 18 (+NOT free, +$C0 alias) |
+| Gate count | ~1,260 |
+| Opcode space | 7% used, 68% expansion |
+| Data access | 64KB (SETDP) |
+| System bus | 40-pin |
+| Forbidden opcodes | 64 (guarded) |
+| Testbenches | 4 (full, IRQ, tasks, SETDP) |
 
 ---
 
-## Opcode Space
+## Memory Map (Final)
 
 ```
-     0 1 2 3 4 5 6 7 8 9 A B C D E F
-$0x [N J B . S . . . E . . . ⛔⛔⛔⛔]
-$1x [A A . . . . . . . . . . ⛔⛔⛔⛔]
-$2x [P P . . . . . . . . . . ⛔⛔⛔⛔]
-$3x [L L . . . . . . . . . . ⛔⛔⛔⛔]
-$4x [D . . . . . . . I . . . ⛔⛔⛔⛔]  D=SETDP I=DI
-$7x [X X . . . . . . . . . . ⛔⛔⛔⛔]
-$8x [. . B . . . . . . . . . ⛔⛔⛔⛔]
-$9x [S S . . . . . . . . . . ⛔⛔⛔⛔]
-$Bx [★ ★ . . . . . . . . . . ⛔⛔⛔⛔]  ★=NOT (free)
+$0000-$7FFF  RAM 32KB (read/write)
+$8000-$FEFF  ROM 32KB
+$FF00-$FF0F  ROM: IRQ vector
+$FF10-$FF1F  I/O Slot 1
+$FF20-$FF2F  I/O Slot 2
+$FF30-$FFFF  ROM: ISR code
 ```
 
 ---
 
-## Final Statement
+## Open Items (v2.0)
+
+| # | Item | Notes |
+|:-:|------|-------|
+| 1 | IRQ hardware save-PC | +2-3 chips |
+| 2 | NOT instruction in assembler | 0 chips |
+| 3 | I/O slot decode board | +1 chip (74HC138) |
+| 4 | RTI instruction | Design TBD |
+
+---
+
+## Sign-off
 
 ```
-RV8-GR: 32-chip horizontal-control CPU
-- 18 instructions, full 64KB code + data access
-- All 256 opcodes produce deterministic behavior
-- Single electrical hazard eliminated by spare gate
-- 68% opcode space available for expansion at 0 cost
-- 40-pin bus enables full computer system
+RV8-GR v1.0: 32-chip horizontal-control CPU
+- Full 64KB code + data
+- All 256 opcodes deterministic
+- Electrical hazard eliminated
+- Pin-level wiring verified
+- Ready for physical build
 
-Signed off for physical build.
+Hardware Design Frozen.
 ```
 
 *Date: 2026-06-09*
-*Design: RV8-GR v1.0*
-*Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25-8 → U7-19)*
-*Bus: RV8-Bus v2 (40-pin)*
+*Chips: U1-U33 (32 logic + ROM + RAM)*
+*Guard: BUF_OE_SAFE (U25-8 → U7-19)*
+*Bus: RV8-Bus v2 (40-pin, Slot1=$FF10, Slot2=$FF20)*
+*IRQ: $FF00 (software save-PC for v1.0)*
