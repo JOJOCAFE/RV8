@@ -1,6 +1,6 @@
 # RV8-GR — Design & ISA Reference (Stable)
 
-**31 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
+**32 logic chips + ROM + RAM. No microcode. 64K. IRQ. Verilog verified.**
 
 ---
 
@@ -123,7 +123,7 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 
 ---
 
-## Chip List (31)
+## Chip List (32)
 
 | U# | Chip | Role |
 |:--:|------|------|
@@ -149,6 +149,7 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 | U29-U30 | 74HC157 ×2 | Addr mux A[15:8] |
 | U31 | 74HC74 | IRQ_FF + IE_FF |
 | U32 | 74HC574 | Data Page Register |
+| U33 | 74HC21 | SETDP decode |
 
 ---
 

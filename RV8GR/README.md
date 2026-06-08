@@ -8,12 +8,12 @@
 
 | Spec | Value |
 |------|-------|
-| Logic chips | 31 (74HC series, DIP) |
-| Total packages | 33 (+ ROM + RAM) |
+| Logic chips | 32 (74HC series, DIP) |
+| Total packages | 34 (+ ROM + RAM) |
 | ISA | 18 instructions |
 | Clock | 10 MHz |
 | Speed | 3.3 MIPS |
-| Gate count | ~1,250 (logic only, excl. ROM/RAM) |
+| Gate count | ~1,260 (logic only, excl. ROM/RAM) |
 | Address | 64KB (ROM $8000+, RAM $0000+) |
 | Bus | RV8-Bus 40-pin (A16+D8+control) |
 | Registers | 8 in RAM ($00-$07) |
@@ -47,6 +47,7 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 |------|:---:|----------|
 | 74HC161 | 4 | PC counter |
 | 74HC574 | 7 | IR, AC, Page Reg, Data Page |
+| 74HC21 | 1 | SETDP decode (4-input AND) |
 | 74HC245 | 1 | Bus buffer |
 | 74HC164 | 1 | Ring counter |
 | 74HC283 | 2 | Adder |

@@ -1,6 +1,6 @@
 # RV8-GR — Design Sign-off v1.0
 
-**Horizontal-control 8-bit CPU. 31 chips. 64KB data. Deterministic. Ready for build.**
+**Horizontal-control 8-bit CPU. 32 chips. 64KB data. Deterministic. Ready for build.**
 
 ---
 
@@ -50,7 +50,7 @@ Opcode = Control Word (no decoder)
 
 | Metric | Value |
 |--------|-------|
-| Logic chips | 31 |
+| Logic chips | 32 |
 | Instructions | 18 (+ NOT free) |
 | Opcode space used | 7.0% |
 | Expansion room | 68.0% |
@@ -81,7 +81,7 @@ $Bx [★ ★ . . . . . . . . . . ⛔⛔⛔⛔]  ★=NOT (free)
 ## Final Statement
 
 ```
-RV8-GR: 31-chip horizontal-control CPU
+RV8-GR: 32-chip horizontal-control CPU
 - 18 instructions, full 64KB code + data access
 - All 256 opcodes produce deterministic behavior
 - Single electrical hazard eliminated by spare gate

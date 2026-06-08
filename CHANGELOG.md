@@ -4,17 +4,20 @@
 
 ### New Feature
 - **SETDP $40**: Data Page Register (U32 74HC574) — full 64KB data access
+- **U33 74HC21**: SETDP decode (4-input AND gate) — pin-level finalized
 - Data address = {DP, operand} = 16-bit (ROM read + RAM read/write)
-- 31 logic chips, 18 instructions
+- 32 logic chips, 18 instructions
+- IRQ save-PC: documented as software-based for v1.0 build
 
 ### Tests
 - `tb_rv8gr_setdp.v`: 5KB RAM write/read + ROM read (160 cycles, PASS)
 - All existing tests still pass (127 + IRQ + tasks)
 
 ### Documentation
-- All 9 docs updated for 31 chips / 18 instructions / 64KB data
+- All docs updated for 32 chips / 18 instructions / 64KB data
+- DP_Load decode finalized (U33 74HC21 pin-level wiring)
+- IRQ save-PC path documented (software approach for v1.0)
 - Opcode map updated with SETDP at $40
-- Risk analysis: SETDP vs SETPG conflict verified safe (#11)
 
 ## 2026-06-09 — v3.2: RV8-GR Design Sign-off
 

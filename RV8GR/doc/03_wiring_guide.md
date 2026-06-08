@@ -1,6 +1,6 @@
 # RV8-GR — Wiring Guide (Official)
 
-**31 logic chips + ROM + RAM = 33 packages. Source of truth for physical build.**
+**32 logic chips + ROM + RAM = 34 packages. Source of truth for physical build.**
 
 ---
 
@@ -607,19 +607,87 @@ U32-18(Q2) → DP1 → U29-6 (A9 B-input)
 U32-19(Q1) → DP0 → U29-3 (A8 B-input)
 U32-20(VCC) → VCC
 
-SETDP decode: ir_high = $40 (XOR_MODE=1, all others=0)
-DP_Load = T2 AND XOR_MODE AND NOT(MUX_SEL) AND NOT(AC_WR) AND NOT(SRC) ...
-Simplified: use spare gate U28-D as part of decode
-  U28-12 ← XOR_MODE (U5-13)
-  U28-13 ← (something to distinguish from XORI $70)
-  Or: compare ir_high == $40 using specific gate combination
+### U33 74HC21 — SETDP Decode (dual 4-input AND)
 
-Practical: SETDP = XOR_MODE=1 AND MUX_SEL=0 AND AC_WR=0 AND SRC=0 AND STR=0
-  = bit6=1 AND bit5=0 AND bit4=0 AND bit3=0 AND bit2=0 AND bit1=0 AND bit0=0
-  Only $40 and $C0 match (SUB doesn't matter for latch)
-  → DP_Load = T2 AND XOR_MODE AND NOT(MUX_SEL) AND NOT(source_type)
-  Use spare gates or add 1 gate for decode
 ```
+U33-1  (1A) ← T2 (U8-5)
+U33-2  (1B) ← XOR_MODE (U5-13)
+U33-4  (1C) ← /ADDR_MODE (U26-6)
+U33-5  (1D) ← /AC_WR (U24-10)
+U33-6  (1Y) → DP_Load → U32-11
+U33-7  (GND) → GND
+U33-9  (2A) → VCC (unused gate, tie high)
+U33-10 (2B) → VCC
+U33-12 (2C) → VCC
+U33-13 (2D) → VCC
+U33-8  (2Y) → NC
+U33-14 (VCC) → VCC
+```
+
+Decode verification:
+| Opcode | T2 | XOR | /ADDR | /AC_WR | DP_Load |
+|:------:|:--:|:---:|:-----:|:------:|:-------:|
+| SETDP $40 | 1 | 1 | 1 | 1 | **1** ✓ |
+| DI $48 | 1 | 1 | 0 | 1 | 0 ✓ |
+| XORI $70 | 1 | 1 | 1 | 0 | 0 ✓ |
+| SETPG $20 | 1 | 0 | 1 | 1 | 0 ✓ |
+| $C0 (SUB+XOR) | 1 | 1 | 1 | 1 | **1** (= SETDP alias, harmless) |
+
+Note: $C0 triggers DP_Load but is equivalent to SETDP (SUB bit has no effect when AC_WR=0).
+
+---
+
+### IRQ Save-PC Logic (Pin-Level)
+
+During IRQ-ack, CPU must:
+1. Write PC[7:0] to RAM[$0E]
+2. Write PC[15:8] to RAM[$0F]
+3. Force PC = $FF00
+
+**Implementation**: IRQ-ack reuses existing STORE path with forced address.
+
+```
+IRQ_ack = T2 AND IRQ_FF(U31-12) AND IE(U31-5) AND NOT(PC_LOAD_COND)
+
+During IRQ-ack (extra 2 cycles inserted by hardware):
+
+Cycle 1 — Save PC low:
+  Force ADDR_MODE=1, address=$0E
+  Force AC buffer to drive PC[7:0] onto IBUS (override U14 input)
+  RAM /WE pulse → RAM[$0E] = PC[7:0]
+
+Cycle 2 — Save PC high:
+  Force address=$0F
+  Drive PC[15:8] onto IBUS
+  RAM /WE pulse → RAM[$0F] = PC[15:8]
+
+Then:
+  Force page_reg = $FF, ir_low = $00
+  Assert /PC_LD → PC loads $FF00
+  Clear IE (U31 /CLR1)
+  Clear IRQ_FF (U31 /CLR2)
+```
+
+**Hardware complexity note**:
+The IRQ save-PC requires additional multiplexing to:
+- Drive PC bytes onto IBUS (normally only AC goes to IBUS via U14)
+- Force address $0E/$0F (normally IRL provides address)
+
+**Options for physical build**:
+
+| Approach | Extra Chips | Complexity |
+|----------|:-----------:|:----------:|
+| A: Software save (ISR reads PC from known location) | 0 | Simple |
+| B: Dedicated save circuit (mux PC onto bus) | 2-3 chips | Complex |
+| C: Use return address register (like CALL) | 1 chip | Medium |
+
+**Recommended for v1.0 build: Option A (software ISR)**
+
+In practice, the Verilog model handles save-PC in behavioral code.
+For physical build v1.0, the ISR at $FF00 can use a fixed return point
+or the programmer can store return address before enabling interrupts.
+
+Future v2.0: Add dedicated PC-save hardware if needed.
 
 Note: A15 from U32 bit 7 → allows data access to both ROM and RAM (full 64KB).
 
@@ -684,6 +752,7 @@ RAM (62256)
 |---------|:---:|:---:|:------:|
 | 74HC161 (U1-U4) | 16 | 8 | 100nF |
 | 74HC574 (U5,U6,U9,U23,U32) | 20 | 10 | 100nF |
+| 74HC21 (U33) | 14 | 7 | 100nF |
 | 74HC245 (U7) | 20 | 10 | 100nF |
 | 74HC164 (U8) | 14 | 7 | 100nF |
 | 74HC283 (U10-U11) | 16 | 8 | 100nF |

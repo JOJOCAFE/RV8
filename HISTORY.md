@@ -3,8 +3,10 @@
 ## 2026-06-09 — v3.3: SETDP + Full 64KB Data Access
 
 - Added SETDP instruction ($40) — Data Page Register (U32 74HC574)
+- Added U33 (74HC21) for SETDP decode — pin-level finalized
 - Full 64KB data access: DP=$00-$7F → RAM, DP=$80-$FF → ROM read
-- 31 logic chips, 18 instructions, 33 packages total
+- 32 logic chips, 18 instructions, 34 packages total
+- IRQ save-PC documented (software approach for v1.0)
 - SETDP test: 5KB RAM write/read + ROM read (160 cycles, all pass)
 - All docs updated and verified consistent
 
