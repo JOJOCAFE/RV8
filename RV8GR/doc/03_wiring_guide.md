@@ -597,11 +597,11 @@ U32-6 (D5) ← IB4   U32-7 (D6) ← IB5
 U32-8 (D7) ← IB6   U32-9 (D8) ← IB7
 U32-10(GND) → GND
 U32-11(CLK) ← DP_Load (decode: T2 AND SETDP)
-U32-12(Q8) → NC (bit 7 unused, A15 always from mux)
+U32-12(Q8) → DP7 → U30-13 (A15 B-input, enables ROM read)
 U32-13(Q7) → DP6 → U30-10 (A14 B-input)
 U32-14(Q6) → DP5 → U30-6 (A13 B-input)
-U32-15(Q5) → DP4 → U30-2 (A12 B-input, was U30-3)
-U32-16(Q4) → DP3 → U29-14 (A11 B-input, was U29-13)
+U32-15(Q5) → DP4 → U30-3 (A12 B-input)
+U32-16(Q4) → DP3 → U29-13 (A11 B-input)
 U32-17(Q3) → DP2 → U29-10 (A10 B-input)
 U32-18(Q2) → DP1 → U29-6 (A9 B-input)
 U32-19(Q1) → DP0 → U29-3 (A8 B-input)
@@ -674,6 +674,7 @@ RAM (62256)
 | WR_DIR | U28-8 | U7-1 |
 | A15 | U30-12 | RAM /CE, U24-5 |
 | PG_Load_N | U25-13 | U23-11 |
+| DP_Load | Decode logic | U32-11 |
 
 ---
 
@@ -682,7 +683,7 @@ RAM (62256)
 | Package | VCC | GND | Bypass |
 |---------|:---:|:---:|:------:|
 | 74HC161 (U1-U4) | 16 | 8 | 100nF |
-| 74HC574 (U5,U6,U9,U23) | 20 | 10 | 100nF |
+| 74HC574 (U5,U6,U9,U23,U32) | 20 | 10 | 100nF |
 | 74HC245 (U7) | 20 | 10 | 100nF |
 | 74HC164 (U8) | 14 | 7 | 100nF |
 | 74HC283 (U10-U11) | 16 | 8 | 100nF |
