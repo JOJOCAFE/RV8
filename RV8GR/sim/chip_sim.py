@@ -149,7 +149,7 @@ class CPUSim:
         self.chips['RAM'].set(25, 0)
         self.chips['RAM'].set(26, 1 if not (self.phase==2 and s['STR']) else 0)
         self.chips['ROM'].update()
-        self.chips['RAM'].update()
+        # Note: RAM.update() NOT called here — memory handled by step() logic
 
         # IBUS → D inputs of consumer chips
         for i in range(8):
@@ -168,6 +168,11 @@ class CPUSim:
             for entry in WIRING:
                 if len(entry) == 4:
                     dest_chip, dest_pin, src_chip, src_pin = entry
+                    # Skip RAM /WE and ROM/RAM data pins — handled by step() logic
+                    if dest_chip == 'RAM' and dest_pin in (26, 16,17,18,19,20,21,22,23):
+                        continue
+                    if dest_chip == 'ROM' and dest_pin in (16,17,18,19,20,21,22,23):
+                        continue
                     self.chips[dest_chip].set(dest_pin, self.chips[src_chip].get(src_pin))
                 elif len(entry) == 3:
                     dest_chip, dest_pin, signal = entry
@@ -176,7 +181,7 @@ class CPUSim:
                     elif signal == 'GND':
                         self.chips[dest_chip].set(dest_pin, 0)
 
-            # Update all combinational chips
+            # Update all combinational chips (skip memory — handled by step)
             for name in ['U24','U25','U26','U27','U28','U33',
                          'U19','U20','U12','U13','U10','U11',
                          'U15','U16','U17','U18','U29','U30',
