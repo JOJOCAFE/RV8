@@ -1,379 +1,497 @@
 """
-RV8-GR Wiring — Connect all 35 chips per 03_wiring_guide.md
+RV8-GR Wiring — Pin-by-pin, matching 03_wiring_guide.md exactly.
 
-Wiring style: define shared wire names, then connect chip pins to them.
-Easy to read, easy to edit, mirrors the wiring guide exactly.
+Format: (chip, pin, source_chip, source_pin)  or  (chip, pin, 'SIGNAL_NAME')
+        (chip, pin, 'VCC')  (chip, pin, 'GND')
 
-Usage:
-    chips = create_cpu()
-    wires = wire_cpu(chips)
+This reads like the wiring guide: each chip, each pin, where it connects.
 """
 
+# =============================================================================
+# WIRING TABLE
+# Each entry: (dest_chip, dest_pin, src_chip, src_pin)
+# For named signals: (dest_chip, dest_pin, 'SIGNAL')
+# For constants: (dest_chip, dest_pin, 'VCC') or 'GND'
+# =============================================================================
 
-class Wire:
-    """A named wire connecting multiple chip pins."""
-    def __init__(self, name: str):
-        self.name = name
-        self.value = 0
-
-    def __repr__(self):
-        return f"{self.name}={'H' if self.value else 'L'}"
-
-
-def wire_cpu(chips):
-    """Wire all chips according to 03_wiring_guide.md. Returns wire dict."""
-    w = {}  # all wires by name
-
-    # Helper: create wire and return it
-    def net(name):
-        w[name] = Wire(name)
-        return w[name]
+WIRING = [
+    # =========================================================================
+    # U1: PC bits 0-3 (74HC161)
+    # =========================================================================
+    ('U1', 1,  '/RST'),           # /CLR ← /RST
+    ('U1', 2,  'CLK'),            # CLK ← CLK
+    ('U1', 3,  'U6', 19),         # D0 ← IRL0 (U6-19)
+    ('U1', 4,  'U6', 18),         # D1 ← IRL1 (U6-18)
+    ('U1', 5,  'U6', 17),         # D2 ← IRL2 (U6-17)
+    ('U1', 6,  'U6', 16),         # D3 ← IRL3 (U6-16)
+    ('U1', 7,  'U25', 6),         # ENP ← PC_INC (U25-6)
+    ('U1', 9,  'U26', 11),        # /LD ← /PC_LD (U26-11)
+    ('U1', 10, 'U25', 6),         # ENT ← PC_INC (U25-6)
+    # U1 outputs: QA=14→U15-2, QB=13→U15-5, QC=12→U15-11, QD=11→U15-14
 
     # =========================================================================
-    # BUS WIRES (shared multi-chip connections)
+    # U2: PC bits 4-7 (74HC161)
     # =========================================================================
-
-    # DBUS — External Data Bus (ROM, RAM, U7 A-side)
-    for i in range(8):
-        net(f'D{i}')
-
-    # IBUS — Internal Bus (U7 B-side, U6*, U14*, inputs to U12/U13/U5/U23/U32)
-    for i in range(8):
-        net(f'IB{i}')
-
-    # ABUS — Address Bus (mux outputs → ROM, RAM)
-    for i in range(16):
-        net(f'A{i}')
+    ('U2', 1,  '/RST'),
+    ('U2', 2,  'CLK'),
+    ('U2', 3,  'U6', 15),         # D0 ← IRL4 (U6-15)
+    ('U2', 4,  'U6', 14),         # D1 ← IRL5 (U6-14)
+    ('U2', 5,  'U6', 13),         # D2 ← IRL6 (U6-13)
+    ('U2', 6,  'U6', 12),         # D3 ← IRL7 (U6-12)
+    ('U2', 7,  'U25', 6),         # ENP ← PC_INC
+    ('U2', 9,  'U26', 11),        # /LD ← /PC_LD
+    ('U2', 10, 'U1', 15),         # ENT ← U1 RCO
+    # U2 outputs: QA=14→U16-2, QB=13→U16-5, QC=12→U16-11, QD=11→U16-14
 
     # =========================================================================
-    # CONTROL WIRES
+    # U3: PC bits 8-11 (74HC161)
     # =========================================================================
-
-    net('CLK')          # System clock → U1-2, U2-2, U3-2, U4-2, U8-8
-    net('/RST')         # Reset → U1-1, U2-1, U3-1, U4-1, U8-9
-    net('T0')           # U8-3 → U5-11, U25-4, U24-1
-    net('T1')           # U8-4 → U6-11, U25-5, U24-3
-    net('T2')           # U8-5 → U26-1, U26-9, U26-12, U27-12, U28-4, U33-1
-
-    # IR_HIGH outputs (U5 Q) = control signals
-    net('ALU_SUB')      # U5-12
-    net('XOR_MODE')     # U5-13
-    net('MUX_SEL')      # U5-14
-    net('AC_WR')        # U5-15
-    net('SRC')          # U5-16
-    net('STR')          # U5-17
-    net('BR')           # U5-18
-    net('JMP')          # U5-19
-
-    # Derived signals
-    net('ADDR_MODE')    # U25-3
-    net('PC_INC')       # U25-6
-    net('BUF_OE_SAFE')  # U25-8
-    net('PG_Load_N')    # U25-13
-    net('/IRL_OE')      # U26-3
-    net('/ADDR_MODE')   # U26-6
-    net('/AC_BUF')      # U26-8
-    net('/PC_LD')       # U26-11
-    net('/BR_TAKEN')    # U27-3
-    net('PC_LOAD_COND') # U27-6
-    net('/PG_cond')     # U27-8
-    net('Acc_Load_N')   # U27-11
-    net('Z_match')      # U28-3
-    net('/T2')          # U28-6
-    net('WR_DIR')       # U28-8
-    net('BUF_OE_N')     # U24-12
-    net('/JUMP')        # U24-8
-    net('/AC_WR')       # U24-10
-    net('/A15')         # U24-6
-    net('DP_Load')      # U33-6
-    net('Z_flag')       # U21-5
-
-    # PC bits (U1-U4 Q outputs)
-    for i in range(16):
-        net(f'PC{i}')
-
-    # IRL bits (U6 Q outputs)
-    for i in range(8):
-        net(f'IRL{i}')
-
-    # AC bits (U9 Q outputs)
-    for i in range(8):
-        net(f'AC{i}')
-
-    # Page Register bits (U23 Q outputs)
-    for i in range(8):
-        net(f'PG{i}')
-
-    # Data Page bits (U32 Q outputs)
-    for i in range(8):
-        net(f'DP{i}')
-
-    # Adder outputs
-    for i in range(8):
-        net(f'SUM{i}')
-    net('Carry')        # U10-9 → U11-7
-
-    # XOR outputs
-    for i in range(8):
-        net(f'XOR_Y{i}')
+    ('U3', 1,  '/RST'),
+    ('U3', 2,  'CLK'),
+    ('U3', 3,  'U23', 19),        # D0 ← PG0 (U23-19)
+    ('U3', 4,  'U23', 18),        # D1 ← PG1 (U23-18)
+    ('U3', 5,  'U23', 17),        # D2 ← PG2 (U23-17)
+    ('U3', 6,  'U23', 16),        # D3 ← PG3 (U23-16)
+    ('U3', 7,  'U25', 6),         # ENP ← PC_INC
+    ('U3', 9,  'U26', 11),        # /LD ← /PC_LD
+    ('U3', 10, 'U2', 15),         # ENT ← U2 RCO
 
     # =========================================================================
-    # WIRING CONNECTIONS (from 03_wiring_guide.md)
+    # U4: PC bits 12-15 (74HC161)
     # =========================================================================
-
-    # Format: connections[wire_name] = [(chip, pin), ...]
-    # First entry = driver, rest = listeners (for tristate: managed separately)
-
-    connections = {
-        # --- Clock & Reset ---
-        'CLK':   [('U1',2), ('U2',2), ('U3',2), ('U4',2), ('U8',8)],
-        '/RST':  [('U1',1), ('U2',1), ('U3',1), ('U4',1), ('U8',9)],
-
-        # --- Ring Counter (U8) outputs ---
-        'T0':    [('U8',3),  ('U5',11), ('U25',4), ('U24',1)],
-        'T1':    [('U8',4),  ('U6',11), ('U25',5), ('U24',3)],
-        'T2':    [('U8',5),  ('U26',1), ('U26',9), ('U26',12), ('U27',12), ('U28',4), ('U33',1)],
-
-        # --- U5 IR_HIGH Q outputs (control signals) ---
-        'ALU_SUB':  [('U5',12), ('U10',7), ('U19',2), ('U19',5), ('U19',11), ('U19',14),
-                     ('U20',2), ('U20',5), ('U20',11), ('U20',14), ('U28',2)],
-        'XOR_MODE': [('U5',13), ('U19',1), ('U20',1), ('U33',2)],
-        'MUX_SEL':  [('U5',14), ('U17',1), ('U18',1), ('U27',9)],
-        'AC_WR':    [('U5',15), ('U24',11), ('U27',13)],
-        'SRC':      [('U5',16), ('U25',1)],
-        'STR':      [('U5',17), ('U25',2), ('U26',10), ('U25',10)],
-        'BR':       [('U5',18), ('U27',1)],
-        'JMP':      [('U5',19), ('U24',9)],
-
-        # --- U24 Inverter outputs ---
-        # NOT(T0) → U8-1, NOT(T1) → U8-2 (ring counter feedback)
-        # /A15 → ROM /CE
-        # /JUMP, /AC_WR, BUF_OE_N
-        '/A15':     [('U24',6), ('ROM',24)],
-        '/JUMP':    [('U24',8), ('U27',4)],
-        '/AC_WR':   [('U24',10), ('U27',10), ('U33',5)],
-        'BUF_OE_N': [('U24',12), ('U25',9)],
-
-        # --- U25 OR gate outputs ---
-        'ADDR_MODE':  [('U25',3), ('U15',1), ('U16',1), ('U29',1), ('U30',1), ('U26',4), ('U26',5)],
-        'PC_INC':     [('U25',6), ('U1',7), ('U1',10), ('U2',7), ('U3',7), ('U4',7)],
-        'BUF_OE_SAFE':[('U25',8), ('U7',19)],
-        'PG_Load_N':  [('U25',13), ('U23',11)],
-
-        # --- U26 NAND outputs ---
-        '/IRL_OE':    [('U26',3), ('U6',1), ('U24',13)],
-        '/ADDR_MODE': [('U26',6), ('U26',2), ('U33',4)],
-        '/AC_BUF':    [('U26',8), ('U14',1), ('U14',19), ('RAM',26), ('U28',9)],
-        '/PC_LD':     [('U26',11), ('U1',9), ('U2',9), ('U3',9), ('U4',9)],
-
-        # --- U27 NAND outputs ---
-        '/BR_TAKEN':   [('U27',3), ('U27',5)],
-        'PC_LOAD_COND':[('U27',6), ('U26',13)],
-        '/PG_cond':    [('U27',8), ('U25',12)],
-        'Acc_Load_N':  [('U27',11), ('U9',11), ('U21',3)],
-
-        # --- U28 XOR outputs ---
-        'Z_match':  [('U28',3), ('U27',2)],
-        '/T2':      [('U28',6), ('U25',11)],
-        'WR_DIR':   [('U28',8), ('U7',1)],
-
-        # --- U33 AND output ---
-        'DP_Load':  [('U33',6), ('U32',11)],
-
-        # --- Z flag ---
-        'Z_flag':   [('U21',5), ('U28',1)],
-
-        # --- A15 (from mux to RAM /CE and U24 input) ---
-        'A15':      [('U30',12), ('RAM',24), ('U24',5)],
-
-        # --- Carry chain ---
-        'Carry':    [('U10',9), ('U11',7)],
-    }
-
-    # --- PC bits: U1 QA-QD = PC0-3, U2 = PC4-7, U3 = PC8-11, U4 = PC12-15 ---
-    pc_q_pins = [(14,'U1'),(13,'U1'),(12,'U1'),(11,'U1'),  # PC0-3
-                 (14,'U2'),(13,'U2'),(12,'U2'),(11,'U2'),  # PC4-7
-                 (14,'U3'),(13,'U3'),(12,'U3'),(11,'U3'),  # PC8-11
-                 (14,'U4'),(13,'U4'),(12,'U4'),(11,'U4')]  # PC12-15
-    # PC → Address mux A-inputs
-    addr_lo_a = [(2,'U15'),(5,'U15'),(11,'U15'),(14,'U15'),  # PC0-3 → U15
-                 (2,'U16'),(5,'U16'),(11,'U16'),(14,'U16')]  # PC4-7 → U16
-    addr_hi_a = [(2,'U29'),(5,'U29'),(11,'U29'),(14,'U29'),  # PC8-11 → U29
-                 (2,'U30'),(5,'U30'),(11,'U30'),(14,'U30')]  # PC12-15 → U30
-    for i in range(8):
-        pin, chip = pc_q_pins[i]
-        a_pin, a_chip = addr_lo_a[i]
-        connections[f'PC{i}'] = [(chip, pin), (a_chip, a_pin)]
-    for i in range(8):
-        pin, chip = pc_q_pins[8+i]
-        a_pin, a_chip = addr_hi_a[i]
-        connections[f'PC{8+i}'] = [(chip, pin), (a_chip, a_pin)]
-
-    # --- IRL bits: U6 Q → addr mux B-inputs + PC D-inputs ---
-    # IRL0(pin19)→U15-3,U1-3 ... IRL7(pin12)→U16-13,U2-6
-    irl_q_pins = [19, 18, 17, 16, 15, 14, 13, 12]  # Q1-Q8 = IRL0-IRL7
-    irl_to_mux = [(3,'U15'),(6,'U15'),(10,'U15'),(13,'U15'),  # IRL0-3 → U15 B
-                  (3,'U16'),(6,'U16'),(10,'U16'),(13,'U16')]  # IRL4-7 → U16 B
-    irl_to_pc  = [(3,'U1'),(4,'U1'),(5,'U1'),(6,'U1'),       # IRL0-3 → U1 D
-                  (3,'U2'),(4,'U2'),(5,'U2'),(6,'U2')]        # IRL4-7 → U2 D
-    for i in range(8):
-        connections[f'IRL{i}'] = [('U6', irl_q_pins[i]),
-                                  (irl_to_mux[i][1], irl_to_mux[i][0]),
-                                  (irl_to_pc[i][1], irl_to_pc[i][0])]
-
-    # --- PG bits: U23 Q → U3/U4 D-inputs ---
-    pg_q_pins = [19, 18, 17, 16, 15, 14, 13, 12]  # PG0-PG7
-    pg_to_pc  = [(3,'U3'),(4,'U3'),(5,'U3'),(6,'U3'),  # PG0-3 → U3 D
-                 (3,'U4'),(4,'U4'),(5,'U4'),(6,'U4')]   # PG4-7 → U4 D
-    for i in range(8):
-        connections[f'PG{i}'] = [('U23', pg_q_pins[i]), (pg_to_pc[i][1], pg_to_pc[i][0])]
-
-    # --- DP bits: U32 Q → U29/U30 B-inputs ---
-    dp_q_pins = [19, 18, 17, 16, 15, 14, 13, 12]  # DP0-DP7
-    dp_to_mux = [(3,'U29'),(6,'U29'),(10,'U29'),(13,'U29'),   # DP0-3 → U29 B
-                 (3,'U30'),(6,'U30'),(10,'U30'),(13,'U30')]    # DP4-7 → U30 B
-    for i in range(8):
-        connections[f'DP{i}'] = [('U32', dp_q_pins[i]), (dp_to_mux[i][1], dp_to_mux[i][0])]
-
-    # --- AC bits: U9 Q → adder A + XOR B-mux B + U14 A + U22 P ---
-    ac_q_pins = [19, 18, 17, 16, 15, 14, 13, 12]  # AC0-AC7
-    ac_to_adder_lo = [(5,'U10'),(3,'U10'),(14,'U10'),(12,'U10')]  # AC0-3
-    ac_to_adder_hi = [(5,'U11'),(3,'U11'),(14,'U11'),(12,'U11')]  # AC4-7
-    ac_to_xmux_lo = [(3,'U19'),(6,'U19'),(10,'U19'),(13,'U19')]   # AC0-3 → U19 B
-    ac_to_xmux_hi = [(3,'U20'),(6,'U20'),(10,'U20'),(13,'U20')]   # AC4-7 → U20 B
-    ac_to_buf = [2, 3, 4, 5, 6, 7, 8, 9]                          # U14 A1-A8
-    ac_to_zero = [2, 4, 6, 8, 12, 14, 16, 18]                     # U22 P0-P7
-    for i in range(4):
-        connections[f'AC{i}'] = [('U9', ac_q_pins[i]),
-                                 (ac_to_adder_lo[i][1], ac_to_adder_lo[i][0]),
-                                 (ac_to_xmux_lo[i][1], ac_to_xmux_lo[i][0]),
-                                 ('U14', ac_to_buf[i]),
-                                 ('U22', ac_to_zero[i])]
-    for i in range(4):
-        connections[f'AC{4+i}'] = [('U9', ac_q_pins[4+i]),
-                                   (ac_to_adder_hi[i][1], ac_to_adder_hi[i][0]),
-                                   (ac_to_xmux_hi[i][1], ac_to_xmux_hi[i][0]),
-                                   ('U14', ac_to_buf[4+i]),
-                                   ('U22', ac_to_zero[4+i])]
-
-    # --- XOR outputs → Adder B + AC mux B ---
-    xor_lo_pins = [3, 6, 8, 11]   # U12 Y1-Y4
-    xor_hi_pins = [3, 6, 8, 11]   # U13 Y1-Y4
-    adder_b_lo = [(6,'U10'),(2,'U10'),(15,'U10'),(11,'U10')]
-    adder_b_hi = [(6,'U11'),(2,'U11'),(15,'U11'),(11,'U11')]
-    acmux_b_lo = [(3,'U17'),(6,'U17'),(10,'U17'),(13,'U17')]
-    acmux_b_hi = [(3,'U18'),(6,'U18'),(10,'U18'),(13,'U18')]
-    for i in range(4):
-        connections[f'XOR_Y{i}'] = [('U12', xor_lo_pins[i]),
-                                    (adder_b_lo[i][1], adder_b_lo[i][0]),
-                                    (acmux_b_lo[i][1], acmux_b_lo[i][0])]
-    for i in range(4):
-        connections[f'XOR_Y{4+i}'] = [('U13', xor_hi_pins[i]),
-                                      (adder_b_hi[i][1], adder_b_hi[i][0]),
-                                      (acmux_b_hi[i][1], acmux_b_hi[i][0])]
-
-    # --- Adder SUM → AC mux A ---
-    sum_lo_pins = [4, 1, 13, 10]  # U10 S0-S3
-    sum_hi_pins = [4, 1, 13, 10]  # U11 S0-S3
-    acmux_a_lo = [(2,'U17'),(5,'U17'),(11,'U17'),(14,'U17')]
-    acmux_a_hi = [(2,'U18'),(5,'U18'),(11,'U18'),(14,'U18')]
-    for i in range(4):
-        connections[f'SUM{i}'] = [('U10', sum_lo_pins[i]), (acmux_a_lo[i][1], acmux_a_lo[i][0])]
-    for i in range(4):
-        connections[f'SUM{4+i}'] = [('U11', sum_hi_pins[i]), (acmux_a_hi[i][1], acmux_a_hi[i][0])]
-
-    # --- AC mux Y → U9 D inputs ---
-    acmux_y_lo = [(4,'U17'),(7,'U17'),(9,'U17'),(12,'U17')]
-    acmux_y_hi = [(4,'U18'),(7,'U18'),(9,'U18'),(12,'U18')]
-    u9_d = [2, 3, 4, 5, 6, 7, 8, 9]  # U9 D1-D8
-    for i in range(4):
-        w[f'ACMUX{i}'] = Wire(f'ACMUX{i}')
-        connections[f'ACMUX{i}'] = [(acmux_y_lo[i][1], acmux_y_lo[i][0]), ('U9', u9_d[i])]
-    for i in range(4):
-        w[f'ACMUX{4+i}'] = Wire(f'ACMUX{4+i}')
-        connections[f'ACMUX{4+i}'] = [(acmux_y_hi[i][1], acmux_y_hi[i][0]), ('U9', u9_d[4+i])]
-
-    # --- IBUS connections ---
-    # IB0-IB7 connect to: U7 B-side, U6 Q*, U14 Y*, U12/U13 A, U5 D, U23 D, U32 D
-    ibus_to_xor_a = [(1,'U12'),(4,'U12'),(9,'U12'),(12,'U12'),
-                     (1,'U13'),(4,'U13'),(9,'U13'),(12,'U13')]
-    u7_b = [18, 17, 16, 15, 14, 13, 12, 11]  # U7 B1-B8
-    u5_d = [2, 3, 4, 5, 6, 7, 8, 9]
-    u23_d = [2, 3, 4, 5, 6, 7, 8, 9]
-    u32_d = [2, 3, 4, 5, 6, 7, 8, 9]
-    for i in range(8):
-        connections[f'IB{i}'] = [
-            ('U7', u7_b[i]),             # U7 B-side (driver/reader)
-            ('U6', irl_q_pins[i]),       # U6 Q (tristate driver)
-            ('U14', 18-i),               # U14 Y (tristate driver)
-            (ibus_to_xor_a[i][1], ibus_to_xor_a[i][0]),  # XOR A input
-            ('U5', u5_d[i]),             # U5 D input
-            ('U23', u23_d[i]),           # U23 D input
-            ('U32', u32_d[i]),           # U32 D input
-        ]
-
-    # --- DBUS connections ---
-    u7_a = [2, 3, 4, 5, 6, 7, 8, 9]  # U7 A1-A8
-    for i in range(8):
-        connections[f'D{i}'] = [('U7', u7_a[i]), ('ROM', 16+i), ('RAM', 16+i)]
-
-    # --- ABUS connections (mux Y → ROM/RAM address) ---
-    mux_y_lo = [(4,'U15'),(7,'U15'),(9,'U15'),(12,'U15'),
-                (4,'U16'),(7,'U16'),(9,'U16'),(12,'U16')]
-    mux_y_hi = [(4,'U29'),(7,'U29'),(9,'U29'),(12,'U29'),
-                (4,'U30'),(7,'U30'),(9,'U30'),(12,'U30')]
-    for i in range(8):
-        connections[f'A{i}'] = [(mux_y_lo[i][1], mux_y_lo[i][0]), ('ROM', i+1), ('RAM', i+1)]
-    for i in range(7):  # A8-A14
-        connections[f'A{8+i}'] = [(mux_y_hi[i][1], mux_y_hi[i][0]), ('ROM', 8+i+1), ('RAM', 8+i+1)]
-    # A15 already defined above → RAM /CE, U24-5
-
-    # --- U8 ring counter feedback (NOT Q0 → A, NOT Q1 → B) ---
-    # U24-1←T0, U24-2→U8-1; U24-3←T1, U24-4→U8-2
-    connections['NOT_Q0'] = [('U24',2), ('U8',1)]
-    connections['NOT_Q1'] = [('U24',4), ('U8',2)]
-    w['NOT_Q0'] = Wire('NOT_Q0')
-    w['NOT_Q1'] = Wire('NOT_Q1')
-
-    # --- U22 Q pins tied to GND (compare with $00) ---
-    # (handled in test setup - Q pins set to 0)
-
-    # --- U22 /P=Q → U21 /PR1 ---
-    w['ZERO_DET'] = Wire('ZERO_DET')
-    connections['ZERO_DET'] = [('U22',19), ('U21',4)]
-
-    # --- U2 ENT ← U1 RCO, U3 ENT ← U2 RCO, U4 ENT ← U3 RCO ---
-    w['RCO1'] = Wire('RCO1'); connections['RCO1'] = [('U1',15), ('U2',10)]
-    w['RCO2'] = Wire('RCO2'); connections['RCO2'] = [('U2',15), ('U3',10)]
-    w['RCO3'] = Wire('RCO3'); connections['RCO3'] = [('U3',15), ('U4',10)]
-
-    # --- U28-5 and U28-10 tied to VCC (XOR with 1 = NOT) ---
-    # (handled by setting those pins HIGH in simulation)
+    ('U4', 1,  '/RST'),
+    ('U4', 2,  'CLK'),
+    ('U4', 3,  'U23', 15),        # D0 ← PG4 (U23-15)
+    ('U4', 4,  'U23', 14),        # D1 ← PG5 (U23-14)
+    ('U4', 5,  'U23', 13),        # D2 ← PG6 (U23-13)
+    ('U4', 6,  'U23', 12),        # D3 ← PG7 (U23-12)
+    ('U4', 7,  'U25', 6),         # ENP ← PC_INC
+    ('U4', 9,  'U26', 11),        # /LD ← /PC_LD
+    ('U4', 10, 'U3', 15),         # ENT ← U3 RCO
 
     # =========================================================================
-    # Store connection map for propagation
+    # U5: IR_HIGH — Control Byte (74HC574)
     # =========================================================================
-    w['_connections'] = connections
-    return w
+    ('U5', 1,  'GND'),            # /OE → GND (always enabled)
+    ('U5', 11, 'U8', 3),          # CLK ← T0 (U8-3)
+    # D1-D8 (pins 2-9) ← IBUS (IB0-IB7) — connected via shared wires
+
+    # =========================================================================
+    # U6: IR_LOW — Operand (74HC574)
+    # =========================================================================
+    ('U6', 1,  'U26', 3),         # /OE ← /IRL_OE (U26-3)
+    ('U6', 11, 'U8', 4),          # CLK ← T1 (U8-4)
+    # D1-D8 (pins 2-9) ← IBUS
+
+    # =========================================================================
+    # U7: Bus Buffer (74HC245) — DBUS ↔ IBUS
+    # =========================================================================
+    ('U7', 1,  'U28', 8),         # DIR ← WR_DIR (U28-8)
+    ('U7', 19, 'U25', 8),         # /OE ← BUF_OE_SAFE (U25-8)
+    # A1-A8 (pins 2-9) ↔ DBUS, B1-B8 (pins 18-11) ↔ IBUS
+
+    # =========================================================================
+    # U8: Ring Counter (74HC164)
+    # =========================================================================
+    ('U8', 1,  'U24', 2),         # A ← NOT(Q0) (U24-2)
+    ('U8', 2,  'U24', 4),         # B ← NOT(Q1) (U24-4)
+    ('U8', 8,  'CLK'),            # CLK ← CLK
+    ('U8', 9,  '/RST'),           # /CLR ← /RST
+    # Q0=3(T0), Q1=4(T1), Q2=5(T2)
+
+    # =========================================================================
+    # U9: Accumulator (74HC574)
+    # =========================================================================
+    ('U9', 1,  'GND'),            # /OE → GND
+    ('U9', 11, 'U27', 11),        # CLK ← Acc_Load_N (U27-11)
+    ('U9', 2,  'U17', 4),         # D1 ← AC mux Y0
+    ('U9', 3,  'U17', 7),         # D2 ← AC mux Y1
+    ('U9', 4,  'U17', 9),         # D3 ← AC mux Y2
+    ('U9', 5,  'U17', 12),        # D4 ← AC mux Y3
+    ('U9', 6,  'U18', 4),         # D5 ← AC mux Y4
+    ('U9', 7,  'U18', 7),         # D6 ← AC mux Y5
+    ('U9', 8,  'U18', 9),         # D7 ← AC mux Y6
+    ('U9', 9,  'U18', 12),        # D8 ← AC mux Y7
+
+    # =========================================================================
+    # U10: ALU Adder Low (74HC283) — bits 0-3
+    # =========================================================================
+    ('U10', 5,  'U9', 19),        # A0 ← AC0 (U9-19)
+    ('U10', 3,  'U9', 18),        # A1 ← AC1 (U9-18)
+    ('U10', 14, 'U9', 17),        # A2 ← AC2 (U9-17)
+    ('U10', 12, 'U9', 16),        # A3 ← AC3 (U9-16)
+    ('U10', 6,  'U12', 3),        # B0 ← XOR_Y0 (U12-3)
+    ('U10', 2,  'U12', 6),        # B1 ← XOR_Y1 (U12-6)
+    ('U10', 15, 'U12', 8),        # B2 ← XOR_Y2 (U12-8)
+    ('U10', 11, 'U12', 11),       # B3 ← XOR_Y3 (U12-11)
+    ('U10', 7,  'U5', 12),        # Cin ← ALU_SUB (U5-12)
+    # S0=4, S1=1, S2=13, S3=10, Cout=9→U11-7
+
+    # =========================================================================
+    # U11: ALU Adder High (74HC283) — bits 4-7
+    # =========================================================================
+    ('U11', 5,  'U9', 15),        # A0 ← AC4 (U9-15)
+    ('U11', 3,  'U9', 14),        # A1 ← AC5 (U9-14)
+    ('U11', 14, 'U9', 13),        # A2 ← AC6 (U9-13)
+    ('U11', 12, 'U9', 12),        # A3 ← AC7 (U9-12)
+    ('U11', 6,  'U13', 3),        # B0 ← XOR_Y4 (U13-3)
+    ('U11', 2,  'U13', 6),        # B1 ← XOR_Y5 (U13-6)
+    ('U11', 15, 'U13', 8),        # B2 ← XOR_Y6 (U13-8)
+    ('U11', 11, 'U13', 11),       # B3 ← XOR_Y7 (U13-11)
+    ('U11', 7,  'U10', 9),        # Cin ← U10 Cout
+
+    # =========================================================================
+    # U12: XOR Low (74HC86) — bits 0-3, A=IBUS, B=mux
+    # =========================================================================
+    # A inputs from IBUS (IB0-IB3) — connected via shared wires
+    ('U12', 2,  'U19', 4),        # B1 ← XOR_B_mux Y0 (U19-4)
+    ('U12', 5,  'U19', 7),        # B2 ← XOR_B_mux Y1 (U19-7)
+    ('U12', 10, 'U19', 9),        # B3 ← XOR_B_mux Y2 (U19-9)
+    ('U12', 13, 'U19', 12),       # B4 ← XOR_B_mux Y3 (U19-12)
+    # Y1=3, Y2=6, Y3=8, Y4=11 → U10 B + U17 B
+
+    # =========================================================================
+    # U13: XOR High (74HC86) — bits 4-7
+    # =========================================================================
+    # A inputs from IBUS (IB4-IB7)
+    ('U13', 2,  'U20', 4),        # B1 ← XOR_B_mux Y4 (U20-4)
+    ('U13', 5,  'U20', 7),        # B2 ← Y5
+    ('U13', 10, 'U20', 9),        # B3 ← Y6
+    ('U13', 13, 'U20', 12),       # B4 ← Y7
+
+    # =========================================================================
+    # U14: AC Output Buffer (74HC541)
+    # =========================================================================
+    ('U14', 1,  'U26', 8),        # /OE1 ← /AC_BUF (U26-8)
+    ('U14', 19, 'U26', 8),        # /OE2 ← /AC_BUF
+    ('U14', 2,  'U9', 19),        # A1 ← AC0
+    ('U14', 3,  'U9', 18),        # A2 ← AC1
+    ('U14', 4,  'U9', 17),        # A3 ← AC2
+    ('U14', 5,  'U9', 16),        # A4 ← AC3
+    ('U14', 6,  'U9', 15),        # A5 ← AC4
+    ('U14', 7,  'U9', 14),        # A6 ← AC5
+    ('U14', 8,  'U9', 13),        # A7 ← AC6
+    ('U14', 9,  'U9', 12),        # A8 ← AC7
+    # Y1=18→IB0, Y2=17→IB1, ... Y8=11→IB7
+
+    # =========================================================================
+    # U15-U16: Address Mux A[7:0] — SEL=ADDR_MODE, A=PC, B=IRL
+    # =========================================================================
+    ('U15', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U15', 15, 'GND'),           # /E → GND
+    ('U15', 2,  'U1', 14),        # 1A ← PC0
+    ('U15', 3,  'U6', 19),        # 1B ← IRL0
+    ('U15', 5,  'U1', 13),        # 2A ← PC1
+    ('U15', 6,  'U6', 18),        # 2B ← IRL1
+    ('U15', 11, 'U1', 12),        # 3A ← PC2
+    ('U15', 10, 'U6', 17),        # 3B ← IRL2
+    ('U15', 14, 'U1', 11),        # 4A ← PC3
+    ('U15', 13, 'U6', 16),        # 4B ← IRL3
+
+    ('U16', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U16', 15, 'GND'),
+    ('U16', 2,  'U2', 14),        # 1A ← PC4
+    ('U16', 3,  'U6', 15),        # 1B ← IRL4
+    ('U16', 5,  'U2', 13),        # 2A ← PC5
+    ('U16', 6,  'U6', 14),        # 2B ← IRL5
+    ('U16', 11, 'U2', 12),        # 3A ← PC6
+    ('U16', 10, 'U6', 13),        # 3B ← IRL6
+    ('U16', 14, 'U2', 11),        # 4A ← PC7
+    ('U16', 13, 'U6', 12),        # 4B ← IRL7
+
+    # =========================================================================
+    # U17-U18: AC Input Mux — SEL=MUX_SEL, A=Adder SUM, B=XOR output
+    # =========================================================================
+    ('U17', 1,  'U5', 14),        # SEL ← MUX_SEL
+    ('U17', 15, 'GND'),
+    ('U17', 2,  'U10', 4),        # 1A ← SUM0
+    ('U17', 3,  'U12', 3),        # 1B ← XOR_Y0
+    ('U17', 5,  'U10', 1),        # 2A ← SUM1
+    ('U17', 6,  'U12', 6),        # 2B ← XOR_Y1
+    ('U17', 11, 'U10', 13),       # 3A ← SUM2
+    ('U17', 10, 'U12', 8),        # 3B ← XOR_Y2
+    ('U17', 14, 'U10', 10),       # 4A ← SUM3
+    ('U17', 13, 'U12', 11),       # 4B ← XOR_Y3
+
+    ('U18', 1,  'U5', 14),        # SEL ← MUX_SEL
+    ('U18', 15, 'GND'),
+    ('U18', 2,  'U11', 4),        # 1A ← SUM4
+    ('U18', 3,  'U13', 3),        # 1B ← XOR_Y4
+    ('U18', 5,  'U11', 1),        # 2A ← SUM5
+    ('U18', 6,  'U13', 6),        # 2B ← XOR_Y5
+    ('U18', 11, 'U11', 13),       # 3A ← SUM6
+    ('U18', 10, 'U13', 8),        # 3B ← XOR_Y6
+    ('U18', 14, 'U11', 10),       # 4A ← SUM7
+    ('U18', 13, 'U13', 11),       # 4B ← XOR_Y7
+
+    # =========================================================================
+    # U19-U20: XOR B-Input Mux — SEL=XOR_MODE, A=ALU_SUB, B=AC
+    # =========================================================================
+    ('U19', 1,  'U5', 13),        # SEL ← XOR_MODE
+    ('U19', 15, 'GND'),
+    ('U19', 2,  'U5', 12),        # 1A ← ALU_SUB
+    ('U19', 3,  'U9', 19),        # 1B ← AC0
+    ('U19', 5,  'U5', 12),        # 2A ← ALU_SUB
+    ('U19', 6,  'U9', 18),        # 2B ← AC1
+    ('U19', 11, 'U5', 12),        # 3A ← ALU_SUB
+    ('U19', 10, 'U9', 17),        # 3B ← AC2
+    ('U19', 14, 'U5', 12),        # 4A ← ALU_SUB
+    ('U19', 13, 'U9', 16),        # 4B ← AC3
+
+    ('U20', 1,  'U5', 13),        # SEL ← XOR_MODE
+    ('U20', 15, 'GND'),
+    ('U20', 2,  'U5', 12),        # 1A ← ALU_SUB
+    ('U20', 3,  'U9', 15),        # 1B ← AC4
+    ('U20', 5,  'U5', 12),        # 2A ← ALU_SUB
+    ('U20', 6,  'U9', 14),        # 2B ← AC5
+    ('U20', 11, 'U5', 12),        # 3A ← ALU_SUB
+    ('U20', 10, 'U9', 13),        # 3B ← AC6
+    ('U20', 14, 'U5', 12),        # 4A ← ALU_SUB
+    ('U20', 13, 'U9', 12),        # 4B ← AC7
+
+    # =========================================================================
+    # U21: Z Flag (74HC74) — FF1 only
+    # =========================================================================
+    ('U21', 1,  'VCC'),            # /CLR1 → VCC
+    ('U21', 2,  'GND'),            # D1 → GND
+    ('U21', 3,  'U27', 11),        # CLK1 ← Acc_Load_N
+    ('U21', 4,  'U22', 19),        # /PR1 ← /P=Q (U22-19)
+    # Q1=5 → Z_flag → U28-1
+    # FF2 unused: pins 8-13 tied
+
+    # =========================================================================
+    # U22: Zero Detect (74HC688) — compare AC with $00
+    # =========================================================================
+    ('U22', 1,  'GND'),           # /OE → GND
+    ('U22', 2,  'U9', 19),        # P0 ← AC0
+    ('U22', 3,  'GND'),           # Q0 → GND
+    ('U22', 4,  'U9', 18),        # P1 ← AC1
+    ('U22', 5,  'GND'),           # Q1 → GND
+    ('U22', 6,  'U9', 17),        # P2 ← AC2
+    ('U22', 7,  'GND'),           # Q2 → GND
+    ('U22', 8,  'U9', 16),        # P3 ← AC3
+    ('U22', 9,  'GND'),           # Q3 → GND
+    ('U22', 11, 'GND'),           # Q4 → GND
+    ('U22', 12, 'U9', 15),        # P4 ← AC4
+    ('U22', 13, 'GND'),           # Q5 → GND
+    ('U22', 14, 'U9', 14),        # P5 ← AC5
+    ('U22', 15, 'GND'),           # Q6 → GND
+    ('U22', 16, 'U9', 13),        # P6 ← AC6
+    ('U22', 17, 'GND'),           # Q7 → GND
+    ('U22', 18, 'U9', 12),        # P7 ← AC7
+    # /P=Q (pin 19) → U21-4
+
+    # =========================================================================
+    # U23: Page Register (74HC574)
+    # =========================================================================
+    ('U23', 1,  'GND'),           # /OE → GND
+    ('U23', 11, 'U25', 13),       # CLK ← PG_Load_N (U25-13)
+    # D1-D8 (pins 2-9) ← IBUS
+    # Q outputs → U3/U4 D inputs (already wired above)
+
+    # =========================================================================
+    # U24: Inverters (74HC04)
+    # =========================================================================
+    ('U24', 1,  'U8', 3),         # 1A ← T0 (for ring counter feedback)
+    # 1Y=2 → U8-1 (NOT Q0)
+    ('U24', 3,  'U8', 4),         # 2A ← T1
+    # 2Y=4 → U8-2 (NOT Q1)
+    ('U24', 5,  'U30', 12),       # 3A ← A15
+    # 3Y=6 → /A15 → ROM /CE
+    ('U24', 9,  'U5', 19),        # 4A ← JUMP
+    # 4Y=8 → /JUMP → U27-4
+    ('U24', 11, 'U5', 15),        # 5A ← AC_WR
+    # 5Y=10 → /AC_WR → U27-10, U33-5
+    ('U24', 13, 'U26', 3),        # 6A ← /IRL_OE
+    # 6Y=12 → BUF_OE_N → U25-9
+
+    # =========================================================================
+    # U25: OR Gates (74HC32) + Bus Guard
+    # =========================================================================
+    ('U25', 1,  'U5', 16),        # 1A ← SRC
+    ('U25', 2,  'U5', 17),        # 1B ← STR
+    # 1Y=3 → ADDR_MODE
+    ('U25', 4,  'U8', 3),         # 2A ← T0
+    ('U25', 5,  'U8', 4),         # 2B ← T1
+    # 2Y=6 → PC_INC
+    ('U25', 9,  'U24', 12),       # 3A ← BUF_OE_N (U24-12)
+    ('U25', 10, 'U5', 17),        # 3B ← STR (U5-17)
+    # 3Y=8 → BUF_OE_SAFE → U7-19
+    ('U25', 11, 'U28', 6),        # 4A ← /T2 (U28-6)
+    ('U25', 12, 'U27', 8),        # 4B ← /PG_cond (U27-8)
+    # 4Y=13 → PG_Load_N → U23-11
+
+    # =========================================================================
+    # U26: NAND #1 (74HC00)
+    # =========================================================================
+    ('U26', 1,  'U8', 5),         # 1A ← T2
+    ('U26', 2,  'U26', 6),        # 1B ← /ADDR_MODE (self gate 2 output)
+    # 1Y=3 → /IRL_OE → U6-1, U24-13
+    ('U26', 4,  'U25', 3),        # 2A ← ADDR_MODE
+    ('U26', 5,  'U25', 3),        # 2B ← ADDR_MODE (NAND as NOT)
+    # 2Y=6 → /ADDR_MODE → U26-2, U33-4
+    ('U26', 9,  'U8', 5),         # 3A ← T2
+    ('U26', 10, 'U5', 17),        # 3B ← STR
+    # 3Y=8 → /AC_BUF → U14-1/19, RAM /WE, U28-9
+    ('U26', 12, 'U8', 5),         # 4A ← T2
+    ('U26', 13, 'U27', 6),        # 4B ← PC_LOAD_COND (U27-6)
+    # 4Y=11 → /PC_LD → U1-9..U4-9
+
+    # =========================================================================
+    # U27: NAND #2 (74HC00)
+    # =========================================================================
+    ('U27', 1,  'U5', 18),        # 1A ← BRANCH
+    ('U27', 2,  'U28', 3),        # 1B ← Z_match (U28-3)
+    # 1Y=3 → /BR_TAKEN → U27-5
+    ('U27', 4,  'U24', 8),        # 2A ← /JUMP (U24-8)
+    ('U27', 5,  'U27', 3),        # 2B ← /BR_TAKEN (self)
+    # 2Y=6 → PC_LOAD_COND → U26-13
+    ('U27', 9,  'U5', 14),        # 3A ← MUX_SEL
+    ('U27', 10, 'U24', 10),       # 3B ← /AC_WR (U24-10)
+    # 3Y=8 → /PG_cond → U25-12
+    ('U27', 12, 'U8', 5),         # 4A ← T2
+    ('U27', 13, 'U5', 15),        # 4B ← AC_WR
+    # 4Y=11 → Acc_Load_N → U9-11, U21-3
+
+    # =========================================================================
+    # U28: XOR Gates (74HC86)
+    # =========================================================================
+    ('U28', 1,  'U21', 5),        # 1A ← Z_flag (U21-5)
+    ('U28', 2,  'U5', 12),        # 1B ← ALU_SUB
+    # 1Y=3 → Z_match → U27-2
+    ('U28', 4,  'U8', 5),         # 2A ← T2
+    ('U28', 5,  'VCC'),           # 2B → VCC (XOR with 1 = NOT)
+    # 2Y=6 → /T2 → U25-11
+    ('U28', 9,  'U26', 8),        # 3A ← /AC_BUF
+    ('U28', 10, 'VCC'),           # 3B → VCC (XOR with 1 = NOT)
+    # 3Y=8 → WR_DIR → U7-1
+
+    # =========================================================================
+    # U29-U30: Address Mux A[15:8] — SEL=ADDR_MODE, A=PC high, B=Data Page
+    # =========================================================================
+    ('U29', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U29', 15, 'GND'),
+    ('U29', 2,  'U3', 14),        # 1A ← PC8
+    ('U29', 3,  'U32', 19),       # 1B ← DP0 (U32-19)
+    ('U29', 5,  'U3', 13),        # 2A ← PC9
+    ('U29', 6,  'U32', 18),       # 2B ← DP1
+    ('U29', 11, 'U3', 12),        # 3A ← PC10
+    ('U29', 10, 'U32', 17),       # 3B ← DP2
+    ('U29', 14, 'U3', 11),        # 4A ← PC11
+    ('U29', 13, 'U32', 16),       # 4B ← DP3
+
+    ('U30', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U30', 15, 'GND'),
+    ('U30', 2,  'U4', 14),        # 1A ← PC12
+    ('U30', 3,  'U32', 15),       # 1B ← DP4
+    ('U30', 5,  'U4', 13),        # 2A ← PC13
+    ('U30', 6,  'U32', 14),       # 2B ← DP5
+    ('U30', 11, 'U4', 12),        # 3A ← PC14
+    ('U30', 10, 'U32', 13),       # 3B ← DP6
+    ('U30', 14, 'U4', 11),        # 4A ← PC15
+    ('U30', 13, 'U32', 12),       # 4B ← DP7 (A15!)
+    # 4Y=12 → A15 → RAM /CE, U24-5
+
+    # =========================================================================
+    # U31: IRQ (74HC74) — FF-A=IE, FF-B=IRQ_FF
+    # =========================================================================
+    # (IRQ logic — simplified for v1.0 software save)
+    ('U31', 4,  'VCC'),           # /PR1 → VCC
+    ('U31', 10, 'VCC'),           # /PR2 → VCC
+    ('U31', 2,  'VCC'),           # D1 → VCC (IE set to 1 by EI clock)
+    ('U31', 12, 'VCC'),           # D2 → VCC (IRQ latch)
+
+    # =========================================================================
+    # U32: Data Page Register (74HC574)
+    # =========================================================================
+    ('U32', 1,  'GND'),           # /OE → GND
+    ('U32', 11, 'U33', 6),        # CLK ← DP_Load (U33-6)
+    # D1-D8 (pins 2-9) ← IBUS
+    # Q outputs → U29/U30 B inputs (already wired above)
+
+    # =========================================================================
+    # U33: SETDP Decode (74HC21)
+    # =========================================================================
+    ('U33', 1,  'U8', 5),         # 1A ← T2
+    ('U33', 2,  'U5', 13),        # 1B ← XOR_MODE
+    ('U33', 4,  'U26', 6),        # 1C ← /ADDR_MODE (U26-6)
+    ('U33', 5,  'U24', 10),       # 1D ← /AC_WR (U24-10)
+    # 1Y=6 → DP_Load → U32-11
+
+    # =========================================================================
+    # ROM: AT28C256
+    # =========================================================================
+    ('ROM', 24, 'U24', 6),        # /CE ← /A15 (U24-6)
+    ('ROM', 25, 'GND'),           # /OE → GND
+    ('ROM', 26, 'VCC'),           # /WE → VCC
+    # A0-A14 ← ABUS (connected via mux outputs)
+    # D0-D7 → DBUS
+
+    # =========================================================================
+    # RAM: 62256
+    # =========================================================================
+    ('RAM', 24, 'U30', 12),       # /CE ← A15 (U30-12)
+    ('RAM', 25, 'GND'),           # /OE → GND
+    ('RAM', 26, 'U26', 8),        # /WE ← /AC_BUF (U26-8)
+    # A0-A14 ← ABUS
+    # D0-D7 ↔ DBUS
+]
+
+# =============================================================================
+# SHARED WIRE GROUPS (IBUS, DBUS, ABUS connections)
+# =============================================================================
+
+# IBUS: IB0-IB7 shared wires
+# Drivers: U7 B-side (18-11), U6 Q (19-12)*, U14 Y (18-11)*
+# Readers: U12 A (1,4,9,12), U13 A (1,4,9,12), U5 D (2-9), U23 D (2-9), U32 D (2-9)
+IBUS_PINS = {
+    'readers': [
+        # (chip, pins[0..7]) — always connected as inputs
+        ('U5',  [2, 3, 4, 5, 6, 7, 8, 9]),       # IR_HIGH D
+        ('U23', [2, 3, 4, 5, 6, 7, 8, 9]),       # Page Reg D
+        ('U32', [2, 3, 4, 5, 6, 7, 8, 9]),       # Data Page D
+        ('U12', [1, 4, 9, 12, None, None, None, None]),  # XOR A (low 4 only)
+        ('U13', [None, None, None, None, 1, 4, 9, 12]),  # XOR A (high 4 only)
+    ],
+    'drivers': [
+        # (chip, pins[0..7], enable_signal_description)
+        ('U7',  [18, 17, 16, 15, 14, 13, 12, 11], 'BUF_OE_SAFE=0'),
+        ('U6',  [19, 18, 17, 16, 15, 14, 13, 12], '/IRL_OE=0'),
+        ('U14', [18, 17, 16, 15, 14, 13, 12, 11], '/AC_BUF=0'),
+    ],
+}
+
+# DBUS: D0-D7 shared wires
+DBUS_PINS = {
+    'connections': [
+        ('U7',  [2, 3, 4, 5, 6, 7, 8, 9]),       # U7 A-side
+        ('ROM', [16, 17, 18, 19, 20, 21, 22, 23]), # ROM D0-D7
+        ('RAM', [16, 17, 18, 19, 20, 21, 22, 23]), # RAM D0-D7
+    ],
+}
+
+# ABUS: A0-A15 (mux Y outputs → ROM/RAM address)
+ABUS_PINS = {
+    'sources': [
+        ('U15', [4, 7, 9, 12]),     # A0-A3
+        ('U16', [4, 7, 9, 12]),     # A4-A7
+        ('U29', [4, 7, 9, 12]),     # A8-A11
+        ('U30', [4, 7, 9, 12]),     # A12-A15
+    ],
+    'destinations': [
+        ('ROM', list(range(1, 16))),  # ROM A0-A14
+        ('RAM', list(range(1, 16))),  # RAM A0-A14
+    ],
+}
 
 
 # =============================================================================
 # SELF-TEST
 # =============================================================================
-
 if __name__ == '__main__':
-    from chips import create_cpu
-
-    chips = create_cpu()
-    wires = wire_cpu(chips)
-
-    # Count
-    wire_count = len([k for k in wires if not k.startswith('_')])
-    conn_count = len(wires['_connections'])
-    total_pins = sum(len(v) for v in wires['_connections'].values())
-
-    print(f"Wiring complete:")
-    print(f"  Wires defined: {wire_count}")
-    print(f"  Connections: {conn_count}")
-    print(f"  Total pin endpoints: {total_pins}")
-    print(f"\n✅ All wiring defined per 03_wiring_guide.md")
+    chip_pin_count = len(WIRING)
+    print(f"Wiring table: {chip_pin_count} pin connections defined")
+    print(f"IBUS: {len(IBUS_PINS['drivers'])} drivers, {len(IBUS_PINS['readers'])} reader groups")
+    print(f"DBUS: {len(DBUS_PINS['connections'])} connections")
+    print(f"ABUS: {len(ABUS_PINS['sources'])} source groups")
+    print(f"\n✅ Wiring definition matches 03_wiring_guide.md style")
