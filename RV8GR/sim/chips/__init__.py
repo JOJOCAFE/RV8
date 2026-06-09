@@ -47,7 +47,7 @@ class Chip:
 # Pins: 1=/OE, 2-9=D1-D8, 10=GND, 11=CLK, 12-19=Q8-Q1, 20=VCC
 # =============================================================================
 
-def hc574(name: str) -> Chip:
+def C_74hc574(name: str) -> Chip:
     pins = {
         1:  ('/OE', 'in'),
         2:  ('D1', 'in'),   3:  ('D2', 'in'),   4:  ('D3', 'in'),   5:  ('D4', 'in'),
@@ -67,7 +67,7 @@ def hc574(name: str) -> Chip:
 #       11-14=QD-QA, 15=RCO, 16=VCC
 # =============================================================================
 
-def hc161(name: str) -> Chip:
+def C_74hc161(name: str) -> Chip:
     pins = {
         1:  ('/CLR', 'in'),
         2:  ('CLK', 'in'),
@@ -88,7 +88,7 @@ def hc161(name: str) -> Chip:
 # Pins: 1=A, 2=B, 3-6=Q0-Q3, 7=GND, 8=CLK, 9=/CLR, 10-13=Q4-Q7, 14=VCC
 # =============================================================================
 
-def hc164(name: str) -> Chip:
+def C_74hc164(name: str) -> Chip:
     pins = {
         1:  ('A', 'in'),
         2:  ('B', 'in'),
@@ -108,7 +108,7 @@ def hc164(name: str) -> Chip:
 #       8=/Q2, 9=Q2, 10=/PR2, 11=CLK2, 12=D2, 13=/CLR2, 14=VCC
 # =============================================================================
 
-def hc74(name: str) -> Chip:
+def C_74hc74(name: str) -> Chip:
     pins = {
         1:  ('/CLR1', 'in'),
         2:  ('D1', 'in'),
@@ -133,7 +133,7 @@ def hc74(name: str) -> Chip:
 # Pins: 1=DIR, 2-9=A1-A8, 10=GND, 11-18=B8-B1, 19=/OE, 20=VCC
 # =============================================================================
 
-def hc245(name: str) -> Chip:
+def C_74hc245(name: str) -> Chip:
     pins = {
         1:  ('DIR', 'in'),
         2:  ('A1', 'bidir'), 3:  ('A2', 'bidir'), 4:  ('A3', 'bidir'), 5:  ('A4', 'bidir'),
@@ -152,7 +152,7 @@ def hc245(name: str) -> Chip:
 # Pins: 1=/OE1, 2-9=A1-A8, 10=GND, 11-18=Y8-Y1, 19=/OE2, 20=VCC
 # =============================================================================
 
-def hc541(name: str) -> Chip:
+def C_74hc541(name: str) -> Chip:
     pins = {
         1:  ('/OE1', 'in'),
         2:  ('A1', 'in'),  3:  ('A2', 'in'),  4:  ('A3', 'in'),  5:  ('A4', 'in'),
@@ -172,7 +172,7 @@ def hc541(name: str) -> Chip:
 #       9=Cout, 10=S3, 11=B3, 12=A3, 13=S2, 14=A2, 15=B2, 16=VCC
 # =============================================================================
 
-def hc283(name: str) -> Chip:
+def C_74hc283(name: str) -> Chip:
     pins = {
         1:  ('S1', 'out'),
         2:  ('B1', 'in'),
@@ -200,7 +200,7 @@ def hc283(name: str) -> Chip:
 #       8=3Y, 9=3A, 10=3B, 11=4Y, 12=4A, 13=4B, 14=VCC
 # =============================================================================
 
-def hc86(name: str) -> Chip:
+def C_74hc86(name: str) -> Chip:
     pins = {
         1:  ('1A', 'in'),  2:  ('1B', 'in'),  3:  ('1Y', 'out'),
         4:  ('2A', 'in'),  5:  ('2B', 'in'),  6:  ('2Y', 'out'),
@@ -218,7 +218,7 @@ def hc86(name: str) -> Chip:
 #       9=3Y, 10=3B, 11=3A, 12=4Y, 13=4B, 14=4A, 15=/E, 16=VCC
 # =============================================================================
 
-def hc157(name: str) -> Chip:
+def C_74hc157(name: str) -> Chip:
     pins = {
         1:  ('SEL', 'in'),
         2:  ('1A', 'in'),  3:  ('1B', 'in'),  4:  ('1Y', 'out'),
@@ -238,7 +238,7 @@ def hc157(name: str) -> Chip:
 #       11=Q4, 12=P4, 13=Q5, 14=P5, 15=Q6, 16=P6, 17=Q7, 18=P7, 19=/P=Q, 20=VCC
 # =============================================================================
 
-def hc688(name: str) -> Chip:
+def C_74hc688(name: str) -> Chip:
     pins = {
         1:  ('/OE', 'in'),
         2:  ('P0', 'in'),  3:  ('Q0', 'in'),
@@ -262,7 +262,7 @@ def hc688(name: str) -> Chip:
 #       8=4Y, 9=4A, 10=5Y, 11=5A, 12=6Y, 13=6A, 14=VCC
 # =============================================================================
 
-def hc04(name: str) -> Chip:
+def C_74hc04(name: str) -> Chip:
     pins = {
         1:  ('1A', 'in'),  2:  ('1Y', 'out'),
         3:  ('2A', 'in'),  4:  ('2Y', 'out'),
@@ -282,7 +282,7 @@ def hc04(name: str) -> Chip:
 #       8=3Y, 9=3A, 10=3B, 11=4A, 12=4B, 13=4Y, 14=VCC
 # =============================================================================
 
-def hc32(name: str) -> Chip:
+def C_74hc32(name: str) -> Chip:
     pins = {
         1:  ('1A', 'in'),  2:  ('1B', 'in'),  3:  ('1Y', 'out'),
         4:  ('2A', 'in'),  5:  ('2B', 'in'),  6:  ('2Y', 'out'),
@@ -300,7 +300,7 @@ def hc32(name: str) -> Chip:
 #       8=3Y, 9=3A, 10=3B, 11=4Y, 12=4A, 13=4B, 14=VCC
 # =============================================================================
 
-def hc00(name: str) -> Chip:
+def C_74hc00(name: str) -> Chip:
     pins = {
         1:  ('1A', 'in'),  2:  ('1B', 'in'),  3:  ('1Y', 'out'),
         4:  ('2A', 'in'),  5:  ('2B', 'in'),  6:  ('2Y', 'out'),
@@ -318,7 +318,7 @@ def hc00(name: str) -> Chip:
 #       8=2Y, 9=2A, 10=2B, 11=NC, 12=2C, 13=2D, 14=VCC
 # =============================================================================
 
-def hc21(name: str) -> Chip:
+def C_74hc21(name: str) -> Chip:
     pins = {
         1:  ('1A', 'in'),  2:  ('1B', 'in'),  3:  ('NC', 'nc'),
         4:  ('1C', 'in'),  5:  ('1D', 'in'),  6:  ('1Y', 'out'),
@@ -334,7 +334,7 @@ def hc21(name: str) -> Chip:
 # Memory Chips
 # =============================================================================
 
-def rom28c256(name: str) -> Chip:
+def C_AT28C256(name: str) -> Chip:
     """AT28C256 — 28-pin DIP, 32KB ROM."""
     pins = {}
     for i in range(15):
@@ -349,7 +349,7 @@ def rom28c256(name: str) -> Chip:
     return Chip(name, pins)
 
 
-def ram62256(name: str) -> Chip:
+def C_62256(name: str) -> Chip:
     """62256 — 28-pin DIP, 32KB RAM."""
     pins = {}
     for i in range(15):
@@ -373,65 +373,65 @@ def create_cpu():
     chips = {}
 
     # PC (U1-U4): 74HC161 ×4
-    chips['U1'] = hc161('U1')
-    chips['U2'] = hc161('U2')
-    chips['U3'] = hc161('U3')
-    chips['U4'] = hc161('U4')
+    chips['U1'] = C_74hc161('U1')
+    chips['U2'] = C_74hc161('U2')
+    chips['U3'] = C_74hc161('U3')
+    chips['U4'] = C_74hc161('U4')
 
     # IR + AC + Page Reg + Data Page (U5,U6,U9,U23,U32): 74HC574 ×5
-    chips['U5'] = hc574('U5')
-    chips['U6'] = hc574('U6')
-    chips['U9'] = hc574('U9')
-    chips['U23'] = hc574('U23')
-    chips['U32'] = hc574('U32')
+    chips['U5'] = C_74hc574('U5')
+    chips['U6'] = C_74hc574('U6')
+    chips['U9'] = C_74hc574('U9')
+    chips['U23'] = C_74hc574('U23')
+    chips['U32'] = C_74hc574('U32')
 
     # Bus buffer (U7): 74HC245
-    chips['U7'] = hc245('U7')
+    chips['U7'] = C_74hc245('U7')
 
     # Ring counter (U8): 74HC164
-    chips['U8'] = hc164('U8')
+    chips['U8'] = C_74hc164('U8')
 
     # Adder (U10,U11): 74HC283 ×2
-    chips['U10'] = hc283('U10')
-    chips['U11'] = hc283('U11')
+    chips['U10'] = C_74hc283('U10')
+    chips['U11'] = C_74hc283('U11')
 
     # XOR (U12,U13,U28): 74HC86 ×3
-    chips['U12'] = hc86('U12')
-    chips['U13'] = hc86('U13')
-    chips['U28'] = hc86('U28')
+    chips['U12'] = C_74hc86('U12')
+    chips['U13'] = C_74hc86('U13')
+    chips['U28'] = C_74hc86('U28')
 
     # AC buffer (U14): 74HC541
-    chips['U14'] = hc541('U14')
+    chips['U14'] = C_74hc541('U14')
 
     # Muxes (U15-U20, U29, U30): 74HC157 ×8
     for i in range(15, 21):
-        chips[f'U{i}'] = hc157(f'U{i}')
-    chips['U29'] = hc157('U29')
-    chips['U30'] = hc157('U30')
+        chips[f'U{i}'] = C_74hc157(f'U{i}')
+    chips['U29'] = C_74hc157('U29')
+    chips['U30'] = C_74hc157('U30')
 
     # Z flag + IRQ (U21, U31): 74HC74 ×2
-    chips['U21'] = hc74('U21')
-    chips['U31'] = hc74('U31')
+    chips['U21'] = C_74hc74('U21')
+    chips['U31'] = C_74hc74('U31')
 
     # Zero detect (U22): 74HC688
-    chips['U22'] = hc688('U22')
+    chips['U22'] = C_74hc688('U22')
 
     # Inverters (U24): 74HC04
-    chips['U24'] = hc04('U24')
+    chips['U24'] = C_74hc04('U24')
 
     # OR gates (U25): 74HC32
-    chips['U25'] = hc32('U25')
+    chips['U25'] = C_74hc32('U25')
 
     # NAND gates (U26, U27): 74HC00 ×2
-    chips['U26'] = hc00('U26')
-    chips['U27'] = hc00('U27')
+    chips['U26'] = C_74hc00('U26')
+    chips['U27'] = C_74hc00('U27')
 
     # SETDP decode (U33): 74HC21
-    chips['U33'] = hc21('U33')
+    chips['U33'] = C_74hc21('U33')
 
     # Memory
-    chips['ROM'] = rom28c256('ROM')
-    chips['RAM'] = ram62256('RAM')
+    chips['ROM'] = C_AT28C256('ROM')
+    chips['RAM'] = C_62256('RAM')
 
     return chips
 
