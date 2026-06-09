@@ -8,8 +8,8 @@
 
 | Spec | Value |
 |------|-------|
-| Logic chips | 34 |
-| Total packages | 37 (+ microcode SRAM + program SRAM + boot Flash) |
+| Logic chips | 38 (34 CPU + 4 boot) |
+| Total packages | 41 (38 logic + 2 SRAM + 1 Flash) |
 | ISA | RISC-V style, 35 instructions |
 | Registers | 8 hardware (74HC574) |
 | Clock | 5 MHz (breadboard), 15 MHz (PCB target) |
@@ -20,7 +20,71 @@
 | ALU | ADD, SUB, AND, OR, XOR, SLT, SLL, SRL |
 | Control | Microcode-driven (programmable ISA) |
 | Target | BASIC interpreter + video games |
-| Boot | Flash → copy microcode to SRAM → run |
+| Boot | Standalone auto-copy Flash→SRAM at power-on (66ms) |
+
+---
+
+## Boot Circuit (Standalone, 4 chips)
+
+CPU cannot run without microcode in SRAM. Boot circuit copies Flash → SRAM automatically at power-on, **without CPU involvement**.
+
+### How It Works
+
+```
+Power On:
+  1. Boot latch holds CPU /RST = LOW (CPU halted)
+  2. Boot counter (16-bit) starts counting at ~1 MHz
+  3. Counter[14:0] → Flash address AND SRAM address
+  4. Counter[15] selects: 0=Microcode SRAM, 1=Program SRAM
+  5. Flash data → SRAM data (direct copy, 1 byte per clock)
+  6. After 65536 clocks (~66ms): counter overflows
+  7. Overflow → boot latch SET → CPU /RST released
+  8. Boot counter tri-states (disconnects from bus)
+  9. CPU starts at 5 MHz with everything loaded
+```
+
+### Boot Circuit Chips
+
+| Chip | Qty | Function |
+|------|:---:|----------|
+| 74HC161 | 3 | 16-bit address counter (A[15:0]) |
+| 74HC74 | 1 | Boot-done latch (/RST control) |
+
+### Boot Timing
+
+```
+Clock: ~1 MHz (RC oscillator or main clock ÷4)
+Copies: 32KB microcode + 32KB program = 64KB total
+Time: 65536 / 1 MHz = ~66ms (instant to user)
+```
+
+### Flash Memory Layout (SST39SF010A, 128KB)
+
+```
+$00000-$07FFF  Microcode table (32KB) → copies to Microcode SRAM
+$08000-$0FFFF  Program + data (32KB) → copies to Program SRAM
+$10000-$17FFF  Alternate program (selectable via DIP switch)
+$18000-$1FFFF  spare
+```
+
+### Boot Sequence Diagram
+
+```
+            /RST ──────────────────────┐
+                                       │ (held LOW)
+┌────────────┐   ┌──────────┐   ┌─────┴─────┐
+│Boot Counter│──▶│  Flash   │──▶│   SRAM    │
+│ 74HC161 ×3 │   │SST39SF   │   │ CY7C199   │
+│(16-bit)    │   │ /CE=0    │   │ /WE=clk   │
+└─────┬──────┘   │ /OE=0    │   │ /CE=!bit15│
+      │          └──────────┘   └───────────┘
+      │ bit16 overflow
+      ▼
+┌──────────┐
+│74HC74    │── Q → /RST released → CPU starts!
+│Boot Latch│   (also tri-states boot counter)
+└──────────┘
+```
 
 ---
 
@@ -118,7 +182,9 @@ Total: 4096 × 2 = 8KB (fits in 32KB SRAM)
 
 ---
 
-## Chip List (34 logic)
+## Chip List (38 logic)
+
+### CPU (34 chips)
 
 | U# | Chip | Qty | Function |
 |:--:|------|:---:|----------|
@@ -138,13 +204,20 @@ Total: 4096 × 2 = 8KB (fits in 32KB SRAM)
 | U33 | 74HC138 | 1 | Register read select |
 | U34 | 74HC138 | 1 | Register write select |
 
-### Memory
+### Boot Circuit (4 chips)
+
+| U# | Chip | Qty | Function |
+|:--:|------|:---:|----------|
+| U35-U37 | 74HC161 | 3 | Boot address counter (16-bit) |
+| U38 | 74HC74 | 1 | Boot-done latch (/RST control) |
+
+### Memory (3 chips)
 
 | Chip | Qty | Function |
 |------|:---:|----------|
 | CY7C199-15PC | 1 | Microcode SRAM (32KB, 15ns) |
 | CY7C199-15PC | 1 | Program + Data SRAM (32KB, 15ns) |
-| SST39SF010A | 1 | Boot Flash (128KB, copy to SRAM at boot) |
+| SST39SF010A | 1 | Boot Flash (128KB, standalone boot) |
 
 ---
 
@@ -234,13 +307,14 @@ $7C00-$7FFF  I/O (mapped via RV8-Bus)
 
 | | Ben Eater | RV8 (orig) | RV8-GR | **RV8F** |
 |--|:---------:|:----------:|:------:|:--------:|
-| Chips | ~15 | 27 | 33 | **34** |
+| Chips | ~15 | 27 | 33 | **38** |
 | ISA | Custom 8 | RISC-V 35 | Custom 18 | **RISC-V 35** |
 | Registers | 2 | 8 | 1 (AC) | **8** |
 | ALU ops | ADD/SUB | Full | ADD/SUB/XOR | **Full** |
 | Clock | 1 MHz | 10 MHz | 5 MHz | **5 MHz** |
 | MIPS | 0.2 | 1.25 | 1.67 | **1.4** |
 | Programmable ISA | ✅ | ✅ | ❌ | **✅** |
+| Standalone boot | ❌ | ✅ | ✅ | **✅ (66ms)** |
 | BASIC capable | ❌ | ✅ | ✅ | **✅** |
 | Games | ❌ | ❌ | Possible | **✅** |
 
