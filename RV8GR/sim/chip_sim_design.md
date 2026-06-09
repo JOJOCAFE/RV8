@@ -80,82 +80,104 @@ class Chip:
 
 ## Bus Architecture (matches 03_wiring_guide)
 
-### Internal Buses
+### Note: "Bus" = shared wires, not physical backplane
+
+In 03_wiring_guide, DBUS/IBUS/ABUS are **naming conventions** for groups of wires
+that connect multiple chip pins together. They are NOT a separate bus backplane.
+
+In the simulator, a "bus" is simply a **set of wire nets** that multiple chips share.
+The tristate logic determines which chip drives the shared wires at any given time.
+
+### Wire Groups (named as buses for clarity)
 
 ```
-DBUS[7:0]  — External data bus (ROM, RAM, U7 A-side)
-IBUS[7:0]  — Internal data bus (U7 B-side, U6*, U14*, U12/U13, U5, U23, U32)
-ABUS[15:0] — Address bus (U15/U16/U29/U30 outputs → ROM, RAM)
+DBUS[7:0]  — 8 wires shared between: ROM data pins, RAM data pins, U7 A-side pins
+IBUS[7:0]  — 8 wires shared between: U7 B-side, U6 Q*, U14 Y*, U12/U13 A, U5 D, U23 D, U32 D
+ABUS[15:0] — 16 wires from mux outputs (U15/U16/U29/U30 Y) to ROM/RAM address pins
 ```
 
-### Tristate Bus Resolution
-
-IBUS has 3 possible drivers (only one active at a time):
+### Simulation Model: Shared Wire with Tristate
 
 ```python
-class TristateBus:
-    """Bus with multiple tristate drivers."""
-    def __init__(self, name: str, width: int):
+class SharedWire:
+    """A wire that multiple chip pins connect to.
+    Only one chip may drive it at a time (tristate control).
+    Others are high-impedance (reading).
+    """
+    def __init__(self, name: str):
         self.name = name
-        self.width = width
-        self.drivers = {}   # {name: (value, enabled)}
+        self.value = 0          # current logic level on the wire
+        self.drivers = {}       # {chip_pin: (value, output_enabled)}
 
-    def drive(self, name: str, value: int, enabled: bool):
-        """A chip asserts/releases the bus."""
-        self.drivers[name] = (value, enabled)
+    def drive(self, chip_pin: str, value: int, output_enabled: bool):
+        """Chip asserts or releases the wire."""
+        self.drivers[chip_pin] = (value, output_enabled)
+
+    def resolve(self) -> int:
+        """Determine wire value from active driver(s)."""
+        active = [(k, v) for k, (v, en) in self.drivers.items() if en]
+        if len(active) == 0:
+            return 0  # no driver = floating (pulled low or undefined)
+        if len(active) == 1:
+            self.value = active[0][1]
+            return self.value
+        # Multiple drivers = BUS CONFLICT (hardware damage risk!)
+        raise BusConflictError(
+            f"Wire {self.name}: conflict between {[k for k,v in active]}")
+```
+
+### IBUS — 8 shared wires with 3 tristate drivers
+
+```python
+# Each IB0-IB7 is a SharedWire
+# Connected pins (from 03_wiring_guide):
+#
+# IB0 wire connects to: U7-18, U6-19, U14-18, U12-1, U23-2, U5-2, U32-2
+#   Drivers (tristate):
+#     U7-18  enabled when BUF_OE_SAFE=0 (U25-8=0)
+#     U6-19  enabled when /IRL_OE=0 (U26-3=0)
+#     U14-18 enabled when /AC_BUF=0 (U26-8=0)
+#   Readers (always connected, high-impedance input):
+#     U12-1, U23-2, U5-2, U32-2
+```
+
+### DBUS — 8 shared wires
+
+```python
+# D0 wire connects to: ROM-D0, RAM-D0, U7-2
+#   Drivers:
+#     ROM-D0  enabled when ROM /CE=0 and /OE=0
+#     RAM-D0  enabled when RAM /CE=0 and /OE=0 and /WE=1 (read)
+#     U7-2    enabled when DIR=1 and BUF_OE_SAFE=0 (write to external)
+```
+
+### ABUS — 16 wires (single driver, no tristate)
+
+```python
+# A0 wire: driven by U15-4 (mux output, always active)
+# A15 wire: driven by U30-12 (mux output, always active)
+# No tristate needed — mux always drives
+```
+
+### In the simulator
+
+```python
+class WireGroup:
+    """Group of SharedWire instances (convenience for 8/16-bit buses)."""
+    def __init__(self, prefix: str, width: int):
+        self.wires = [SharedWire(f"{prefix}{i}") for i in range(width)]
 
     def read(self) -> int:
-        """Resolve bus value. Error if multiple drivers."""
-        active = [(n,v) for n,(v,e) in self.drivers.items() if e]
-        if len(active) == 0:
-            return 0xFF  # floating (pulled high)
-        if len(active) == 1:
-            return active[0][1]
-        # BUS CONFLICT!
-        raise BusConflictError(f"{self.name}: multiple drivers {[n for n,v in active]}")
-```
+        """Read all wires as integer value."""
+        val = 0
+        for i, w in enumerate(self.wires):
+            val |= (w.resolve() & 1) << i
+        return val
 
-### Bus Instances
-
-```python
-# From 03_wiring_guide.md:
-dbus = TristateBus('DBUS', 8)   # D0-D7: ROM out, RAM bidir, U7 A-side
-ibus = TristateBus('IBUS', 8)   # IB0-IB7: U7 B, U6 Q*, U14 Y*
-abus = Bus('ABUS', 16)          # A0-A15: driven by mux only (no tristate)
-```
-
-### IBUS Drivers (from 03_wiring_guide)
-
-```python
-# U7 (74HC245 B-side): drives IBUS when BUF_OE_SAFE=0
-ibus.drive('U7', dbus_value, enabled=(buf_oe_safe == 0))
-
-# U6 (74HC574 Q outputs): drives IBUS when /IRL_OE=0
-ibus.drive('U6', irl_value, enabled=(irl_oe_n == 0))
-
-# U14 (74HC541 Y outputs): drives IBUS when /AC_BUF=0
-ibus.drive('U14', ac_value, enabled=(ac_buf_n == 0))
-```
-
-### DBUS Drivers
-
-```python
-# ROM: drives DBUS when ROM /CE=0 AND /OE=0
-dbus.drive('ROM', rom_data, enabled=(rom_ce_n == 0))
-
-# RAM: drives DBUS when RAM /CE=0 AND /OE=0 AND /WE=1 (read mode)
-dbus.drive('RAM', ram_data, enabled=(ram_ce_n == 0 and ram_we_n == 1))
-
-# U7 (74HC245 A-side): drives DBUS when DIR=1 AND /OE=0 (write mode)
-dbus.drive('U7', ibus_value, enabled=(wr_dir == 1 and buf_oe_safe == 0))
-```
-
-### ABUS (no tristate — always driven by mux)
-
-```python
-# U15-U16: A[7:0] from mux (PC low or IRL)
-# U29-U30: A[15:8] from mux (PC high or Data Page)
-abus.value = (addr_hi << 8) | addr_lo
+    def drive_byte(self, chip: str, value: int, enabled: bool):
+        """Drive all 8 wires from one chip."""
+        for i, w in enumerate(self.wires):
+            w.drive(chip, (value >> i) & 1, enabled)
 ```
 
 ---
