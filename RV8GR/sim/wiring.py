@@ -6,7 +6,6 @@ Easy to read, easy to edit, mirrors the wiring guide exactly.
 
 Usage:
     chips = create_cpu()
-    attach_behaviors(chips)
     wires = wire_cpu(chips)
 """
 
@@ -364,10 +363,8 @@ def wire_cpu(chips):
 
 if __name__ == '__main__':
     from chips import create_cpu
-    from chips.behaviors import attach_behaviors
 
     chips = create_cpu()
-    attach_behaviors(chips)
     wires = wire_cpu(chips)
 
     # Count
