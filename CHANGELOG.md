@@ -1,5 +1,21 @@
 # RV8 Project — Changelog
 
+## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
+
+### Gate-Level Simulator (Task 6 Complete)
+- **chip_sim.py**: Full CPU simulation through all 35 chips
+- **sim_lab/**: 10 step-by-step labs (module-by-module testing)
+- **chips/__init__.py**: 35 chip objects with pin layout + behavior
+- **wiring.py**: 247 pin connections matching 03_wiring_guide.md
+- **Timing analysis**: max safe clock 9.7 MHz, 97ns margin @ 5 MHz
+- All 3 .bin programs pass through gate-level sim
+
+### Build Plan
+- Complete BOM with sources (LCSC/AliExpress)
+- 5-board breadboard layout plan
+- Wire color convention
+- Propagation delay analysis for all chip types
+
 ## 2026-06-09 — v3.3: SETDP + Full 64KB Data Access
 
 ### New Feature

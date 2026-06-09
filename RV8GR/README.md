@@ -209,35 +209,24 @@ RV8GR/
 | 3 | Parts list | ✅ |
 | 4 | Design sign-off | ✅ |
 | 5 | Programmer tools | ✅ |
-| 6 | Gate-level simulator (chip_sim.py) | ⬜ |
-| 7 | Breadboard layout plan | ⬜ |
-| 8 | Physical build (5 MHz) | ⬜ |
-| 9 | Verify at 10 MHz | ⬜ |
-| 10 | BASIC interpreter | ⬜ |
-| 11 | Simple game | ⬜ |
+| 6 | Gate-level simulator | ✅ |
+| 7 | Breadboard layout plan | ✅ |
+| 8 | Order parts | ⬜ |
+| 9 | Physical build (5 MHz) | ⬜ |
+| 10 | Verify at 10 MHz | ⬜ |
+| 11 | BASIC interpreter | ⬜ |
+| 12 | Simple game | ⬜ |
 
-### Task 6: Gate-Level Simulator (In Progress)
+### Task 6: Gate-Level Simulator ✅
 
-Pin-accurate Python simulation of all 35 chips. Design: `sim/chip_sim_design.md`
-
-**Done:**
-- [x] All 35 chip objects with correct pin layout
-- [x] All 14 chip type behaviors (combinational + sequential + memory)
-- [x] Probe + DipSwitch test tools
-- [x] 141 test vectors, all pass
-- [x] Wiring definition (145 wires, 444 pin endpoints)
-
-**Next:**
-- [ ] Propagation engine (chip_sim.py) — steps clock, resolves shared wires
-- [ ] Full CPU test: LI $42 executes correctly
-- [ ] Integration: run test_setdp.asm through gate-level sim
+All 35 chips simulated pin-by-pin. 3 .bin programs verified.
 
 ```
 sim/
-├── chips/__init__.py       — 35 chips with behavior (done)
-├── chips/test_chips.py     — 141 test vectors (done)
-├── wiring.py               — all connections (done)
-├── chip_sim_design.md      — design doc (done)
-├── chip_sim.py             — propagation engine (next)
-└── soft_debug.py           — high-level sim (done)
+├── chips/__init__.py       — 35 chips with behavior
+├── chips/test_chips.py     — 141 test vectors
+├── chip_sim.py             — Full CPU simulation + timing
+├── wiring.py               — 247 pin connections (03_wiring_guide)
+├── sim_lab/lab01-10.py     — 10 step-by-step labs
+└── soft_debug.py           — High-level trace
 ```

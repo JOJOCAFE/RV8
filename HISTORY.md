@@ -1,5 +1,14 @@
 # RV8 Project — Development History
 
+## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
+
+- Gate-level chip simulator: 35 chips, 14 types, 141 test vectors
+- 10 sim labs (ring counter → full execute LI $42)
+- 3 .bin programs verified through gate-level sim
+- Propagation delay model (70ns ROM/RAM, max 9.7 MHz)
+- Complete BOM (order-ready) + 5-board breadboard layout
+- Wiring verified: 23 critical connections checked against 03_wiring_guide
+
 ## 2026-06-09 — v3.3: SETDP + Full 64KB Data Access
 
 - Added SETDP instruction ($40) — Data Page Register (U32 74HC574)
