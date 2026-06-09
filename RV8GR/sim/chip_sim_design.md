@@ -314,6 +314,48 @@ assert sim.probe_bus('DBUS', 8) == rom_data[0]
 
 ---
 
+## Timing Analysis (auto-calculated by propagation engine)
+
+The simulator tracks cumulative delay along each signal path per phase.
+After each instruction, it reports:
+
+```python
+class TimingReport:
+    """Generated after each instruction execution."""
+    def __init__(self):
+        self.paths = {}          # {path_name: total_delay_ns}
+        self.longest_path = ""   # name of critical path
+        self.longest_delay = 0   # ns
+        self.max_safe_freq = 0   # MHz (= 1000 / longest_delay)
+
+    def add_path(self, name, chips_in_path):
+        """Sum propagation delays along a chip chain."""
+        total = sum(chip.prop_delay for chip in chips_in_path)
+        self.paths[name] = total
+        if total > self.longest_delay:
+            self.longest_delay = total
+            self.longest_path = name
+        self.max_safe_freq = 1000.0 / self.longest_delay if self.longest_delay > 0 else 999
+
+    def report(self):
+        print(f"  Critical path: {self.longest_path} = {self.longest_delay}ns")
+        print(f"  Max safe clock: {self.max_safe_freq:.1f} MHz")
+        print(f"  At 5 MHz (200ns): margin = {200 - self.longest_delay}ns")
+```
+
+### Pre-calculated Critical Paths
+
+| Path | Chips | Delay | Max Clock |
+|------|-------|:-----:|:---------:|
+| ALU (8-bit add) | XOR→U10→U11→Mux | 103ns | 9.7 MHz |
+| Fetch (ROM) | Mux→ROM→U7 | 100ns | 10.0 MHz |
+| Branch decide | XOR→NAND→NAND→NAND | 51ns | 19.6 MHz |
+| Store | NAND→U14→U7 | 36ns | 27.8 MHz |
+
+**System max = 9.7 MHz** (limited by ALU 8-bit carry propagation)
+
+---
+
 ## File Structure
 
 ```
@@ -352,3 +394,5 @@ sim/
 - [ ] `SETDP + LB` reads correct page
 - [ ] Probe any pin returns correct value
 - [ ] Step-by-step matches soft_debug.py output
+- [ ] Critical path timing reported per instruction
+- [ ] Max safe clock speed calculated automatically
