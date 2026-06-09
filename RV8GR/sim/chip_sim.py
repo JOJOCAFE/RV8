@@ -87,11 +87,14 @@ class CPUSim:
     # =========================================================================
 
     def _propagate_to_chips(self):
-        """Set physical chip pins to match current state (for probing)."""
+        """Set all chip pins to match current CPU state, then propagate via wiring."""
+        from wiring import WIRING
+
         s = self._decode()
         ibus = self._ibus(s)
         abus = self._abus(s)
 
+        # 1. Set state registers into their chip objects
         # U8: Ring counter
         self.chips['U8']._sr = [0]*8
         self.chips['U8']._sr[self.phase] = 1
@@ -99,6 +102,7 @@ class CPUSim:
 
         # U5: IR_HIGH
         for i in range(8): self.chips['U5']._reg[i] = (self.ir_high>>i)&1
+        self.chips['U5'].set(1, 0)  # /OE=0
         self.chips['U5'].update()
 
         # U6: IR_LOW
@@ -107,14 +111,17 @@ class CPUSim:
 
         # U9: AC
         for i in range(8): self.chips['U9']._reg[i] = (self.ac>>i)&1
+        self.chips['U9'].set(1, 0)
         self.chips['U9'].update()
 
         # U23: Page Register
         for i in range(8): self.chips['U23']._reg[i] = (self.page_reg>>i)&1
+        self.chips['U23'].set(1, 0)
         self.chips['U23'].update()
 
         # U32: Data Page
         for i in range(8): self.chips['U32']._reg[i] = (self.data_page>>i)&1
+        self.chips['U32'].set(1, 0)
         self.chips['U32'].update()
 
         # U1-U4: PC
@@ -126,49 +133,69 @@ class CPUSim:
         self.chips['U21']._q[0] = self.z_flag
         self.chips['U21'].update()
 
-        # Address bus → ROM/RAM address pins
+        # U31: IRQ (simplified)
+        self.chips['U31']._q = [0, 0]
+        self.chips['U31'].update()
+
+        # ROM/RAM data
         for i in range(15):
             self.chips['ROM'].set(i+1, (abus>>i)&1)
             self.chips['RAM'].set(i+1, (abus>>i)&1)
-
-        # ROM/RAM chip select
         a15 = (abus >> 15) & 1
-        self.chips['ROM'].set(24, 1-a15)  # /CE = /A15
-        self.chips['RAM'].set(24, a15)    # /CE = A15
-        self.chips['ROM'].set(25, 0)      # /OE = 0
-        self.chips['RAM'].set(25, 0)      # /OE = 0
-        self.chips['RAM'].set(26, 1)      # /WE = 1 (default read)
-
-        # Update ROM/RAM outputs
+        self.chips['ROM'].set(24, 1-a15)
+        self.chips['ROM'].set(25, 0)
+        self.chips['ROM'].set(26, 1)
+        self.chips['RAM'].set(24, a15)
+        self.chips['RAM'].set(25, 0)
+        self.chips['RAM'].set(26, 1 if not (self.phase==2 and s['STR']) else 0)
         self.chips['ROM'].update()
         self.chips['RAM'].update()
 
-        # IBUS → XOR A inputs
-        xor_a_lo = [1, 4, 9, 12]   # U12 pins for IB0-IB3
-        xor_a_hi = [1, 4, 9, 12]   # U13 pins for IB4-IB7
+        # IBUS → D inputs of consumer chips
+        for i in range(8):
+            bit = (ibus >> i) & 1
+            self.chips['U5'].set(2+i, bit)
+            self.chips['U23'].set(2+i, bit)
+            self.chips['U32'].set(2+i, bit)
+        # XOR A inputs
         for i in range(4):
-            self.chips['U12'].set(xor_a_lo[i], (ibus >> i) & 1)
-            self.chips['U13'].set(xor_a_hi[i], (ibus >> (i+4)) & 1)
+            self.chips['U12'].set([1,4,9,12][i], (ibus>>i)&1)
+            self.chips['U13'].set([1,4,9,12][i], (ibus>>(i+4))&1)
 
-        # Control signals on U25, U26, U27, U28, U33
-        t2 = 1 if self.phase == 2 else 0
-        addr_mode = self._addr_mode(s)
-        self.chips['U25'].set(1, s['SRC']); self.chips['U25'].set(2, s['STR'])
-        self.chips['U25'].update()
-        self.chips['U26'].set(1, t2); self.chips['U26'].set(4, addr_mode); self.chips['U26'].set(5, addr_mode)
-        self.chips['U26'].set(9, t2); self.chips['U26'].set(10, s['STR'])
-        self.chips['U26'].update()
+        # 2. Apply wiring + update combinational in correct order (multiple passes)
+        for iteration in range(3):
+            # Apply wiring connections
+            for entry in WIRING:
+                if len(entry) == 4:
+                    dest_chip, dest_pin, src_chip, src_pin = entry
+                    self.chips[dest_chip].set(dest_pin, self.chips[src_chip].get(src_pin))
+                elif len(entry) == 3:
+                    dest_chip, dest_pin, signal = entry
+                    if signal == 'VCC':
+                        self.chips[dest_chip].set(dest_pin, 1)
+                    elif signal == 'GND':
+                        self.chips[dest_chip].set(dest_pin, 0)
 
-        # ALU path
-        alu_result = self._alu(s, ibus)
-        for i in range(8):
-            self.chips['U9'].set(2+i, (alu_result>>i)&1)  # stage D inputs
+            # Update all combinational chips
+            for name in ['U24','U25','U26','U27','U28','U33',
+                         'U19','U20','U12','U13','U10','U11',
+                         'U15','U16','U17','U18','U29','U30',
+                         'U22','U14','U7']:
+                self.chips[name].update()
 
-        # U22 zero detect
-        for i in range(8):
-            self.chips['U22'].set([2,4,6,8,12,14,16,18][i], (self.ac>>i)&1)
-            self.chips['U22'].set([3,5,7,9,11,13,15,17][i], 0)
-        self.chips['U22'].update()
+            # Re-set IBUS-driven inputs (tristate resolution)
+            for i in range(8):
+                bit = (ibus >> i) & 1
+                self.chips['U12'].set([1,4,9,12][i] if i<4 else [1,4,9,12][i-4], bit)
+            for i in range(4):
+                self.chips['U12'].set([1,4,9,12][i], (ibus>>i)&1)
+                self.chips['U13'].set([1,4,9,12][i], (ibus>>(i+4))&1)
+
+            # Update ALU chain
+            self.chips['U19'].update(); self.chips['U20'].update()
+            self.chips['U12'].update(); self.chips['U13'].update()
+            self.chips['U10'].update(); self.chips['U11'].update()
+            self.chips['U17'].update(); self.chips['U18'].update()
 
     # =========================================================================
     # CLOCK STEP
