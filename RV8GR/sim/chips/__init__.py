@@ -10,9 +10,13 @@ class Pin:
 
 
 class Chip:
-    def __init__(self, name, pin_defs):
+    # Default propagation delays (ns) per chip type — override in factory
+    PROP_DELAY = 10  # default for simple gates
+
+    def __init__(self, name, pin_defs, prop_delay=10):
         self.name = name
         self.pins = {n: Pin(pn, d) for n, (pn, d) in pin_defs.items()}
+        self.prop_delay = prop_delay  # ns from input change to output valid
 
     def get(self, n): return self.pins[n].value
     def set(self, n, v): self.pins[n].value = v & 1
@@ -28,7 +32,7 @@ def TTL_74hc04(name):
             5:('3A','in'),6:('3Y','out'),7:('GND','power'),
             8:('4Y','out'),9:('4A','in'),10:('5Y','out'),11:('5A','in'),
             12:('6Y','out'),13:('6A','in'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=12)
     def update():
         c.set(2,1-c.get(1)); c.set(4,1-c.get(3)); c.set(6,1-c.get(5))
         c.set(8,1-c.get(9)); c.set(10,1-c.get(11)); c.set(12,1-c.get(13))
@@ -43,7 +47,7 @@ def TTL_74hc00(name):
             4:('2A','in'),5:('2B','in'),6:('2Y','out'),7:('GND','power'),
             8:('3Y','out'),9:('3A','in'),10:('3B','in'),
             11:('4Y','out'),12:('4A','in'),13:('4B','in'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=12)
     def update():
         c.set(3,1-(c.get(1)&c.get(2))); c.set(6,1-(c.get(4)&c.get(5)))
         c.set(8,1-(c.get(9)&c.get(10))); c.set(11,1-(c.get(12)&c.get(13)))
@@ -58,7 +62,7 @@ def TTL_74hc32(name):
             4:('2A','in'),5:('2B','in'),6:('2Y','out'),7:('GND','power'),
             8:('3Y','out'),9:('3A','in'),10:('3B','in'),
             11:('4A','in'),12:('4B','in'),13:('4Y','out'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=12)
     def update():
         c.set(3,c.get(1)|c.get(2)); c.set(6,c.get(4)|c.get(5))
         c.set(8,c.get(9)|c.get(10)); c.set(13,c.get(11)|c.get(12))
@@ -73,7 +77,7 @@ def TTL_74hc86(name):
             4:('2A','in'),5:('2B','in'),6:('2Y','out'),7:('GND','power'),
             8:('3Y','out'),9:('3A','in'),10:('3B','in'),
             11:('4Y','out'),12:('4A','in'),13:('4B','in'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=15)
     def update():
         c.set(3,c.get(1)^c.get(2)); c.set(6,c.get(4)^c.get(5))
         c.set(8,c.get(9)^c.get(10)); c.set(11,c.get(12)^c.get(13))
@@ -88,7 +92,7 @@ def TTL_74hc21(name):
             4:('1C','in'),5:('1D','in'),6:('1Y','out'),7:('GND','power'),
             8:('2Y','out'),9:('2A','in'),10:('2B','in'),
             11:('NC','nc'),12:('2C','in'),13:('2D','in'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=15)
     def update():
         c.set(6, c.get(1)&c.get(2)&c.get(4)&c.get(5))
         c.set(8, c.get(9)&c.get(10)&c.get(12)&c.get(13))
@@ -103,7 +107,7 @@ def TTL_74hc157(name):
             5:('2A','in'),6:('2B','in'),7:('2Y','out'),8:('GND','power'),
             9:('3Y','out'),10:('3B','in'),11:('3A','in'),12:('4Y','out'),
             13:('4B','in'),14:('4A','in'),15:('/E','in'),16:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=18)
     def update():
         if c.get(15):  # /E=1 disabled
             c.set(4,0); c.set(7,0); c.set(9,0); c.set(12,0); return
@@ -123,7 +127,7 @@ def TTL_74hc283(name):
             5:('A0','in'),6:('B0','in'),7:('Cin','in'),8:('GND','power'),
             9:('Cout','out'),10:('S3','out'),11:('B3','in'),12:('A3','in'),
             13:('S2','out'),14:('A2','in'),15:('B2','in'),16:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=35)
     def update():
         a = c.get(5)|(c.get(3)<<1)|(c.get(14)<<2)|(c.get(12)<<3)
         b = c.get(6)|(c.get(2)<<1)|(c.get(15)<<2)|(c.get(11)<<3)
@@ -142,7 +146,7 @@ def TTL_74hc688(name):
             11:('Q4','in'),12:('P4','in'),13:('Q5','in'),14:('P5','in'),
             15:('Q6','in'),16:('P6','in'),17:('Q7','in'),18:('P7','in'),
             19:('/P=Q','out'),20:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=30)
     def update():
         if c.get(1): c.set(19,1); return
         p = c.get(2)|(c.get(4)<<1)|(c.get(6)<<2)|(c.get(8)<<3)|(c.get(12)<<4)|(c.get(14)<<5)|(c.get(16)<<6)|(c.get(18)<<7)
@@ -157,7 +161,7 @@ def TTL_74hc688(name):
 def TTL_74hc541(name):
     pins = {1:('/OE1','in'),19:('/OE2','in'),10:('GND','power'),20:('VCC','power')}
     for i in range(8): pins[2+i] = (f'A{i+1}','in'); pins[18-i] = (f'Y{i+1}','out')
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=12)
     def update():
         en = (c.get(1)==0 and c.get(19)==0)
         for i in range(8): c.set(18-i, c.get(2+i) if en else 0)
@@ -170,7 +174,7 @@ def TTL_74hc541(name):
 def TTL_74hc245(name):
     pins = {1:('DIR','in'),19:('/OE','in'),10:('GND','power'),20:('VCC','power')}
     for i in range(8): pins[2+i] = (f'A{i+1}','bidir'); pins[18-i] = (f'B{i+1}','bidir')
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=12)
     def update():
         if c.get(19): return  # disabled
         if c.get(1)==0:  # A→B
@@ -186,7 +190,7 @@ def TTL_74hc245(name):
 def TTL_74hc574(name):
     pins = {1:('/OE','in'),11:('CLK','in'),10:('GND','power'),20:('VCC','power')}
     for i in range(8): pins[2+i] = (f'D{i+1}','in'); pins[19-i] = (f'Q{i+1}','out')
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=20)
     c._reg = [0]*8
     def clock_edge():
         for i in range(8): c._reg[i] = c.get(2+i)
@@ -207,7 +211,7 @@ def TTL_74hc161(name):
             5:('D2','in'),6:('D3','in'),7:('ENP','in'),8:('GND','power'),
             9:('/LD','in'),10:('ENT','in'),11:('QD','out'),12:('QC','out'),
             13:('QB','out'),14:('QA','out'),15:('RCO','out'),16:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=22)
     c._count = 0
     def clock_edge():
         if c.get(1)==0: c._count = 0
@@ -231,7 +235,7 @@ def TTL_74hc164(name):
             5:('Q2','out'),6:('Q3','out'),7:('GND','power'),8:('CLK','in'),
             9:('/CLR','in'),10:('Q4','out'),11:('Q5','out'),12:('Q6','out'),
             13:('Q7','out'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=20)
     c._sr = [0]*8
     q_pins = [3,4,5,6,10,11,12,13]
     def clock_edge():
@@ -252,7 +256,7 @@ def TTL_74hc74(name):
             5:('Q1','out'),6:('/Q1','out'),7:('GND','power'),
             8:('/Q2','out'),9:('Q2','out'),10:('/PR2','in'),11:('CLK2','in'),
             12:('D2','in'),13:('/CLR2','in'),14:('VCC','power')}
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=20)
     c._q = [0,0]
     def clock_edge():
         if c.get(1)==0: c._q[0]=0
@@ -284,7 +288,7 @@ def MEM_AT28C256(name):
     for i in range(8): pins[i+16] = (f'D{i}','out')
     pins[24]=('/CE','in'); pins[25]=('/OE','in'); pins[26]=('/WE','in')
     pins[27]=('GND','power'); pins[28]=('VCC','power')
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=70)
     c._data = bytearray(32768)
     def update():
         if c.get(24)==0 and c.get(25)==0:
@@ -300,7 +304,7 @@ def MEM_62256(name):
     for i in range(8): pins[i+16] = (f'D{i}','bidir')
     pins[24]=('/CE','in'); pins[25]=('/OE','in'); pins[26]=('/WE','in')
     pins[27]=('GND','power'); pins[28]=('VCC','power')
-    c = Chip(name, pins)
+    c = Chip(name, pins, prop_delay=70)
     c._data = bytearray(32768)
     def update():
         if c.get(24)==0:
