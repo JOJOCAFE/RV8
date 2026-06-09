@@ -153,16 +153,28 @@ RV8GR/
 | 10 | BASIC interpreter | ⬜ |
 | 11 | Simple game | ⬜ |
 
-### Task 6: Gate-Level Simulator (Next)
+### Task 6: Gate-Level Simulator (In Progress)
 
 Pin-accurate Python simulation of all 35 chips. Design: `sim/chip_sim_design.md`
 
+**Done:**
+- [x] All 35 chip objects with correct pin layout
+- [x] All 14 chip type behaviors (combinational + sequential + memory)
+- [x] Probe + DipSwitch test tools
+- [x] 141 test vectors, all pass
+- [x] Wiring definition (145 wires, 444 pin endpoints)
+
+**Next:**
+- [ ] Propagation engine (chip_sim.py) — steps clock, resolves shared wires
+- [ ] Full CPU test: LI $42 executes correctly
+- [ ] Integration: run test_setdp.asm through gate-level sim
+
 ```
 sim/
-├── chips/base.py           — Chip + TristateBus + Simulator engine
-├── chips/sequential.py     — HC574, HC161, HC164, HC74
-├── chips/combinational.py  — HC04, HC00, HC32, HC86, HC157, HC283, HC245, HC541, HC688, HC21
-├── chips/memory.py         — ROM, RAM
-├── wiring.py               — All connections from 03_wiring_guide.md
-└── chip_sim.py             — Main entry + probe + LED-style testing
+├── chips/__init__.py       — 35 chips with behavior (done)
+├── chips/test_chips.py     — 141 test vectors (done)
+├── wiring.py               — all connections (done)
+├── chip_sim_design.md      — design doc (done)
+├── chip_sim.py             — propagation engine (next)
+└── soft_debug.py           — high-level sim (done)
 ```
