@@ -15,51 +15,43 @@
 These are the default pins. Edit at top of sketch to change:
 
 ```cpp
-// ======== DEFAULT PINS (NodeMCU-32S) ========
-// Data bus D[7:0]
-#define PIN_D0  32
-#define PIN_D1  33
-#define PIN_D2  25
-#define PIN_D3  26
-#define PIN_D4  27
-#define PIN_D5  14
-#define PIN_D6  12
-#define PIN_D7  13
+// ======== DEFAULT PINS (ESP32 + TXS0108E + 74HC595 ×2) ========
+// Data bus D[7:0] (via TXS0108E #2, bidirectional)
+#define PIN_D0  13
+#define PIN_D1  12
+#define PIN_D2  14
+#define PIN_D3  27
+#define PIN_D4  26
+#define PIN_D5  25
+#define PIN_D6  33
+#define PIN_D7  32
 
-// Address bus A[7:0]
-#define PIN_A0  15
-#define PIN_A1  2
-#define PIN_A2  4
-#define PIN_A3  16
-#define PIN_A4  17
-#define PIN_A5  5
-#define PIN_A6  18
-#define PIN_A7  19
+// Address via 74HC595 ×2 shift register (via TXS0108E #1)
+#define PIN_SR_DATA   23   // SER (595 #1 pin 14)
+#define PIN_SR_CLK    18   // SRCLK (both 595 pin 11)
+#define PIN_SR_LATCH  19   // RCLK (both 595 pin 12)
 
-// Shift register for A[14:8] (optional, skip if not connected)
-#define PIN_SR_DATA   23   // SER
-#define PIN_SR_CLK    18   // SRCLK
-#define PIN_SR_LATCH  5    // RCLK
-
-// Control pins
-#define PIN_nWE   21       // /WE to ROM (active low)
-#define PIN_nRST  0        // /RST to CPU (active low)
-
-// Mode switch (HIGH = RUN, LOW = PROG)
-#define PIN_MODE  39
+// Control pins (via TXS0108E #1)
+#define PIN_nCE   4        // /CE to ROM (active low)
+#define PIN_nOE   16       // /OE to ROM (active low)
+#define PIN_nWE   17       // /WE to ROM (active low)
 
 // ======== BAUD RATE ========
 #define SERIAL_BAUD 115200
 // =============================
 ```
 
-### Board Variations
+### Pin Summary
 
-| Board | D[7:0] | A[7:0] | Notes |
-|-------|--------|--------|-------|
-| **NodeMCU-32S** | 32,33,25,26,27,14,12,13 | 15,2,4,16,17,5,18,19 | **Default** |
-| DevKit V1 | 23,19,5,17,16,25,26,27 | 15,2,4,13,12,14,18,19 | Alternate |
-| Custom | Edit pins | Edit pins | Your wiring |
+| Function | GPIO | Via |
+|----------|:----:|-----|
+| D0-D7 | 13,12,14,27,26,25,33,32 | TXS0108E #2 |
+| SR_DATA | 23 | TXS0108E #1 → 595 SER |
+| SR_CLK | 18 | TXS0108E #1 → 595 SRCLK |
+| SR_LATCH | 19 | TXS0108E #1 → 595 RCLK |
+| /CE | 4 | TXS0108E #1 → ROM |
+| /OE | 16 | TXS0108E #1 → ROM |
+| /WE | 17 | TXS0108E #1 → ROM |
 
 ---
 
