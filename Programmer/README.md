@@ -28,104 +28,62 @@ One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole bo
 
 ## ESP32-WROOM-32 Pin Mapping
 
-### Data Bus (D[7:0]) — bidirectional, used in both modes
+### Data Bus (D[7:0]) — bidirectional, via TXS0108E #2
 
-| ESP32 GPIO | Bus Pin | Signal |
-|:----------:|:-------:|--------|
-| GPIO 13 | — | D0 |
-| GPIO 12 | — | D1 |
-| GPIO 14 | — | D2 |
-| GPIO 27 | — | D3 |
-| GPIO 26 | — | D4 |
-| GPIO 25 | — | D5 |
-| GPIO 33 | — | D6 |
-| GPIO 32 | — | D7 |
+| ESP32 GPIO | Signal | ROM Pin |
+|:----------:|--------|:-------:|
+| GPIO 13 | D0 | I/O 0 (pin 11) |
+| GPIO 12 | D1 | I/O 1 (pin 12) |
+| GPIO 14 | D2 | I/O 2 (pin 13) |
+| GPIO 27 | D3 | I/O 3 (pin 15) |
+| GPIO 26 | D4 | I/O 4 (pin 16) |
+| GPIO 25 | D5 | I/O 5 (pin 17) |
+| GPIO 33 | D6 | I/O 6 (pin 18) |
+| GPIO 32 | D7 | I/O 7 (pin 19) |
 
-### Address Bus (A[15:0]) — output, PROG mode only (RV8/RV801)
+### Address (A[14:0]) — via 74HC595 ×2 shift register, through TXS0108E #1
 
-| ESP32 GPIO | Bus Pin | Signal |
-|:----------:|:-------:|--------|
-| GPIO 15 | 21 | A0 |
-| GPIO 2 | 22 | A1 |
-| GPIO 4 | 23 | A2 |
-| GPIO 16 | 24 | A3 |
-| GPIO 17 | 25 | A4 |
-| GPIO 5 | 26 | A5 |
-| GPIO 18 | 27 | A6 |
-| GPIO 19 | 28 | A7 |
-| — | — | (A8-A14 via 74HC595 shift register) |
-| GPIO 22 | — | A9 |
-| GPIO 23 | — | A10 |
-| GPIO 34* | — | A11 |
-| GPIO 35* | — | A12 |
-| GPIO 36* | — | A13 |
-| GPIO 39* | — | A14 |
+| ESP32 GPIO | Function | 74HC595 Pin |
+|:----------:|----------|:-----------:|
+| GPIO 23 | SR_DATA (SER) | #1 pin 14 |
+| GPIO 18 | SR_CLK (SRCLK) | Both pin 11 |
+| GPIO 19 | SR_LATCH (RCLK) | Both pin 12 |
 
-*GPIO 34-39 are input-only on ESP32. Need alternative for A11-A14.
+74HC595 #1 outputs Q0-Q7 → ROM A0-A7
+74HC595 #2 outputs Q0-Q6 → ROM A8-A14 (daisy-chained from #1 Q7S → #2 SER)
 
-**Revised approach**: Use shift register (74HC595) for high address bits:
+### Control Signals — via TXS0108E #1
 
-```
-ESP32 (3 pins: DATA, CLK, LATCH) → 74HC595 → A8-A14 (7 bits)
-```
+| ESP32 GPIO | Signal | ROM Pin |
+|:----------:|--------|:-------:|
+| GPIO 4 | /CE | pin 20 |
+| GPIO 16 | /OE | pin 22 |
+| GPIO 17 | /WE | pin 27 |
 
-This uses only 3 ESP32 pins for the upper 7 address bits. Total GPIO: 8 (data) + 8 (addr low) + 3 (shift reg) + 3 (control) = **22 GPIO**. Fits easily.
-
-### Control Signals
-
-| ESP32 GPIO | Bus Pin | Signal | Direction |
-|:----------:|:-------:|--------|:---------:|
-| GPIO 0 | 6 | /RST | output |
-| GPIO 2 | 7 | /RD | output |
-| GPIO 4 | 8 | /WR | output |
-| — | 11 | /SLOT1 | input (RUN mode, detect slot access) |
-
-### Shift Register for A[8:14] (1× 74HC595 on programmer board)
-
-| ESP32 GPIO | 74HC595 Pin | Function |
-|:----------:|:-----------:|----------|
-| GPIO 23 | 14 (SER) | Serial data |
-| GPIO 18 | 11 (SRCLK) | Shift clock |
-| GPIO 19 | 12 (RCLK) | Latch output |
-
-74HC595 Q0-Q6 → ROM A8-A14 (directly, or via bus if RV8 has full address on bus)
-
-**Note**: For RV8/RV801 (which have A[15:0] on the 40-pin bus), the shift register is NOT needed — ESP32 drives all address lines directly via the bus. The shift register is only needed for RV808 ROM programming header.
-
----
-
-## Simplified Pin Map (RV8/RV801 — full address on bus)
+### Summary
 
 | Function | ESP32 GPIOs | Count |
 |----------|:-----------:|:-----:|
-| D[7:0] | 32,33,25,26,27,14,12,13 | 8 |
-| A[7:0] | 15,2,4,16,17,5,18,19 | 8 |
-| A[8:14] | 21,22,23,34,35,36,39 | 7* |
-| /RST | 0 | 1 |
-| /RD | — (directly from bus, optional) | 0 |
-| /WR | — (use GPIO for ROM /WE) | 1 |
-| /SLOT1 (RUN mode) | input pin | 1 |
-| **Total** | | **~20** |
-
-*A[8:14] only needed in PROG mode. In RUN mode these pins are tri-stated/unused.
+| D[7:0] | 13,12,14,27,26,25,33,32 | 8 |
+| Shift Reg | 23,18,19 | 3 |
+| ROM Control | 4,16,17 | 3 |
+| **Total** | | **14 GPIO** |
 
 ---
 
 ## PROG Mode — ROM Flash Sequence
 
 ```
-1. Switch to PROG → ESP32 pulls /RST low
-2. PC sends: "FLASH <size>\n" over USB-serial
-3. ESP32 receives .bin data
-4. For each byte:
-   a. Set A[14:0] (address)
-   b. Set D[7:0] (data)
-   c. /CE=LOW, /OE=HIGH
-   d. Pulse /WE LOW for 200ns
-   e. Wait for write completion (poll D7 or 10ms delay)
-5. Verify: read back all bytes, compare
-6. ESP32 sends "OK\n" to PC
-7. Switch to RUN → ESP32 releases /RST → CPU boots
+1. ESP32 sets /CE=LOW, /OE=HIGH
+2. PC sends data over USB-serial
+3. For each byte:
+   a. Shift out A[14:0] via 74HC595 (2 bytes, MSB first)
+   b. Pulse RCLK to latch address
+   c. Set D[7:0] (data)
+   d. Pulse /WE LOW for 1µs
+   e. Wait for write completion (10ms delay)
+4. Verify: read back all bytes, compare
+5. ESP32 sends "OK\n" to PC
 ```
 
 ---
