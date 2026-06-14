@@ -170,6 +170,10 @@ def TTL_74hc541(name):
 
 # =============================================================================
 # 74HC245 — Octal Bidirectional Buffer
+# NOTE: DIR convention is INVERTED vs real datasheet for legacy reasons.
+#   Sim:       DIR=0 → A→B,  DIR=1 → B→A
+#   Real chip: DIR=0 → B→A,  DIR=1 → A→B
+#   Physical build swaps A/B sides to compensate (A=IBUS, B=DBUS).
 # =============================================================================
 def TTL_74hc245(name):
     pins = {1:('DIR','in'),19:('/OE','in'),10:('GND','power'),20:('VCC','power')}

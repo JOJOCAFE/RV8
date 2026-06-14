@@ -85,10 +85,17 @@ WIRING = [
 
     # =========================================================================
     # U7: Bus Buffer (74HC245) — DBUS ↔ IBUS
+    # DIR=0: read (DBUS→IBUS, A→B in sim model)
+    # DIR=1: write (IBUS→DBUS, B→A in sim model)
+    # NOTE: sim model DIR is inverted vs real 74HC245 datasheet.
+    #   Real chip: DIR=0→B→A, DIR=1→A→B
+    #   Physical build: connect A-side=IBUS, B-side=DBUS
+    #   Then DIR=0→B→A→DBUS→IBUS (read) matches WR_DIR=0 ✓
     # =========================================================================
     ('U7', 1,  'U28', 8),         # DIR ← WR_DIR (U28-8)
     ('U7', 19, 'U25', 8),         # /OE ← BUF_OE_SAFE (U25-8)
-    # A1-A8 (pins 2-9) ↔ DBUS, B1-B8 (pins 18-11) ↔ IBUS
+    # Physical build: A-side (pins 2-9) = IBUS, B-side (pins 18-11) = DBUS
+    # Sim model: A-side (pins 2-9) = DBUS, B-side (pins 18-11) = IBUS (inverted)
 
     # =========================================================================
     # U8: Ring Counter (74HC164)
@@ -442,8 +449,10 @@ WIRING = [
 # =============================================================================
 
 # IBUS: IB0-IB7 shared wires
-# Drivers: U7 B-side (18-11), U6 Q (19-12)*, U14 Y (18-11)*
+# Drivers: U7 A-side (2-9), U6 Q (19-12)*, U14 Y (18-11)*
 # Readers: U12 A (1,4,9,12), U13 A (1,4,9,12), U5 D (2-9), U23 D (2-9), U32 D (2-9)
+# NOTE: Physical build has U7 A-side=IBUS, B-side=DBUS.
+#       Sim model keeps A=DBUS,B=IBUS with inverted DIR (legacy).
 IBUS_PINS = {
     'readers': [
         # (chip, pins[0..7]) — always connected as inputs
@@ -455,6 +464,7 @@ IBUS_PINS = {
     ],
     'drivers': [
         # (chip, pins[0..7], enable_signal_description)
+        # Sim uses B-side (18-11) as IBUS output (inverted convention)
         ('U7',  [18, 17, 16, 15, 14, 13, 12, 11], 'BUF_OE_SAFE=0'),
         ('U6',  [19, 18, 17, 16, 15, 14, 13, 12], '/IRL_OE=0'),
         ('U14', [18, 17, 16, 15, 14, 13, 12, 11], '/AC_BUF=0'),
@@ -464,7 +474,8 @@ IBUS_PINS = {
 # DBUS: D0-D7 shared wires
 DBUS_PINS = {
     'connections': [
-        ('U7',  [2, 3, 4, 5, 6, 7, 8, 9]),       # U7 A-side
+        # Sim uses A-side (2-9) as DBUS (inverted convention)
+        ('U7',  [2, 3, 4, 5, 6, 7, 8, 9]),       # U7 A-side (sim: DBUS)
         ('ROM', [16, 17, 18, 19, 20, 21, 22, 23]), # ROM D0-D7
         ('RAM', [16, 17, 18, 19, 20, 21, 22, 23]), # RAM D0-D7
     ],

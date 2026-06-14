@@ -86,6 +86,20 @@ LED (ดู 8 บิตล่าง = U1 + U2):
 
 **สำคัญ**: ถ้ากด 16 ครั้งแล้ว bit4 ติด = cascade ทำงาน!
 
+> 📝 **หมายเหตุ: PC จริงใน RV8-GR**
+>
+> Lab นี้ต่อ ENP=ENT=VCC ทำให้ PC นับ **ทุก clock** เพื่อความง่าย
+>
+> แต่ใน CPU จริง PC จะนับเฉพาะ T0 และ T1 (ไม่นับใน T2)
+> ผ่านสัญญาณ `PC_INC = T0 OR T1` จาก Ring Counter (Lab 02)
+>
+> ```
+> U4  U3  U2  U1
+> [15:12] [11:8] [7:4] [3:0]  ← PC 16 บิตเต็ม
+> ```
+>
+> LED 8 ดวงที่เห็นใน lab นี้ = PC[7:0] เท่านั้น (PC[15:8] ยังมีอยู่ใน U3-U4)
+
 ---
 
 ## ถ้าไม่ถูก?
@@ -105,6 +119,31 @@ LED (ดู 8 บิตล่าง = U1 + U2):
 cd RV8GR/sim/sim_lab
 python3 lab02_pc_counter.py
 ```
+
+---
+
+## Challenge (ไม่บังคับ — สำหรับคนที่อยากลองเพิ่ม)
+
+### Challenge A: PC_INC — ให้ Ring Counter ควบคุม PC
+
+```
+ถอด ENP/ENT จาก VCC
+ต่อ ENP (U1-7) ← T0 (U8-3) [หรือ T0 OR T1]
+ต่อ ENT (U1-10) ← T0 (U8-3)
+```
+
+สังเกต: PC จะนับเฉพาะเมื่อ T0=HIGH → **Control Unit ควบคุม PC!**
+
+### Challenge B: Parallel Load — ทำ Jump
+
+```
+ต่อ DIP switch 4 บิต → U1 pin 3,4,5,6 (D0-D3)
+ดึง /LD (pin 9) ลง LOW (ปุ่มกด)
+กด Clock → PC โหลดค่าจาก switch!
+```
+
+นี่คือวิธีที่คำสั่ง J (Jump) ทำงานใน CPU จริง:
+/PC_LD = LOW → PC ← target address
 
 ---
 

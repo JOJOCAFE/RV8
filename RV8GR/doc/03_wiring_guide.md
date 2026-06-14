@@ -42,8 +42,8 @@ ROM access window depends on when ADDR_MODE returns to 0 (PC on ABUS):
 - After LB/SB/ADD/SUB/XOR: address switches late → may need extra cycle or faster ROM
 
 **Recommendation**: Use **70ns ROM/RAM** + start at **5 MHz**.
-70ns parts work reliably up to 10 MHz (30ns margin worst case).
-Start at 5 MHz for debugging, increase to 10 MHz after verification.
+70ns parts work reliably at 5 MHz (130ns margin).
+Use 5 MHz crystal for the physical build.
 
 ---
 
@@ -85,7 +85,7 @@ CPU board ↔ Expansion/Programmer ผ่าน 40-pin IDC connector
 |:---:|--------|:---:|--------|-------------|
 | 1-16 | A[15:0] | out | Addr Mux | 16-bit address bus |
 | 17-24 | D[7:0] | bidir | U7/ROM/RAM | 8-bit data bus |
-| 25 | CLK | out | Oscillator | System clock (10 MHz) |
+| 25 | CLK | out | Oscillator | System clock (5 MHz) |
 | 26 | /RST | out | RC+button | Active-low reset |
 | 27 | /WR | out | /AC_BUF (U26-8) | Write strobe (LOW during T2+STORE) |
 | 28 | /RD | out | /T2 or fetch | Read strobe |
@@ -116,14 +116,14 @@ D[7:0]:  ←─ ctrl ─→←─ oper ─→←─ data ─→←─ ctrl ─�
 ### DBUS — External Data Bus (D0-D7)
 
 ```
-D0 ←→ ROM D0, RAM D0, U7-2
-D1 ←→ ROM D1, RAM D1, U7-3
-D2 ←→ ROM D2, RAM D2, U7-4
-D3 ←→ ROM D3, RAM D3, U7-5
-D4 ←→ ROM D4, RAM D4, U7-6
-D5 ←→ ROM D5, RAM D5, U7-7
-D6 ←→ ROM D6, RAM D6, U7-8
-D7 ←→ ROM D7, RAM D7, U7-9
+D0 ←→ ROM D0, RAM D0, U7-18
+D1 ←→ ROM D1, RAM D1, U7-17
+D2 ←→ ROM D2, RAM D2, U7-16
+D3 ←→ ROM D3, RAM D3, U7-15
+D4 ←→ ROM D4, RAM D4, U7-14
+D5 ←→ ROM D5, RAM D5, U7-13
+D6 ←→ ROM D6, RAM D6, U7-12
+D7 ←→ ROM D7, RAM D7, U7-11
 ```
 
 ### IBUS — Internal Bus (IB0-IB7)
@@ -134,14 +134,14 @@ Drivers (tristate, only ONE active at T2):
 - U14: AC value (STR=1)
 
 ```
-IB0 ←→ U7-18, U6-19*, U14-18*, U12-1, U23-2, U5-2
-IB1 ←→ U7-17, U6-18*, U14-17*, U12-4, U23-3, U5-3
-IB2 ←→ U7-16, U6-17*, U14-16*, U12-9, U23-4, U5-4
-IB3 ←→ U7-15, U6-16*, U14-15*, U12-12, U23-5, U5-5
-IB4 ←→ U7-14, U6-15*, U14-14*, U13-1, U23-6, U5-6
-IB5 ←→ U7-13, U6-14*, U14-13*, U13-4, U23-7, U5-7
-IB6 ←→ U7-12, U6-13*, U14-12*, U13-9, U23-8, U5-8
-IB7 ←→ U7-11, U6-12*, U14-11*, U13-12, U23-9, U5-9
+IB0 ←→ U7-2, U6-19*, U14-18*, U12-1, U23-2, U5-2
+IB1 ←→ U7-3, U6-18*, U14-17*, U12-4, U23-3, U5-3
+IB2 ←→ U7-4, U6-17*, U14-16*, U12-9, U23-4, U5-4
+IB3 ←→ U7-5, U6-16*, U14-15*, U12-12, U23-5, U5-5
+IB4 ←→ U7-6, U6-15*, U14-14*, U13-1, U23-6, U5-6
+IB5 ←→ U7-7, U6-14*, U14-13*, U13-4, U23-7, U5-7
+IB6 ←→ U7-8, U6-13*, U14-12*, U13-9, U23-8, U5-8
+IB7 ←→ U7-9, U6-12*, U14-11*, U13-12, U23-9, U5-9
 ```
 
 ### ABUS — Address Bus (A0-A15)
@@ -275,17 +275,21 @@ U6-20 (VCC) → VCC
 
 ```
 U7-1  (DIR) ← WR_DIR (U28-8)
-U7-2  (A1)  ←→ D0             U7-18 (B1)  ←→ IB0
-U7-3  (A2)  ←→ D1             U7-17 (B2)  ←→ IB1
-U7-4  (A3)  ←→ D2             U7-16 (B3)  ←→ IB2
-U7-5  (A4)  ←→ D3             U7-15 (B4)  ←→ IB3
-U7-6  (A5)  ←→ D4             U7-14 (B5)  ←→ IB4
-U7-7  (A6)  ←→ D5             U7-13 (B6)  ←→ IB5
-U7-8  (A7)  ←→ D6             U7-12 (B7)  ←→ IB6
-U7-9  (A8)  ←→ D7             U7-11 (B8)  ←→ IB7
+U7-2  (A1)  ←→ IB0            U7-18 (B1)  ←→ D0
+U7-3  (A2)  ←→ IB1            U7-17 (B2)  ←→ D1
+U7-4  (A3)  ←→ IB2            U7-16 (B3)  ←→ D2
+U7-5  (A4)  ←→ IB3            U7-15 (B4)  ←→ D3
+U7-6  (A5)  ←→ IB4            U7-14 (B5)  ←→ D4
+U7-7  (A6)  ←→ IB5            U7-13 (B6)  ←→ D5
+U7-8  (A7)  ←→ IB6            U7-12 (B7)  ←→ D6
+U7-9  (A8)  ←→ IB7            U7-11 (B8)  ←→ D7
 U7-10 (GND) → GND
 U7-19 (/OE) ← BUF_OE_SAFE (U25-8)
 U7-20 (VCC) → VCC
+
+Direction (real 74HC245 datasheet):
+  DIR=0 (WR_DIR=0): B→A = DBUS→IBUS (READ)
+  DIR=1 (WR_DIR=1): A→B = IBUS→DBUS (WRITE/STORE)
 ```
 
 ### U8 74HC164 — Ring Counter (T0/T1/T2)
