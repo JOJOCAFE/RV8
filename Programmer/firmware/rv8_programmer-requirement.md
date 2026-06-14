@@ -6,11 +6,11 @@
 
 **Purpose**: ROM flash/read/verify + RAM boot upload + terminal bridge
 
-**Default Board**: NodeMCU-32S (change pins for other boards)
+**Default Board**: ESP32-WROOM-32 (change pins for other boards)
 
 ---
 
-## Default Pin Configuration (NodeMCU-32S)
+## Default Pin Configuration (ESP32-WROOM-32)
 
 These are the default pins. Edit at top of sketch to change:
 
@@ -444,7 +444,7 @@ void testTimeout() {
 
 **Step 1: Connect ESP32**
 ```
-USB (PC) ←→ ESP32 (NodeMCU-32S)
+USB (PC) ←→ ESP32 (ESP32-WROOM-32)
 ```
 
 **Step 2: Upload firmware**
@@ -490,7 +490,7 @@ python3 -m unittest test_rv8flash -v
 
 ### Completed ✅
 
-- [x] Pin configuration at top (NodeMCU-32S defaults)
+- [x] Pin configuration at top (ESP32-WROOM-32 defaults)
 - [x] Serial commands: `?`, `F`, `V`, `R`
 - [x] ROM flash implementation
 - [x] ROM read implementation

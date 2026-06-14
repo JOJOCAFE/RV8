@@ -1,5 +1,5 @@
 // ============================================================
-// RV8 Programmer — ESP32 NodeMCU Firmware
+// RV8 Programmer — ESP32-WROOM-32 Firmware
 // ROM flasher (PROG) + UART bridge (RUN) for RV8 family CPUs
 // Target: AT28C256 (32KB), 74HC595 for A[8:14]
 // Serial protocol: 115200 baud

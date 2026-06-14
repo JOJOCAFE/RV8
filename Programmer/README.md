@@ -1,4 +1,4 @@
-# Programmer Board — ESP32 NodeMCU
+# Programmer Board — ESP32-WROOM-32
 
 **Purpose**: Flash ROM + UART terminal for all RV8 family CPUs
 **Connection**: ESP32 ←USB→ PC | ESP32 ←40-pin bus→ CPU board
@@ -8,12 +8,12 @@
 ## Overview
 
 ```
-PC ←──USB──→ [ESP32 NodeMCU] ←──40-pin ribbon──→ [CPU Board]
+PC ←──USB──→ [ESP32-WROOM-32] ←──40-pin ribbon──→ [CPU Board]
                     │
               [PROG/RUN switch]
 ```
 
-One ESP32 NodeMCU module + 40-pin IDC connector + 1 switch. That's the whole board.
+One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole board.
 
 ---
 
@@ -26,7 +26,7 @@ One ESP32 NodeMCU module + 40-pin IDC connector + 1 switch. That's the whole boa
 
 ---
 
-## ESP32 NodeMCU Pin Mapping
+## ESP32-WROOM-32 Pin Mapping
 
 ### Data Bus (D[7:0]) — bidirectional, used in both modes
 
@@ -195,7 +195,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 | Part | Qty | Package | Notes |
 |------|:---:|:-------:|-------|
-| ESP32 NodeMCU-32S | 1 | Module | Main controller |
+| ESP32 ESP32-WROOM-32 | 1 | Module | Main controller |
 | TXB0108 module (8-ch) | 3 | Module | Level shifters |
 | 40-pin IDC socket | 1 | 40DIP | RV8-Bus connection |
 | 74HC595 | 1 | 16DIP | Shift register for A8-A14 |✅ |
@@ -226,7 +226,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 | Category | Est. Cost |
 |----------|----------:|
-| ESP32 NodeMCU | ~$4 |
+| ESP32-WROOM-32 | ~$4 |
 | TXB0108 ×3 | ~$3 |
 | IDC cable + socket | ~$2 |
 | 74HC595 | ~$0.30 |
@@ -237,7 +237,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 | Part | Source | Notes |
 |------|--------|-------|
-| ESP32 NodeMCU-32S | AliExpress, LCSC | ~$4 |
+| ESP32 ESP32-WROOM-32 | AliExpress, LCSC | ~$4 |
 | TXB0108 modules | AliExpress, eBay | ~$1 each |
 | 40-pin IDC cable | AliExpress | ~$1 |
 | 74HC595 | LCSC, AliExpress | ~$0.20 |
@@ -349,7 +349,7 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 
 | ชิ้น | ชื่อ | หน้าที่ | จำนวน | ราคาประมาณ |
 |:----:|------|---------|:-----:|:----------:|
-| 1 | ESP32 NodeMCU (30 ขา) | สมองของบอร์ด — ต่อ USB กับคอม, ควบคุมทุกอย่าง | 1 | ~฿140 |
+| 1 | ESP32-WROOM-32 (30 ขา) | สมองของบอร์ด — ต่อ USB กับคอม, ควบคุมทุกอย่าง | 1 | ~฿140 |
 | 2 | TXB0108 (โมดูล 8 ช่อง) | แปลงไฟ 3.3V↔5V ให้ ESP32 คุยกับ CPU ได้ | 3 | ~฿105 |
 | 3 | 74HC595 (shift register) | ส่ง address สูง A8-A14 ไปหา ROM (ใช้สายแค่ 3 เส้น) | 1 | ~฿10 |
 | 4 | สาย IDC 40 พิน + หัวต่อ | เชื่อมบอร์ด Programmer กับบอร์ด CPU | 1 | ~฿70 |
