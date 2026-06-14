@@ -1,28 +1,29 @@
 # Programmer Board — ESP32-WROOM-32
 
-**Purpose**: Flash ROM + UART terminal for all RV8 family CPUs
-**Connection**: ESP32 ←USB→ PC | ESP32 ←40-pin bus→ CPU board
+**Purpose**: Flash AT28C256 ROM for all RV8 family CPUs
+**Connection**: ESP32 ←USB→ PC, ROM inserted in ZIF socket
 
 ---
 
 ## Overview
 
 ```
-PC ←──USB──→ [ESP32-WROOM-32] ←──40-pin ribbon──→ [CPU Board]
-                    │
-              [PROG/RUN switch]
+PC ←──USB──→ [ESP32-WROOM-32] ←→ [TXS0108E ×2] ←→ [74HC595 ×2] ←→ [AT28C256 ROM]
 ```
 
-One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole board.
+Standalone ROM programmer. Insert ROM chip, flash, put back in CPU board.
 
 ---
 
-## Modes
+## How to Use
 
-| Mode | Switch | What happens |
-|------|:------:|-------------|
-| **PROG** | PROG | ESP32 holds /RST low, drives address+data, writes ROM |
-| **RUN** | RUN | ESP32 releases /RST, listens on slot, UART bridge to PC |
+1. Remove ROM (AT28C256) from CPU board
+2. Insert into Programmer board socket
+3. Connect ESP32 to PC via USB
+4. Flash: `python3 rv8flash.py -w program.bin`
+5. Verify: `python3 rv8flash.py -v program.bin`
+6. Remove ROM, insert back into CPU board
+7. Power on CPU → runs program
 
 ---
 
@@ -88,117 +89,19 @@ One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole bo
 
 ---
 
-## RUN Mode — UART Terminal Bridge
-
-```
-CPU writes to I/O slot:
-  PAGE $F0          ; system I/O page
-  SB pg:$00         ; write byte → ESP32 sees /SLOT active + data on D[7:0]
-  
-ESP32 detects:
-  /SLOT1 goes LOW + /WR goes LOW → latch D[7:0] → send over USB to PC
-
-PC sends keystroke:
-  ESP32 receives byte over USB
-  ESP32 waits for CPU to read:
-    CPU does: LB pg:$00 → ESP32 drives D[7:0] with received byte
-
-Flow:
-  PC terminal ←USB→ ESP32 ←slot I/O→ CPU
-```
-
-### I/O Register Map (at slot page $F0):
-
-| Offset | R/W | Function |
-|:------:|:---:|----------|
-| $00 | R | RX data (read byte from PC) |
-| $00 | W | TX data (send byte to PC) |
-| $01 | R | Status: bit0=rx_ready, bit1=tx_busy |
-
----
-
-## RV808 Note
-
-RV808 ROM is wired directly to PC (internal, not on bus). For ROM programming:
-- **Option A**: Add 6-pin ROM header on RV808 CPU board (A8-A14 exposed)
-- **Option B**: Program ROM off-board with TL866 before inserting
-- **Terminal mode works fine** — uses slot on the 40-pin bus, same as RV8
-
----
-
-## Voltage Level Shifting (CRITICAL)
-
-ESP32 is **3.3V**. The RV8-Bus is **5V** (74HC logic). Direct connection will damage the ESP32.
-
-**Solution**: TXS0108E bidirectional level shifter modules (8-channel, ~$1 each):
-
-```
-ESP32 (3.3V) ←→ [TXS0108E ×3] ←→ 40-pin bus (5V)
-                 level shifters
-```
-
-| Module | Channels | Signals |
-|:------:|:--------:|---------|
-| TXS0108E #1 | 8 | D[7:0] — bidirectional |
-| TXS0108E #2 | 8 | A[7:0] — output (PROG mode) |
-| TXS0108E #3 | 4+ | /RST, /WR, /RD, /SLOT1, SYNC |
-
-Wire: TXS0108E VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 ---
 
 ## Parts List
 
-### Main Board
-
-| Part | Qty | Package | Notes |
-|------|:---:|:-------:|-------|
-| ESP32 ESP32-WROOM-32 | 1 | Module | Main controller |
-| TXS0108E module (8-ch) | 3 | Module | Level shifters |
-| 40-pin IDC socket | 1 | 40DIP | RV8-Bus connection |
-| 74HC595 | 2 | 16DIP | Shift register A0-A14 (daisy-chain) |✅ |
-
-### Switches & Connectors
-
-| Part | Qty | Package | Notes |
-|------|:---:|:-------:|-------|
-| SPDT toggle switch | 1 | - | PROG/RUN selector |✅ |
-| 10kΩ resistor | 1 | 1/4W | Pull-up for GPIO 0 |
-| Pin header 2.54mm | 20 | - | General connections |
-
-### Passive Components
-
 | Part | Qty | Notes |
 |------|:---:|-------|
-| 100nF capacitor | 6 | Bypass caps for TXS0108E |
-| 10µF capacitor | 2 | Power filtering |
-
-### Cable
-
-| Part | Qty | Notes |
-|------|:---:|-------|
-| 40-pin IDC ribbon cable | 1m | Connect to CPU board |
-| USB cable (A to micro-B) | 1 | PC to ESP32 |
-
-### Total Cost Estimate
-
-| Category | Est. Cost |
-|----------|----------:|
-| ESP32-WROOM-32 | ~$4 |
-| TXS0108E ×2 | ~$2 |
-| IDC cable + socket | ~$2 |
-| 74HC595 | ~$0.30 |
-| Switch + passives | ~$1 |
-| **Total** | **~$10** |
-
-### Where to Buy
-
-| Part | Source | Notes |
-|------|--------|-------|
-| ESP32 ESP32-WROOM-32 | AliExpress, LCSC | ~$4 |
-| TXS0108E modules | AliExpress, eBay | ~$1 each |
-| 40-pin IDC cable | AliExpress | ~$1 |
-| 74HC595 | LCSC, AliExpress | ~$0.20 |
+| ESP32-WROOM-32 | 1 | Main controller |
+| TXS0108E module (8-ch) | 2 | Level shifters (control + data) |
+| 74HC595 | 2 | Shift register (address A0-A14) |
+| 28-pin ZIF socket | 1 | ROM socket (easy insert/remove) |
+| 100nF capacitor | 4 | Bypass caps |
+| USB cable (micro-B) | 1 | PC to ESP32 |
 
 ---
 
@@ -278,11 +181,14 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 
 ## Compatibility
 
-| CPU Board | PROG (flash ROM) | RUN (terminal) |
-|-----------|:-:|:-:|
-| RV8 (26 chips) | ✅ Full address on bus | ✅ Via slot |
-| RV801 (8-9 chips) | ✅ Same bus as RV8 | ✅ Via slot |
-| RV808 (23 chips) | ⚠️ Need ROM header or off-board | ✅ Via slot |
+Works with any board using AT28C256 (28-pin DIP, 32KB):
+
+| CPU Board | Flash ROM |
+|-----------|:---------:|
+| RV8-GR (33 chips) | ✅ |
+| RV8 (27 chips) | ✅ |
+| RV8-R (18 chips) | ✅ |
+| Any AT28C256 project | ✅ |
 
 ---
 
