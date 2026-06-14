@@ -24,23 +24,25 @@ The program uses a `VirtualESP32` class to define pin mappings. Pin assignment i
 
 class VirtualESP32:
     """Virtual ESP32 board with configurable pin assignments."""
-    NAME = "RV8 Terminal ESP32"
+    NAME = "RV8 Programmer ESP32"
 
     # Serial port settings
     BAUD_RATE = 115200
-    TIMEOUT = 0.1  # Short timeout for terminal mode
+    TIMEOUT = 5  # seconds
 
-    # Data bus D[7:0] — bidirectional
-    DATA_PINS = [32, 33, 25, 26, 27, 14, 12, 13]  # D0-D7
+    # Data bus D[7:0] — bidirectional (via TXS0108E #2)
+    DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Control signals
+    # Address via 74HC595 x2 shift register (via TXS0108E #1)
+    SR_DATA_PIN = 23   # SER
+    SR_CLK_PIN = 18    # SRCLK
+    SR_LATCH_PIN = 19  # RCLK
+
+    # Control signals (via TXS0108E #1)
+    PIN_nCE = 4        # /CE to ROM (active low)
+    PIN_nOE = 16       # /OE to ROM (active low)
+    PIN_nWE = 17       # /WE to ROM (active low)
     PIN_nRST = 0       # /RST to CPU (active low)
-
-    # Input-only pins
-    PIN_nSLOT = 34     # /SLOT1 (slot detection)
-    PIN_nRD = 35       # /RD (read cycle)
-    PIN_nWR = 36       # /WR (write cycle)
-    PIN_MODE = 39      # PROG/RUN switch
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -50,8 +52,7 @@ ESP32 = VirtualESP32()
 
 | Board Variant | Data Pins | Notes |
 |---------------|-----------|-------|
-| NodeMCU-32S | 32,33,25,26,27,14,12,13 | Default |
-| DevKit V1 | 23,19,5,17,16,25,26,27 | Alternate pinout |
+| Default | 13,12,14,27,26,25,33,32 | TXS0108E |
 
 To use a different board, edit the `VirtualESP32` class values at the top of the program.
 

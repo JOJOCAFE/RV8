@@ -30,26 +30,19 @@ class VirtualESP32:
     BAUD_RATE = 115200
     TIMEOUT = 5  # seconds
 
-    # Data bus D[7:0] — bidirectional
-    DATA_PINS = [32, 33, 25, 26, 27, 14, 12, 13]  # D0-D7
+    # Data bus D[7:0] — bidirectional (via TXS0108E #2)
+    DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Address bus A[7:0] — directly driven
-    ADDR_LOW_PINS = [15, 2, 4, 16, 17, 5, 18, 19]  # A0-A7
-
-    # Shift register (74HC595) for A[14:8]
+    # Address via 74HC595 x2 shift register (via TXS0108E #1)
     SR_DATA_PIN = 23   # SER
-    SR_clk_PIN = 18    # SRCLK
-    SR_LATCH_PIN = 5   # RCLK
+    SR_CLK_PIN = 18    # SRCLK
+    SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals
-    PIN_nWE = 21       # /WE to ROM (active low)
+    # Control signals (via TXS0108E #1)
+    PIN_nCE = 4        # /CE to ROM (active low)
+    PIN_nOE = 16       # /OE to ROM (active low)
+    PIN_nWE = 17       # /WE to ROM (active low)
     PIN_nRST = 0       # /RST to CPU (active low)
-
-    # Input-only pins
-    PIN_nSLOT = 34     # /SLOT1 (slot detection)
-    PIN_nRD = 35       # /RD (read cycle)
-    PIN_nWR = 36       # /WR (write cycle)
-    PIN_MODE = 39      # PROG/RUN switch
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -59,8 +52,8 @@ ESP32 = VirtualESP32()
 
 | Board Variant | D[7:0] | A[7:0] | Notes |
 |---------------|--------|--------|-------|
-| NodeMCU-32S | 32,33,25,26,27,14,12,13 | 15,2,4,16,17,5,18,19 | Default |
-| DevKit V1 | 23,19,5,17,16,25,26,27 | 15,2,4,13,12,14,18,19 | Alternate pinout |
+| Default | 13,12,14,27,26,25,33,32 | via 74HC595 x2 | TXS0108E |
+| Custom | Edit pins | Edit pins | Your wiring |
 
 To use a different board, edit the `VirtualESP32` class values at the top of the program.
 
