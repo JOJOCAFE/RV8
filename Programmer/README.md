@@ -198,13 +198,13 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 | ESP32 NodeMCU-32S | 1 | Module | Main controller |
 | TXB0108 module (8-ch) | 3 | Module | Level shifters |
 | 40-pin IDC socket | 1 | 40DIP | RV8-Bus connection |
-| 74HC595 | 1 | 16DIP | Shift register for A8-A14 |
+| 74HC595 | 1 | 16DIP | Shift register for A8-A14 |✅ |
 
 ### Switches & Connectors
 
 | Part | Qty | Package | Notes |
 |------|:---:|:-------:|-------|
-| SPDT toggle switch | 1 | - | PROG/RUN selector |
+| SPDT toggle switch | 1 | - | PROG/RUN selector |✅ |
 | 10kΩ resistor | 1 | 1/4W | Pull-up for GPIO 0 |
 | Pin header 2.54mm | 20 | - | General connections |
 

@@ -38,7 +38,7 @@ class VirtualESP32:
     TIMEOUT = 0.1  # Short timeout for terminal mode
 
     # Data bus D[7:0] — bidirectional
-    DATA_PINS = [32, 33, 25, 26, 27, 14, 12, 13]  # D0-D7
+    DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
     # Control signals
     PIN_nRST = 0       # /RST to CPU (active low)

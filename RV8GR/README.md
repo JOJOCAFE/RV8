@@ -45,20 +45,20 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 | Part | Qty | Package | Notes |
 |------|:---:|:-------:|-------|
-| 74HC161 | 4 | 16DIP | PC counter |
-| 74HC574 | 5 | 20DIP | IR, AC, PG, DP |
-| 74HC245 | 1 | 20DIP | Bus buffer |
-| 74HC164 | 1 | 14DIP | Ring counter |
-| 74HC283 | 2 | 16DIP | Adder |
-| 74HC86 | 3 | 14DIP | XOR |
-| 74HC541 | 1 | 20DIP | AC buffer |
-| 74HC157 | 8 | 16DIP | Muxes |
-| 74HC74 | 2 | 14DIP | Z flag, IRQ |
-| 74HC688 | 1 | 20DIP | Zero detect |
-| 74HC04 | 1 | 14DIP | Inverters |
-| 74HC32 | 1 | 14DIP | OR gates |
-| 74HC00 | 2 | 14DIP | NAND gates |
-| 74HC21 | 1 | 14DIP | SETDP decode |
+| 74HC161 | 4 | 16DIP | PC counter |✅ |
+| 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ | มี 6 ตัว
+| 74HC245 | 1 | 20DIP | Bus buffer |✅ | มี 3 ตัว
+| 74HC164 | 1 | 14DIP | Ring counter |✅ |
+| 74HC283 | 2 | 16DIP | Adder | waiting
+| 74HC86 | 3 | 14DIP | XOR |✅ |✅ |
+| 74HC541 | 1 | 20DIP | AC buffer |✅ |
+| 74HC157 | 8 | 16DIP | Muxes | waiting
+| 74HC74 | 2 | 14DIP | Z flag, IRQ |✅ |
+| 74HC688 | 1 | 20DIP | Zero detect |✅ |
+| 74HC04 | 1 | 14DIP | Inverters |✅ |
+| 74HC32 | 1 | 14DIP | OR gates |✅ |
+| 74HC00 | 2 | 14DIP | NAND gates |✅ |
+| 74HC21 | 1 | 14DIP | SETDP decode | ✅ |มี 2 ตัว
 
 ### Memory
 

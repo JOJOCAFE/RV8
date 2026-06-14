@@ -10,19 +10,18 @@
 
 // --- Pin Definitions ---
 
-// Data bus D[7:0] — bidirectional, via TXB0108 level shifters
-const int DATA_PINS[8] = {32, 33, 25, 26, 27, 14, 12, 13};
+// Data bus D[7:0] — bidirectional, via TXS0108E #2
+const int DATA_PINS[8] = {13, 12, 14, 27, 26, 25, 33, 32};
 
-// Address bus A[7:0] — directly driven in PROG mode (matches schematic)
-const int ADDR_PINS[8] = {15, 2, 4, 16, 17, 5, 18, 19};
+// Address via 74HC595 ×2 shift register (daisy-chain, via TXS0108E #1)
+#define PIN_SR_DATA  23  // SER (pin 14 on 595 #1) → ESP32 GPIO23
+#define PIN_SR_CLK   18  // SRCLK (pin 11 on both 595) → ESP32 GPIO18
+#define PIN_SR_LATCH 19  // RCLK (pin 12 on both 595) → ESP32 GPIO19
 
-// 74HC595 shift register for A[14:8] (matches schematic)
-#define PIN_SR_DATA  23  // SER (pin 14 on 595) → ESP32 GPIO23
-#define PIN_SR_CLK   18  // SRCLK (pin 11 on 595) → ESP32 GPIO18
-#define PIN_SR_LATCH 5   // RCLK (pin 12 on 595) → ESP32 GPIO5
-
-// Control signals (matches schematic)
-#define PIN_nWE   21  // /WE to ROM — active low, direct to ROM in PROG mode
+// Control signals (via TXS0108E #1)
+#define PIN_nCE   4   // /CE to ROM — active low
+#define PIN_nOE   16  // /OE to ROM — active low
+#define PIN_nWE   17  // /WE to ROM — active low, write pulse
 #define PIN_nRST  0   // /RST to CPU — active low, via TXB0108 to bus pin 28
 
 // Input-only pins (GPIO 34-39)

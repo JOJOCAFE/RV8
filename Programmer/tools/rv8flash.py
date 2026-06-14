@@ -38,19 +38,18 @@ class VirtualESP32:
     BAUD_RATE = 115200
     TIMEOUT = 5  # seconds
 
-    # Data bus D[7:0] — bidirectional
-    DATA_PINS = [32, 33, 25, 26, 27, 14, 12, 13]  # D0-D7
+    # Data bus D[7:0] — bidirectional (via TXS0108E #2)
+    DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Address bus A[7:0] — directly driven
-    ADDR_LOW_PINS = [15, 2, 4, 16, 17, 5, 18, 19]  # A0-A7
-
-    # Shift register (74HC595) for A[14:8]
+    # Address shift register (74HC595 ×2, via TXS0108E #1)
     SR_DATA_PIN = 23   # SER
     SR_CLK_PIN = 18    # SRCLK
-    SR_LATCH_PIN = 5   # RCLK
+    SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals
-    PIN_nWE = 21       # /WE to ROM (active low)
+    # Control signals (via TXS0108E #1)
+    PIN_nCE = 4        # /CE to ROM (active low)
+    PIN_nOE = 16       # /OE to ROM (active low)
+    PIN_nWE = 17       # /WE to ROM (active low)
     PIN_nRST = 0       # /RST to CPU (active low)
 
     # Input-only pins
