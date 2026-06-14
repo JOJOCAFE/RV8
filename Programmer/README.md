@@ -32,14 +32,14 @@ One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole bo
 
 | ESP32 GPIO | Bus Pin | Signal |
 |:----------:|:-------:|--------|
-| GPIO 32 | 29 | D0 |
-| GPIO 33 | 30 | D1 |
-| GPIO 25 | 31 | D2 |
-| GPIO 26 | 32 | D3 |
-| GPIO 27 | 33 | D4 |
-| GPIO 14 | 34 | D5 |
-| GPIO 12 | 35 | D6 |
-| GPIO 13 | 36 | D7 |
+| GPIO 13 | — | D0 |
+| GPIO 12 | — | D1 |
+| GPIO 14 | — | D2 |
+| GPIO 27 | — | D3 |
+| GPIO 26 | — | D4 |
+| GPIO 25 | — | D5 |
+| GPIO 33 | — | D6 |
+| GPIO 32 | — | D7 |
 
 ### Address Bus (A[15:0]) — output, PROG mode only (RV8/RV801)
 
@@ -53,7 +53,7 @@ One ESP32-WROOM-32 module + 40-pin IDC connector + 1 switch. That's the whole bo
 | GPIO 5 | 26 | A5 |
 | GPIO 18 | 27 | A6 |
 | GPIO 19 | 28 | A7 |
-| GPIO 21 | — | A8 (directly to ROM via bus extension) |
+| — | — | (A8-A14 via 74HC595 shift register) |
 | GPIO 22 | — | A9 |
 | GPIO 23 | — | A10 |
 | GPIO 34* | — | A11 |
@@ -86,7 +86,7 @@ This uses only 3 ESP32 pins for the upper 7 address bits. Total GPIO: 8 (data) +
 |:----------:|:-----------:|----------|
 | GPIO 23 | 14 (SER) | Serial data |
 | GPIO 18 | 11 (SRCLK) | Shift clock |
-| GPIO 5 | 12 (RCLK) | Latch output |
+| GPIO 19 | 12 (RCLK) | Latch output |
 
 74HC595 Q0-Q6 → ROM A8-A14 (directly, or via bus if RV8 has full address on bus)
 
@@ -172,20 +172,20 @@ RV808 ROM is wired directly to PC (internal, not on bus). For ROM programming:
 
 ESP32 is **3.3V**. The RV8-Bus is **5V** (74HC logic). Direct connection will damage the ESP32.
 
-**Solution**: TXB0108 bidirectional level shifter modules (8-channel, ~$1 each):
+**Solution**: TXS0108E bidirectional level shifter modules (8-channel, ~$1 each):
 
 ```
-ESP32 (3.3V) ←→ [TXB0108 ×3] ←→ 40-pin bus (5V)
+ESP32 (3.3V) ←→ [TXS0108E ×3] ←→ 40-pin bus (5V)
                  level shifters
 ```
 
 | Module | Channels | Signals |
 |:------:|:--------:|---------|
-| TXB0108 #1 | 8 | D[7:0] — bidirectional |
-| TXB0108 #2 | 8 | A[7:0] — output (PROG mode) |
-| TXB0108 #3 | 4+ | /RST, /WR, /RD, /SLOT1, SYNC |
+| TXS0108E #1 | 8 | D[7:0] — bidirectional |
+| TXS0108E #2 | 8 | A[7:0] — output (PROG mode) |
+| TXS0108E #3 | 4+ | /RST, /WR, /RD, /SLOT1, SYNC |
 
-Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
+Wire: TXS0108E VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 ---
 
@@ -196,9 +196,9 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 | Part | Qty | Package | Notes |
 |------|:---:|:-------:|-------|
 | ESP32 ESP32-WROOM-32 | 1 | Module | Main controller |
-| TXB0108 module (8-ch) | 3 | Module | Level shifters |
+| TXS0108E module (8-ch) | 3 | Module | Level shifters |
 | 40-pin IDC socket | 1 | 40DIP | RV8-Bus connection |
-| 74HC595 | 1 | 16DIP | Shift register for A8-A14 |✅ |
+| 74HC595 | 2 | 16DIP | Shift register A0-A14 (daisy-chain) |✅ |
 
 ### Switches & Connectors
 
@@ -212,7 +212,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| 100nF capacitor | 6 | Bypass caps for TXB0108 |
+| 100nF capacitor | 6 | Bypass caps for TXS0108E |
 | 10µF capacitor | 2 | Power filtering |
 
 ### Cable
@@ -227,7 +227,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 | Category | Est. Cost |
 |----------|----------:|
 | ESP32-WROOM-32 | ~$4 |
-| TXB0108 ×3 | ~$3 |
+| TXS0108E ×2 | ~$2 |
 | IDC cable + socket | ~$2 |
 | 74HC595 | ~$0.30 |
 | Switch + passives | ~$1 |
@@ -238,7 +238,7 @@ Wire: TXB0108 VA = 3.3V (ESP32 side), VB = 5V (bus side), GND shared.
 | Part | Source | Notes |
 |------|--------|-------|
 | ESP32 ESP32-WROOM-32 | AliExpress, LCSC | ~$4 |
-| TXB0108 modules | AliExpress, eBay | ~$1 each |
+| TXS0108E modules | AliExpress, eBay | ~$1 each |
 | 40-pin IDC cable | AliExpress | ~$1 |
 | 74HC595 | LCSC, AliExpress | ~$0.20 |
 
@@ -350,12 +350,12 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 | ชิ้น | ชื่อ | หน้าที่ | จำนวน | ราคาประมาณ |
 |:----:|------|---------|:-----:|:----------:|
 | 1 | ESP32-WROOM-32 (30 ขา) | สมองของบอร์ด — ต่อ USB กับคอม, ควบคุมทุกอย่าง | 1 | ~฿140 |
-| 2 | TXB0108 (โมดูล 8 ช่อง) | แปลงไฟ 3.3V↔5V ให้ ESP32 คุยกับ CPU ได้ | 3 | ~฿105 |
+| 2 | TXS0108E (โมดูล 8 ช่อง) | แปลงไฟ 3.3V↔5V ให้ ESP32 คุยกับ CPU ได้ | 3 | ~฿105 |
 | 3 | 74HC595 (shift register) | ส่ง address สูง A8-A14 ไปหา ROM (ใช้สายแค่ 3 เส้น) | 1 | ~฿10 |
 | 4 | สาย IDC 40 พิน + หัวต่อ | เชื่อมบอร์ด Programmer กับบอร์ด CPU | 1 | ~฿70 |
 | 5 | สวิตช์ SPDT (3 ขา) | เลือก PROG หรือ RUN | 1 | ~฿15 |
 | 6 | ตัวต้านทาน 10kΩ | pull-up สำหรับ GPIO 0 (ป้องกัน boot ผิดโหมด) | 1 | ~฿1 |
-| 7 | ตัวเก็บประจุ 100nF | กรองไฟให้ TXB0108 (ติดข้าง ๆ ขา VCC) | 6 | ~฿6 |
+| 7 | ตัวเก็บประจุ 100nF | กรองไฟให้ TXS0108E (ติดข้าง ๆ ขา VCC) | 6 | ~฿6 |
 
 **รวม ~฿350** (ไม่รวมบอร์ด CPU)
 
@@ -370,17 +370,17 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 | จาก | ไป | หมายเหตุ |
 |------|-----|----------|
 | ESP32 VIN (5V จาก USB) | Bus pin 39 (VCC) | จ่ายไฟ 5V ให้บอร์ด CPU |
-| ESP32 3.3V | TXB0108 ทุกตัว ขา VCCA | ฝั่งแรงดันต่ำ |
-| Bus pin 39 (5V) | TXB0108 ทุกตัว ขา VCCB | ฝั่งแรงดันสูง |
+| ESP32 3.3V | TXS0108E ทุกตัว ขา VCCA | ฝั่งแรงดันต่ำ |
+| Bus pin 39 (5V) | TXS0108E ทุกตัว ขา VCCB | ฝั่งแรงดันสูง |
 | ESP32 3.3V | 74HC595 ขา 16 (VCC) | จ่ายไฟ shift register |
 | ESP32 GND | Bus pin 40 (GND) | กราวด์ร่วม |
-| TXB0108 ขา OE | ต่อเข้า VCCA (3.3V) | เปิดใช้งานตลอด |
+| TXS0108E ขา OE | ต่อเข้า VCCA (3.3V) | เปิดใช้งานตลอด |
 
-> ⚡ ติด C 100nF ข้างขา VCCA และ VCCB ของ TXB0108 ทุกตัว (6 ตัว)
+> ⚡ ติด C 100nF ข้างขา VCCA และ VCCB ของ TXS0108E ทุกตัว (6 ตัว)
 
 #### ขั้นที่ 2 — Data Bus (D0-D7)
 
-| ESP32 GPIO | → TXB0108 #1 ช่อง | → Bus Pin | สัญญาณ |
+| ESP32 GPIO | → TXS0108E #1 ช่อง | → Bus Pin | สัญญาณ |
 |:----------:|:-----------------:|:---------:|--------|
 | 32 | A1/B1 | 17 | D0 |
 | 33 | A2/B2 | 18 | D1 |
@@ -393,7 +393,7 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 
 #### ขั้นที่ 3 — Address Bus ต่ำ (A0-A7)
 
-| ESP32 GPIO | → TXB0108 #2 ช่อง | → Bus Pin | สัญญาณ |
+| ESP32 GPIO | → TXS0108E #2 ช่อง | → Bus Pin | สัญญาณ |
 |:----------:|:-----------------:|:---------:|--------|
 | 15 | A1/B1 | 1 | A0 |
 | 2 | A2/B2 | 2 | A1 |
@@ -415,19 +415,19 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 | 13 (/OE) | ต่อเข้า GND | เปิด output ตลอด |
 | 16 (VCC) | 3.3V | ไฟเลี้ยง |
 | 8 (GND) | GND | กราวด์ |
-| 15 (Q0) | TXB0108 #3 A1 → Bus pin 9 | A8 |
-| 1 (Q1) | TXB0108 #3 A2 → Bus pin 10 | A9 |
-| 2 (Q2) | TXB0108 #3 A3 → Bus pin 11 | A10 |
-| 3 (Q3) | TXB0108 #3 A4 → Bus pin 12 | A11 |
-| 4 (Q4) | TXB0108 #3 A5 → Bus pin 13 | A12 |
-| 5 (Q5) | TXB0108 #3 A6 → Bus pin 14 | A13 |
-| 6 (Q6) | TXB0108 #3 A7 → Bus pin 15 | A14 |
+| 15 (Q0) | TXS0108E #3 A1 → Bus pin 9 | A8 |
+| 1 (Q1) | TXS0108E #3 A2 → Bus pin 10 | A9 |
+| 2 (Q2) | TXS0108E #3 A3 → Bus pin 11 | A10 |
+| 3 (Q3) | TXS0108E #3 A4 → Bus pin 12 | A11 |
+| 4 (Q4) | TXS0108E #3 A5 → Bus pin 13 | A12 |
+| 5 (Q5) | TXS0108E #3 A6 → Bus pin 14 | A13 |
+| 6 (Q6) | TXS0108E #3 A7 → Bus pin 15 | A14 |
 
 #### ขั้นที่ 5 — สัญญาณควบคุม
 
 | จาก | ไป | หน้าที่ |
 |------|-----|---------|
-| ESP32 GPIO 0 | TXB0108 #3 A8/B8 → Bus pin 28 | /RST (รีเซ็ต CPU) |
+| ESP32 GPIO 0 | TXS0108E #3 A8/B8 → Bus pin 28 | /RST (รีเซ็ต CPU) |
 | ESP32 GPIO 21 | สายตรงไปขา /WE ของ ROM | เขียน ROM (PROG mode) |
 
 #### ขั้นที่ 6 — สวิตช์ PROG/RUN
@@ -482,7 +482,7 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 |:-:|--------|----------|:-----:|
 | 1 | ไฟเข้า ESP32 | ต่อ USB → ไฟ LED บน ESP32 ติด | ☐ |
 | 2 | ไฟ 5V ถึง Bus | วัดไฟ Bus pin 39-40 ได้ ~5V | ☐ |
-| 3 | ไฟ 3.3V ถึง TXB0108 | วัดขา VCCA ได้ ~3.3V ทุกตัว | ☐ |
+| 3 | ไฟ 3.3V ถึง TXS0108E | วัดขา VCCA ได้ ~3.3V ทุกตัว | ☐ |
 | 4 | สวิตช์ทำงาน | PROG → วัด GPIO 0 ได้ 0V, RUN → ได้ 3.3V | ☐ |
 | 5 | /RST ถึง Bus | PROG → วัด Bus pin 28 ได้ ~0V, RUN → ได้ ~5V | ☐ |
 | 6 | Flash ROM | รัน rv8flash.py → ขึ้น "Done" ไม่มี error | ☐ |
