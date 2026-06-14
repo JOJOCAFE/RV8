@@ -51,7 +51,7 @@ RV8/
 ## Shared Across All
 
 - **RV8-Bus**: 40-pin system bus (A[15:0] + D[7:0] + CLK + /WR + /RD + /IRQ + /SLOT)
-- **Programmer**: ESP32 + TXB0108 (flash + terminal)
+- **Programmer**: ESP32-WROOM-32 + TXS0108E (flash + terminal)
 - **Registers**: 8 in RAM ($00-$07)
 - **RISC-V naming**: ADD, SUB, LB, SB, BEQ, J
 
