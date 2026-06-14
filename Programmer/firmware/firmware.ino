@@ -1,8 +1,10 @@
 // ============================================================
 // RV8 Programmer — ESP32-WROOM-32 Firmware
-// ROM flasher (PROG) + UART bridge (RUN) for RV8 family CPUs
-// Target: AT28C256 (32KB), 74HC595 for A[8:14]
+// Connects to CPU board via RV8-Bus (40-pin)
+// PROG mode: hold /RST, drive A[14:0]+D[7:0]+/WR to flash ROM
+// RUN mode: release bus, UART bridge via /SLOT1
 // Serial protocol: 115200 baud
+//   '?' → "Connected\n"
 //   'F' + len_hi + len_lo + data[len] → flash ROM
 //   'V' → verify (read back and send)
 //   'R' → reset CPU (pulse /RST)
@@ -10,31 +12,30 @@
 
 // --- Pin Definitions ---
 
-// Data bus D[7:0] — bidirectional, via TXS0108E #2
+// Data bus D[7:0] — bidirectional, via TXS0108E #2 → RV8-Bus pin 17-24
 const int DATA_PINS[8] = {13, 12, 14, 27, 26, 25, 33, 32};
 
-// Address via 74HC595 ×2 shift register (daisy-chain, via TXS0108E #1)
-#define PIN_SR_DATA  23  // SER (pin 14 on 595 #1) → ESP32 GPIO23
-#define PIN_SR_CLK   18  // SRCLK (pin 11 on both 595) → ESP32 GPIO18
-#define PIN_SR_LATCH 19  // RCLK (pin 12 on both 595) → ESP32 GPIO19
+// Address via 74HC595 ×2 shift register → RV8-Bus pin 1-15
+#define PIN_SR_DATA  23  // SER (pin 14 on 595 #1)
+#define PIN_SR_CLK   18  // SRCLK (pin 11 on both 595)
+#define PIN_SR_LATCH 19  // RCLK (pin 12 on both 595)
 
-// Control signals (via TXS0108E #1)
-#define PIN_nCE   4   // /CE to ROM — active low
-#define PIN_nOE   16  // /OE to ROM — active low
-#define PIN_nWE   17  // /WE to ROM — active low, write pulse
-#define PIN_nRST  0   // /RST to CPU — active low, via TXB0108 to bus pin 28
+// Control signals via TXS0108E #1 → RV8-Bus
+#define PIN_nRST  4   // → Bus pin 26 (/RST)
+#define PIN_nWR   16  // → Bus pin 27 (/WR) — write strobe
+#define PIN_nRD_O 17  // → Bus pin 28 (/RD) — read strobe (drives ROM /OE)
 
-// Input-only pins (GPIO 34-39)
-#define PIN_nSLOT 34  // /SLOT1 — goes LOW when CPU accesses I/O slot
-#define PIN_nRD   35  // /RD from CPU — LOW on read cycle
-#define PIN_nWR   36  // /WR from CPU — LOW on write cycle
+// Input-only pins (GPIO 34-39) — from RV8-Bus
+#define PIN_nSLOT 34  // ← Bus pin 30 (/SLOT1)
+#define PIN_nRD   35  // ← Bus pin 28 (/RD)
+#define PIN_nWR_S 36  // ← Bus pin 27 (/WR sense — for RUN mode)
 #define PIN_MODE  39  // PROG/RUN switch: LOW=PROG, HIGH=RUN
 
 // --- State ---
 enum Mode { MODE_PROG, MODE_RUN };
 volatile Mode currentMode;
-volatile bool rxReady = false;   // byte waiting for CPU to read
-volatile uint8_t rxByte = 0;     // byte from PC for CPU
+volatile bool rxReady = false;
+volatile uint8_t rxByte = 0;
 
 // --- Data Bus Helpers ---
 
@@ -61,61 +62,54 @@ uint8_t dataBusRead() {
 }
 
 // --- Address Helpers ---
+// Full A[14:0] via 74HC595 ×2 daisy-chain (16 bits shifted, A15=0 for ROM)
 
-void addrOutput() {
-  for (int i = 0; i < 8; i++) pinMode(ADDR_PINS[i], OUTPUT);
-}
-
-void addrRelease() {
-  for (int i = 0; i < 8; i++) pinMode(ADDR_PINS[i], INPUT);
-}
-
-// Set full 15-bit address: A[7:0] direct, A[14:8] via shift register
 void setAddress(uint16_t addr) {
-  // A[7:0] — direct GPIO (matches schematic: A0=GPIO15, A1=GPIO2, etc.)
-  for (int i = 0; i < 8; i++) {
-    digitalWrite(ADDR_PINS[i], (addr >> i) & 1);
-  }
-  // A[14:8] — shift out via 74HC595 (MSB first: Q6=A14 .. Q0=A8)
-  uint8_t hi = (addr >> 8) & 0x7F;  // 7 bits: A14..A8
-  for (int i = 6; i >= 0; i--) {
-    digitalWrite(PIN_SR_DATA, (hi >> i) & 1);
+  // Shift 16 bits MSB first: [0, A14..A8, A7..A0]
+  // A15=0 selects ROM on CPU board (ROM /CE = /A15)
+  uint16_t bits = addr & 0x7FFF;
+  for (int i = 15; i >= 0; i--) {
+    digitalWrite(PIN_SR_DATA, (bits >> i) & 1);
     digitalWrite(PIN_SR_CLK, HIGH);
     digitalWrite(PIN_SR_CLK, LOW);
   }
-  // Latch the 7 bits to outputs (single pulse on RCLK)
   digitalWrite(PIN_SR_LATCH, HIGH);
   digitalWrite(PIN_SR_LATCH, LOW);
 }
 
-// --- ROM Write (PROG mode) ---
+// --- ROM Write/Read via Bus ---
+// ROM on CPU board: /CE = /A15 (addr < 0x8000 → selected)
+// ROM /OE tied to bus /RD on CPU board
+// ROM /WE tied to bus /WR on CPU board
 
 void romWriteByte(uint16_t addr, uint8_t data) {
   setAddress(addr);
   dataBusOutput();
   dataBusWrite(data);
-  delayMicroseconds(1);  // address/data setup time
+  delayMicroseconds(1);
 
-  // Pulse /WE low (min 100ns, we'll do ~200ns)
-  digitalWrite(PIN_nWE, LOW);
-  delayMicroseconds(1);  // ~1µs pulse (well above 100ns minimum)
-  digitalWrite(PIN_nWE, HIGH);
+  // Pulse /WR low on bus → ROM sees write cycle
+  digitalWrite(PIN_nWR, LOW);
+  delayMicroseconds(1);
+  digitalWrite(PIN_nWR, HIGH);
 
-  delayMicroseconds(1);  // data hold time
+  delayMicroseconds(1);
 }
 
 uint8_t romReadByte(uint16_t addr) {
   setAddress(addr);
   dataBusInput();
-  digitalWrite(PIN_nWE, HIGH);  // ensure /WE inactive
-  delayMicroseconds(1);         // output enable time
-  return dataBusRead();
+  digitalWrite(PIN_nWR, HIGH);   // /WR inactive
+  digitalWrite(PIN_nRD_O, LOW);  // /RD active → ROM outputs data
+  delayMicroseconds(1);
+  uint8_t val = dataBusRead();
+  digitalWrite(PIN_nRD_O, HIGH); // /RD inactive
+  return val;
 }
 
 // --- Serial Protocol Handlers ---
 
 void handleFlash() {
-  // Read 2-byte length (big-endian)
   while (Serial.available() < 2) yield();
   uint16_t len = (Serial.read() << 8) | Serial.read();
 
@@ -124,12 +118,10 @@ void handleFlash() {
     return;
   }
 
-  Serial.print("K\n");  // ACK, ready to receive data
+  Serial.print("K\n");
 
-  // Hold CPU in reset, set up for programming
   digitalWrite(PIN_nRST, LOW);
-  digitalWrite(PIN_nWE, HIGH);
-  addrOutput();
+  digitalWrite(PIN_nWR, HIGH);
   delay(10);
 
   uint16_t addr = 0;
@@ -140,10 +132,9 @@ void handleFlash() {
     if (Serial.available()) {
       uint8_t b = Serial.read();
 
-      // AT28C256 page write: 64-byte pages. Insert delay at page boundary.
-      uint16_t page = addr & 0x7FC0;  // 64-byte page
+      uint16_t page = addr & 0x7FC0;
       if (page != lastPageAddr && lastPageAddr != 0xFFFF) {
-        delay(10);  // page write completion delay
+        delay(10);
       }
       lastPageAddr = page;
 
@@ -154,43 +145,38 @@ void handleFlash() {
     yield();
   }
 
-  delay(10);  // final page write completion
-  Serial.print("D\n");  // Done
+  delay(10);
+  Serial.print("D\n");
 }
 
 void handleVerify() {
-  // Read back entire ROM and send to PC for verification
   digitalWrite(PIN_nRST, LOW);
-  digitalWrite(PIN_nWE, HIGH);
-  addrOutput();
+  digitalWrite(PIN_nWR, HIGH);
   dataBusInput();
   delay(1);
 
-  // Send 32KB
   for (uint16_t addr = 0; addr < 32768; addr++) {
     Serial.write(romReadByte(addr));
-    if ((addr & 0xFF) == 0) yield();  // prevent WDT
+    if ((addr & 0xFF) == 0) yield();
   }
 }
 
 void handleReset() {
-  // Pulse /RST low for 10ms then release
   digitalWrite(PIN_nRST, LOW);
   delay(10);
   digitalWrite(PIN_nRST, HIGH);
   Serial.print("K\n");
 }
 
-// --- RUN Mode: UART Bridge ---
+// --- RUN Mode: UART Bridge via /SLOT1 ---
 
 void runModePoll() {
   // CPU WRITE: /SLOT1 LOW + /WR LOW → read D[7:0], send to PC
-  if (digitalRead(PIN_nSLOT) == LOW && digitalRead(PIN_nWR) == LOW) {
+  if (digitalRead(PIN_nSLOT) == LOW && digitalRead(PIN_nWR_S) == LOW) {
     dataBusInput();
     uint8_t b = dataBusRead();
     Serial.write(b);
-    // Wait for /WR to go back HIGH (end of write cycle)
-    while (digitalRead(PIN_nWR) == LOW) {}
+    while (digitalRead(PIN_nWR_S) == LOW) {}
   }
 
   // CPU READ: /SLOT1 LOW + /RD LOW → drive D[7:0] with buffered byte
@@ -201,11 +187,10 @@ void runModePoll() {
       rxReady = false;
     } else {
       dataBusOutput();
-      dataBusWrite(0x00);  // no data available (CPU can check status reg)
+      dataBusWrite(0x00);
     }
-    // Wait for /RD to go back HIGH
     while (digitalRead(PIN_nRD) == LOW) {}
-    dataBusInput();  // release bus
+    dataBusInput();
   }
 
   // Buffer incoming byte from PC
@@ -223,18 +208,20 @@ Mode detectMode() {
 
 void enterProgMode() {
   Serial.println("[PROG]");
-  digitalWrite(PIN_nRST, LOW);   // hold CPU in reset
-  digitalWrite(PIN_nWE, HIGH);   // /WE inactive
-  addrOutput();
+  digitalWrite(PIN_nRST, LOW);
+  digitalWrite(PIN_nWR, HIGH);
+  pinMode(PIN_nRD_O, OUTPUT);   // reclaim /RD for read operations
+  digitalWrite(PIN_nRD_O, HIGH);
   dataBusInput();
 }
 
 void enterRunMode() {
   Serial.println("[RUN]");
-  addrRelease();                  // release address bus
-  dataBusInput();                 // release data bus
-  digitalWrite(PIN_nWE, HIGH);   // /WE inactive
-  digitalWrite(PIN_nRST, HIGH);  // release CPU from reset
+  dataBusInput();
+  digitalWrite(PIN_nWR, HIGH);
+  digitalWrite(PIN_nRD_O, HIGH);
+  pinMode(PIN_nRD_O, INPUT);    // release /RD — let CPU drive it
+  digitalWrite(PIN_nRST, HIGH);
   rxReady = false;
 }
 
@@ -244,13 +231,15 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) delay(1);
 
-  // Control pins
-  pinMode(PIN_nWE, OUTPUT);
-  digitalWrite(PIN_nWE, HIGH);
+  // Control output pins
   pinMode(PIN_nRST, OUTPUT);
-  digitalWrite(PIN_nRST, LOW);  // hold reset initially
+  digitalWrite(PIN_nRST, LOW);   // hold CPU in reset
+  pinMode(PIN_nWR, OUTPUT);
+  digitalWrite(PIN_nWR, HIGH);   // /WR inactive
+  pinMode(PIN_nRD_O, OUTPUT);
+  digitalWrite(PIN_nRD_O, HIGH); // /RD inactive
 
-  // Shift register (74HC595 for A[14:8])
+  // Shift register
   pinMode(PIN_SR_DATA, OUTPUT);
   pinMode(PIN_SR_CLK, OUTPUT);
   pinMode(PIN_SR_LATCH, OUTPUT);
@@ -258,25 +247,21 @@ void setup() {
   digitalWrite(PIN_SR_CLK, LOW);
   digitalWrite(PIN_SR_LATCH, LOW);
 
-  // Input-only pins
+  // Input-only pins (from bus)
   pinMode(PIN_nSLOT, INPUT);
   pinMode(PIN_nRD, INPUT);
-  pinMode(PIN_nWR, INPUT);
+  pinMode(PIN_nWR_S, INPUT);
   pinMode(PIN_MODE, INPUT);
 
   // Detect initial mode
   currentMode = detectMode();
-  if (currentMode == MODE_PROG) {
-    enterProgMode();
-  } else {
-    enterRunMode();
-  }
+  if (currentMode == MODE_PROG) enterProgMode();
+  else enterRunMode();
 
   Serial.println("RV8 Programmer ready");
 }
 
 void loop() {
-  // Auto-detect mode switch change
   Mode m = detectMode();
   if (m != currentMode) {
     currentMode = m;
@@ -285,10 +270,10 @@ void loop() {
   }
 
   if (currentMode == MODE_PROG) {
-    // Wait for commands from PC
     if (Serial.available()) {
       char cmd = Serial.read();
       switch (cmd) {
+        case '?': Serial.print("Connected\n"); break;
         case 'F': handleFlash();  break;
         case 'V': handleVerify(); break;
         case 'R': handleReset();  break;
@@ -296,7 +281,6 @@ void loop() {
       }
     }
   } else {
-    // RUN mode: UART bridge
     runModePoll();
   }
 }

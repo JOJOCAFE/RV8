@@ -1,5 +1,46 @@
 # RV8 Project — Changelog
 
+## 2026-06-14 — v3.6: Programmer Bus-Based Redesign
+
+### Architecture Change
+- **Bus-based**: Programmer connects via RV8-Bus (40-pin), not direct to ROM
+- **No /CE /OE**: ROM chip-select handled by A15=0 on CPU board
+- **/RD added**: GPIO 17 drives bus pin 28 (ROM /OE) for reads
+- **Two scenarios**: A=bare ROM, B=full CPU board (hold /RST to free bus)
+
+### Pin Mapping (final)
+```
+Data D[0:7]:  GPIO [13, 12, 14, 27, 26, 25, 33, 32] → Bus pin 17-24
+SR_DATA:      GPIO 23 → 595 SER
+SR_CLK:       GPIO 18 → 595 SRCLK
+SR_LATCH:     GPIO 19 → 595 RCLK
+/RST:         GPIO 4  → Bus pin 26
+/WR:          GPIO 16 → Bus pin 27
+/RD:          GPIO 17 → Bus pin 28 (output in PROG, input in RUN)
+/SLOT1:       GPIO 34 ← Bus pin 30 (input, RUN mode)
+/RD sense:    GPIO 35 ← Bus pin 28 (input, RUN mode)
+/WR sense:    GPIO 36 ← Bus pin 27 (input, RUN mode)
+MODE:         GPIO 39 ← Switch (LOW=PROG, HIGH=RUN)
+```
+
+### Firmware Protocol (final)
+- `?` → `Connected\n` (new: connection check)
+- `F` + len(2B) → `K\n` (ACK), receive data, → `D\n` (done)
+- `V` → 32KB raw bytes (drives /RD for each read)
+- `R` → pulse /RST, → `K\n`
+
+### Python Tools
+- rv8flash.py: fixed double-send bug, added boot delay, port+baud display
+- rv8term.py: rewritten (follows rv8flash patterns), added `-c` check
+- Both show `Port: /dev/ttyUSB0 @ 115200 baud` + `Programmer: Connected`
+
+### Files Changed
+- firmware/firmware.ino (rewritten, 276 lines)
+- schematic.md (rewritten for bus-based design)
+- README.md (scenarios, bus overview, updated pinout)
+- tools/rv8flash.py, rv8term.py, rv8ram-boot.py (pin updates)
+- All 4 requirement .md files updated
+
 ## 2026-06-14 — v3.5: Programmer Schematic Update
 
 ### Hardware Change

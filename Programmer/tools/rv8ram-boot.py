@@ -39,9 +39,10 @@ class VirtualESP32:
     # Data bus D[7:0] — bidirectional (via TXS0108E #2)
     DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Control signals (via TXS0108E #1)
-    PIN_nWE = 17       # /WE to ROM (active low)
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD)
 
 # Create global board instance
 ESP32 = VirtualESP32()

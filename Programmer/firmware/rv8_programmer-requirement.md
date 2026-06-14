@@ -31,10 +31,10 @@ These are the default pins. Edit at top of sketch to change:
 #define PIN_SR_CLK    18   // SRCLK (both 595 pin 11)
 #define PIN_SR_LATCH  19   // RCLK (both 595 pin 12)
 
-// Control pins (via TXS0108E #1)
-#define PIN_nCE   4        // /CE to ROM (active low)
-#define PIN_nOE   16       // /OE to ROM (active low)
-#define PIN_nWE   17       // /WE to ROM (active low)
+// Control pins (via TXS0108E #1 → RV8-Bus)
+#define PIN_nRST  4        // → Bus pin 26 (/RST)
+#define PIN_nWR   16       // → Bus pin 27 (/WR)
+#define PIN_nRD_O 17       // → Bus pin 28 (/RD, output in PROG)
 
 // ======== BAUD RATE ========
 #define SERIAL_BAUD 115200
@@ -45,13 +45,13 @@ These are the default pins. Edit at top of sketch to change:
 
 | Function | GPIO | Via |
 |----------|:----:|-----|
-| D0-D7 | 13,12,14,27,26,25,33,32 | TXS0108E #2 |
+| D0-D7 | 13,12,14,27,26,25,33,32 | TXS0108E #2 → Bus pin 17-24 |
 | SR_DATA | 23 | TXS0108E #1 → 595 SER |
 | SR_CLK | 18 | TXS0108E #1 → 595 SRCLK |
 | SR_LATCH | 19 | TXS0108E #1 → 595 RCLK |
-| /CE | 4 | TXS0108E #1 → ROM |
-| /OE | 16 | TXS0108E #1 → ROM |
-| /WE | 17 | TXS0108E #1 → ROM |
+| /RST | 4 | TXS0108E #1 → Bus pin 26 |
+| /WR | 16 | TXS0108E #1 → Bus pin 27 |
+| /RD | 17 | TXS0108E #1 → Bus pin 28 |
 
 ---
 
@@ -59,19 +59,19 @@ These are the default pins. Edit at top of sketch to change:
 
 | Command | Action | Response |
 |---------|--------|----------|
-| `?` | Check connection | `Connected` |
-| `F` | Flash ROM | `OK` or `ERROR` |
-| `V` | Read ROM | 32768 bytes |
-| `R` | Reset CPU | `OK` |
+| `?` | Check connection | `Connected\n` |
+| `F` | Flash ROM | `K\n` (ACK), then `D\n` (done) or `E:msg\n` |
+| `V` | Read ROM | 32768 bytes raw |
+| `R` | Reset CPU | `K\n` |
 
 ### Protocol Details
 
 | PC → Programmer | Format | Programmer → PC |
 |-----------------|--------|-----------------|
 | Check | `?` | `Connected\n` |
-| Flash | `F` + `len_hi` + `len_lo` + `data` | `OK\n` (ACK), then `OK\n` or `ERROR:msg\n` |
-| Read | `V` | 32768 bytes |
-| Reset | `R` | `OK\n` |
+| Flash | `F` + `len_hi` + `len_lo`, wait `K\n`, then send `data[len]` | `K\n` (ACK), then `D\n` or `E:msg\n` |
+| Read | `V` | 32768 bytes raw |
+| Reset | `R` | `K\n` |
 
 ---
 
@@ -146,26 +146,25 @@ def calc_checksum(data):
 
 | Command | Firmware Response |
 |---------|-----------------|
-| `?` | `Connected` |
-| `F len data` | `OK`, then `OK` or `ERROR:msg` |
-| `V` | 32768 bytes |
-| `R` | `OK` |
+| `?` | `Connected\n` |
+| `F` + len(2 bytes) | `K\n` (ACK), receive data, then `D\n` |
+| `V` | 32768 bytes raw |
+| `R` | `K\n` |
+
+### rv8term.py
+
+| Command | Firmware Response |
+|---------|-----------------|
+| `?` | `Connected\n` (check before terminal mode) |
+| Terminal mode | Bidirectional byte bridge via I/O slot |
 
 ### rv8ram-boot.py (Bootloader Mode)
 
 | Command | Firmware Response |
 |---------|-----------------|
 | `B` | `R` (ready signal) |
-| `U len data` | `OK`, then `OK` or `ERROR:msg` |
+| `U len data` | `K\n`, then `D\n` or `E:msg\n` |
 | `X` | Enter terminal mode |
-
-### rv8term.py
-
-| Operation | Firmware Action |
-|-----------|-----------------|
-| PC sends byte | Forward to CPU via I/O slot |
-| CPU writes byte | Forward to PC via serial |
-| Switch to RUN | Terminal mode active |
 
 ---
 
@@ -188,11 +187,13 @@ void setup() {
         pinMode(dataPins[i], OUTPUT);
         pinMode(addrPins[i], OUTPUT);
     }
-    pinMode(PIN_nWE, OUTPUT);
+    pinMode(PIN_nWR, OUTPUT);
+    pinMode(PIN_nRD_O, OUTPUT);
     pinMode(PIN_nRST, OUTPUT);
     pinMode(PIN_MODE, INPUT_PULLUP);
 
-    digitalWrite(PIN_nWE, HIGH);  // Inactive
+    digitalWrite(PIN_nWR, HIGH);  // Inactive
+    digitalWrite(PIN_nRD_O, HIGH); // Inactive
     digitalWrite(PIN_nRST, HIGH); // Inactive
 
     // LED indicator
@@ -254,8 +255,8 @@ void flashROM() {
         // Write byte to ROM
         setAddress(addr);
         dataBusWrite(data);
-        digitalWrite(PIN_nWE, LOW);
-        digitalWrite(PIN_nWE, HIGH);
+        digitalWrite(PIN_nWR, LOW);
+        digitalWrite(PIN_nWR, HIGH);
 
         delay(10);  // Write time
         addr++;

@@ -38,11 +38,10 @@ class VirtualESP32:
     SR_CLK_PIN = 18    # SRCLK
     SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals (via TXS0108E #1)
-    PIN_nCE = 4        # /CE to ROM (active low)
-    PIN_nOE = 16       # /OE to ROM (active low)
-    PIN_nWE = 17       # /WE to ROM (active low)
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD, output in PROG mode)
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -70,13 +69,13 @@ class Options:
         self.port_name = None
         self.help = False
         self.port_list = False
+        self.check = False      # -c: check connection and exit
         self.baud = 115200     # -b, --baud
         self.no_echo = False    # --no-echo
         self.debug = False       # -d: show serial traffic
         self.auto_port = True   # use port 0 if not specified
         self.quiet = False     # -q: minimal output
         self.raw = False        # --raw: binary mode
-        self.baud_rate = 115200  # Alias for baud
 ```
 
 ---
@@ -88,11 +87,12 @@ class Options:
 | -h | --help | none | Show help |
 | -pl | --portlist | none | List available ports |
 | -p | --port | N | Port index (0, 1, ...) |
+| -c | --check | none | Check connection and exit |
 | -b | --baud | N | Baud rate (default: 115200) |
 | -d | --debug | none | Show serial traffic |
 | -t | --timeout | N | Timeout in seconds (default: 0.1) |
-| --no-echo | none | Disable local echo |
-| --raw | none | Binary mode (no CR/LF translation) |
+| --no-echo | | none | Disable local echo |
+| --raw | | none | Binary mode (no CR/LF translation) |
 | -q | --quiet | none | Minimal output |
 
 ---
@@ -128,11 +128,27 @@ Specify port by index number. If omitted, use port 0.
 
 ```bash
 $ python3 rv8term.py -pl
-[0] ttyUSB0
+[0] /dev/ttyUSB0
 
 $ python3 rv8term.py -p 0
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 hello from RV8!
+```
+
+### -c, --check
+Check if programmer is connected and exit.
+
+```bash
+$ python3 rv8term.py -c
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
+
+$ python3 rv8term.py -c
+Port: /dev/ttyUSB0 @ 115200 baud
+Error: Programmer not responding
 ```
 
 | Index | Linux/WSL | Windows | macOS |
@@ -233,12 +249,16 @@ hello from RV8!
 
 ```
 $ python3 rv8term.py -p 0
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 hello from RV8!     <-- CPU output
 A                   <-- You type 'A', sent to CPU
 B                   <-- You type 'B'
 goodbye             <-- CPU output
 ^C                  <-- Ctrl+C to exit
+Exiting...
 ```
 
 ### Bidirectional Flow
@@ -296,16 +316,26 @@ goodbye             <-- CPU output
 **Linux/WSL**:
 ```bash
 $ python3 rv8term.py -pl
-[0] ttyUSB0
-[1] ttyUSB1
+[0] /dev/ttyUSB0
+[1] /dev/ttyUSB1
+
+$ python3 rv8term.py -c
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 
 $ python3 rv8term.py -p 0
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 RV8 BASIC 1.0
 > 
 
 $ python3 rv8term.py -p 0 -d
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 [DEBUG] RX: 52 56 38 20 42 41 53 49 43 20 31 2E 30 0D 0A
 RV8 BASIC 1.0
 >
@@ -313,8 +343,15 @@ RV8 BASIC 1.0
 
 **Windows**:
 ```cmd
+> python rv8term.py -c
+Port: COM3 @ 115200 baud
+Programmer: Connected
+
 > python rv8term.py -p 0
+Port: COM3 @ 115200 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 RV8 BASIC 1.0
 >
 ```
@@ -322,13 +359,21 @@ RV8 BASIC 1.0
 **Custom baud rate**:
 ```bash
 $ python3 rv8term.py -p 0 -b 9600
+Port: /dev/ttyUSB0 @ 9600 baud
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 ```
 
 **Debug mode**:
 ```bash
 $ python3 rv8term.py -p 0 -d
+Port: /dev/ttyUSB0 @ 115200 baud
+[DEBUG] TX: 3F (?)
+[DEBUG] RX: Connected
+Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
+---
 [DEBUG] RX: 52 56 38 20
 RV8
 ```
@@ -359,12 +404,15 @@ python3 rv8term.py -p 0
 
 - [x] VirtualESP32 class at top
 - [x] Options class for CLI parsing
-- [x] All options: -h, -pl, -p, -b, -t, -d, --no-echo, --raw, -q
+- [x] All options: -h, -pl, -p, -c, -b, -t, -d, --no-echo, --raw, -q
+- [x] Connection check before terminal (same as rv8flash.py)
+- [x] Port + baud display on connect
 - [x] Terminal handler (bidirectional PC↔CPU)
 - [x] Keyboard input (non-blocking)
 - [x] Screen output
 - [x] Ctrl+C detection
-- [x] rv8term.py implementation (289 lines)
+- [x] Boot delay + buffer drain (ESP32 resets on DTR)
+- [x] rv8term.py implementation
 - [x] test_rv8term.py tests (15/15 passing)
 
 ### Test Results

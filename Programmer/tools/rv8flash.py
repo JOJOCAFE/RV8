@@ -38,24 +38,23 @@ class VirtualESP32:
     BAUD_RATE = 115200
     TIMEOUT = 5  # seconds
 
-    # Data bus D[7:0] — bidirectional (via TXS0108E #2)
+    # Data bus D[7:0] — bidirectional (via TXS0108E #2 → RV8-Bus pin 17-24)
     DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Address shift register (74HC595 ×2, via TXS0108E #1)
+    # Address shift register (74HC595 ×2, via TXS0108E #1 → RV8-Bus pin 1-15)
     SR_DATA_PIN = 23   # SER
     SR_CLK_PIN = 18    # SRCLK
     SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals (via TXS0108E #1)
-    PIN_nCE = 4        # /CE to ROM (active low)
-    PIN_nOE = 16       # /OE to ROM (active low)
-    PIN_nWE = 17       # /WE to ROM (active low)
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD, output in PROG mode)
 
-    # Input-only pins
-    PIN_nSLOT = 34     # /SLOT1 (slot detection)
-    PIN_nRD = 35       # /RD (read cycle)
-    PIN_nWR = 36       # /WR (write cycle)
+    # Input-only pins (from RV8-Bus)
+    PIN_nSLOT = 34     # ← Bus pin 30 (/SLOT1)
+    PIN_nRD = 35       # ← Bus pin 28 (/RD sense)
+    PIN_nWR_S = 36     # ← Bus pin 27 (/WR sense)
     PIN_MODE = 39      # PROG/RUN switch
 
 # Create global board instance
@@ -186,7 +185,10 @@ class SerialPort:
         self.ser = None
 
     def __enter__(self):
+        import time
         self.ser = serial.Serial(self.port, self.baud, timeout=self.timeout)
+        time.sleep(2)            # ESP32 resets on DTR — wait for boot
+        self.ser.reset_input_buffer()  # discard boot messages
         return self
 
     def __exit__(self, *args):
@@ -241,18 +243,18 @@ def cmd_flash(port: SerialPort, data: bytes, retry: int = 3, debug: bool = False
     length = len(data)
 
     for attempt in range(retry):
-        # Send flash command with length
-        cmd = b'F' + bytes([(length >> 8) & 0xFF, length & 0xFF]) + data
-        port.write(cmd)
+        # Send flash command with length (NOT data yet)
+        header = b'F' + bytes([(length >> 8) & 0xFF, length & 0xFF])
+        port.write(header)
         if debug:
-            print(f"[DEBUG] TX: {hex_dump(cmd[:3])} + {len(data)} bytes")
+            print(f"[DEBUG] TX: {hex_dump(header)}")
 
         # Wait for ACK
         response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
         if debug:
             print(f"[DEBUG] RX: {response}")
 
-        if response == "K" or response == "OK":
+        if response == "K":
             break
         elif attempt < retry - 1:
             if not quiet:
@@ -260,11 +262,10 @@ def cmd_flash(port: SerialPort, data: bytes, retry: int = 3, debug: bool = False
             continue
         else:
             if not quiet:
-                print(f"Error: Flash failed")
+                print(f"Error: Flash failed ({response})")
             return False
 
-    # Send data
-    # For large data, send in chunks
+    # Send data in chunks
     chunk_size = 256
     addr = 0
     total = len(data)
@@ -278,15 +279,17 @@ def cmd_flash(port: SerialPort, data: bytes, retry: int = 3, debug: bool = False
             print(f"[DEBUG] TX: {hex_dump(chunk[:8])}... ({len(chunk)} bytes)")
 
         # Progress
-        print(f"\r{progress_bar(addr, total, quiet=quiet)}", end='', flush=True)
+        if not quiet:
+            print(f"\r{progress_bar(addr, total, quiet=quiet)}", end='', flush=True)
 
     # Wait for completion
     response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
     if debug:
         print(f"\n[DEBUG] RX: {response}")
 
-    print()  # New line after progress
-    return response == "D" or response == "Done" or response == "OK"
+    if not quiet:
+        print()  # New line after progress
+    return response == "D"
 
 
 def cmd_read(port: SerialPort, size: int = 32768, debug: bool = False) -> bytes:
@@ -436,11 +439,13 @@ def rv8flash(opts: Options) -> int:
         with SerialPort(port_name) as port:
             # Check connection
             if not opts.port_list:
-                if opts.debug:
-                    print(f"Using port: {port_name}")
+                if not opts.quiet:
+                    print(f"Port: {port_name} @ {ESP32.BAUD_RATE} baud")
                 if not cmd_check(port, opts.debug):
                     print("Error: Programmer not responding")
                     return 1
+                if not opts.quiet:
+                    print("Programmer: Connected")
 
             # Check
             if opts.check:

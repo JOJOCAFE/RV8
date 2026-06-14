@@ -1,48 +1,52 @@
 # Programmer Board — ESP32-WROOM-32
 
-**Purpose**: Flash AT28C256 ROM for all RV8 family CPUs
-**Connection**: ESP32 ←USB→ PC, ROM inserted in ZIF socket
+**Purpose**: Flash AT28C256 ROM via RV8-Bus for all RV8 family CPUs
+**Connection**: ESP32 ←USB→ PC ←ribbon→ RV8-Bus (40-pin) on target board
 
 ---
 
 ## Overview
 
 ```
-PC ←──USB──→ [ESP32-WROOM-32] ←→ [TXS0108E ×2] ←→ [74HC595 ×2] ←→ [AT28C256 ROM]
+PC ←──USB──→ [ESP32-WROOM-32] ←→ [TXS0108E ×2] ←→ [74HC595 ×2] ──→ RV8-Bus (40-pin)
+                                                                         │
+                                                                    CPU Board
+                                                                  (ROM + RAM on board)
 ```
 
-Standalone ROM programmer. Insert ROM chip, flash, put back in CPU board.
+Programmer connects to the CPU board via the shared **RV8-Bus** (40-pin).
+In PROG mode: holds /RST low, drives Address + Data + /WR to write ROM on the CPU board.
+In RUN mode: releases bus, acts as UART bridge via /SLOT1.
 
 ---
 
 ## How to Use
 
-1. Remove ROM (AT28C256) from CPU board
-2. Insert into Programmer board socket
-3. Connect ESP32 to PC via USB
+1. Connect Programmer to CPU board via 40-pin ribbon cable (RV8-Bus)
+2. Connect ESP32 to PC via USB
+3. Flip switch to PROG
 4. Flash: `python3 rv8flash.py -w program.bin`
 5. Verify: `python3 rv8flash.py -v program.bin`
-6. Remove ROM, insert back into CPU board
-7. Power on CPU → runs program
+6. Flip switch to RUN → CPU boots, use `rv8term.py` for terminal
 
 ---
 
 ## ESP32-WROOM-32 Pin Mapping
 
-### Data Bus (D[7:0]) — bidirectional, via TXS0108E #2
+### Data Bus (D[7:0]) — bidirectional, via TXS0108E #2 → RV8-Bus
 
-| ESP32 GPIO | Signal | ROM Pin |
-|:----------:|--------|:-------:|
-| GPIO 13 | D0 | I/O 0 (pin 11) |
-| GPIO 12 | D1 | I/O 1 (pin 12) |
-| GPIO 14 | D2 | I/O 2 (pin 13) |
-| GPIO 27 | D3 | I/O 3 (pin 15) |
-| GPIO 26 | D4 | I/O 4 (pin 16) |
-| GPIO 25 | D5 | I/O 5 (pin 17) |
-| GPIO 33 | D6 | I/O 6 (pin 18) |
-| GPIO 32 | D7 | I/O 7 (pin 19) |
+| ESP32 GPIO | Signal | RV8-Bus Pin |
+|:----------:|--------|:-----------:|
+| GPIO 13 | D0 | pin 17 |
+| GPIO 12 | D1 | pin 18 |
+| GPIO 14 | D2 | pin 19 |
+| GPIO 27 | D3 | pin 20 |
+| GPIO 26 | D4 | pin 21 |
+| GPIO 25 | D5 | pin 22 |
+| GPIO 33 | D6 | pin 23 |
+| GPIO 32 | D7 | pin 24 |
 
-### Address (A[14:0]) — via 74HC595 ×2 shift register, through TXS0108E #1
+### Address (A[14:0]) — via 74HC595 ×2 shift register → RV8-Bus
 
 | ESP32 GPIO | Function | 74HC595 Pin |
 |:----------:|----------|:-----------:|
@@ -50,16 +54,25 @@ Standalone ROM programmer. Insert ROM chip, flash, put back in CPU board.
 | GPIO 18 | SR_CLK (SRCLK) | Both pin 11 |
 | GPIO 19 | SR_LATCH (RCLK) | Both pin 12 |
 
-74HC595 #1 outputs Q0-Q7 → ROM A0-A7
-74HC595 #2 outputs Q0-Q6 → ROM A8-A14 (daisy-chained from #1 Q7S → #2 SER)
+74HC595 #1 outputs Q0-Q7 → RV8-Bus pin 1-8 (A0-A7)
+74HC595 #2 outputs Q0-Q6 → RV8-Bus pin 9-15 (A8-A14)
 
-### Control Signals — via TXS0108E #1
+### Control Signals — via TXS0108E #1 → RV8-Bus
 
-| ESP32 GPIO | Signal | ROM Pin |
-|:----------:|--------|:-------:|
-| GPIO 4 | /CE | pin 20 |
-| GPIO 16 | /OE | pin 22 |
-| GPIO 17 | /WE | pin 27 |
+| ESP32 GPIO | Signal | RV8-Bus Pin |
+|:----------:|--------|:-----------:|
+| GPIO 4 | /RST | pin 26 |
+| GPIO 16 | /WR | pin 27 |
+| GPIO 17 | /RD | pin 28 (output in PROG, released in RUN) |
+
+### Input Signals — from RV8-Bus (RUN mode)
+
+| ESP32 GPIO | Signal | RV8-Bus Pin |
+|:----------:|--------|:-----------:|
+| GPIO 34 | /SLOT1 | pin 30 |
+| GPIO 35 | /RD (sense) | pin 28 |
+| GPIO 36 | /WR (sense) | pin 27 |
+| GPIO 39 | MODE switch | — |
 
 ### Summary
 
@@ -67,25 +80,92 @@ Standalone ROM programmer. Insert ROM chip, flash, put back in CPU board.
 |----------|:-----------:|:-----:|
 | D[7:0] | 13,12,14,27,26,25,33,32 | 8 |
 | Shift Reg | 23,18,19 | 3 |
-| ROM Control | 4,16,17 | 3 |
-| **Total** | | **14 GPIO** |
+| Control out | 4,16,17 | 3 |
+| Bus sense | 34,35,36 | 3 |
+| Mode switch | 39 | 1 |
+| **Total** | | **18 GPIO** |
 
 ---
 
 ## PROG Mode — ROM Flash Sequence
 
 ```
-1. ESP32 sets /CE=LOW, /OE=HIGH
-2. PC sends data over USB-serial
-3. For each byte:
-   a. Shift out A[14:0] via 74HC595 (2 bytes, MSB first)
+1. ESP32 holds /RST=LOW (CPU stops, releases bus)
+2. A15=0 via shift register → ROM /CE active (address decode on CPU board)
+3. PC sends 'F' + len_hi + len_lo over USB-serial
+4. ESP32 replies 'K' (ACK), waits for data
+5. For each byte:
+   a. Shift out A[14:0] via 74HC595 ×2 (16 bits, MSB first, A15=0)
    b. Pulse RCLK to latch address
-   c. Set D[7:0] (data)
-   d. Pulse /WE LOW for 1µs
-   e. Wait for write completion (10ms delay)
-4. Verify: read back all bytes, compare
-5. ESP32 sends "OK\n" to PC
+   c. Set D[7:0] (data) on bus
+   d. Pulse /WR LOW for 1µs (bus pin 27 → ROM /WE)
+   e. Page write delay (10ms at 64-byte boundary)
+6. ESP32 sends 'D' (done) to PC
+7. Verify: PC sends 'V', ESP32 pulses /RD LOW per byte → ROM outputs data
 ```
+
+---
+
+## Usage Scenarios
+
+### Scenario A: ROM only (bare AT28C256 on breadboard)
+
+```
+[Programmer] ──ribbon──→ [Bus connector] → ROM wired to bus pins
+```
+
+| Signal | Programmer drives | ROM sees |
+|--------|-------------------|----------|
+| A[14:0] | 74HC595 → bus pin 1-15 | Address |
+| A15=0 | 74HC595 bit15 = 0 | `/CE` = LOW (selected) |
+| D[7:0] | ESP32 → bus pin 17-24 | Data in/out |
+| `/WR` | GPIO 16 → bus pin 27 | `/WE` pulse (write) |
+| `/RD` | GPIO 17 → bus pin 28 | `/OE` active (read) |
+| `/RST` | GPIO 4 → bus pin 26 | Not connected (ignored) |
+
+**Procedure:**
+```bash
+python3 rv8flash.py -w program.bin   # flash
+python3 rv8flash.py -v program.bin   # verify
+```
+
+No CPU needed. Programmer controls all ROM signals directly via bus. ✅
+
+---
+
+### Scenario B: Full CPU board (RV8-GR, RV8, RV8-R)
+
+```
+[Programmer] ──ribbon──→ [RV8-Bus] → CPU board (CPU + ROM + RAM)
+```
+
+| Signal | Programmer drives | What happens |
+|--------|-------------------|--------------|
+| `/RST` | GPIO 4 = LOW | **CPU stops**, tri-states bus |
+| A[14:0] | 74HC595 → bus | Reaches ROM through CPU board wiring |
+| A15=0 | 74HC595 bit15 = 0 | CPU board decode: ROM `/CE` = LOW |
+| D[7:0] | ESP32 → bus | Through CPU board buffer (tri-stated) to ROM |
+| `/WR` | GPIO 16 → bus pin 27 | Routed to ROM `/WE` |
+| `/RD` | GPIO 17 → bus pin 28 | Routed to ROM `/OE` |
+
+**Procedure:**
+```bash
+# PROG mode (switch to PROG)
+python3 rv8flash.py -w program.bin   # flash
+python3 rv8flash.py -v program.bin   # verify
+
+# RUN mode (switch to RUN)
+python3 rv8term.py                   # terminal bridge
+```
+
+`/RST=LOW` is critical — without it, CPU fights Programmer for the bus. ✅
+
+---
+
+### Same firmware, same commands
+
+Both scenarios use identical firmware and Python tools.
+The only difference: Scenario B needs `/RST` to stop the CPU.
 
 ---
 
@@ -99,7 +179,9 @@ Standalone ROM programmer. Insert ROM chip, flash, put back in CPU board.
 | ESP32-WROOM-32 | 1 | Main controller |
 | TXS0108E module (8-ch) | 2 | Level shifters (control + data) |
 | 74HC595 | 2 | Shift register (address A0-A14) |
-| 28-pin ZIF socket | 1 | ROM socket (easy insert/remove) |
+| 40-pin IDC connector | 1 | RV8-Bus connector |
+| 40-pin ribbon cable | 1 | Connect to CPU board |
+| SPDT switch | 1 | PROG/RUN mode select |
 | 100nF capacitor | 4 | Bypass caps |
 | USB cable (micro-B) | 1 | PC to ESP32 |
 
@@ -142,6 +224,8 @@ python3 Programmer/tools/rv8flash.py -pl
 
 # Check connection
 python3 Programmer/tools/rv8flash.py -c
+# Output: Port: /dev/ttyUSB0 @ 115200 baud
+#         Programmer: Connected
 
 # Flash ROM (PROG mode)
 python3 Programmer/tools/rv8flash.py -w program.bin          # auto port 0
@@ -158,7 +242,8 @@ python3 Programmer/tools/rv8ram-boot.py program.bin
 
 # Terminal (RUN mode)
 python3 Programmer/tools/rv8term.py
-python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
+python3 Programmer/tools/rv8term.py -c                      # check only
+python3 Programmer/tools/rv8term.py -p 0 -d                 # debug mode
 ```
 
 ### Options
@@ -168,7 +253,7 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 | `-h` | Show help |
 | `-pl` | List ports |
 | `-p N` | Use port N (default: 0) |
-| `-c` | Check connection |
+| `-c` | Check connection (rv8flash + rv8term) |
 | `-w FILE` | Write to ROM |
 | `-r FILE` | Read from ROM |
 | `-v FILE` | Verify ROM |
@@ -181,14 +266,15 @@ python3 Programmer/tools/rv8term.py -p 0 -d    # debug mode
 
 ## Compatibility
 
-Works with any board using AT28C256 (28-pin DIP, 32KB):
+Works with any board that has AT28C256 on the RV8-Bus:
 
-| CPU Board | Flash ROM |
-|-----------|:---------:|
-| RV8-GR (33 chips) | ✅ |
-| RV8 (27 chips) | ✅ |
-| RV8-R (18 chips) | ✅ |
-| Any AT28C256 project | ✅ |
+| Target | Scenario | Notes |
+|--------|:--------:|-------|
+| RV8-GR (33 chips) | B | Full CPU, /RST stops it |
+| RV8 (27 chips) | B | Full CPU, /RST stops it |
+| RV8-R (18 chips) | B | Full CPU, /RST stops it |
+| Bare ROM on breadboard | A | No CPU, direct bus wiring |
+| Any AT28C256 + bus connector | A | Wire A[14:0], D[7:0], /WR, /RD, /CE=A15 |
 
 ---
 
@@ -200,9 +286,9 @@ Works with any board using AT28C256 (28-pin DIP, 32KB):
 
 ### เป้าหมาย
 
-บอร์ด Programmer ทำหน้าที่อย่างเดียว: **เขียนโปรแกรมลงชิป ROM (AT28C256)**
-
-เหมือนก๊อปไฟล์ลง USB แต่เป็นชิป ROM แทน!
+บอร์ด Programmer ต่อเข้ากับ CPU board ผ่าน **RV8-Bus (40-pin)** เพื่อ:
+- **PROG mode**: เขียนโปรแกรมลง ROM บน CPU board (ไม่ต้องถอดชิป!)
+- **RUN mode**: เป็น Terminal bridge คุยกับ CPU ผ่าน I/O slot
 
 ---
 
@@ -212,9 +298,11 @@ Works with any board using AT28C256 (28-pin DIP, 32KB):
 |:----:|------|---------|:-----:|:----------:|
 | 1 | ESP32-WROOM-32 | สมองบอร์ด ต่อ USB กับคอม | 1 | ~฿140 |
 | 2 | TXS0108E (โมดูล 8 ช่อง) | แปลงไฟ 3.3V↔5V | 2 | ~฿70 |
-| 3 | 74HC595 (shift register) | ส่ง address ไปหา ROM | 2 | ~฿20 |
-| 4 | ซ็อกเก็ต ZIF 28 ขา | เสียบชิป ROM | 1 | ~฿50 |
-| 5 | ตัวเก็บประจุ 100nF | กรองไฟ | 4 | ~฿4 |
+| 3 | 74HC595 (shift register) | ส่ง address ออก bus | 2 | ~฿20 |
+| 4 | IDC connector 40 pin | ต่อ RV8-Bus | 1 | ~฿15 |
+| 5 | สายแพร 40 เส้น | เชื่อมไป CPU board | 1 | ~฿30 |
+| 6 | ตัวเก็บประจุ 100nF | กรองไฟ | 4 | ~฿4 |
+| 7 | สวิตช์ SPDT | เลือก PROG/RUN | 1 | ~฿5 |
 
 **รวม ~฿285**
 
@@ -222,23 +310,23 @@ Works with any board using AT28C256 (28-pin DIP, 32KB):
 
 ### วิธีใช้
 
-1. ถอดชิป ROM ออกจากบอร์ด CPU
-2. เสียบชิป ROM เข้า Programmer (ซ็อกเก็ต ZIF)
-3. ต่อสาย USB เข้าคอม
-4. เปิด Terminal พิมพ์:
-   
+1. ต่อสายแพร 40 เส้นจาก Programmer ไป CPU board (RV8-Bus)
+2. ต่อสาย USB เข้าคอม
+3. เลื่อนสวิตช์ไปที่ PROG
+4. เปิด Terminal พิมพ์: `python3 rv8flash.py -w program.bin`
 5. รอจนขึ้น "Done" ✅
-6. ถอดชิป ROM กลับไปเสียบบอร์ด CPU
-7. เปิดไฟ CPU → ทำงาน!
+6. เลื่อนสวิตช์ไปที่ RUN → CPU ทำงาน!
+7. พิมพ์: `python3 rv8term.py` เพื่อคุยกับ CPU
 
 ---
 
 ### การต่อวงจร (ตาม schematic.md)
 
 ```
-ESP32 → TXS0108E #1 → 74HC595 x2 → ROM Address (A0-A14)
-                     → ROM Control (/CE, /OE, /WE)
-ESP32 → TXS0108E #2 → ROM Data (D0-D7)
+ESP32 → TXS0108E #1 → 74HC595 x2 → RV8-Bus A[14:0]
+                     → RV8-Bus /RST, /WR, /RD
+ESP32 → TXS0108E #2 → RV8-Bus D[7:0]
+ESP32 ← RV8-Bus /SLOT1, /RD, /WR (ฟังอย่างเดียว, RUN mode)
 ```
 
 ดูรายละเอียดขาต่อขาที่ไฟล์ `schematic.md`

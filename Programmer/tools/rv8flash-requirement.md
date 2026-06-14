@@ -38,11 +38,10 @@ class VirtualESP32:
     SR_CLK_PIN = 18    # SRCLK
     SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals (via TXS0108E #1)
-    PIN_nCE = 4        # /CE to ROM (active low)
-    PIN_nOE = 16       # /OE to ROM (active low)
-    PIN_nWE = 17       # /WE to ROM (active low)
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD, output in PROG mode)
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -163,13 +162,13 @@ Check if programmer is connected.
 
 ```bash
 $ python3 rv8flash.py -c
-Connected
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 
-$ python3 rv8flash.py -p 2 -c
-Not Connected
+$ python3 rv8flash.py -c
+Port: /dev/ttyUSB0 @ 115200 baud
+Error: Programmer not responding
 ```
-
-Returns: `"Connected"` or `"Not Connected"`
 
 ---
 
@@ -182,13 +181,17 @@ Write binary file to ROM.
 
 ```bash
 $ python3 rv8flash.py -w testrom.bin
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Flashing testrom.bin (32768 bytes)...
 [██████████] 100%
 Done. 32768 bytes written.
 
 $ python3 rv8flash.py -w testrom.bin -R -d
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Flashing testrom.bin (32768 bytes)...
-[DEBUG] TX: F 00 80 30
+[DEBUG] TX: 46 80 00
 [DEBUG] RX: K
 [██████████] 100%
 Done. 32768 bytes written.
@@ -350,8 +353,8 @@ Done. 32768 bytes written.
 | PC → Programmer | Format | Programmer → PC |
 |-----------------|--------|-----------------|
 | Check | `?` | `Connected\n` |
-| Flash | `F` + `len_hi` + `len_lo` + `data` | `K\n` (ACK), then `D\n` or `E:msg\n` |
-| Read | `V` | 32768 bytes |
+| Flash | `F` + `len_hi` + `len_lo`, wait `K\n`, then send `data[len]` | `K\n` (ACK), then `D\n` |
+| Read | `V` | 32768 bytes raw |
 | Reset | `R` | `K\n` |
 
 ---
@@ -438,20 +441,24 @@ def calc_checksum(data):
 **Linux/WSL**:
 ```bash
 $ python3 rv8flash.py -pl
-[0] ttyUSB0
-[1] ttyUSB1
+[0] /dev/ttyUSB0
+[1] /dev/ttyUSB1
 
 $ python3 rv8flash.py -p 0 -c
-Connected
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 
 $ python3 rv8flash.py -p 0 -w testrom.bin -R
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Flashing testrom.bin (32768 bytes)...
 [██████████] 100%
 Done. 32768 bytes written.
 Auto-resetting CPU...
-Done.
 
 $ python3 rv8flash.py -p 0 -v testrom.bin -d
+Port: /dev/ttyUSB0 @ 115200 baud
+Programmer: Connected
 Verifying...
 [DEBUG] TX: 56
 [DEBUG] RX: 30 4D ...

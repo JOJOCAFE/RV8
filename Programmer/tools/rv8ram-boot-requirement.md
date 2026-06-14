@@ -38,11 +38,10 @@ class VirtualESP32:
     SR_CLK_PIN = 18    # SRCLK
     SR_LATCH_PIN = 19  # RCLK
 
-    # Control signals (via TXS0108E #1)
-    PIN_nCE = 4        # /CE to ROM (active low)
-    PIN_nOE = 16       # /OE to ROM (active low)
-    PIN_nWE = 17       # /WE to ROM (active low)
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD, output in PROG mode)
 
 # Create global board instance
 ESP32 = VirtualESP32()

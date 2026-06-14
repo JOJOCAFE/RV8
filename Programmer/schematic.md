@@ -1,216 +1,258 @@
- 1. ผังการต่อระบบไฟเลี้ยง (Power & Ground Lines)ต่อสายไฟเลี้ยงหลักเหล่านี้ให้ครบทุกจุดก่อนเริ่มเดินสายสัญญาณ เพื่อความปลอดภัยของชิป
+# Programmer Board — Schematic (ผังวงจร)
 
- [ ESP32 บอร์ด ] -------- (3V3) --------------------> [ TXS0108E ตัวที่ 1 และ 2: พิน 1 (V_A) ]
-                                                      [ TXS0108E ตัวที่ 1 และ 2: พิน 10 (OE) ] (ต่อผ่านตัวต้านทาน 10kΩ Pull-up เข้า 3.3V)
-                 -------- (VN / 5V) ----------------> [ 74HC595 ตัวที่ 1 และ 2: พิน 16 (VCC) ]
-                                                      [ TXS0108E ตัวที่ 1 และ 2: พิน 20 (V_B) ]
-                                                      [ AT28C256: พิน 28 (VCC) ]
-                 -------- (GND) --------------------> ต่อพ่วงเข้ากับพิน GND ของไอซีทุกตัว (Common Ground)
-                                                      - TXS0108E ตัวที่ 1 และ 2: พิน 11 (GND)
-                                                      - 74HC595 ตัวที่ 1 และ 2: พิน 8 (GND)
-                                                      - AT28C256: พิน 14 (GND)
+**แนวคิด**: Programmer ต่อเข้ากับ CPU board ผ่าน **RV8-Bus (40-pin)** ไม่ได้ต่อตรงกับ ROM
+ข้อดี: ใช้กับ CPU board ทุกรุ่น (RV8, RV8-R, RV8-G, RV8-GR) และยังใช้เป็น Terminal bridge ได้ด้วย
 
+---
 
-2. ผังวงจรฝั่งสัญญาณควบคุม และ Address Busใช้ TXS0108E ตัวที่ 1 แปลงสัญญาณจาก ESP32 (3.3V) เป็น 5V ส่งเข้า 74HC595 และขา Control ของ ROM
+## ภาพรวมระบบ
 
-[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 1 ]              [ อุปกรณ์ปลายทาง ฝั่ง 5V ]
+```
+PC ←─USB─→ [ESP32-WROOM-32] ←─3.3V─→ [TXS0108E ×2] ←─5V─→ [74HC595 ×2] ──┐
+                                                                              │
+                                                              ┌───────────────┘
+                                                              │
+                                                              ▼
+                                                 ┌─────────────────────┐
+                                                 │  RV8-Bus (40-pin)   │
+                                                 │  A[14:0], D[7:0]    │
+                                                 │  /WR, /RD, /RST     │
+                                                 │  /SLOT1, VCC, GND   │
+                                                 └──────────┬──────────┘
+                                                            │
+                                                   CPU Board (RV8-GR etc.)
+                                                   ROM + RAM อยู่บน CPU board
+```
 
-📌 กลุ่มขับชิฟต์รีจิสเตอร์เพื่อกำหนด Address
-GPIO 23 ----------------> พิน 2 (A1) <======> พิน 19 (B1) ------> [ 74HC595 ตัวที่ 1: พิน 14 (SER) ]
-GPIO 18 ----------------> พิน 3 (A2) <======> พิน 18 (B2) ------> [ 74HC595 ทั้ง 2 ตัว: พิน 11 (SRCLK) ]
-GPIO 19 ----------------> พิน 4 (A3) <======> พิน 17 (B3) ------> [ 74HC595 ทั้ง 2 ตัว: พิน 12 (RCLK) ]
+**PROG mode**: ESP32 ยึด /RST=LOW (CPU หยุด), ขับ Address + Data + /WR ผ่าน bus → เขียน ROM บน CPU board
+**RUN mode**: ESP32 ปล่อย bus ทั้งหมด, ฟังที่ /SLOT1 สำหรับ UART bridge
 
-📌 กลุ่มสั่งงานคำสั่งควบคุม ROM ลอจิก 5V เต็ม
-GPIO 4  ----------------> พิน 5 (A4) <======> พิน 16 (B4) ------> [ AT28C256: พิน 20 (/CE - Chip Enable) ]
-GPIO 16 ----------------> พิน 6 (A5) <======> พิน 15 (B5) ------> [ AT28C256: พิน 22 (/OE - Output Enable) ]
-GPIO 17 ----------------> พิน 7 (A6) <======> พิน 14 (B6) ------> [ AT28C256: พิน 27 (/WE - Write Enable) ]
-(ขา A7/B7 และ A8/B8 ของ TXS ตัวที่ 1 นี้ไม่ได้ใช้งาน ให้ปล่อยลอยไว้ได้เลย)
+---
 
-การเชื่อมต่อระหว่าง 74HC595 (ทั้ง 2 ตัว) ไปยังขา Address ของ AT28C256
+## 1. ผังการต่อระบบไฟเลี้ยง (Power & Ground)
 
-📌 การจัดการขาพิเศษของ 74HC595 ทั้งตัวที่ 1 และ 2:
-- พิน 10 (/SRCLR) -------> ต่อเข้าไฟ 5V (VCC)
-- พิน 13 (/G) -----------> ต่อลงกราวด์ (GND)
+ต่อสายไฟเลี้ยงหลักให้ครบทุกจุดก่อนเริ่มเดินสายสัญญาณ
 
-📌 การต่อพ่วงชิป (Daisy Chain):
-- [ 74HC595 ตัวที่ 1: พิน 9 (Q7S) ] --------------------> ต่อข้ามไปเข้า [ 74HC595 ตัวที่ 2: พิน 14 (SER) ]
+```
+[ ESP32 บอร์ด ] ─── (3V3) ───────→ [ TXS0108E ตัวที่ 1 และ 2: พิน 1 (V_A) ]
+                                    [ TXS0108E ตัวที่ 1 และ 2: พิน 10 (OE) ] (Pull-up 10kΩ เข้า 3.3V)
 
-📌 การเดินสายไปยังขา Address ของ ROM (AT28C256):
-- 74HC595 ตัวที่ 1 (คุม Address บิตต่ำ A0 - A7):
-  พิน 15 (Q0) -> ขา A0 (พิน 10)       พิน 1 (Q1) -> ขา A1 (พิน 9)        พิน 2 (Q2) -> ขา A2 (พิน 8)
-  พิน 3 (Q3) -> ขา A3 (พิน 7)        พิน 4 (Q4) -> ขา A4 (พิน 6)        พิน 5 (Q5) -> ขา A5 (พิน 5)
-  พิน 6 (Q6) -> ขา A6 (พิน 4)        พิน 7 (Q7) -> ขา A7 (พิน 3)
+                ─── (VN / 5V) ────→ [ 74HC595 ตัวที่ 1 และ 2: พิน 16 (VCC) ]
+                                    [ TXS0108E ตัวที่ 1 และ 2: พิน 20 (V_B) ]
 
-- 74HC595 ตัวที่ 2 (คุม Address บิตสูง A8 - A14):
-  พิน 15 (Q0) -> ขา A8 (พิน 25)      พิน 1 (Q1) -> ขา A9 (พิน 24)       พิน 2 (Q2) -> ขา A10 (พิน 21)
-  พิน 3 (Q3) -> ขา A11 (พิน 23)      พิน 4 (Q4) -> ขา A12 (พิน 2)       พิน 5 (Q5) -> ขา A13 (พิน 26)
-  พิน 6 (Q6) -> ขา A14 (พิน 1)       พิน 7 (Q7) -> (ปล่อยลอย ไม่ใช้งาน)
+                ─── (GND) ────────→ ต่อพ่วง GND ของ IC ทุกตัว
+                                    - TXS0108E ตัวที่ 1 และ 2: พิน 11 (GND)
+                                    - 74HC595 ตัวที่ 1 และ 2: พิน 8 (GND)
+```
 
-3. ผังวงจรฝั่ง Data Bus (สื่อสารแบบ 2 ทาง)ใช้ TXS0108E ตัวที่ 2 ทั้งตัวในการรับ-ส่งข้อมูล 8 บิต ระหว่าง ESP32 (3.3V) และ AT28C256 (5V)
+หมายเหตุ: VCC (+5V) และ GND รับจาก RV8-Bus pin 39 (VCC) และ pin 40 (GND) ก็ได้
 
-[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 2 ]              [ AT28C256 Data Pins ]
-GPIO 13 ----------------> พิน 2 (A1) <======> พิน 19 (B1) ------> พิน 11 (I/O 0)
-GPIO 12 ----------------> พิน 3 (A2) <======> พิน 18 (B2) ------> พิน 12 (I/O 1)
-GPIO 14 ----------------> พิน 4 (A3) <======> พิน 17 (B3) ------> พิน 13 (I/O 2)
-GPIO 27 ----------------> พิน 5 (A4) <======> พิน 16 (B4) ------> พิน 15 (I/O 3)
-GPIO 26 ----------------> พิน 6 (A5) <======> พิน 15 (B5) ------> พิน 16 (I/O 4)
-GPIO 25 ----------------> พิน 7 (A6) <======> พิน 14 (B6) ------> พิน 17 (I/O 5)
-GPIO 33 ----------------> พิน 8 (A7) <======> พิน 13 (B7) ------> พิน 18 (I/O 6)
-GPIO 32 ----------------> พิน 9 (A8) <======> พิน 12 (B8) ------> พิน 19 (I/O 7)
+---
 
-C 104 (0.1uF)เซรามิก คร่อม Vcc และ Gnd ของทุกตัว
+## 2. ผังวงจรฝั่งสัญญาณควบคุมและ Address Bus
 
-เขียนฟังก์ชันในโค้ดแยกส่วนกันอย่างชัดเจน เช่น ฟังก์ชัน setAddress(uint16_t addr) สำหรับยิงบิตเข้า 74HC595 และฟังก์ชัน writeEEPROM() / readEEPROM() เพื่อควบคุมทิศทางของขาพินคำสั่งควบคุมตามลำดับ [1]
+ใช้ TXS0108E ตัวที่ 1 แปลง 3.3V → 5V ส่งเข้า 74HC595 และขา Control
 
-Example Code
+```
+[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 1 ]              [ ปลายทาง 5V ]
 
-// ==========================================
-// 📌 CONFIGURATION & PIN MAPPING (ESP32)
-// ==========================================
+📌 กลุ่มขับ Shift Register (กำหนด Address)
+GPIO 23 ──────→ พิน 2 (A1) ←══→ พิน 19 (B1) ──→ [ 74HC595 #1: พิน 14 (SER) ]
+GPIO 18 ──────→ พิน 3 (A2) ←══→ พิน 18 (B2) ──→ [ 74HC595 ทั้ง 2: พิน 11 (SRCLK) ]
+GPIO 19 ──────→ พิน 4 (A3) ←══→ พิน 17 (B3) ──→ [ 74HC595 ทั้ง 2: พิน 12 (RCLK) ]
 
-// กลุ่มควบคุม Address (ผ่าน TXS0108E #1 -> 74HC595 x2)
-#define SHIFT_DATA   23   // ขา SER
-#define SHIFT_CLK    18   // ขา SRCLK
-#define SHIFT_LATCH  19   // ขา RCLK
+📌 กลุ่มสัญญาณควบคุม → ออก RV8-Bus
+GPIO 4  ──────→ พิน 5 (A4) ←══→ พิน 16 (B4) ──→ RV8-Bus pin 26 (/RST)
+GPIO 16 ──────→ พิน 6 (A5) ←══→ พิน 15 (B5) ──→ RV8-Bus pin 27 (/WR)
+GPIO 17 ──────→ พิน 7 (A6) ←══→ พิน 14 (B6) ──→ RV8-Bus pin 28 (/RD)
 
-// กลุ่มควบคุมคำสั่ง ROM (ผ่าน TXS0108E #1)
-#define ROM_CE       4    // Chip Enable (Active LOW)
-#define ROM_OE       16   // Output Enable (Active LOW)
-#define ROM_WE       17   // Write Enable (Active LOW)
+(ขา A7/B7 และ A8/B8 ของ TXS ตัวที่ 1 ไม่ได้ใช้ — ปล่อยลอย)
+```
 
-// กลุ่มรับ-ส่งข้อมูล Data Bus 8 บิต (ผ่าน TXS0108E #2)
-const int dataPins[8] = {13, 12, 14, 27, 26, 25, 33, 32}; // I/O 0 ถึง I/O 7
+### การเชื่อมต่อ 74HC595 → RV8-Bus Address
 
-// ==========================================
-// 🛠️ FUNCTIONS FOR HARDWARE CONTROL
-// ==========================================
+```
+📌 ขาพิเศษของ 74HC595 ทั้ง 2 ตัว:
+- พิน 10 (/SRCLR) → ต่อ VCC (5V) — ไม่เคลียร์
+- พิน 13 (/G)     → ต่อ GND     — เปิด output ตลอด
 
-// ฟังก์ชันกำหนดทิศทางของขาข้อมูล Data Bus (ESP32: INPUT หรือ OUTPUT)
-void setDataBusMode(uint8_t mode) {
-  for (int i = 0; i < 8; i++) {
-    pinMode(dataPins[i], mode);
-  }
-}
+📌 Daisy Chain:
+- 74HC595 #1: พิน 9 (Q7S) → 74HC595 #2: พิน 14 (SER)
 
-// ฟังก์ชันส่งตำแหน่ง Address 15 บิต ออกไปยัง 74HC595 ทั้ง 2 ตัว
-void setAddress(uint16_t address) {
-  digitalWrite(SHIFT_LATCH, LOW);
-  
-  // แยกส่งทีละ 8 บิต (ชิปตัวที่ 2 รับบิตสูงก่อน, ชิปตัวที่ 1 รับบิตต่ำ)
-  shiftOut(SHIFT_DATA, SHIFT_CLK, MSBFIRST, (address >> 8) & 0xFF);
-  shiftOut(SHIFT_DATA, SHIFT_CLK, MSBFIRST, address & 0xFF);
-  
-  digitalWrite(SHIFT_LATCH, HIGH);
-}
+📌 74HC595 #1 → RV8-Bus Address ต่ำ (A0-A7):
+  พิน 15 (Q0) → Bus pin 1 (A0)
+  พิน 1  (Q1) → Bus pin 2 (A1)
+  พิน 2  (Q2) → Bus pin 3 (A2)
+  พิน 3  (Q3) → Bus pin 4 (A3)
+  พิน 4  (Q4) → Bus pin 5 (A4)
+  พิน 5  (Q5) → Bus pin 6 (A5)
+  พิน 6  (Q6) → Bus pin 7 (A6)
+  พิน 7  (Q7) → Bus pin 8 (A7)
 
-// ฟังก์ชันเขียนข้อมูลลงบัสข้อมูล (ใช้ตอนฟังก์ชัน Write)
-void writeDataBus(uint8_t data) {
-  for (int i = 0; i < 8; i++) {
-    digitalWrite(dataPins[i], (data >> i) & 0x01);
-  }
-}
+📌 74HC595 #2 → RV8-Bus Address สูง (A8-A14):
+  พิน 15 (Q0) → Bus pin 9  (A8)
+  พิน 1  (Q1) → Bus pin 10 (A9)
+  พิน 2  (Q2) → Bus pin 11 (A10)
+  พิน 3  (Q3) → Bus pin 12 (A11)
+  พิน 4  (Q4) → Bus pin 13 (A12)
+  พิน 5  (Q5) → Bus pin 14 (A13)
+  พิน 6  (Q6) → Bus pin 15 (A14)
+  พิน 7  (Q7) → (ปล่อยลอย ไม่ใช้)
+```
 
-// ฟังก์ชันอ่านข้อมูลจากบัสข้อมูล (ใช้ตอนฟังก์ชัน Read)
-uint8_t readDataBus() {
-  uint8_t data = 0;
-  for (int i = 0; i < 8; i++) {
-    if (digitalRead(dataPins[i]) == HIGH) {
-      data |= (1 << i);
-    }
-  }
-  return data;
-}
+---
 
-// ==========================================
-// 💾 CORE ROM OPERATIONS (READ / WRITE)
-// ==========================================
+## 3. ผังวงจรฝั่ง Data Bus (สื่อสารแบบ 2 ทาง)
 
-// 🔵 ฟังก์ชันอ่านข้อมูลจาก EEPROM 1 ไบต์
-uint8_t readEEPROM(uint16_t address) {
-  setDataBusMode(INPUT); // เปลี่ยนโหมดพินเป็นอินพุตเพื่อเตรียมรับข้อมูล
-  
-  // ปิดสวิตช์ควบคุมทั้งหมดก่อนเปลี่ยนตำแหน่งข้อมูล
-  digitalWrite(ROM_WE, HIGH);
-  digitalWrite(ROM_OE, HIGH);
-  digitalWrite(ROM_CE, HIGH);
-  
-  setAddress(address);   // สั่งขยับ Address ไปยังตำแหน่งที่ต้องการ
-  
-  // เริ่มจังหวะเวลาอ่านข้อมูล (Read Cycle)
-  digitalWrite(ROM_CE, LOW); // เปิดใช้งานชิป ROM
-  digitalWrite(ROM_OE, LOW); // เปิดให้ ROM จ่ายสัญญาณข้อมูลออกมา
-  
-  delayMicroseconds(1);      // รอสัญญาณเสถียร (ตามสเปก AT28C256 ใช้เวลาเข้าถึงข้อมูลพิกัดนาโนวินาที)
-  
-  uint8_t data = readDataBus(); // อ่านลอจิกบัสข้อมูล
-  
-  // เคลียร์ขาสัญญาณคุมกลับเข้าสู่โหมดพัก
-  digitalWrite(ROM_OE, HIGH);
-  digitalWrite(ROM_CE, HIGH);
-  
-  return data;
-}
+ใช้ TXS0108E ตัวที่ 2 รับ-ส่ง 8 บิต ระหว่าง ESP32 (3.3V) และ RV8-Bus D[7:0] (5V)
 
-// 🔴 ฟังก์ชันเขียนข้อมูลลง EEPROM 1 ไบต์ (Byte Write)
-void writeEEPROM(uint16_t address, uint8_t data) {
-  setDataBusMode(OUTPUT); // เปลี่ยนโหมดพินเป็นเอาต์พุตเพื่อส่งข้อมูลเข้าไป
-  
-  // ตรึงขาสัญญาณคุมให้อยู่ในสถานะปลอดภัยก่อนเริ่มงาน
-  digitalWrite(ROM_WE, HIGH);
-  digitalWrite(ROM_OE, HIGH);
-  digitalWrite(ROM_CE, HIGH);
-  
-  setAddress(address);   // กำหนดตำแหน่งที่จะเขียน
-  writeDataBus(data);    // ป้อนข้อมูลเตรียมรอไว้ที่บัสข้อมูล
-  
-  // เริ่มจังหวะเวลาเขียนข้อมูล (Write Cycle Sequence)
-  digitalWrite(ROM_CE, LOW); // เปิดใช้งานชิป
-  delayMicroseconds(1);
-  digitalWrite(ROM_WE, LOW); // ยิงพัลส์สัญญาณสั่ง "บันทึก" (Write Enable)
-  
-  delayMicroseconds(1);      // พัลส์ความกว้างขั้นต่ำของสัญญาณสับบันทึกข้อมูล (Twp)
-  
-  digitalWrite(ROM_WE, HIGH); // ปิดสัญญาณบันทึกเพื่อล็อกข้อมูลเข้าหน่วยความจำ
-  digitalWrite(ROM_CE, HIGH); // ปิดการทำงานชิป
-  
-  // ⚠️ ข้อควรระวังสูงสุด: ชิป AT28C256 ต้องการเวลาประมวลผลภายในหลังรับคำสั่ง (Write Cycle Time: Twc)
-  // สเปกโรงงานกำหนดให้รอประมาณ 10 มิลลิวินาที ห้ามส่งข้อมูลไบต์ถัดไปซ้อนในช่วงเวลานี้เด็ดขาด
-  delay(10); 
-}
+```
+[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 2 ]          [ RV8-Bus Data ]
 
-// ==========================================
-// 🚀 ARDUINO STANDARD MAIN RUN
-// ==========================================
+GPIO 13 ──────→ พิน 2 (A1) ←══→ พิน 19 (B1) ──→ Bus pin 17 (D0)
+GPIO 12 ──────→ พิน 3 (A2) ←══→ พิน 18 (B2) ──→ Bus pin 18 (D1)
+GPIO 14 ──────→ พิน 4 (A3) ←══→ พิน 17 (B3) ──→ Bus pin 19 (D2)
+GPIO 27 ──────→ พิน 5 (A4) ←══→ พิน 16 (B4) ──→ Bus pin 20 (D3)
+GPIO 26 ──────→ พิน 6 (A5) ←══→ พิน 15 (B5) ──→ Bus pin 21 (D4)
+GPIO 25 ──────→ พิน 7 (A6) ←══→ พิน 14 (B6) ──→ Bus pin 22 (D5)
+GPIO 33 ──────→ พิน 8 (A7) ←══→ พิน 13 (B7) ──→ Bus pin 23 (D6)
+GPIO 32 ──────→ พิน 9 (A8) ←══→ พิน 12 (B8) ──→ Bus pin 24 (D7)
+```
 
-void setup() {
-  Serial.begin(115200);
-  
-  // ตั้งค่ากลุ่มขาควบคุมเอาต์พุต
-  pinMode(SHIFT_DATA, OUTPUT);
-  pinMode(SHIFT_CLK, OUTPUT);
-  pinMode(SHIFT_LATCH, OUTPUT);
-  
-  pinMode(ROM_CE, OUTPUT);
-  pinMode(ROM_OE, OUTPUT);
-  pinMode(ROM_WE, OUTPUT);
-  
-  // ตรึงขาให้อยู่ในสถานะไม่ทำงานตอนเปิดเครื่อง (High-State Safe)
-  digitalWrite(ROM_CE, HIGH);
-  digitalWrite(ROM_OE, HIGH);
-  digitalWrite(ROM_WE, HIGH);
-  
-  Serial.println("\n--- Starting AT28C256 Programmer Test ---");
-  
-  // 📝 ทดสอบเขียนข้อมูล
-  Serial.println("Writing data 0xA5 to Address 0x0042...");
-  writeEEPROM(0x0042, 0xA5);
-  
-  // 🔍 ทดสอบอ่านข้อมูลกลับมาเช็ก
-  Serial.print("Reading data from Address 0x0042: 0x");
-  uint8_t testRead = readEEPROM(0x0042);
-  Serial.println(testRead, HEX);
-}
+---
 
-void loop() {
-  // พักระบบไว้หลังจากรันครั้งแรกเสร็จใน setup
-}
+## 4. สัญญาณฟังจาก RV8-Bus (Input-only)
+
+สัญญาณเหล่านี้ ESP32 ฟังอย่างเดียว (INPUT) สำหรับ RUN mode:
+
+```
+RV8-Bus pin 30 (/SLOT1) ──→ ESP32 GPIO 34  (ตรวจจับ CPU เข้าถึง I/O slot)
+RV8-Bus pin 28 (/RD)    ──→ ESP32 GPIO 35  (CPU อ่านข้อมูล)
+RV8-Bus pin 27 (/WR)    ──→ ESP32 GPIO 36  (CPU เขียนข้อมูล)
+```
+
+หมายเหตุ: GPIO 34-39 เป็น input-only บน ESP32 (ไม่มี pull-up ภายใน)
+ใช้ตัวต้านทาน pull-up 10kΩ ภายนอกเข้า 5V ถ้าจำเป็น
+
+---
+
+## 5. PROG/RUN Switch
+
+```
+GPIO 39 (MODE) ──→ สวิตช์:
+  - ต่อ GND = PROG mode (ESP32 ยึด bus, เขียน ROM)
+  - ปล่อยลอย/ต่อ VCC = RUN mode (ESP32 ปล่อย bus, เป็น UART bridge)
+```
+
+---
+
+## 6. RV8-Bus Pinout (อ้างอิง)
+
+| Pin | Signal | Dir (CPU) | ใช้โดย Programmer |
+|:---:|--------|:---------:|:-----------------:|
+| 1-8 | A[7:0] | out | ✅ ขับผ่าน 595 #1 (PROG) |
+| 9-15 | A[14:8] | out | ✅ ขับผ่าน 595 #2 (PROG) |
+| 16 | A15 | out | ✅ ขับผ่าน 595 #2 (=0 for ROM) |
+| 17-24 | D[7:0] | bidir | ✅ อ่าน/เขียนผ่าน TXS #2 |
+| 25 | CLK | out | ❌ ไม่ใช้ |
+| 26 | /RST | out | ✅ ESP32 ยึด LOW ตอน PROG |
+| 27 | /WR | out | ✅ ESP32 pulse LOW ตอนเขียน |
+| 28 | /RD | out | ✅ ESP32 pulse LOW ตอนอ่าน (→ ROM /OE) |
+| 29 | /IRQ | in | ❌ ไม่ใช้ |
+| 30 | /SLOT1 | out | ✅ ฟัง (RUN mode, UART bridge) |
+| 31 | /SLOT2 | out | ❌ ไม่ใช้ |
+| 32 | T2 | out | ❌ ไม่ใช้ |
+| 39 | VCC | — | ✅ จ่ายไฟ 5V |
+| 40 | GND | — | ✅ Ground |
+
+---
+
+## 7. การทำงานในแต่ละ Mode
+
+### PROG Mode (เขียน/อ่าน ROM ผ่าน bus)
+
+```
+เขียน (Write):
+1. ESP32 ยึด /RST = LOW (CPU หยุดทำงาน, ปล่อย bus)
+2. ESP32 ขับ A[14:0] ผ่าน 74HC595 (A15=0 → ROM /CE active)
+3. ESP32 ขับ D[7:0] ผ่าน TXS #2
+4. ESP32 pulse /WR = LOW (1µs) → ROM รับข้อมูล
+5. ทำซ้ำจนครบ
+
+อ่าน (Read/Verify):
+1. ESP32 ยึด /RST = LOW
+2. ESP32 ขับ A[14:0] (A15=0 → ROM /CE active)
+3. ESP32 ปล่อย D[7:0] เป็น input
+4. ESP32 pulse /RD = LOW → ROM ปล่อยข้อมูลออกมา (/OE active)
+5. ESP32 อ่าน D[7:0]
+```
+
+หมายเหตุ: ROM /CE ต่อกับ /A15 บน CPU board → Programmer ตั้ง A15=0 → ROM ถูกเลือกอัตโนมัติ
+ถ้าไม่มี CPU (ROM อย่างเดียว) ก็ทำงานได้เหมือนกัน เพราะ Programmer ขับ /WR + /RD เอง
+
+### RUN Mode (UART bridge ผ่าน /SLOT1)
+
+```
+1. ESP32 ปล่อย /RST = HIGH (CPU ทำงาน)
+2. ESP32 ปล่อย address bus (595 output ไม่ conflict เพราะ CPU ขับแรงกว่า)
+3. ESP32 ฟัง /SLOT1 + /WR → CPU เขียนข้อมูลมาที่ I/O → ส่งไป PC
+4. ESP32 ฟัง /SLOT1 + /RD → CPU อ่านข้อมูล → ESP32 ขับ D[7:0] ตอบ
+```
+
+---
+
+## 8. Bypass Capacitors
+
+C 104 (0.1µF) เซรามิก คร่อม VCC-GND ของทุก IC:
+- TXS0108E ตัวที่ 1: 1 ตัว
+- TXS0108E ตัวที่ 2: 1 ตัว
+- 74HC595 ตัวที่ 1: 1 ตัว
+- 74HC595 ตัวที่ 2: 1 ตัว
+
+**รวม 4 ตัว**
+
+---
+
+## 9. รายการอุปกรณ์ (BOM)
+
+| Part | Qty | หน้าที่ |
+|------|:---:|---------|
+| ESP32-WROOM-32 | 1 | สมองหลัก |
+| TXS0108E module (8-ch) | 2 | แปลงระดับไฟ 3.3V↔5V |
+| 74HC595 | 2 | Shift register ขับ Address |
+| 40-pin IDC connector | 1 | ต่อ RV8-Bus |
+| 40-pin ribbon cable | 1 | เชื่อมไป CPU board |
+| 100nF capacitor | 4 | Bypass |
+| สวิตช์ SPDT | 1 | PROG/RUN |
+| USB cable (micro-B) | 1 | PC → ESP32 |
+
+---
+
+## 10. ESP32 GPIO Summary
+
+| GPIO | Function | Direction | Via |
+|:----:|----------|:---------:|-----|
+| 23 | SR_DATA | OUT | TXS #1 → 595 SER |
+| 18 | SR_CLK | OUT | TXS #1 → 595 SRCLK |
+| 19 | SR_LATCH | OUT | TXS #1 → 595 RCLK |
+| 4 | /RST | OUT | TXS #1 → Bus pin 26 |
+| 16 | /WR | OUT | TXS #1 → Bus pin 27 |
+| 17 | /RD | OUT/IN | TXS #1 → Bus pin 28 (OUT in PROG, IN in RUN) |
+| 13 | D0 | BIDIR | TXS #2 → Bus pin 17 |
+| 12 | D1 | BIDIR | TXS #2 → Bus pin 18 |
+| 14 | D2 | BIDIR | TXS #2 → Bus pin 19 |
+| 27 | D3 | BIDIR | TXS #2 → Bus pin 20 |
+| 26 | D4 | BIDIR | TXS #2 → Bus pin 21 |
+| 25 | D5 | BIDIR | TXS #2 → Bus pin 22 |
+| 33 | D6 | BIDIR | TXS #2 → Bus pin 23 |
+| 32 | D7 | BIDIR | TXS #2 → Bus pin 24 |
+| 34 | /SLOT1 | IN | Bus pin 30 |
+| 35 | /RD (sense) | IN | Bus pin 28 |
+| 36 | /WR (sense) | IN | Bus pin 27 |
+| 39 | MODE | IN | PROG/RUN switch |
+
+**Total: 18 GPIO used**
+
+---
+
+*เขียนสำหรับน้อง ๆ ม.ต้น — ถ้าติดตรงไหนถามพี่ได้เลย!*

@@ -8,8 +8,8 @@ Options:
   -h, --help          Show help
   -pl, --portlist     List available serial ports
   -p N, --port N      Use port N (default: 0)
-  -b, --baud          Baud rate (default: 115200)
-  -t, --timeout       Serial timeout in seconds (default: 0.1)
+  -b N, --baud N      Baud rate (default: 115200)
+  -t N, --timeout N   Serial timeout in seconds (default: 0.1)
   -d, --debug         Show serial traffic
   --no-echo           Disable local echo
   --raw               Binary mode (no CR/LF translation)
@@ -19,6 +19,7 @@ Options:
 import sys
 import argparse
 import os
+import time
 import select
 import serial
 import tty
@@ -31,17 +32,30 @@ import termios
 
 class VirtualESP32:
     """Virtual ESP32 board with configurable pin assignments."""
-    NAME = "RV8 Terminal ESP32"
+    NAME = "RV8 Programmer ESP32"
 
     # Serial port settings
     BAUD_RATE = 115200
-    TIMEOUT = 0.1  # Short timeout for terminal mode
+    TIMEOUT = 5  # seconds (for connection check)
 
-    # Data bus D[7:0] — bidirectional
+    # Data bus D[7:0] — bidirectional (via TXS0108E #2 → RV8-Bus pin 17-24)
     DATA_PINS = [13, 12, 14, 27, 26, 25, 33, 32]  # D0-D7
 
-    # Control signals
-    PIN_nRST = 0       # /RST to CPU (active low)
+    # Address via 74HC595 ×2 shift register (via TXS0108E #1 → RV8-Bus pin 1-15)
+    SR_DATA_PIN = 23   # SER
+    SR_CLK_PIN = 18    # SRCLK
+    SR_LATCH_PIN = 19  # RCLK
+
+    # Control signals (via TXS0108E #1 → RV8-Bus)
+    PIN_nRST = 4       # → Bus pin 26 (/RST)
+    PIN_nWR = 16       # → Bus pin 27 (/WR)
+    PIN_nRD_O = 17     # → Bus pin 28 (/RD, output in PROG mode)
+
+    # Input-only pins (from RV8-Bus)
+    PIN_nSLOT = 34     # ← Bus pin 30 (/SLOT1)
+    PIN_nRD = 35       # ← Bus pin 28 (/RD sense)
+    PIN_nWR_S = 36     # ← Bus pin 27 (/WR sense)
+    PIN_MODE = 39      # PROG/RUN switch
 
 # Create global board instance
 ESP32 = VirtualESP32()
@@ -58,6 +72,7 @@ class Options:
         self.port_name = None
         self.help = False
         self.port_list = False
+        self.check = False
         self.baud = 115200
         self.timeout = 0.1
         self.debug = False
@@ -70,14 +85,9 @@ class Options:
 # UTILITY FUNCTIONS
 # =============================================================================
 
-def hex_dump(data: bytes, prefix: str = "") -> str:
+def hex_dump(data: bytes) -> str:
     """Convert bytes to hex string for debug."""
     return ' '.join(f'{b:02X}' for b in data)
-
-
-def is_data_available() -> bool:
-    """Check if keyboard data is available (non-blocking)."""
-    return select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], [])
 
 
 def get_serial_ports():
@@ -89,15 +99,15 @@ def get_serial_ports():
     elif sys.platform.startswith('win'):
         import glob
         ports = [f'COM{i+1}' for i in range(256) if os.path.exists(f'COM{i+1}')]
-    return ports
+    return sorted(ports)
 
 
 # =============================================================================
-# SERIAL WRAPPER
+# SERIAL WRAPPER (follows rv8flash.py pattern)
 # =============================================================================
 
 class SerialPort:
-    """Wrapper around pyserial."""
+    """Wrapper around pyserial with board configuration."""
     def __init__(self, port: str, baud: int = ESP32.BAUD_RATE, timeout: float = ESP32.TIMEOUT):
         self.port = port
         self.baud = baud
@@ -106,6 +116,8 @@ class SerialPort:
 
     def __enter__(self):
         self.ser = serial.Serial(self.port, self.baud, timeout=self.timeout)
+        time.sleep(2)            # ESP32 resets on DTR — wait for boot
+        self.ser.reset_input_buffer()  # discard boot messages
         return self
 
     def __exit__(self, *args):
@@ -121,61 +133,80 @@ class SerialPort:
             return self.ser.read(n)
         return b''
 
+    def read_until(self, expected: bytes = b'\n') -> bytes:
+        if self.ser:
+            return self.ser.read_until(expected)
+        return b''
+
     def available(self) -> int:
         if self.ser:
             return self.ser.in_waiting
         return 0
 
+    def set_timeout(self, timeout: float):
+        """Change timeout (e.g. switch from check mode to terminal mode)."""
+        if self.ser:
+            self.ser.timeout = timeout
+
 
 # =============================================================================
-# TERMINAL HANDLING
+# PROGRAMMER COMMANDS (same protocol as rv8flash.py)
 # =============================================================================
 
-class TerminalHandler:
-    """Handle terminal mode for bidirectional communication."""
-    def __init__(self, no_echo: bool = False, raw: bool = False):
-        self.no_echo = no_echo
-        self.raw = raw
-        self.old_settings = None
+def cmd_check(port: SerialPort, debug: bool = False) -> bool:
+    """Check programmer connection — sends '?' expects 'Connected'."""
+    port.write(b'?')
+    if debug:
+        print(f"[DEBUG] TX: 3F (?)")
+    response = port.read_until(b'\n').decode('utf-8', errors='replace').strip()
+    if debug:
+        print(f"[DEBUG] RX: {response}")
+    return response == "Connected"
 
-    def __enter__(self):
-        """Setup terminal for raw mode."""
-        if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
-            self.old_settings = termios.tcgetattr(sys.stdin)
-            if self.raw:
-                # Raw mode - no echo, no line buffering
-                tty.setcbreak(sys.stdin.fileno())
-            elif not self.no_echo:
-                # Cooked mode with echo - just set non-blocking
-                pass
-        return self
 
-    def __exit__(self, *args):
-        """Restore terminal settings."""
-        if self.old_settings:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_settings)
+# =============================================================================
+# TERMINAL LOOP
+# =============================================================================
 
-    def read_keyboard(self) -> bytes:
-        """Read single key from keyboard (non-blocking)."""
-        if is_data_available():
-            char = sys.stdin.read(1)
-            if char == '\x03':  # Ctrl+C
-                raise KeyboardInterrupt
-            return char.encode('latin-1')
-        return b''
+def terminal_loop(port: SerialPort, opts: Options):
+    """Bidirectional terminal: keyboard → ESP32, ESP32 → screen."""
+    # Switch to short timeout for responsive terminal
+    port.set_timeout(opts.timeout)
 
-    def write_screen(self, data: bytes):
-        """Write data to screen."""
-        if data:
-            try:
+    old_settings = termios.tcgetattr(sys.stdin)
+    try:
+        tty.setcbreak(sys.stdin.fileno())
+
+        while True:
+            # ESP32 → screen
+            if port.available() > 0:
+                data = port.read(port.available())
+                if opts.debug:
+                    print(f"\n[DEBUG] RX: {hex_dump(data)}")
+                if not opts.raw:
+                    # CR/LF translation for display
+                    data = data.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
                 sys.stdout.buffer.write(data)
                 sys.stdout.buffer.flush()
-            except:
-                pass
+
+            # Keyboard → ESP32
+            if select.select([sys.stdin], [], [], 0)[0]:
+                char = sys.stdin.read(1)
+                if char == '\x03':  # Ctrl+C
+                    raise KeyboardInterrupt
+                raw_byte = char.encode('latin-1')
+                if not opts.raw and char == '\n':
+                    raw_byte = b'\r\n'  # Enter → CR+LF
+                if opts.debug:
+                    print(f"\n[DEBUG] TX: {hex_dump(raw_byte)}")
+                port.write(raw_byte)
+
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
 
 # =============================================================================
-# MAIN FUNCTION
+# MAIN
 # =============================================================================
 
 def parse_args():
@@ -184,50 +215,39 @@ def parse_args():
         description='Terminal program for RV8 CPU',
         add_help=False
     )
-
     parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-pl', '--portlist', action='store_true')
-
-    # Port selection
-    port_group = parser.add_argument_group('Port selection')
-    port_group.add_argument('-p', '--port', type=int, default=0, dest='port_index')
-
-    # Serial options
-    serial_group = parser.add_argument_group('Serial options')
-    serial_group.add_argument('-b', '--baud', type=int, default=115200)
-    serial_group.add_argument('-t', '--timeout', type=float, default=0.1)
-
-    # Terminal options
-    term_group = parser.add_argument_group('Terminal options')
-    term_group.add_argument('-d', '--debug', action='store_true')
-    term_group.add_argument('--no-echo', action='store_true')
-    term_group.add_argument('--raw', action='store_true')
-    term_group.add_argument('-q', '--quiet', action='store_true')
+    parser.add_argument('-p', '--port', type=int, default=0, dest='port_index')
+    parser.add_argument('-c', '--check', action='store_true')
+    parser.add_argument('-b', '--baud', type=int, default=115200)
+    parser.add_argument('-t', '--timeout', type=float, default=0.1)
+    parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('--no-echo', action='store_true')
+    parser.add_argument('--raw', action='store_true')
+    parser.add_argument('-q', '--quiet', action='store_true')
 
     args = parser.parse_args()
 
     opts = Options()
-    opts.port_index = args.port
+    opts.port_index = args.port_index
     opts.help = args.help
     opts.port_list = args.portlist
+    opts.check = args.check
     opts.baud = args.baud
     opts.timeout = args.timeout
     opts.debug = args.debug
     opts.no_echo = args.no_echo
     opts.raw = args.raw
     opts.quiet = args.quiet
-
     return opts
 
 
 def rv8term(opts: Options) -> int:
     """Main terminal session."""
-    # Help
     if opts.help:
         print(__doc__)
         return 0
 
-    # Port list
     if opts.port_list:
         ports = get_serial_ports()
         for i, p in enumerate(ports):
@@ -247,26 +267,27 @@ def rv8term(opts: Options) -> int:
     port_name = ports[opts.port_index]
 
     try:
-        with SerialPort(port_name, opts.baud, opts.timeout) as port:
+        with SerialPort(port_name, opts.baud) as port:
             if not opts.quiet:
-                print(f"Terminal mode. Press Ctrl+C to exit.")
-                print(f"Connected to {port_name} at {opts.baud} baud.")
+                print(f"Port: {port_name} @ {opts.baud} baud")
 
-            with TerminalHandler(opts.no_echo, opts.raw) as term:
-                while True:
-                    # Check for serial data from CPU
-                    if port.available() > 0:
-                        data = port.read(port.available())
-                        if opts.debug:
-                            print(f"[DEBUG] RX: {hex_dump(data)}")
-                        term.write_screen(data)
+            # Check programmer is alive (same as rv8flash.py)
+            if not cmd_check(port, opts.debug):
+                print("Error: Programmer not responding")
+                return 1
 
-                    # Check for keyboard input
-                    key = term.read_keyboard()
-                    if key:
-                        if opts.debug:
-                            print(f"[DEBUG] TX: {hex_dump(key)}")
-                        port.write(key)
+            if not opts.quiet:
+                print("Programmer: Connected")
+
+            # -c: just check and exit
+            if opts.check:
+                return 0
+
+            if not opts.quiet:
+                print("Terminal mode. Press Ctrl+C to exit.")
+                print("---")
+
+            terminal_loop(port, opts)
 
     except serial.SerialException as e:
         print(f"Error: Serial port error: {e}")

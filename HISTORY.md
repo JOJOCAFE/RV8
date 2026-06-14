@@ -1,5 +1,20 @@
 # RV8 Project — Development History
 
+## 2026-06-14 — v3.6: Programmer Bus-Based Redesign
+
+- Programmer connects via RV8-Bus (40-pin) instead of direct ROM
+- Firmware rewritten: removed /CE /OE, now drives /RST + /WR + /RD on bus
+- Added `?` command for connection check (rv8flash + rv8term use it)
+- Added 2s boot delay + buffer drain (ESP32 resets on serial open)
+- Two usage scenarios documented: bare ROM (A) and full CPU board (B)
+- rv8term.py rewritten following rv8flash.py patterns (check before connect)
+- Added `-c` option to rv8term.py
+- Port + baud displayed on connect (`Port: /dev/ttyUSB0 @ 115200 baud`)
+- Fixed cmd_flash double-send bug in rv8flash.py
+- All docs updated: schematic, README, requirements (6 .md files)
+- Firmware compiled and flashed to ESP32 via arduino-cli
+- 31 tests passing (16 flash + 15 term)
+
 ## 2026-06-14 — v3.5: Programmer Schematic Update
 
 - Replaced schematic with new design (TXS0108E + 74HC595 ×2)
