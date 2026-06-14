@@ -1,5 +1,30 @@
 # RV8 Project — Changelog
 
+## 2026-06-14 — v3.5: Programmer Schematic Update
+
+### Hardware Change
+- **New schematic**: TXS0108E ×2 + 74HC595 ×2 (daisy-chain)
+- **Board**: ESP32-WROOM-32 (verified against pinout image)
+- **Address**: Full 15-bit via shift register (no direct ADDR_PINS)
+- **Control**: /CE, /OE, /WE via TXS0108E #1
+
+### Pin Mapping (all files synced)
+```
+Data D[0:7]:  GPIO [13, 12, 14, 27, 26, 25, 33, 32]
+SR_DATA:      GPIO 23
+SR_CLK:       GPIO 18
+SR_LATCH:     GPIO 19
+/CE:          GPIO 4
+/OE:          GPIO 16
+/WE:          GPIO 17
+```
+
+### Files Updated
+- schematic.md (replaced with Thai pin-by-pin guide + code)
+- rv8_programmer.ino, rv8flash.py, rv8ram-boot.py, rv8term.py
+- All 3 requirement docs
+- rv8_programmer-requirement.md
+
 ## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
 
 ### Gate-Level Simulator (Task 6 Complete)

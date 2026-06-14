@@ -1,5 +1,13 @@
 # RV8 Project — Development History
 
+## 2026-06-14 — v3.5: Programmer Schematic Update
+
+- Replaced schematic with new design (TXS0108E + 74HC595 ×2)
+- Board renamed to ESP32-WROOM-32 (pin-verified)
+- All software pin mappings updated and verified consistent
+- RV8-R design plan created (18 chips, RISC-V, microcode)
+- RV8F concept saved (38 chips, fast SRAM microcode)
+
 ## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
 
 - Gate-level chip simulator: 35 chips, 14 types, 141 test vectors
