@@ -30,7 +30,7 @@ This eliminates the sequential "load A, load B, compute, store" of single-bus de
 | U18 | 74HC138 | Register select A (which reg → bus A) |
 | U19 | 74HC138 | Register select B (which reg → bus B) |
 | U20 | 74HC245 | External data bus buffer |
-| U21 | SST39SF010A | Control microcode (70ns, PDIP-32) |
+| U21 | AT28C256-70 ×2 | Control microcode (16-bit, 70ns) |
 | U22 | 74HC74 | Flags (Z, C) + state bits |
 | — | AT28C256 | Program ROM |
 | — | 62256 | Data RAM |

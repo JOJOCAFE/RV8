@@ -1,5 +1,5 @@
 """
-RV8-GR Wiring — Pin-by-pin, matching 03_wiring_guide.md exactly.
+RV8-GR Wiring — Pin-by-pin, matching 02_wiring_guide.md exactly.
 
 Format: (chip, pin, source_chip, source_pin)  or  (chip, pin, 'SIGNAL_NAME')
         (chip, pin, 'VCC')  (chip, pin, 'GND')
@@ -110,7 +110,7 @@ WIRING = [
     # U9: Accumulator (74HC574)
     # =========================================================================
     ('U9', 1,  'GND'),            # /OE → GND
-    ('U9', 11, 'U27', 11),        # CLK ← Acc_Load_N (U27-11)
+    ('U9', 11, 'U27', 11),        # CLK ← ACC_CLK (U27-11)
     ('U9', 2,  'U17', 4),         # D1 ← AC mux Y0
     ('U9', 3,  'U17', 7),         # D2 ← AC mux Y1
     ('U9', 4,  'U17', 9),         # D3 ← AC mux Y2
@@ -261,7 +261,7 @@ WIRING = [
     # =========================================================================
     ('U21', 1,  'VCC'),            # /CLR1 → VCC
     ('U21', 2,  'GND'),            # D1 → GND
-    ('U21', 3,  'U27', 11),        # CLK1 ← Acc_Load_N
+    ('U21', 3,  'U27', 11),        # CLK1 ← ACC_CLK
     ('U21', 4,  'U22', 19),        # /PR1 ← /P=Q (U22-19)
     # Q1=5 → Z_flag → U28-1
     # FF2 unused: pins 8-13 tied
@@ -292,7 +292,7 @@ WIRING = [
     # U23: Page Register (74HC574)
     # =========================================================================
     ('U23', 1,  'GND'),           # /OE → GND
-    ('U23', 11, 'U25', 13),       # CLK ← PG_Load_N (U25-13)
+    ('U23', 11, 'U25', 13),       # CLK ← PG_CLK (U25-13)
     # D1-D8 (pins 2-9) ← IBUS
     # Q outputs → U3/U4 D inputs (already wired above)
 
@@ -304,7 +304,7 @@ WIRING = [
     ('U24', 3,  'U8', 4),         # 2A ← T1
     # 2Y=4 → U8-2 (NOT Q1)
     ('U24', 5,  'U30', 12),       # 3A ← A15
-    # 3Y=6 → /A15 → ROM /CE
+    # 3Y=6 → /A15 → RAM /CE
     ('U24', 9,  'U5', 19),        # 4A ← JUMP
     # 4Y=8 → /JUMP → U27-4
     ('U24', 11, 'U5', 15),        # 5A ← AC_WR
@@ -326,7 +326,7 @@ WIRING = [
     # 3Y=8 → BUF_OE_SAFE → U7-19
     ('U25', 11, 'U28', 6),        # 4A ← /T2 (U28-6)
     ('U25', 12, 'U27', 8),        # 4B ← /PG_cond (U27-8)
-    # 4Y=13 → PG_Load_N → U23-11
+    # 4Y=13 → PG_CLK → U23-11
 
     # =========================================================================
     # U26: NAND #1 (74HC00)
@@ -358,7 +358,7 @@ WIRING = [
     # 3Y=8 → /PG_cond → U25-12
     ('U27', 12, 'U8', 5),         # 4A ← T2
     ('U27', 13, 'U5', 15),        # 4B ← AC_WR
-    # 4Y=11 → Acc_Load_N → U9-11, U21-3
+    # 4Y=11 → ACC_CLK → U9-11, U21-3
 
     # =========================================================================
     # U28: XOR Gates (74HC86)
@@ -372,6 +372,9 @@ WIRING = [
     ('U28', 9,  'U26', 8),        # 3A ← /AC_BUF
     ('U28', 10, 'VCC'),           # 3B → VCC (XOR with 1 = NOT)
     # 3Y=8 → WR_DIR → U7-1
+    ('U28', 12, 'U5', 13),        # 4A ← XOR_MODE
+    ('U28', 13, 'VCC'),           # 4B → VCC (XOR with 1 = NOT)
+    # 4Y=11 → /XOR_MODE → U33-12
 
     # =========================================================================
     # U29-U30: Address Mux A[15:8] — SEL=ADDR_MODE, A=PC high, B=Data Page
@@ -397,16 +400,20 @@ WIRING = [
     ('U30', 10, 'U32', 13),       # 3B ← DP6
     ('U30', 14, 'U4', 11),        # 4A ← PC15
     ('U30', 13, 'U32', 12),       # 4B ← DP7 (A15!)
-    # 4Y=12 → A15 → RAM /CE, U24-5
+    # 4Y=12 → A15 → ROM /CE, U24-5
 
     # =========================================================================
     # U31: IRQ (74HC74) — FF-A=IE, FF-B=IRQ_FF
     # =========================================================================
-    # (IRQ logic — simplified for v1.0 software save)
+    # U31: IRQ (74HC74) — FF-A=IE, FF-B=IRQ_FF
+    # =========================================================================
+    ('U31', 1,  '/RST'),          # /CLR1 ← /RST (IE=0 on reset)
+    ('U31', 13, '/RST'),          # /CLR2 ← /RST (IRQ_FF=0 on reset)
     ('U31', 4,  'VCC'),           # /PR1 → VCC
     ('U31', 10, 'VCC'),           # /PR2 → VCC
     ('U31', 2,  'VCC'),           # D1 → VCC (IE set to 1 by EI clock)
     ('U31', 12, 'VCC'),           # D2 → VCC (IRQ latch)
+    ('U31', 3,  'U33', 8),        # CLK1 ← EI_decode (U33 gate 2)
 
     # =========================================================================
     # U32: Data Page Register (74HC574)
@@ -424,11 +431,17 @@ WIRING = [
     ('U33', 4,  'U26', 6),        # 1C ← /ADDR_MODE (U26-6)
     ('U33', 5,  'U24', 10),       # 1D ← /AC_WR (U24-10)
     # 1Y=6 → DP_Load → U32-11
+    ('U33', 9,  'U8', 5),         # 2A ← T2
+    ('U33', 10, 'U5', 16),        # 2B ← SRC
+    ('U33', 12, 'U28', 11),       # 2C ← /XOR_MODE (U28-11)
+    ('U33', 13, 'U24', 10),       # 2D ← /AC_WR (U24-10)
+    # 2Y=8 → EI_decode → U31-3
+    ('U31', 3,  'U33', 8),        # IE CLK ← EI_decode
 
     # =========================================================================
     # ROM: AT28C256
     # =========================================================================
-    ('ROM', 24, 'U24', 6),        # /CE ← /A15 (U24-6)
+    ('ROM', 24, 'U30', 12),       # /CE ← A15 (U30-12) — ROM enabled when A15=0
     ('ROM', 25, 'GND'),           # /OE → GND
     ('ROM', 26, 'VCC'),           # /WE → VCC
     # A0-A14 ← ABUS (connected via mux outputs)
@@ -437,7 +450,7 @@ WIRING = [
     # =========================================================================
     # RAM: 62256
     # =========================================================================
-    ('RAM', 24, 'U30', 12),       # /CE ← A15 (U30-12)
+    ('RAM', 24, 'U24', 6),        # /CE ← /A15 (U24-6) — RAM enabled when A15=1
     ('RAM', 25, 'GND'),           # /OE → GND
     ('RAM', 26, 'U26', 8),        # /WE ← /AC_BUF (U26-8)
     # A0-A14 ← ABUS
@@ -505,4 +518,4 @@ if __name__ == '__main__':
     print(f"IBUS: {len(IBUS_PINS['drivers'])} drivers, {len(IBUS_PINS['readers'])} reader groups")
     print(f"DBUS: {len(DBUS_PINS['connections'])} connections")
     print(f"ABUS: {len(ABUS_PINS['sources'])} source groups")
-    print(f"\n✅ Wiring definition matches 03_wiring_guide.md style")
+    print(f"\n✅ Wiring definition matches 02_wiring_guide.md style")

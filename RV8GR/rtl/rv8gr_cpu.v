@@ -1,9 +1,9 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// Matches 03_wiring_guide.md: 31 logic chips (incl. U31 IRQ, U32 Data Page)
-// Memory: ROM $8000-$FFFF, RAM $0000-$7FFF, PC starts $8000
+// Matches 02_wiring_guide.md: 33 logic chips (U1-U33 incl. U31 IRQ, U32 DP, U33 decode)
+// Memory: ROM $0000-$7FFF, RAM $8000-$FFFF, PC starts $0000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 // 18 instructions (17 + SETDP)
-// IRQ: fixed vector $FF00, IE flag. PC save: software (v1.0), behavioral model saves for testing.
+// IRQ: fixed vector $FF00 (in RAM), IE flag. PC save: software (v1.0), behavioral model saves for testing.
 // Guard: BUF_OE_SAFE = BUF_OE_N OR STR (U25 gate 3 → U7-19)
 // Data Page: U32 74HC574, SETDP $40 → full 64KB data access (ROM+RAM)
 
@@ -21,7 +21,7 @@ module rv8gr_cpu (
     reg        z_flag, halt;
     reg        ie, irq_ff;  // interrupt enable, IRQ latch (74HC74)
 
-    // Memory: ROM at $8000-$FFFF, RAM at $0000-$7FFF
+    // Memory: ROM at $0000-$7FFF (A15=0), RAM at $8000-$FFFF (A15=1)
     reg [7:0] rom [0:32767];
     reg [7:0] ram [0:32767];
 
@@ -49,14 +49,14 @@ module rv8gr_cpu (
     // IRQ condition
     wire irq_pending = irq_ff & ie;
 
-    // Memory read (fetch): A15 selects ROM or RAM
-    wire [7:0] mem_read = pc[15] ? rom[pc[14:0]] : ram[pc[14:0]];
+    // Memory read (fetch): A15=0 → ROM, A15=1 → RAM
+    wire [7:0] mem_read = pc[15] ? ram[pc[14:0]] : rom[pc[14:0]];
 
     // Data address: {data_page_reg[7:0], ir_low} — full 64KB
     wire [15:0] data_addr_full = {data_page_reg, ir_low};
 
     // IBUS during T2: data access uses data_page_reg for full 64KB
-    wire [7:0] ibus = source_type ? (data_addr_full[15] ? rom[data_addr_full[14:0]] : ram[data_addr_full[14:0]]) : ir_low;
+    wire [7:0] ibus = source_type ? (data_addr_full[15] ? ram[data_addr_full[14:0]] : rom[data_addr_full[14:0]]) : ir_low;
 
     // ALU
     wire [7:0] xor_b = xor_mode ? ac : {8{alu_sub}};
@@ -90,12 +90,12 @@ module rv8gr_cpu (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state <= T0;
-            pc <= 16'h8000;
+            pc <= 16'h0000;
             ac <= 8'h00;
             ir_high <= 8'h00;
             ir_low <= 8'h00;
-            page_reg <= 8'h80;
-            data_page_reg <= 8'h00;  // data page 0 on reset
+            page_reg <= 8'h00;
+            data_page_reg <= 8'h80;  // data page $80 → RAM starts $8000
             z_flag <= 1'b1;
             halt <= 1'b0;
             ie <= 1'b0;
@@ -112,8 +112,8 @@ module rv8gr_cpu (
                     state <= T2;
                 end
                 T2: begin
-                    // Store: RAM write only if address in RAM range (A15=0)
-                    if (store && !data_addr_full[15])
+                    // Store: RAM write only if address in RAM range (A15=1)
+                    if (store && data_addr_full[15])
                         ram[data_addr_full[14:0]] <= ac;
                     if (ac_wr) begin
                         ac <= ac_mux;
@@ -131,7 +131,8 @@ module rv8gr_cpu (
                     if (is_di) ie <= 1'b0;
 
                     // IRQ: behavioral model does hardware save-PC
-                    // Physical v1.0: software save (see 03_wiring_guide.md)
+                    // Physical v1.0: software save (see 02_wiring_guide.md)
+                    // Saves PC to RAM $800E/$800F (ram[14:0] = $000E/$000F)
                     if (irq_pending && !pc_load) begin
                         ram[8'h0E] <= pc[7:0];
                         ram[8'h0F] <= pc[15:8];

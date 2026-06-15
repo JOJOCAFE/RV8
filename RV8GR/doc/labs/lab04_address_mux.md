@@ -28,7 +28,7 @@ CPU ต้องเข้าถึง 2 ที่อยู่:
   T2:    ABUS = IRL+DP  → อ่าน/เขียนข้อมูลจาก RAM
 ```
 
-74HC157 = ตัวเลือก 4 บิต (4:1 mux ×4 ช่อง)
+74HC157 = Quad 2-to-1 Multiplexer (มี 4 ช่อง แต่ละช่องเลือก A หรือ B)
 - S=0 → เอา input "A" (จาก PC)
 - S=1 → เอา input "B" (จาก IRL)
 
@@ -219,8 +219,8 @@ python3 lab04_address_mux.py
 > Lab นี้ต่อ DP0-DP7 = GND ทำให้ address high byte = $00 เสมอ
 > ใน CPU จริง มี Data Page Register (U32) ที่กำหนด A[15:8] ตอน access RAM:
 > ```
-> SETDP $10    → DP = $10
-> LB $03       → address = $1003 (DP:IRL = $10:$03)
+> SETDP $90    → DP = $90
+> LB $03       → address = $9003 (DP:IRL = $90:$03)
 > ```
 > จะได้เรียนใน Lab 12
 
@@ -228,9 +228,7 @@ python3 lab04_address_mux.py
 
 ## Challenge (ไม่บังคับ)
 
-### Challenge A: ให้ Ring Counter ควบคุม Mux
-
-ใน CPU จริง ADDR_MODE = SRC OR STR → HIGH เฉพาะ T2
+### Challenge A: ให้ Ring Counter ควบคุม Mux (สาธิต)
 
 ลองต่อ:
 ```
@@ -242,5 +240,13 @@ SEL (pin 1 ทุกตัว) ← T2 (U8 pin 5 จาก Lab 02)
 - T2: ABUS = IRL (execute)
 
 → **Control Unit ควบคุม Address Mux โดยอัตโนมัติ!**
+
+> ⚠️ **หมายเหตุ: CPU จริงใช้ ADDR_MODE ไม่ใช่ T2 ตรงๆ**
+>
+> RV8-GR จริง: `ADDR_MODE = SRC OR STR` (จาก U25)
+> ไม่ใช่ทุก T2 จะเปลี่ยน address — เฉพาะคำสั่ง LB/SB/ADD/SUB/XOR เท่านั้น
+> คำสั่ง LI, ADDI, SETPG ไม่มี SRC/STR → ABUS ยังเป็น PC แม้ใน T2
+>
+> Challenge นี้ใช้ T2 เพื่อสาธิตแนวคิดเท่านั้น
 
 **ผ่านทุกข้อ → ไป Lab 05!** 🎉

@@ -1,5 +1,5 @@
 """
-Lab 05: IR Latch — U5 (IR_HIGH) + U6 (IR_LOW)
+Lab 06: IR Latch — U5 (IR_HIGH) + U6 (IR_LOW)
 
 Wiring:
   U5 D[1:8] ← IBUS,  U5 CLK ← T0
@@ -25,17 +25,18 @@ def read_ir_high():
 def read_ir_low():
     return sum(U6.get(19-i)<<i for i in range(8))
 
-# Test sequence: (IBUS_val, clock_which, expected_IR_HIGH, expected_IR_LOW)
+# Test sequence matches Lab 06 ROM pattern:
+# $0000=$10 (ADDI), $0001=$05, $0002=$90 (SUBI), $0003=$02
 TEST_SEQUENCE = [
-    # Set /OE=0 for both
-    (0x30, 'U5', 0x30, 0x00),   # T0 edge: U5 latches $30
-    (0x42, 'U6', 0x30, 0x42),   # T1 edge: U6 latches $42
-    (0x10, 'U5', 0x10, 0x42),   # new T0: U5 latches $10
-    (0x05, 'U6', 0x10, 0x05),   # new T1: U6 latches $05
+    # (IBUS_val, clock_which, expected_IR_HIGH, expected_IR_LOW)
+    (0x10, 'U5', 0x10, 0x00),   # T0: U5 latches ADDI ($10)
+    (0x05, 'U6', 0x10, 0x05),   # T1: U6 latches operand $05
+    (0x90, 'U5', 0x90, 0x05),   # T0: U5 latches SUBI ($90)
+    (0x02, 'U6', 0x90, 0x02),   # T1: U6 latches operand $02
 ]
 
 if __name__ == '__main__':
-    print("Lab 05: IR Latch (U5 + U6)")
+    print("Lab 06: IR Latch (U5 + U6)")
     print("-" * 40)
 
     U5.set(1, 0); U6.set(1, 0)  # /OE=0
@@ -50,4 +51,4 @@ if __name__ == '__main__':
         print(f"  CLK{i}: IBUS=${ibus:02X} → {clk_chip} edge → IR_H=${h:02X} IR_L=${l:02X}  {status}")
         assert h == exp_h and l == exp_l
 
-    print("\n✅ Lab 05 PASS: IR latches control byte and operand separately")
+    print("\n✅ Lab 06 PASS: IR latches control byte and operand separately")

@@ -1,5 +1,5 @@
 """
-Lab 10: Full Execute — LI $42 runs through all chips, AC=$42
+Lab 13: Full System — LI $42 runs through all chips, AC=$42
 
 Integration of all modules:
   T0: fetch $30 → IR_HIGH
@@ -133,7 +133,7 @@ U8.set(1,1); U8.set(2,1); U8.clock_edge()
 
 
 if __name__ == '__main__':
-    print("Lab 10: Full Execute (LI $42 → AC=$42)")
+    print("Lab 13: Full System (LI $42 → AC=$42)")
     print("-" * 40)
 
     # 3 phases: T0, T1, T2
@@ -149,4 +149,4 @@ if __name__ == '__main__':
     ac = sum(U9.get(19-i)<<i for i in range(8))
     print(f"\n  Final AC = ${ac:02X}")
     assert ac == 0x42, f"Expected $42, got ${ac:02X}"
-    print("\n✅ Lab 10 PASS: LI $42 executed through all chips → AC=$42")
+    print("\n✅ Lab 13 PASS: LI $42 executed through all chips → AC=$42")

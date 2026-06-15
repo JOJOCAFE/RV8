@@ -23,7 +23,7 @@ ROM._data[0x0000] = 0x30  # LI
 ROM._data[0x0001] = 0x42  # $42
 ROM._data[0x0002] = 0x10  # ADDI
 ROM._data[0x0003] = 0x05  # $05
-ROM._data[0x1000] = 0xAB  # at $9000 (offset $1000)
+ROM._data[0x1000] = 0xAB  # at $1000 (offset $1000 in ROM)
 
 def fetch(addr):
     """Set address, read ROM→U7→IBUS."""

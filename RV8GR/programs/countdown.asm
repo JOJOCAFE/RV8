@@ -1,7 +1,7 @@
 ; RV8-GR Test Program — Count down from 5 to 0
 ; Expected: AC ends at 0, loops 5 times
 
-.org $8000
+.org $0000
 
 start:
     li    5           ; AC = 5

@@ -1,5 +1,5 @@
 ; RV8-GR Test ROM — Full hardware verification
-; Flash to SST39SF010A. PC starts at $8000.
+; Flash to SST39SF010A. PC starts at $0000.
 ; PASS: halts at 'pass' label. FAIL: halts earlier.
 
 ; === TEST 1: ALU immediate ===
@@ -84,14 +84,14 @@ t7fail:
 t8ok:
 
 ; === TEST 8: SETPG + J (cross-page) ===
-    SETPG $90
-    J $00           ; → $9000
+    SETPG $10
+    J $00           ; → $1000
 
 ; === TEST 9: SETPG_R ===
 t8ret:
-    LI $80
-    MV $04, a0      ; RAM[4]=$80
-    SETPG_R $04     ; PG=RAM[4]=$80
+    LI $00
+    MV $04, a0      ; RAM[4]=$00
+    SETPG_R $04     ; PG=RAM[4]=$00
 
 ; === TEST 10: Subroutine ===
     LI lo(subret)
@@ -108,16 +108,16 @@ subret:
 pass:
     HLT
 
-; === Subroutine at $80C0 ===
-.ORG $80C0
+; === Subroutine at $00C0 ===
+.ORG $00C0
 mysub:
     LI $77
     MV $05, a0      ; RAM[5]=$77
-    SETPG $80
+    SETPG $00
     J lo(subret)    ; return
 
-; === Page $90 code ===
-.ORG $9000
-page90:
-    SETPG $80
-    J lo(t8ret)     ; back to page $80
+; === Page $10 code ===
+.ORG $1000
+page10:
+    SETPG $00
+    J lo(t8ret)     ; back to page $00

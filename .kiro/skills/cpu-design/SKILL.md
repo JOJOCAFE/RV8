@@ -9,7 +9,7 @@ description: RV8 8-bit RISC-V style CPU design patterns. 64K address space, RAM-
 
 - **8-bit data bus**, 16-bit address bus (64KB address space)
 - **RISC-V style mnemonics**: ADD, SUB, LB, SB, BEQ, J
-- **RAM-backed registers**: 8 registers at $00-$07 in main RAM
+- **RAM-backed registers**: 8 registers at $8000-$8007 (DP=$80, operand $00-$07)
 - **Accumulator-based**: AC is the primary ALU input/output
 - **RV8-Bus**: 40-pin (A[15:0] + D[7:0] + control signals)
 
@@ -22,14 +22,25 @@ description: RV8 8-bit RISC-V style CPU design patterns. 64K address space, RAM-
 | **RV8-G** | 38 | No | 35 | 2.5 | Full ISA, no microcode |
 | **RV8-GR** | 30 | No | 17 | 3.3 | Fastest, execute RAM |
 
-### RV8-GR (current)
+### RV8-GR (current — BUILDING)
 
-- **30 logic chips** (29 + 1 for IRQ)
+- **33 logic chips** + ROM + RAM = 35 packages
 - **No microcode** — direct-encoded control bytes
 - **3-cycle execution**: T0=fetch control, T1=fetch operand, T2=execute
-- **Full 64K**: A15 chip select (ROM $8000-$FFFF, RAM $0000-$7FFF)
+- **Full 64K**: A15 chip select (ROM $0000-$7FFF, RAM $8000-$FFFF)
+- **Chip select**: ROM /CE=A15 (direct), RAM /CE=/A15 (U24 inverter)
 - **16-bit jump**: Page Register for full address space
-- **Execute from RAM**: PC in $0000-$7FFF fetches from RAM
+- **Execute from RAM**: PC in $8000-$FFFF fetches from RAM
+- **Reset**: PC=$0000 → boots directly from ROM (standalone, no Programmer needed)
+- **Registers**: $8000-$8007 via default DP=$80
+- **IRQ**: v1.0=polling (U31), v1.1=hardware vector $FF00 (+2 chips)
+- **Memory layout**:
+  - $0000-$7FFF: ROM (program, lookup tables)
+  - $8000-$8007: RAM (registers r0-r7)
+  - $8008-$FEFF: RAM (general data, stack, executable)
+  - $FF00-$FF0F: RAM (ISR vector, v1.1)
+  - $FF10-$FF2F: I/O slots (/SLOT1, /SLOT2)
+  - $FF30-$FFFF: RAM (available)
 
 ## Control Byte Encoding (RV8-GR)
 
@@ -78,8 +89,8 @@ Bit 0: JUMP       — 0=no jump, 1=unconditional PC load
 
 1. Falling edge of /IRQ latches IRQ_FF=1
 2. At end of T2, if IRQ_FF=1 AND IE=1 AND no jump in progress:
-   - Save PC to RAM[$0E] (low) and RAM[$0F] (high)
-   - Jump to vector $FF00
+   - Save PC to RAM[$800E] (low) and RAM[$800F] (high)
+   - Jump to vector $FF00 (in RAM — user must set up ISR before EI)
    - Clear IE (prevent nesting)
    - Clear IRQ_FF
 3. If a jump is in progress, IRQ is deferred to next instruction
@@ -123,6 +134,8 @@ Bit 0: JUMP       — 0=no jump, 1=unconditional PC load
 | U28 | 74HC86 | XOR (Z_match, /T2, WR_DIR) |
 | U29-U30 | 74HC157 ×2 | Address mux A8-A15 |
 | U31 | 74HC74 | IRQ_FF + IE_FF |
+| U32 | 74HC574 | Data Page Register |
+| U33 | 74HC21 | SETDP decode + EI decode |
 
 ## Verilog Conventions
 
@@ -151,10 +164,10 @@ wire pg_load = mux_sel & ~ac_wr;
 
 ### 1. A15 Chip Select
 ```verilog
-wire [7:0] mem_read = pc[15] ? rom[pc[14:0]] : ram[pc[14:0]];
+wire [7:0] mem_read = pc[15] ? ram[pc[14:0]] : rom[pc[14:0]];
 ```
-- ROM at $8000-$FFFF (A15=1)
-- RAM at $0000-$7FFF (A15=0)
+- ROM at $0000-$7FFF (A15=0, ROM /CE=A15)
+- RAM at $8000-$FFFF (A15=1, RAM /CE=/A15)
 
 ### 2. IBUS During T2
 ```verilog
@@ -202,17 +215,24 @@ J ret_lo            ; $01, ret_lo
 ```bash
 # Full ISA test
 cd RV8GR
-iverilog -o tb/sim_full.vvp rv8gr_cpu.v tb/tb_rv8gr_full.v
-vvp tb/sim_full.vvp
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
 # === ALL TESTS PASSED === (127 cycles)
 
 # IRQ test
-iverilog -o tb/sim_irq.vvp rv8gr_cpu.v tb/tb_rv8gr_irq.v
-vvp tb/sim_irq.vvp
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
 # === ALL IRQ TESTS PASSED ===
 
-# Run simulation
-gtkwave rv8gr_test.vcd
+# SETDP test
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_setdp.v && vvp /tmp/tb.vvp
+# === SETDP TEST PASSED === (160 cycles)
+
+# Python gate-level sim
+python3 sim/chip_sim.py
+# ALL 8 CPU TESTS PASSED ✅
+
+# Soft debug trace
+python3 sim/soft_debug.py
+# ALL SOFT DEBUG TESTS PASSED ✅
 
 # Assemble program
 python3 tools/rv8gr_asm.py programs/testrom.asm -o programs/testrom.bin
@@ -262,10 +282,42 @@ python3 tools/rv8gr_asm.py programs/testrom.asm -o programs/testrom.bin
 - Shift: DATA=23, CLK=18, LATCH=19
 - Control out: /RST=4 (bus 26), /WR=16 (bus 27), /RD=17 (bus 28)
 - Input: /SLOT1=34 (bus 30), /RD=35 (bus 28), /WR=36 (bus 27), MODE=39
-- ROM selected by A15=0 (CPU board address decode)
+- ROM selected by A15=0 (ROM /CE=A15, active when A15=0)
 - PROG mode: hold /RST, drive A+D+/WR+/RD → flash ROM on CPU board
 - RUN mode: release bus, UART bridge via /SLOT1
 - Scenarios: A=bare ROM on bus, B=full CPU board (hold /RST)
 - Firmware protocol: `?`→`Connected\n`, `F`→`K\n`+data→`D\n`, `V`→32KB, `R`→`K\n`
 - Tools: rv8flash.py (flash/read/verify), rv8term.py (terminal bridge)
 - 31 tests passing (16 flash + 15 term)
+
+## Current Status (2026-06-15)
+
+- **Design**: Signed off, gate-level verified, ready for physical build
+- **Verilog**: ALL 4 TESTBENCHES PASS (full 127 cycles, IRQ, tasks, SETDP 160 cycles)
+- **Gate-level sim**: chip_sim.py 8/8, soft_debug.py 4/4
+- **Memory map**: ROM $0000-$7FFF, RAM $8000-$FFFF (swapped 2026-06-15)
+- **Timing**: max 9.7 MHz theoretical, 1 MHz recommended for breadboard
+- **Hardware labs**: 14 of 14 written (Thai, middle school level)
+- **Source of truth**: `doc/00_design_isa.md` + `doc/02_wiring_guide.md`
+
+## TODO
+
+## Current TODO
+- Wiring Guide แบบรูปภาพ (visual diagrams per module)
+- Bring-up Labs (hands-on build, labs 01-14)
+- Debug Labs (fault injection exercises)
+- Example Programs (.asm collection: blink, counter, game)
+- Assembler Tutorial (rv8gr_asm.py usage guide)
+- Order parts for physical build
+- Build Lab 01-14 on breadboard
+- RV8-R architecture design (when ready)
+
+## Design Status
+- RV8-GR: **Architecture Frozen v1.0** — all 9 docs consistent and signed off
+- Verilog: ALL TESTS PASSED (127 cycles + IRQ + SETDP)
+- Gate-level sim: 3 .bin programs pass through all 35 chips
+- Wiring sim: 257 connections verified, all critical nets confirmed
+- Timing: max 9.7 MHz, safe at 1 MHz (700ns+ margin)
+- BOM finalized, 5-board breadboard layout planned
+- Hardware labs: 14 written (Thai, middle school level), synced with debug plan
+- Documentation freeze date: 2026-06-16

@@ -11,16 +11,16 @@
 | Logic chips | 33 (74HC series, DIP) |
 | Total packages | 35 (+ ROM + RAM) |
 | ISA | 18 instructions |
-| Clock | 5 MHz (start), 10 MHz (target) |
-| Speed | 1.67 MIPS @ 5 MHz, 3.3 MIPS @ 10 MHz |
+| Clock | 1 MHz (breadboard), 5 MHz (PCB) |
+| Speed | 333K instr/sec @ 1 MHz |
 | Gate count | ~1,260 (logic only, excl. ROM/RAM) |
-| Address | 64KB (ROM $8000+, RAM $0000+) |
+| Address | 64KB (ROM $0000-$7FFF, RAM $8000-$FFFF) |
 | Bus | RV8-Bus 40-pin (A16+D8+control) |
-| Registers | 8 in RAM ($00-$07) |
+| Registers | 8 in RAM ($8000-$8007 via DP=$80) |
 | ALU | ADD, SUB, XOR |
 | Jump | 16-bit (Page Register) |
-| Execute RAM | Yes |
-| IRQ | Fixed vector $FF00 |
+| Execute RAM | Yes (PC ≥ $8000) |
+| IRQ | v1.0: polling, v1.1: vector $FF00 |
 
 ---
 
@@ -43,50 +43,50 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 ### Logic (33 chips)
 
-| Part | Qty | Package | Notes |
-|------|:---:|:-------:|-------|
-| 74HC161 | 4 | 16DIP | PC counter |✅ |
-| 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ | มี 6 ตัว
-| 74HC245 | 1 | 20DIP | Bus buffer |✅ | มี 3 ตัว
-| 74HC164 | 1 | 14DIP | Ring counter |✅ |
-| 74HC283 | 2 | 16DIP | Adder | waiting
-| 74HC86 | 3 | 14DIP | XOR |✅ |✅ |
-| 74HC541 | 1 | 20DIP | AC buffer |✅ |
-| 74HC157 | 8 | 16DIP | Muxes | waiting
-| 74HC74 | 2 | 14DIP | Z flag, IRQ |✅ |
-| 74HC688 | 1 | 20DIP | Zero detect |✅ |
-| 74HC04 | 1 | 14DIP | Inverters |✅ |
-| 74HC32 | 1 | 14DIP | OR gates |✅ |
-| 74HC00 | 2 | 14DIP | NAND gates |✅ |
-| 74HC21 | 1 | 14DIP | SETDP decode | ✅ |มี 2 ตัว
+| Part | Qty | Package | Notes |    |count|
+|------|:---:|:-------:|-------|-----|-----|
+| 74HC161 | 4 | 16DIP | PC counter |✅ |   |
+| 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ | มี 6 ตัว|
+| 74HC245 | 1 | 20DIP | Bus buffer |✅ | มี 3 ตัว|
+| 74HC164 | 1 | 14DIP | Ring counter |✅ |   |
+| 74HC283 | 2 | 16DIP | Adder | waiting|  |
+| 74HC86 | 3 | 14DIP | XOR |✅ |✅ |  |
+| 74HC541 | 1 | 20DIP | AC buffer |✅ |  |
+| 74HC157 | 8 | 16DIP | Muxes | waiting|  |
+| 74HC74 | 2 | 14DIP | Z flag, IRQ |✅ |  |
+| 74HC688 | 1 | 20DIP | Zero detect |✅ |  |
+| 74HC04 | 1 | 14DIP | Inverters |✅ |  |
+| 74HC32 | 1 | 14DIP | OR gates |✅ |  |
+| 74HC00 | 2 | 14DIP | NAND gates |✅ |  |
+| 74HC21 | 1 | 14DIP | SETDP decode | ✅ |มี 2 ตัว|
 
 ### Memory
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| AT28C256-70 or SST39SF010A-70 | 1 | ROM 32KB, 70ns |
-| 62256-70 (or AS6C62256) | 1 | RAM 32KB, 70ns |
+| AT28C256-70 or SST39SF010A-70 | 1 | ROM 32KB, 70ns |waiting|  |
+| 62256-70 (or AS6C62256) | 1 | RAM 32KB, 70ns |waiting|  |
 
 ### Clock & Reset
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| 5 MHz crystal (HC49S) | 1 | Start clock |
-| 22pF capacitor | 2 | Crystal load caps |
-| 10kΩ resistor | 1 | Reset pull-up |
-| 100nF capacitor | 1 | Reset RC |
-| Push button (NO) | 1 | Reset button |
+| 5 MHz crystal (HC49S) | 1 | Start clock |waiting|  |
+| 22pF capacitor | 2 | Crystal load caps |waiting|  |
+| 10kΩ resistor | 1 | Reset pull-up |waiting|  |
+| 100nF capacitor | 1 | Reset RC |waiting|  |
+| Push button (NO) | 1 | Reset button |waiting|  |
 
 ### Passives & Debug
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| 100nF capacitor (ceramic) | 35 | Bypass (1 per chip) |
-| 10µF capacitor | 2 | Power filter |
-| 330Ω resistor | 8 | LED current limit |
-| LED 3mm green | 8 | Bus probe |
-| LED 3mm red | 1 | Power |
-| DIP switch 8-bit | 1 | Debug input |
+| 100nF capacitor (ceramic) | 35 | Bypass (1 per chip) |waiting|  |
+| 10µF capacitor | 2 | Power filter |waiting|  |
+| 330Ω resistor | 8 | LED current limit |waiting|  |
+| LED 3mm green | 8 | Bus probe |waiting|  |
+| LED 3mm red | 1 | Power |waiting|  |
+| DIP switch 8-bit | 1 | Debug input |waiting|  |
 
 ### Breadboard & Wiring
 
@@ -140,13 +140,17 @@ Board 4: CONTROL         Board 5: BUS + DEBUG
 
 ```bash
 cd RV8GR
-iverilog -o tb/sim_full.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v
-vvp tb/sim_full.vvp
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
 # === ALL TESTS PASSED === (127 cycles)
 
-iverilog -o tb/sim_irq.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v
-vvp tb/sim_irq.vvp
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
 # === ALL IRQ TESTS PASSED ===
+
+python3 sim/chip_sim.py
+# ALL 8 CPU TESTS PASSED ✅
+
+python3 sim/verify_wiring.py
+# ALL WIRING VERIFIED ✅
 ```
 
 ---
@@ -174,8 +178,8 @@ RV8GR/
 │   └── gate_sim.py             Python gate-level simulation
 └── doc/
     ├── 00_design_isa.md        Design + ISA reference
-    ├── 02_instruction_trace.md Pin-level traces
-    ├── 03_wiring_guide.md      SOURCE OF TRUTH (wiring)
+    ├── 02_wiring_guide.md      SOURCE OF TRUTH (wiring)
+    ├── 03_instruction_trace.md Pin-level traces
     ├── 04_bank_switch.md       Memory expansion
     ├── 05_understand_by_module.md  Thai tutorial
     ├── 06_debug_plan.md        Physical build debug steps
@@ -212,21 +216,23 @@ RV8GR/
 | 6 | Gate-level simulator | ✅ |
 | 7 | Breadboard layout plan | ✅ |
 | 8 | Order parts | ⬜ |
-| 9 | Physical build (5 MHz) | ⬜ |
-| 10 | Verify at 10 MHz | ⬜ |
+| 9 | Physical build (1 MHz) | ⬜ |
+| 10 | Verify at 1-2 MHz | ⬜ |
 | 11 | BASIC interpreter | ⬜ |
 | 12 | Simple game | ⬜ |
 
 ### Task 6: Gate-Level Simulator ✅
 
-All 35 chips simulated pin-by-pin. 3 .bin programs verified.
+All 35 chips simulated pin-by-pin. 8 CPU tests + 11K wiring checks pass.
 
 ```
 sim/
-├── chips/__init__.py       — 35 chips with behavior
-├── chips/test_chips.py     — 141 test vectors
-├── chip_sim.py             — Full CPU simulation + timing
-├── wiring.py               — 247 pin connections (03_wiring_guide)
-├── sim_lab/lab01-10.py     — 10 step-by-step labs
-└── soft_debug.py           — High-level trace
+├── chips/__init__.py       — 35 chip models
+├── chips/test_chips.py     — 141 test vectors (14 chip types)
+├── chip_sim.py             — Full CPU simulation + timing analysis
+├── soft_debug.py           — High-level trace (4 tests)
+├── gate_sim.py             — Simplified educational sim
+├── verify_wiring.py        — Pin-level wiring checker (11K+ checks)
+├── wiring.py               — 247 pin connections (02_wiring_guide)
+└── sim_lab/lab01-14.py     — 14 step-by-step labs
 ```

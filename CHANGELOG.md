@@ -1,5 +1,41 @@
 # RV8 Project — Changelog
 
+## 2026-06-16 — v3.7: Documentation Freeze & Consistency Pass
+
+### Architecture Documentation (ALL FROZEN 🔒)
+- **00_design_isa.md**: Added Architectural Invariants (7 rules), Hardware Freeze Policy (9 signals), Signal Naming Convention (suffix rules), Reset Contract, Forbidden Bus States, Instruction Trace Contract (13-field canonical format), Illegal Opcode Behavior (18/174/64 split with examples), Expansion Budget normalized (v1.0=35, v1.1=37, remaining=3)
+- **02_wiring_guide.md**: Added Critical Timing Paths table (6 paths), Critical Nets Summary (12 key signals with source/dest pins), IRQ_FF clear wording fixed (v1.0 = /RST only)
+- **03_instruction_trace.md**: Added Trace 10 (Forbidden Opcode $0C), Trace 11 (Boot Sequence 9-clock), Golden Trace (12-cycle regression reference), all signal clarifications
+- **04_bank_switch.md**: Added v2.x Banking Contract (2-bit/128KB/74HC74), Banked Address Formula, Reserved I/O Table ($FF10), Compatibility Contract, Interrupt Safety Rule
+- **06_debug_plan.md**: Added Step 0 (Boot Sanity Check), Bus Ownership Verification, Clock Integrity, Floating Input Audit, Memory Contention Test, Walking-1/RAM March, Ring Counter State Matrix, Clock Sweep, Power Integrity, Reset Recovery, Golden Bring-up Program (20-byte ROM image), Burn-in test, IRQ_FF sticky note
+- **05_understand_by_module.md**: Added Block Diagram, Fetch→Fetch→Execute, ISA Table (18 instr), Clock-by-Clock Walkthrough, State Diagram, Two's Complement example, Registers in RAM, PG vs DP table, Memory Map with I/O, Chapter Book roadmap
+- **07_risk_analysis.md**: Added Known Limitations (L1: $60 PG+DP conflict, L2: IRQ_FF sticky, L3: Hidden free instructions)
+- **08_design_signoff.md**: Added Status Levels table (FROZEN/VERIFIED/PENDING), Remaining Proof checklist, IRQ v1.0 polling corrected
+- **09_task_test_plan.md**: Verified consistent (no changes needed)
+
+### Simulation
+- **wiring.py**: Fixed missing U31 /RST connections (pin 1, pin 13) — IE and IRQ_FF now properly reset
+- **sim_lab/lab14_irq_bus.py**: Labeled as v1.1 behavior (matching Verilog model)
+- All sims pass: chip_sim ✅, verify_wiring ✅, soft_debug ✅, gate_sim ✅
+
+### Hardware Labs (14 labs synced with debug plan)
+- lab01: Added bypass cap warning, clock integrity, rail continuity, rising edge diagram, reset LED, troubleshooting
+- lab02: Added state machine diagram, Q3-Q7 debug header, recovery wording fix, milestone summary
+- lab04: Fixed 74HC157 description (Quad 2-to-1), Challenge A ADDR_MODE clarification
+- lab05: Fixed ROM test data ($11→$30/$42), added Bus Ownership diagram, Hi-Z explanation, clock note
+- lab06: Added Bus Ownership Verification table, Bus Float Test
+- lab08: Fixed "AC=$00 (reset)" → "AC=unknown"
+- lab09: Added async preset toggle test
+- lab10: Added PC_LOAD Priority Test
+- lab11: Added Long Jump Test ($FFFF, $AA55)
+- lab12: Added ROM/RAM Boundary Test, Memory Contention Test
+- lab14: Fixed IRQ from v1.1 auto-jump to v1.0 polling, added sticky latch test
+
+### Status
+- RV8-GR v1.0: **Architecture Complete, Implementation Validation Pending**
+- All 9 documentation files frozen and internally consistent
+- Ready for physical breadboard build
+
 ## 2026-06-14 — v3.6: Programmer Bus-Based Redesign
 
 ### Architecture Change

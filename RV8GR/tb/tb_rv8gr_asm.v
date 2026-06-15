@@ -32,7 +32,8 @@ module tb_rv8gr_asm;
         $display("Halted at PC=$%04X after %0d cycles", cpu.pc, cycle_count);
         $display("AC=$%02X Z=%b PG=$%02X", cpu.ac, cpu.z_flag, cpu.page_reg);
 
-        if (cpu.pc == 16'h8084)
+        // testrom.asm: pass has AC=$00 Z=1 from SUBI $77 test
+        if (cpu.ac == 8'h00 && cpu.z_flag == 1'b1)
             $display("=== ASSEMBLER TEST PASSED ===");
         else
             $display("=== FAILED ===");

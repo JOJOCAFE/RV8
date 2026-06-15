@@ -5,12 +5,12 @@ import rv8gr_asm
 
 class AssemblerEncodingTest(unittest.TestCase):
     def assembled_bytes(self, source):
-        code, _ = rv8gr_asm.assemble(source, 0x8000)
+        code, _ = rv8gr_asm.assemble(source, 0x0000)
         return [b for pc, bytes_list, src in code for b in bytes_list]
 
     def test_base_instruction_encodings(self):
         src = """
-            .org $8000
+            .org $0000
             NOP
             ADDI $10
             SUBI $20
@@ -36,7 +36,7 @@ class AssemblerEncodingTest(unittest.TestCase):
 
     def test_aliases_and_macros(self):
         src = """
-            .org $8000
+            .org $0000
             MV $00,a0
             MV $01,a1
         """

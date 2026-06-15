@@ -1,5 +1,5 @@
 ; RV8-GR Full ISA Test
-; Assembles to ROM at $8000
+; Assembles to ROM at $0000
 ; Expected: halts at 'pass' label with AC=$00, Z=1
 
 start:
@@ -27,19 +27,19 @@ ok2:
     LI $55          ; AC=$55
     ADD $02         ; AC=$55+$FF=$54
     XOR $02         ; AC=$54^$FF=$AB
-    SETPG $90       ; PG=$90
-    J lo(page90)    ; jump to $9000
+    SETPG $10       ; PG=$10
+    J lo(page10)    ; jump to $1000
 
-.ORG $9000
-page90:
-    SETPG $80       ; PG=$80
-    J lo(back)      ; jump back to $802E
+.ORG $1000
+page10:
+    SETPG $00       ; PG=$00
+    J lo(back)      ; jump back to $002E
 
-.ORG $802E
+.ORG $002E
 back:
     LI $80          ; AC=$80
     MV $03, a0      ; RAM[3]=$80
-    SETPG_R $03     ; PG=RAM[3]=$80
+    SETPG_R $03     ; PG=RAM[3]=$80 (used below but doesn't matter for $00xx)
     LI $00          ; AC=$00
     SUBI $00        ; AC=$00, Z=1
 

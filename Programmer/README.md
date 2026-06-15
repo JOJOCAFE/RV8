@@ -176,14 +176,16 @@ The only difference: Scenario B needs `/RST` to stop the CPU.
 
 | Part | Qty | Notes |
 |------|:---:|-------|
-| ESP32-WROOM-32 | 1 | Main controller |
-| TXS0108E module (8-ch) | 2 | Level shifters (control + data) |
-| 74HC595 | 2 | Shift register (address A0-A14) |
-| 40-pin IDC connector | 1 | RV8-Bus connector |
-| 40-pin ribbon cable | 1 | Connect to CPU board |
-| SPDT switch | 1 | PROG/RUN mode select |
-| 100nF capacitor | 4 | Bypass caps |
-| USB cable (micro-B) | 1 | PC to ESP32 |
+| ESP32-WROOM-32 | 1 | Main controller |✅ |   |
+| TXS0108E module (8-ch) | 2 | Level shifters (control + data) |✅ |   |
+| 74HC595 | 2 | Shift register (address A0-A14) | ✅ |   |
+| 40-pin IDC connector | 1 | RV8-Bus connector |- |   |
+| 40-pin ribbon cable | 1 | Connect to CPU board |- |   |
+| SPDT switch | 1 | PROG/RUN mode select |waiting |   |
+| 100nF capacitor | 4 | Bypass caps |waiting |   |
+| USB cable (micro-B) | 1 | PC to ESP32 |- |   |
+| zif socket wide | 1 | for 28C256 ROM |waiting |   |
+
 
 ---
 

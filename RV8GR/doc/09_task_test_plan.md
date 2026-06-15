@@ -8,10 +8,16 @@
 
 | Test | Expected |
 |------|----------|
-| PC starts at $8000 | ✅ |
-| Page Register = $80 | ✅ |
-| AC = $00, Z = 1 | ✅ |
+| PC starts at $0000 | ✅ |
+| Page Register | ? (indeterminate — 74HC574 no /CLR) |
+| Data Page Register | ? (indeterminate — 74HC574 no /CLR) |
+| AC, Z flag | ? (indeterminate — no hardware reset) |
+| IE = 0, IRQ_FF = 0 | ✅ (/CLR ← /RST) |
 | Ring counter at T0 | ✅ |
+
+> 📌 Verilog model initializes PG=$00, DP=$80, AC=$00, Z=1 for simulation.
+> Physical hardware: these values are random at power-on.
+> ROM must begin with: `SETDP $80`, `SETPG $00`, `LI $00`
 
 ---
 
@@ -19,10 +25,10 @@
 
 | Test | Expected |
 |------|----------|
-| T0: latch control byte from ROM[$8000] | IR_HIGH = opcode |
-| T0: PC increments to $8001 | ✅ |
-| T1: latch operand from ROM[$8001] | IR_LOW = operand |
-| T1: PC increments to $8002 | ✅ |
+| T0: latch control byte from ROM[$0000] | IR_HIGH = opcode |
+| T0: PC increments to $0001 | ✅ |
+| T1: latch operand from ROM[$0001] | IR_LOW = operand |
+| T1: PC increments to $0002 | ✅ |
 | T2: execute instruction | ✅ |
 | T2→T0: returns to fetch | ✅ |
 
@@ -53,7 +59,7 @@
 
 | Test | Opcode | Expected |
 |------|--------|----------|
-| SB $00 (AC=$AA) | $04 | RAM[$00]=$AA |
+| SB $00 (AC=$AA) | $04 | RAM[$8000]=$AA |
 | LB $00 | $38 | AC=$AA |
 | ADD $00 (AC=$55, RAM=$AA) | $18 | AC=$FF |
 | SUB $00 (AC=$AA, RAM=$AA) | $98 | AC=$00, Z=1 |
@@ -65,7 +71,7 @@
 
 | Test | Expected |
 |------|----------|
-| SB writes to RAM at $00xx | ✅ |
+| SB writes to RAM at $80xx | ✅ |
 | AC unchanged after SB | ✅ |
 | Multiple stores to different addresses | ✅ |
 
@@ -88,9 +94,9 @@
 |------|----------|
 | SETPG $90 | PG=$90 |
 | J $00 (PG=$90) | PC=$9000 |
-| SETPG_R $03 (RAM[$03]=$80) | PG=$80 |
+| SETPG_R $03 (RAM[$8003]=$80) | PG=$80 |
 | Cross-page jump and return | ✅ |
-| Execute from RAM (PC < $8000) | ✅ |
+| Execute from RAM (PC >= $8000) | ✅ |
 
 ---
 
@@ -99,13 +105,23 @@
 | Test | Expected |
 |------|----------|
 | EI sets IE=1 | ✅ |
-| DI clears IE=0 | ✅ |
+| DI clears IE=0 | ⚠️ v1.0: NOP (no decode). v1.1: hardware clear |
 | /IRQ falling edge latches IRQ_FF | ✅ |
-| IRQ fires at instruction boundary | PC=$FF00 |
-| PC saved to RAM[$0E:$0F] | ✅ |
-| IE cleared on IRQ entry | ✅ |
 | IRQ blocked when IE=0 | ✅ |
+
+**v1.0 Hardware** (33 chips): polling only — software reads IRQ_FF, branches to handler.
+
+**v1.1 / Verilog model** (+2 chips): hardware vector behavior:
+
+| Test | Expected |
+|------|----------|
+| IRQ fires at instruction boundary | PC=$FF00 |
+| PC saved to RAM[$800E:$800F] | ✅ |
+| IE cleared on IRQ entry | ✅ |
 | IRQ deferred during jump | ✅ |
+
+> 📌 Task 9 hardware vector tests apply to **Verilog simulation only**.
+> Physical v1.0 build uses software polling (no hardware PC forcing).
 
 ---
 
@@ -113,10 +129,10 @@
 
 | Test | Expected |
 |------|----------|
-| SETDP $10, SB $00 | RAM[$1000] written |
-| SETDP $10, LB $00 | AC = RAM[$1000] |
-| SETDP $80, LB $00 | AC = ROM[$8000] |
-| SETDP $00, LB $03 | AC = RAM[$0003] (registers) |
+| SETDP $80, SB $00 | RAM[$8000] written |
+| SETDP $80, LB $00 | AC = RAM[$8000] |
+| SETDP $00, LB $00 | AC = ROM[$0000] |
+| SETDP $80, LB $03 | AC = RAM[$8003] (registers) |
 | Cross-page write/read (5KB) | All pages consistent |
 
 ---
@@ -125,7 +141,7 @@
 
 | Test | Expected |
 |------|----------|
-| J self (e.g. $01 $36 at $8036) | PC loops |
+| J self (e.g. $01 $36 at $0036) | PC loops |
 
 ---
 
@@ -134,6 +150,7 @@
 | File | Tasks Covered |
 |------|--------------|
 | `tb/tb_rv8gr_full.v` | 1-8, 11 (127 cycles, ALL PASS) |
+| `tb/tb_rv8gr_tasks.v` | 1-2 (reset + fetch, ALL PASS) |
 | `tb/tb_rv8gr_irq.v` | 9 (6 tests, ALL PASS) |
 | `tb/tb_rv8gr_setdp.v` | 10 (160 cycles, ALL PASS) |
 
@@ -143,15 +160,15 @@
 
 ```bash
 cd RV8GR
-iverilog -o tb/sim_full.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v
-vvp tb/sim_full.vvp
-# === ALL TESTS PASSED ===
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
+# === ALL TESTS PASSED === (127 cycles)
 
-iverilog -o tb/sim_irq.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v
-vvp tb/sim_irq.vvp
-# === ALL IRQ TESTS PASSED ===
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_tasks.v && vvp /tmp/tb.vvp
+# ALL TASK TESTS PASSED
 
-iverilog -o tb/sim_setdp.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_setdp.v
-vvp tb/sim_setdp.vvp
-# === SETDP TEST PASSED ===
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
+# ALL IRQ TESTS PASSED
+
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_setdp.v && vvp /tmp/tb.vvp
+# === SETDP TEST PASSED === (160 cycles)
 ```

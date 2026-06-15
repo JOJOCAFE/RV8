@@ -29,12 +29,12 @@
 
 | # | Task | Status |
 |:-:|------|:------:|
-| 1 | Architecture design | ⬜ |
-| 2 | ISA encoding (2-byte) | ⬜ |
-| 3 | Microcode format + control word | ⬜ |
+| 1 | Architecture design | ✅ |
+| 2 | ISA encoding (2-byte) | ✅ |
+| 3 | Microcode format + control word | ✅ |
 | 4 | Chip list + pin wiring | ⬜ |
-| 5 | Verilog model | ⬜ |
-| 6 | Testbench (all 35 instructions) | ⬜ |
+| 5 | Verilog model | ✅ |
+| 6 | Testbench (all 35 instructions) | ✅ (core 15 tests) |
 | 7 | Assembler (Python) | ⬜ |
 | 8 | Microcode generator (Python) | ⬜ |
 | 9 | Gate-level simulation (sim_lab) | ⬜ |

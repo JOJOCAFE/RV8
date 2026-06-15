@@ -7,43 +7,226 @@
 ## Memory Map
 
 ```
-$0000-$7FFF  RAM 32KB (registers $00-$07, data, executable)
-$8000-$FEFF  ROM 32KB (bankable to 128KB)
-$FF00-$FF0F  ROM: IRQ vector + ISR entry
+$0000-$7EFF  ROM 32KB (bankable to 128KB)
+$7F00-$7FFF  ROM (available)
+$8000-$FEFF  RAM 32KB (registers at $8000-$8007, data, executable)
+$FF00-$FF0F  RAM (ISR vector — user must set up before EI)
 $FF10-$FF1F  I/O Slot 1 (/SLOT1 on bus)
 $FF20-$FF2F  I/O Slot 2 (/SLOT2 on bus)
-$FF30-$FFFF  ROM: ISR code
-Reset → $8000
+$FF30-$FFFF  RAM: available
+Reset → $0000
 ```
+
+> 📌 **Boot Requirements (first 3 instructions in ROM):**
+>
+> ```asm
+> $0000: SETDP $80       ; DP → RAM (registers at $8000-$8007)
+> $0002: SETPG $00       ; PG → page 0 (safe jumps)
+> $0004: LI $00          ; AC = 0, Z = 1
+> ```
+>
+> Why: PG, DP, AC have no hardware reset (74HC574 has no /CLR pin).
+> These 3 instructions don't use SRC/STR, so random DP/PG values are harmless.
+>
+> **DP ranges:** $80-$FF = RAM (read/write) · $00-$7F = ROM (read only, SB ignored)
 
 ---
 
-## Timing Note (Critical for ROM Selection)
+## Timing Note — Official Clock Target: 1 MHz
 
-**U5/U6 latch on rising edge of T0/T1** (= CLK edge that creates the phase).
+### Summary
 
-ROM access window depends on when ADDR_MODE returns to 0 (PC on ABUS):
+| Clock | ROM | Status |
+|:-----:|:---:|:------:|
+| **1 MHz** | 70ns or 150ns | ✅ **Official target** — works with any ROM |
+| 2 MHz | 70ns | ✅ Achievable on short-wire breadboard |
+| 5 MHz | 70ns | ⚠️ PCB only (experimental) |
 
-| Previous Instruction | ADDR_MODE during T2 | ROM access time available |
-|---------------------|:-------------------:|:-------------------------:|
-| LI, ADDI, SUBI, XORI, J, BEQ, BNE, SETPG, SETDP, EI, DI, NOP | 0 (PC on ABUS) | T2 + prop delay = ~115ns |
-| LB, ADD, SUB, XOR, SETPG_R, SB | 1 (IRL on ABUS) | prop delay only = ~15ns ❌ |
+### The Worst Case: Fetch After Memory-Access Instruction
 
-**Issue**: After a data-access instruction (SRC=1 or STR=1), the address mux switches from IRL back to PC at T2→T0 transition. ROM then needs 150ns from new address — but U5 latches ~15ns later!
+After LB/SB/ADD/SUB/XOR/SETPG_R (ADDR_MODE=1 during T2), the address mux switches from {DP,IRL} back to PC at the T2→T0 boundary. ROM then needs access time before U5 can latch valid data.
 
-**Resolution**: The PC address was already on ABUS during T0+T1 of the CURRENT instruction. The ROM at that address was read and latched into U5/U6. For the NEXT instruction, PC has been incremented and the NEW address appears only after T2→T0 switch.
+**Timing chain** (worst case — fetch after LB/SB):
+```
+T2→T0 edge (ring counter shifts)
+  → ADDR_MODE drops LOW (U25 propagation: ~15ns)
+    → Mux switches to PC (U15/U29 propagation: ~15ns)
+      → ROM sees new address (access time: 70-150ns)
+        → U7 buffer (12ns)
+          → Data valid on IBUS
+            → U5 latches at NEXT T0 rising edge
+```
 
-**Actually the correct model**: 
-- U5 latches at T0↑ = captures data that ROM output during PREVIOUS T2/T0 overlap
-- The design relies on: PC doesn't change during T2 (PC_INC=0), so ROM address stays valid
+**Time available** = one full clock period (T0 phase duration):
 
-**Safe ROM timing**:
-- AT28C256-150ns: works if ADDR_MODE=0 during previous T2 (most cases)
-- After LB/SB/ADD/SUB/XOR: address switches late → may need extra cycle or faster ROM
+| Clock | Phase period | Worst path (150ns ROM) | Margin |
+|:-----:|:------------:|:----------------------:|:------:|
+| 1 MHz | 1000ns | 15+15+150+12 = 192ns | **+808ns ✅** |
+| 2 MHz | 500ns | 192ns | **+308ns ✅** |
+| 5 MHz | 200ns | 192ns | **+8ns ⚠️** |
 
-**Recommendation**: Use **70ns ROM/RAM** + start at **5 MHz**.
-70ns parts work reliably at 5 MHz (130ns margin).
-Use 5 MHz crystal for the physical build.
+**Why 1 MHz is completely safe**: Even with 150ns ROM + breadboard stray capacitance (~50ns extra), total worst path ≈ 242ns. At 1 MHz each phase is 1000ns — over 700ns margin.
+
+**Why 5 MHz is risky**: 200ns per phase, worst path 192ns on paper. Zero margin for breadboard capacitance. PCB-only.
+
+### Critical Path: ALU (separate concern)
+
+The ALU path (IR → XOR → Adder → AC mux → AC setup) is internal to T2 and does NOT involve ROM timing:
+
+| Stage | Chip | Typ ns |
+|-------|------|:------:|
+| XOR B-mux | 74HC157 | 15 |
+| XOR array | 74HC86 | 12 |
+| Adder 8-bit ripple | 74HC283 ×2 | 40 |
+| AC input mux | 74HC157 | 15 |
+| AC setup time | 74HC574 | 10 |
+| **Total** | | **~92ns** |
+
+This fits easily within 1 phase at 1 MHz (1000ns).
+
+### Critical Timing Paths (PCB v1.1 Reference)
+
+| Path | Chips | Typ ns | Critical? |
+|------|-------|:------:|:---------:|
+| ROM → U7 → U5 (fetch) | ROM + 74HC245 + 74HC574 | 70+12+5 = 87 | **Yes** |
+| RAM → U7 → AC (load) | RAM + 74HC245 + mux + 574 | 70+12+15+5 = 102 | **Yes** |
+| IR → ALU → AC (execute) | 74HC157+86+283×2+157+574 | 15+12+40+15+5 = 87 | **Yes** |
+| Z → Branch → PC (BEQ) | 74HC86 + 00 + 161 | 12+12+15 = 39 | Medium |
+| PG → PC load (J) | 74HC574 → 161 D-inputs | 0 (static) | Low |
+| DP → Addr mux (SRC) | 74HC574 → 157 | 0+15 = 15 | Low |
+
+> 📌 **PCB layout priority**: Place ROM/RAM/U7/U5 close together (fetch path).
+> ALU cluster (U12-U13, U10-U11, U17-U18, U9) as second priority.
+> Branch logic (U21, U28, U26) is fast — placement less critical.
+
+### Conclusion
+
+**1 MHz = no timing risk.** Use AT28C256-70ns or even 150ns ROM.
+Start breadboard at 1 MHz. Test up to 2 MHz if desired. 5 MHz = PCB/wire-wrap only.
+
+> 📌 **ROM/RAM recommendation: 70ns** (AT28C256-70, 62256-70 or CY7C199-15)
+> This gives maximum headroom for future clock increase.
+> 150ns parts work fine at 1-2 MHz.
+
+### Master Timing Table (one instruction = 3 phases)
+
+| Phase | Action | Signals Asserted | Data Flow |
+|:-----:|--------|------------------|-----------|
+| T0 | Fetch opcode | PC_INC=1, U5 CLK↑ | PC→ABUS→ROM→DBUS→U7→IBUS→U5 |
+| T1 | Fetch operand | PC_INC=1, U6 CLK↑ | PC→ABUS→ROM→DBUS→U7→IBUS→U6 |
+| T2 | Execute | (depends on instruction) | See below |
+
+**T2 actions by instruction type:**
+
+| Type | Key Signals at T2 | What happens |
+|------|-------------------|-------------|
+| ADDI/SUBI | ACC_CLK↑, /IRL_OE=LOW | U6→IBUS→XOR→Adder→mux→AC |
+| ADD/SUB/LB | ACC_CLK↑, ADDR_MODE=1 | IRL→ABUS→RAM→DBUS→U7→IBUS→ALU→AC |
+| XORI | ACC_CLK↑, /IRL_OE=LOW | U6→IBUS→XOR(with AC)→mux→AC |
+| LI | ACC_CLK↑, /IRL_OE=LOW | U6→IBUS→XOR(pass)→mux→AC |
+| SB | /AC_BUF=LOW, ADDR_MODE=1 | AC→U14→IBUS→U7→DBUS→RAM |
+| J/BEQ/BNE | /PC_LD=LOW | {PG,IRL}→PC D-inputs→PC loads |
+| SETPG | PG_CLK↑ | IBUS→U23 (PG register) |
+| SETDP | DP_Load↑ | IBUS→U32 (DP register) |
+| EI | EI_decode↑ | U31 IE=1 |
+| NOP | (nothing) | PC already incremented |
+
+**Key rule**: Only ONE IBUS driver active at T2:
+- SRC=0, STR=0 → U6 (immediate from IRL)
+- SRC=1 → U7 (RAM data)
+- STR=1 → U14 (AC value for store)
+
+### T0/T1/T2 Timing Diagram
+
+```
+CLK     __|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__
+         1    2    3    4    5    6    7    8    9
+
+T0      ‾‾‾|___________________________________|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+T1      ‾‾‾‾‾‾‾‾‾‾‾‾|_________________________|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+T2      ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|_____________|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+              ↑fetch op    ↑fetch imm    ↑execute
+              U5 CLK       U6 CLK        ACC_CLK/PG_CLK/DP_Load
+```
+
+(Ring counter U8: shift register cycles T0→T1→T2→T0)
+
+### Bus Ownership (who drives DBUS/IBUS per phase)
+
+| Phase | ABUS driven by | DBUS driven by | IBUS driven by |
+|:-----:|:--------------:|:--------------:|:--------------:|
+| T0 | PC (U1-U4 via mux) | ROM (data out) | U7 (DBUS→IBUS) |
+| T1 | PC (U1-U4 via mux) | ROM (data out) | U7 (DBUS→IBUS) |
+| T2, SRC=0 STR=0 | PC (unchanged) | ROM (stale) | **U6** (IRL→IBUS) |
+| T2, SRC=1 | DP:IRL (via mux) | RAM (data out) | **U7** (DBUS→IBUS) |
+| T2, STR=1 | DP:IRL (via mux) | **U7** (IBUS→DBUS) | **U14** (AC→IBUS) |
+
+Note: During T2+STR, U7 reverses direction (WR_DIR=1) to write DBUS from IBUS.
+
+
+
+### Reset & Standalone Boot (boots from ROM at $0000)
+
+**Circuit**: RC (10kΩ + 10µF) → 74HC14 Schmitt → /RST LOW ~100ms at power-on.
+
+**Wiring**:
+```
+U1 (PC 0-3):   /CLR ← /RST,   /LD ← /PC_LD (U26-11)
+U2 (PC 4-7):   /CLR ← /RST,   /LD ← /PC_LD (U26-11)
+U3 (PC 8-11):  /CLR ← /RST,   /LD ← /PC_LD (U26-11)
+U4 (PC 12-15): /CLR ← /RST,   /LD ← /PC_LD (U26-11)
+U8:  /CLR ← /RST
+U31: /CLR1,/CLR2 ← /RST
+```
+
+**How it works**:
+1. Power on: /RST=LOW for ~100ms (RC circuit)
+2. U1-U4: /CLR=LOW → PC[15:0] = $0000 (async, immediate)
+3. /RST releases → normal mode. PC = $0000 ✅
+4. CPU fetches first instruction from ROM!
+
+**Normal jump operation**: /PC_LD=LOW → loads {PG, IRL} into PC.
+U3-U4 D-inputs connect to PG (U23 outputs).
+
+**FINAL DECISION for v1.0:**
+
+```
+U1-U4: ALL /CLR ← /RST, ALL /LD ← /PC_LD (standard, no diodes)
+PC resets to $0000. ROM is at $0000-$7FFF. Boots directly from ROM.
+TRUE standalone boot supported — no Programmer needed at power-on.
+```
+
+**Register states after reset:**
+
+| Register | Value | How |
+|----------|:-----:|-----|
+| PC | $0000 | /CLR resets all counters to 0 |
+| PG | ? | 74HC574 has no /CLR — indeterminate |
+| DP | ? | 74HC574 has no /CLR — indeterminate |
+| AC | ? | 74HC574 has no /CLR — indeterminate |
+| Z | ? | 74HC74 /CLR not connected to /RST |
+| IE | 0 | /CLR ← /RST |
+| IRQ_FF | 0 | /CLR ← /RST |
+
+> 📌 **Standalone boot is native in v1.0.**
+> PC resets to $0000 which is in ROM space. No boot stub needed.
+> First instruction in ROM executes immediately after reset.
+
+> 📌 **PG, DP, AC are indeterminate at power-on** (74HC574 has no /CLR).
+> Boot sequence handles this — see "Boot Requirements" above.
+> No hardware fix needed (74HC273 resets to $00, but we need DP=$80).
+> - ต้องการ DP=$80 (bit7=1) → ต้อง preset ซึ่งซับซ้อนเกิน
+> - Software init (`SETDP $80`) ง่ายกว่า + ไม่เพิ่ม hardware
+
+### Placement Notes (breadboard)
+
+```
+U21 (Z flag) and U22 (comparator): place adjacent — minimize /PR wire length.
+U10-U11 (adder): place adjacent — carry chain is timing-critical.
+U12-U13 (XOR) near U10-U11: minimize ALU path delay.
+U5-U6 (IR) near ROM/U7: minimize fetch path delay.
+Bypass caps: one per chip, as close to VCC/GND pins as possible.
+```
 
 ---
 
@@ -156,6 +339,30 @@ A5  ← U16-7     A13 ← U30-7
 A6  ← U16-9     A14 ← U30-9
 A7  ← U16-12    A15 ← U30-12
 ```
+
+---
+
+## Critical Nets Summary
+
+Key control signals — source chip/pin and all destinations. Verify these first during debug.
+
+| Signal | Source | Destinations |
+|--------|--------|-------------|
+| PC_INC | U25-3 (T0 OR T1) | U1-7, U1-10, U2-7, U3-7, U4-7 (ENP/ENT) |
+| /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 (/LD) |
+| ACC_CLK | U27-11 (NAND T2,AC_WR) | U9-11 (AC CLK), U21-3 (Z CLK) |
+| ADDR_MODE | U25-3 (SRC OR STR) | U15-1, U16-1, U29-1, U30-1 (mux SEL) |
+| BUF_OE_SAFE | U25-8 (BUF_OE_N OR STR) | U7-19 (/OE) |
+| WR_DIR | U28-8 (XOR gate) | U7-1 (DIR) |
+| /AC_BUF | U26-8 (NAND T2,STR) | U14-1, U14-19 (/OE), RAM /WE |
+| /IRL_OE | U26-3 (NAND T2,/ADDR_MODE) | U6-1, U6-19 (/OE) |
+| DP_Load | U33-6 (AND gate 1) | U32-11 (CLK) |
+| PG_CLK | U25-6 (/T2 OR /PG_cond) | U23-11 (CLK) |
+| /RST | Reset circuit (RC+Schmitt) | U1-1, U2-1, U3-1, U4-1, U8-9, U31-1, U31-13 |
+| CLK | Oscillator | U8-8, U9-11*, U5-11, U6-11 |
+
+> 📌 If a signal is wrong, check: (1) source chip output, (2) each destination pin, (3) solder/wire continuity.
+> These 12 nets account for >80% of debug issues on breadboard builds.
 
 ---
 
@@ -317,7 +524,7 @@ U9-4  (D3)  ← U17-9 (Y2)     U9-5  (D4)  ← U17-12 (Y3)
 U9-6  (D5)  ← U18-4 (Y4)     U9-7  (D6)  ← U18-7 (Y5)
 U9-8  (D7)  ← U18-9 (Y6)     U9-9  (D8)  ← U18-12 (Y7)
 U9-10 (GND) → GND
-U9-11 (CLK) ← Acc_Load_N (U27-11)
+U9-11 (CLK) ← ACC_CLK (U27-11)
 U9-12 (Q8)  → AC7 → U11-12, U20-13, U14-9, U22-18
 U9-13 (Q7)  → AC6 → U11-14, U20-10, U14-8, U22-16
 U9-14 (Q6)  → AC5 → U11-3, U20-6, U14-7, U22-14
@@ -455,7 +662,7 @@ U20-8 (GND) → GND  U20-16(VCC) → VCC
 ```
 U21-1 (/CLR1) → VCC
 U21-2 (D1)    → GND
-U21-3 (CLK1)  ← Acc_Load_N (U27-11)
+U21-3 (CLK1)  ← ACC_CLK (U27-11)
 U21-4 (/PR1)  ← U22-19 (/P=Q)
 U21-5 (Q1)    → Z_flag → U28-1
 U21-6 (/Q1)   → NC
@@ -463,6 +670,10 @@ U21-7 (GND)   → GND
 U21-8..13     → FF2 unused (CLK2=GND, /PR2=VCC, /CLR2=VCC, D2=GND)
 U21-14(VCC)   → VCC
 ```
+
+> 📌 **Z flag uses async preset** — U22 /P=Q drives U21 /PR.
+> Place U21 and U22 physically adjacent on breadboard (minimize wire delay).
+> Works reliably at 1 MHz. For PCB v2.0: consider synchronous Z update.
 
 ### U22 74HC688 — Zero Detect
 
@@ -483,6 +694,32 @@ U22-20(VCC) → VCC
 
 ### U23 74HC574 — Page Register
 
+> 📌 **74HC574 = positive-edge triggered.** U23/U32 latch data on CLK **rising edge** (LOW→HIGH).
+> Do NOT treat CLK as active-low enable. PG_CLK and DP_Load must provide a clean LOW→HIGH transition.
+
+**PG_CLK timing (SETPG instruction):**
+```
+         T0       T1       T2       T0 (next)
+CLK   __|‾‾|__|‾‾|__|‾‾|__|‾‾|__
+T2    ____________|‾‾‾‾‾‾|________
+PG_cond __________| HIGH |________   (MUX_SEL=1 AND /AC_WR=1)
+/T2   ‾‾‾‾‾‾‾‾‾‾‾‾|_____|‾‾‾‾‾‾‾
+/PG_cond ‾‾‾‾‾‾‾‾‾‾|_____|‾‾‾‾‾‾‾
+PG_CLK ‾‾‾‾‾‾‾‾‾‾‾‾|_____|‾‾‾‾‾‾‾   = /T2 OR /PG_cond
+                           ↑
+                     RISING EDGE = U23 latches IBUS!
+```
+PG_CLK = HIGH normally. Goes LOW only during T2 of SETPG. Returns HIGH at T2→T0 transition = latch point.
+
+PG_CLK truth table:
+
+| T2 | PG_cond (MUX & /AC_WR) | /T2 | /PG_cond | PG_CLK (/T2 OR /PG_cond) | Edge? |
+|:--:|:----------------------:|:---:|:--------:|:------------------------:|:-----:|
+| 0 | X | 1 | X | 1 | — |
+| 1 | 0 | 0 | 1 | 1 | — |
+| 1 | 1 (SETPG!) | 0 | 0 | **0** | — |
+| 0 (T2 ends) | 1→0 | 1 | 0→1 | **1** | **↑ LATCH!** |
+
 ```
 U23-1 (/OE) → GND
 U23-2 (D1) ← IB0   U23-3 (D2) ← IB1
@@ -490,7 +727,7 @@ U23-4 (D3) ← IB2   U23-5 (D4) ← IB3
 U23-6 (D5) ← IB4   U23-7 (D6) ← IB5
 U23-8 (D7) ← IB6   U23-9 (D8) ← IB7
 U23-10(GND) → GND
-U23-11(CLK) ← PG_Load_N (U25-13)
+U23-11(CLK) ← PG_CLK (U25-13)
 U23-12(Q8) → PG7 → U4-6     U23-13(Q7) → PG6 → U4-5
 U23-14(Q6) → PG5 → U4-4     U23-15(Q5) → PG4 → U4-3
 U23-16(Q4) → PG3 → U3-6     U23-17(Q3) → PG2 → U3-5
@@ -503,7 +740,7 @@ U23-20(VCC) → VCC
 ```
 U24-1 (1A) ← T0 (U8-3)         U24-2 (1Y) → NOT(Q0) → U8-1
 U24-3 (2A) ← T1 (U8-4)         U24-4 (2Y) → NOT(Q1) → U8-2
-U24-5 (3A) ← A15 (U30-12)      U24-6 (3Y) → /A15 → ROM /CE
+U24-5 (3A) ← A15 (U30-12)      U24-6 (3Y) → /A15 → RAM /CE
 U24-7 (GND) → GND
 U24-9 (4A) ← JUMP (U5-19)      U24-8 (4Y) → /JUMP → U27-4
 U24-11(5A) ← AC_WR (U5-15)     U24-10(5Y) → /AC_WR → U27-10
@@ -518,7 +755,7 @@ U25-1 (1A) ← SRC (U5-16)   U25-2 (1B) ← STR (U5-17)   U25-3 (1Y) → ADDR_MO
 U25-4 (2A) ← T0 (U8-3)     U25-5 (2B) ← T1 (U8-4)     U25-6 (2Y) → PC_INC
 U25-7 (GND) → GND
 U25-9 (3A) ← BUF_OE_N (U24-12)  U25-10(3B) ← STR (U5-17)  U25-8 (3Y) → BUF_OE_SAFE → U7-19
-U25-11(4A) ← /T2 (U28-6)   U25-12(4B) ← /PG_cond(U27-8) U25-13(4Y) → PG_Load_N → U23-11
+U25-11(4A) ← /T2 (U28-6)   U25-12(4B) ← /PG_cond(U27-8) U25-13(4Y) → PG_CLK → U23-11
 U25-14(VCC) → VCC
 ```
 
@@ -552,8 +789,8 @@ U27-4 ← /JUMP (U24-8)   U27-5 ← /BR_TAKEN (U27-3)   U27-6 → PC_LOAD_COND �
 Gate C: /PG_cond = NAND(MUX_SEL, /AC_WR)
 U27-9 ← MUX (U5-14)   U27-10 ← /AC_WR (U24-10)   U27-8 → /PG_cond → U25-12
 
-Gate D: Acc_Load_N = NAND(T2, AC_WR)
-U27-12 ← T2 (U8-5)   U27-13 ← AC_WR (U5-15)   U27-11 → Acc_Load_N → U9-11, U21-3
+Gate D: ACC_CLK = NAND(T2, AC_WR)
+U27-12 ← T2 (U8-5)   U27-13 ← AC_WR (U5-15)   U27-11 → ACC_CLK → U9-11, U21-3
 
 U27-7 (GND) → GND   U27-14(VCC) → VCC
 ```
@@ -570,8 +807,8 @@ U28-4 ← T2 (U8-5)   U28-5 → VCC   U28-6 → /T2 → U25-11
 Gate C: WR_DIR = /AC_BUF XOR 1 = NOT(/AC_BUF)
 U28-9 ← /AC_BUF (U26-8)   U28-10 → VCC   U28-8 → WR_DIR → U7-1
 
-Gate D: spare
-U28-12 → NC   U28-13 → NC   U28-11 → NC
+Gate D: /XOR_MODE = XOR_MODE XOR 1 = NOT(XOR_MODE)
+U28-12 ← XOR_MODE (U5-13)   U28-13 ← VCC   U28-11 → /XOR_MODE → U33-12
 
 U28-7 (GND) → GND   U28-14(VCC) → VCC
 ```
@@ -592,38 +829,87 @@ U30-1 (SEL) ← ADDR_MODE        U30-15(/E) → GND
 U30-2 (1A) ← PC12   U30-3 (1B) ← DP4 (U32-15)   U30-4 (1Y) → A12
 U30-5 (2A) ← PC13   U30-6 (2B) ← DP5 (U32-14)   U30-7 (2Y) → A13
 U30-11(3A) ← PC14   U30-10(3B) ← DP6 (U32-13)   U30-9 (3Y) → A14
-U30-14(4A) ← PC15   U30-13(4B) ← DP7 (U32-12)    U30-12(4Y) → A15 → RAM /CE, U24-5
+U30-14(4A) ← PC15   U30-13(4B) ← DP7 (U32-12)    U30-12(4Y) → A15 → ROM /CE, U24-5
 U30-8 (GND) → GND   U30-16(VCC) → VCC
 ```
 
-### U31 74HC74 — IRQ (IE_FF + IRQ_FF)
+### U31 74HC74 — IRQ Latch + IE Flag (v1.0 Polling)
 
 ```
-FF-A: IE flag
-U31-1 (/CLR1) ← DI_decode OR IRQ_ack
-U31-2 (D1)    → VCC
-U31-3 (CLK1)  ← EI_decode (T2 AND ir_high=$08)
+FF-A: IE flag (Interrupt Enable)
+U31-1 (/CLR1) ← /RST (clear on reset → IE=0 at boot)
+U31-2 (D1)    → VCC (D=1 always)
+U31-3 (CLK1)  ← EI_decode (U33-8, rising edge sets IE=1)
 U31-4 (/PR1)  → VCC
-U31-5 (Q1)    → IE → IRQ-ack gate
+U31-5 (Q1)    → IE flag → LED
 U31-6 (/Q1)   → NC
 
 FF-B: IRQ latch
 U31-7 (GND)   → GND
-U31-8 (/CLR2) ← IRQ_ack
-U31-9 (D2)    → VCC
-U31-10(CLK2)  ← /IRQ (external, falling edge)
+U31-8 (/CLR2) ← /RST (clear on reset)
+U31-9 (D2)    → VCC (D=1 always)
+U31-10(CLK2)  ← /IRQ (external, active-low from peripheral)
 U31-11(/PR2)  → VCC
-U31-12(Q2)    → IRQ_FF → IRQ-ack gate
+U31-12(Q2)    → IRQ_FF → LED, readable via I/O slot
 U31-13(/Q2)   → NC
 U31-14(VCC)   → VCC
+```
 
-IRQ_ack = T2 AND IE(U31-5) AND IRQ_FF(U31-12) AND NOT(PC_LOAD_COND(U27-6))
-// NOT(PC_LOAD_COND) = NOT( JMP | (BR & Z_match) )
-// = CPU is NOT jumping/branching this cycle
-// ≠ /PC_LD signal (which is NAND(T2, PC_LOAD_COND))
-// IRQ_ack uses the raw combinational PC_LOAD_COND, inverted
-On ack: force PG=$FF, IRL=$00, assert /PC_LD → PC=$FF00, clear IE+IRQ_FF
-PC save: software (v1.0) or hardware (v2.0, see IRQ Save-PC section below)
+> 📌 **IRQ latches on /IRQ rising edge** (device releases line).
+> v1.0 uses level-triggered protocol: device holds /IRQ LOW until software acknowledges.
+> For edge-detect: add inverter on /IRQ input (future option).
+
+### v1.0 IRQ Operation: Software Polling
+
+```
+1. External device pulls /IRQ LOW → IRQ_FF = 1 (on release)
+2. Main loop reads IRQ_FF (mapped to I/O address via /SLOT1)
+3. If IRQ_FF=1 AND IE=1: branch to handler subroutine
+4. Handler processes event (IRQ_FF remains set until /RST in v1.0)
+5. DI to ignore further interrupts, return to main loop
+
+No hardware vector. No PC forcing. No bus override.
+No IRQ_ack gate needed. No extra chips beyond U31+U33.
+v1.0: IRQ_FF cleared only by /RST. v1.1 adds auto-clear on ack.
+```
+
+### v1.1 Upgrade: Hardware Vector $FF00 (+2 chips, future)
+
+```
+Add: 74HC157 ×2 as mux on PC D-inputs (U1-U4)
+Add: IRQ_ack = T2 AND IE AND IRQ_FF AND NOT(PC_LOAD_COND)
+SEL ← IRQ_ack: 0={PG,IRL}, 1={$FF,$00}
+On ack: /PC_LD → PC=$FF00, clear IE+IRQ_FF
+Total v1.1: 34 logic + ROM + RAM = 36 packages
+```
+
+> 📌 **$FF00 is in RAM** — v1.1 hardware vector jumps here.
+> Must load ISR code before enabling hardware interrupts:
+> `SETDP $FF` → write ISR via SB → `SETDP $80` → enable.
+> v1.0 (polling) does not jump to $FF00 automatically.
+
+### EI/DI Decode (v1.0)
+
+```
+EI opcode = $08 = 00001000 (SRC=1, all others=0)
+
+EI_decode: U33 gate 2 (74HC21, 4-input AND)
+  U33-9  ← T2 (U8-5)
+  U33-10 ← SRC (U5-16)
+  U33-12 ← /XOR_MODE (U28-11, XOR gate D as inverter)
+  U33-13 ← /AC_WR (U24-10)
+  U33-8  → EI_decode → U31-3 (CLK1, ↑edge sets IE=1)
+
+Decode safety check (only $08 triggers EI):
+  $08: SRC=1, XOR=0, AC_WR=0 → T2 & 1 & 1 & 1 = 1 ✅
+  $18: SRC=1, XOR=0, AC_WR=1 → /AC_WR=0 → blocked ✅
+  $38: SRC=1, XOR=0, AC_WR=1 → /AC_WR=0 → blocked ✅
+  $48: SRC=1, XOR=1, AC_WR=0 → /XOR=0 → blocked ✅
+  $78: SRC=1, XOR=1, AC_WR=1 → both blocked ✅
+
+DI ($48): v1.0 = reset-only (IE cleared by /RST)
+  Software convention: don't call EI again = effectively DI
+  v1.1: add DI_decode → U31 /CLR1 for explicit disable
 ```
 
 ---
@@ -638,7 +924,7 @@ U32-6 (D5) ← IB4   U32-7 (D6) ← IB5
 U32-8 (D7) ← IB6   U32-9 (D8) ← IB7
 U32-10(GND) → GND
 U32-11(CLK) ← DP_Load (decode: T2 AND SETDP)
-U32-12(Q8) → DP7 → U30-13 (A15 B-input, enables ROM read)
+U32-12(Q8) → DP7 → U30-13 (A15 B-input: when DP7=1, A15=1 → selects RAM)
 U32-13(Q7) → DP6 → U30-10 (A14 B-input)
 U32-14(Q6) → DP5 → U30-6 (A13 B-input)
 U32-15(Q5) → DP4 → U30-3 (A12 B-input)
@@ -647,6 +933,7 @@ U32-17(Q3) → DP2 → U29-10 (A10 B-input)
 U32-18(Q2) → DP1 → U29-6 (A9 B-input)
 U32-19(Q1) → DP0 → U29-3 (A8 B-input)
 U32-20(VCC) → VCC
+```
 
 ### U33 74HC21 — SETDP Decode (dual 4-input AND)
 
@@ -658,12 +945,12 @@ U33-4  (1C) ← /ADDR_MODE (U26-6)
 U33-5  (1D) ← /AC_WR (U24-10)
 U33-6  (1Y) → DP_Load → U32-11
 U33-7  (GND) → GND
-U33-8  (2Y) → NC
-U33-9  (2A) → VCC (unused gate, tie inputs high)
-U33-10 (2B) → VCC
+U33-8  (2Y) → EI_decode → U31-3
+U33-9  (2A) ← T2 (U8-5)
+U33-10 (2B) ← SRC (U5-16)
 U33-11 (NC)
-U33-12 (2C) → VCC
-U33-13 (2D) → VCC
+U33-12 (2C) ← /XOR_MODE (U28-11)
+U33-13 (2D) ← /AC_WR (U24-10)
 U33-14 (VCC) → VCC
 ```
 
@@ -680,68 +967,6 @@ Note: $C0 triggers DP_Load but is equivalent to SETDP (SUB bit has no effect whe
 
 ---
 
-### IRQ Save-PC Logic (Pin-Level)
-
-During IRQ-ack, CPU must:
-1. Write PC[7:0] to RAM[$0E]
-2. Write PC[15:8] to RAM[$0F]
-3. Force PC = $FF00
-
-**Implementation**: IRQ-ack reuses existing STORE path with forced address.
-
-```
-IRQ_ack = T2(U8-5) AND IRQ_FF(U31-12) AND IE(U31-5) AND NOT(PC_LOAD_COND(U27-6))
-
-Note: NOT(PC_LOAD_COND) means the instruction is NOT a jump/branch.
-This is NOT the same as /PC_LD (which = NAND(T2, PC_LOAD_COND)).
-IRQ_ack needs the raw PC_LOAD_COND inverted:
-  PC_LOAD_COND=0 → NOT=1 → IRQ can fire
-  PC_LOAD_COND=1 → NOT=0 → IRQ deferred (jump in progress)
-
-During IRQ-ack (extra 2 cycles inserted by hardware):
-
-Cycle 1 — Save PC low:
-  Force ADDR_MODE=1, address=$0E
-  Force AC buffer to drive PC[7:0] onto IBUS (override U14 input)
-  RAM /WE pulse → RAM[$0E] = PC[7:0]
-
-Cycle 2 — Save PC high:
-  Force address=$0F
-  Drive PC[15:8] onto IBUS
-  RAM /WE pulse → RAM[$0F] = PC[15:8]
-
-Then:
-  Force page_reg = $FF, ir_low = $00
-  Assert /PC_LD → PC loads $FF00
-  Clear IE (U31 /CLR1)
-  Clear IRQ_FF (U31 /CLR2)
-```
-
-**Hardware complexity note**:
-The IRQ save-PC requires additional multiplexing to:
-- Drive PC bytes onto IBUS (normally only AC goes to IBUS via U14)
-- Force address $0E/$0F (normally IRL provides address)
-
-**Options for physical build**:
-
-| Approach | Extra Chips | Complexity |
-|----------|:-----------:|:----------:|
-| A: Software save (ISR reads PC from known location) | 0 | Simple |
-| B: Dedicated save circuit (mux PC onto bus) | 2-3 chips | Complex |
-| C: Use return address register (like CALL) | 1 chip | Medium |
-
-**Recommended for v1.0 build: Option A (software ISR)**
-
-In practice, the Verilog model handles save-PC in behavioral code.
-For physical build v1.0, the ISR at $FF00 can use a fixed return point
-or the programmer can store return address before enabling interrupts.
-
-Future v2.0: Add dedicated PC-save hardware if needed.
-
-Note: A15 from U32 bit 7 → allows data access to both ROM and RAM (full 64KB).
-
----
-
 ## ROM & RAM
 
 ```
@@ -749,49 +974,61 @@ ROM (AT28C256 / SST39SF010A)
   A[0:7]  ← ABUS A[0:7]
   A[8:14] ← ABUS A[8:14]
   D[0:7]  → DBUS
-  /CE     ← /A15 (U24-6)
+  /CE     ← A15 (U30-12)
   /OE     → GND
-  /WE     → VCC
+  /WE     ← /WR (RV8-Bus pin 27, from Programmer board only)
+
+Note: Bus pin 27 (/WR) is driven by /AC_BUF during CPU STORE operations.
+ROM sees /WE pulse when SETDP<$80 + SB, but AT28C256 has built-in software data
+protection (SDP) — single pulses without unlock sequence are ignored.
+Programmer board unlocks SDP before flashing (while /RST=LOW, CPU stopped).
+SETDP <$80 + LB = read from ROM (lookup tables, safe).
 
 RAM (62256)
   A[0:7]  ← ABUS A[0:7]
   A[8:14] ← ABUS A[8:14]
   D[0:7]  ←→ DBUS
-  /CE     ← A15 (U30-12)
-  /OE     → GND
+  /CE     ← /A15 (U24-6)
+  /OE     → GND (output always enabled when /CE active)
   /WE     ← /AC_BUF (U26-8)
 ```
+
+> 📌 **RAM output permanently enabled** — relies on mutually-exclusive chip selects.
+> A15=0 → ROM /CE=LOW (ROM drives DBUS). A15=1 → RAM /CE=LOW (RAM drives DBUS).
+> No bus fight possible as long as A15 decode is correct.
+> During STORE: RAM /WE=LOW disables output drivers automatically (62256 datasheet).
 
 ---
 
 ## Control Signal Summary
 
-| Signal | Source | Destinations |
-|--------|--------|-------------|
-| CLK | Oscillator | U1-2, U2-2, U3-2, U4-2, U8-8 |
-| /RST | RC+button | U1-1, U2-1, U3-1, U4-1, U8-9 |
-| T0 | U8-3 | U5-11, U25-4, U24-1 |
-| T1 | U8-4 | U6-11, U25-5, U24-3 |
-| T2 | U8-5 | U26-1, U26-9, U26-12, U27-12, U28-4 |
-| ALU_SUB | U5-12 | U10-7, U19-2/5/11/14, U20-2/5/11/14, U28-2 |
-| XOR_MODE | U5-13 | U19-1, U20-1 |
-| MUX_SEL | U5-14 | U17-1, U18-1, U27-9 |
-| AC_WR | U5-15 | U24-11, U27-13 |
-| SRC | U5-16 | U25-1 |
-| STR | U5-17 | U25-2, U26-10 |
-| BR | U5-18 | U25-10, U27-1 |
-| JMP | U5-19 | U24-9, U25-9 |
-| ADDR_MODE | U25-3 | U15-1, U16-1, U29-1, U30-1, U26-4/5 |
-| PC_INC | U25-6 | U1-7/10, U2-7, U3-7, U4-7 |
-| /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 |
-| /AC_BUF | U26-8 | U14-1/19, RAM /WE, U28-9 |
-| Acc_Load_N | U27-11 | U9-11, U21-3 |
-| BUF_OE_N | U24-12 | U25-9 |
-| BUF_OE_SAFE | U25-8 | U7-19 |
-| WR_DIR | U28-8 | U7-1 |
-| A15 | U30-12 | RAM /CE, U24-5 |
-| PG_Load_N | U25-13 | U23-11 |
-| DP_Load | U33-6 | U32-11 |
+| Signal | Source | Destinations | Active |
+|--------|--------|-------------|:------:|
+| CLK | Oscillator | U1-2, U2-2, U3-2, U4-2, U8-8 | ↑edge |
+| /RST | RC+button | U1-1, U2-1, U3-1, U4-1, U8-9 | LOW |
+| T0 | U8-3 | U5-11, U25-4, U24-1 | HIGH |
+| T1 | U8-4 | U6-11, U25-5, U24-3 | HIGH |
+| T2 | U8-5 | U26-1, U26-9, U26-12, U27-12, U28-4, U33-1, U33-9 | HIGH |
+| ALU_SUB | U5-12 | U10-7, U19-2/5/11/14, U20-2/5/11/14, U28-2 | HIGH |
+| XOR_MODE | U5-13 | U19-1, U20-1, U33-2, U28-12 | HIGH |
+| MUX_SEL | U5-14 | U17-1, U18-1, U27-9 | HIGH |
+| AC_WR | U5-15 | U24-11, U27-13 | HIGH |
+| SRC | U5-16 | U25-1, U33-10 | HIGH |
+| STR | U5-17 | U25-2, U25-10, U26-10 | HIGH |
+| BR | U5-18 | U27-1 | HIGH |
+| JMP | U5-19 | U24-9 | HIGH |
+| ADDR_MODE | U25-3 | U15-1, U16-1, U29-1, U30-1, U26-4/5 | HIGH |
+| PC_INC | U25-6 | U1-7/10, U2-7, U3-7, U4-7 | HIGH |
+| /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 | LOW |
+| /AC_BUF | U26-8 | U14-1/19, RAM /WE, U28-9 | LOW |
+| ACC_CLK | U27-11 | U9-11, U21-3 | ↑edge |
+| BUF_OE_N | U24-12 | U25-9 | LOW |
+| BUF_OE_SAFE | U25-8 | U7-19 | LOW |
+| WR_DIR | U28-8 | U7-1 | HIGH=write |
+| A15 | U30-12 | ROM /CE, U24-5 | — |
+| PG_CLK | U25-13 | U23-11 | ↑edge |
+| DP_Load | U33-6 | U32-11 | ↑edge |
+| EI_decode | U33-8 | U31-3 | ↑edge |
 
 ---
 
@@ -813,3 +1050,88 @@ RAM (62256)
 | 74HC04 (U24) | 14 | 7 | 100nF |
 | 74HC32 (U25) | 14 | 7 | 100nF |
 | 74HC00 (U26-U27) | 14 | 7 | 100nF |
+
+---
+
+## Forbidden Bus States
+
+The following states must NEVER occur — they cause electrical bus contention:
+
+| Bus | Conflict | Prevention |
+|-----|----------|-----------|
+| IBUS | U6 + U14 driving simultaneously | /IRL_OE and /AC_BUF mutually exclusive (NAND gates) |
+| IBUS | U7 + U14 driving simultaneously | BUF_OE_SAFE = BUF_OE_N OR STR (U25-8) |
+| IBUS | U6 + U7 driving simultaneously | /IRL_OE=0 only when ADDR_MODE=0; U7 enabled when ADDR_MODE=1 |
+| DBUS | ROM + U7(write) simultaneously | ROM /CE=0 only when A15=0; STORE uses A15=1 (RAM) |
+| DBUS | RAM + U7(write) simultaneously | RAM /WE=0 disables RAM output automatically |
+| chip select | ROM + RAM both /CE=0 | Impossible: ROM /CE=A15, RAM /CE=/A15 (complementary) |
+
+If any of these occur during debug → check ADDR_MODE, BUF_OE_SAFE, or A15 decode.
+
+---
+
+## Revision History
+
+| Version | Date | Changes |
+|:-------:|:----:|---------|
+| v1.0 | 2026-06-15 | Initial freeze. 33 logic + ROM + RAM. 18 instructions. 1 MHz target. Software polling IRQ. |
+| v1.1 | (reserved) | +2 chips: hardware IRQ vector $FF00, auto-clear IE |
+| v2.0 | (future) | Hardware save-PC, RTI instruction |
+
+---
+
+## Appendix A: IRQ Hardware Vector (v2.0 — FUTURE)
+
+> **NOT part of v1.0 build.** Requires +2-3 chips beyond the 33-chip design.
+
+### Hardware Save-PC (v2.0 concept)
+
+During IRQ-ack, a v2.0 CPU would:
+1. Write PC[7:0] to RAM[$800E]
+2. Write PC[15:8] to RAM[$800F]
+3. Force PC = $FF00
+
+```
+Cycle 1 — Save PC low:
+  Force ADDR_MODE=1, address=$0E, DP=$80
+  Force AC buffer to drive PC[7:0] onto IBUS (override U14 input)
+  RAM /WE pulse → RAM[$800E] = PC[7:0]
+
+Cycle 2 — Save PC high:
+  Force address=$0F, DP=$80
+  Drive PC[15:8] onto IBUS
+  RAM /WE pulse → RAM[$800F] = PC[15:8]
+```
+
+**Required chips**: 74HC157 ×2 (PC mux) + additional state logic.
+Not included in v1.0 BOM.
+
+---
+
+## Appendix B: Canonical Opcode → Control Bits Table
+
+| Hex | Mnemonic | SUB | XOR | MUX | AC_WR | SRC | STR | BR | JMP |
+|:---:|----------|:---:|:---:|:---:|:-----:|:---:|:---:|:--:|:---:|
+| $00 | NOP      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| $01 | J        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
+| $02 | BEQ      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+| $04 | SB       | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 |
+| $08 | EI       | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
+| $10 | ADDI     | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
+| $18 | ADD      | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
+| $20 | SETPG    | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 |
+| $28 | SETPG_R  | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 |
+| $30 | LI       | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 |
+| $38 | LB       | 0 | 0 | 1 | 1 | 1 | 0 | 0 | 0 |
+| $40 | SETDP    | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| $48 | DI       | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 |
+| $70 | XORI     | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 0 |
+| $78 | XOR      | 0 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |
+| $82 | BNE      | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+| $90 | SUBI     | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
+| $98 | SUB      | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
+
+**Alias**: $C0 = SETDP (SUB bit ignored by U33 decode)
+
+**Forbidden**: Any opcode with SRC+STR both set (bit3+bit2 = 11) → bus contention.
+Pattern: `(opcode & $0C) == $0C` → 64 forbidden opcodes.

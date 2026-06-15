@@ -189,7 +189,7 @@ Part:{
     // ═══════════════════════════════════════════
     // SUPPORT
     // ═══════════════════════════════════════════
-    OSC:{type:"Crystal 3.5/10MHz", output:CLK},
+    OSC:{type:"Crystal 5MHz", output:CLK},
     R1:{type:"10K", 1:VCC, 2:"/RST"},
     SW:{type:"Pushbutton", 1:"/RST", 2:GND},
     C1:{type:"100nF", 1:"/RST", 2:GND},

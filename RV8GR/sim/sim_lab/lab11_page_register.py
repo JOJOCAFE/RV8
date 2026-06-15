@@ -1,5 +1,5 @@
 """
-Lab 09: Full Fetch — All modules together fetch 'LI $42' from ROM
+Lab 11: Page Register — Full fetch with U23 cross-page
 
 Uses: Ring counter + PC + Address Mux + ROM + U7 + IR latch
 
@@ -18,11 +18,11 @@ U15 = TTL_74hc157('U15'); U16 = TTL_74hc157('U16')
 ROM = MEM_AT28C256('ROM'); U7 = TTL_74hc245('U7')
 U5 = TTL_74hc574('U5'); U6 = TTL_74hc574('U6')
 
-# Load ROM: LI $42 at $8000
-ROM._data[0x0000] = 0x30  # $8000: LI
-ROM._data[0x0001] = 0x42  # $8001: $42
+# Load ROM: LI $42 at $0000
+ROM._data[0x0000] = 0x30  # $0000: LI
+ROM._data[0x0001] = 0x42  # $0001: $42
 
-# Init: PC=$8000 → U1=0, U2=0 (low byte), high byte has A15=1
+# Init: PC=$0000 → U1=0, U2=0 (low byte), high byte=0
 U1._count = 0; U2._count = 0
 U5.set(1, 0); U6.set(1, 0)  # /OE=0
 U15.set(15, 0); U16.set(15, 0)  # /E=0
@@ -85,7 +85,7 @@ def read_pc():
 
 
 if __name__ == '__main__':
-    print("Lab 09: Full Fetch (LI $42 from ROM)")
+    print("Lab 11: Page Register (LI $42 from ROM)")
     print("-" * 40)
 
     # Reset ring counter
@@ -108,4 +108,4 @@ if __name__ == '__main__':
     print(f"\n  Result: IR_HIGH=${ir_h:02X} IR_LOW=${ir_l:02X}")
     assert ir_h == 0x30, f"IR_HIGH=${ir_h:02X}, expected $30"
     assert ir_l == 0x42, f"IR_LOW=${ir_l:02X}, expected $42"
-    print("\n✅ Lab 09 PASS: Fetched LI $42 from ROM correctly")
+    print("\n✅ Lab 11 PASS: Fetched LI $42 from ROM correctly")

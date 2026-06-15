@@ -1,5 +1,5 @@
 """
-Lab 08: Control Logic — U24-U28, U33
+Lab 09: Z Flag + Control Logic — U21-U22, U24-U28, U33
 
 Tests derived signals from IR_HIGH control bits:
   ADDR_MODE, PC_INC, /IRL_OE, /AC_BUF, /PC_LD, Z_match, WR_DIR, DP_Load
@@ -98,7 +98,7 @@ TEST_VECTORS = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 08: Control Logic (U24-U28, U33)")
+    print("Lab 09: Z Flag + Control Logic (U21-U22, U24-U28, U33)")
     print("-" * 40)
 
     for i, (t2, sub,xor_m,mux,acwr,src,stt,br,jmp, z, expected) in enumerate(TEST_VECTORS):
@@ -113,4 +113,4 @@ if __name__ == '__main__':
                     print(f"     {k}: got {result[k]}, expected {v}")
         assert ok
 
-    print("\n✅ Lab 08 PASS: All control signals decode correctly")
+    print("\n✅ Lab 09 PASS: All control signals decode correctly")

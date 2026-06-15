@@ -224,7 +224,7 @@ Microcode: STEP_RST=1 (reset step counter, back to fetch)
 
 ## Total steps: 7 (fetch 2 + load_B 1 + read_reg 1 + compute 1 + write_reg 1 + end 1)
 
-At 10 MHz: 7 steps = ~1.43 MIPS (was claimed 1.0 MIPS — actually faster than estimated!)
+At 5 MHz: 7 steps = ~0.71 MIPS.
 
 ---
 

@@ -1,10 +1,10 @@
 """
-Lab 07: AC Mux + Latch — U17-U18 (mux) + U9 (74HC574)
+Lab 08: AC Mux + Latch — U17-U18 (mux) + U9 (74HC574)
 
 Wiring:
   U17/U18 SEL ← MUX_SEL,  A ← Adder SUM,  B ← XOR output
   U17/U18 Y → U9 D
-  U9 CLK ← Acc_Load_N (rising edge)
+  U9 CLK ← ACC_CLK (rising edge)
   U9 /OE ← GND
 
 Test: select adder or XOR output, latch into AC
@@ -46,7 +46,7 @@ TEST_VECTORS = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 07: AC Mux + Latch (U17-U18 + U9)")
+    print("Lab 08: AC Mux + Latch (U17-U18 + U9)")
     print("-" * 40)
 
     for i, (sel, adder, xor, exp) in enumerate(TEST_VECTORS):
@@ -57,4 +57,4 @@ if __name__ == '__main__':
         print(f"  {i}: MUX={sel}({src}) Adder=${adder:02X} XOR=${xor:02X} → AC=${ac:02X}  {status}")
         assert ac == exp
 
-    print("\n✅ Lab 07 PASS: AC mux selects and latches correctly")
+    print("\n✅ Lab 08 PASS: AC mux selects and latches correctly")

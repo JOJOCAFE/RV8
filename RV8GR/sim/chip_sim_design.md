@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Pin-accurate simulation of all 35 chips. Verify wiring from 03_wiring_guide.md.
+Pin-accurate simulation of all 35 chips. Verify wiring from 02_wiring_guide.md.
 Probe any pin like attaching an LED. Step one clock at a time.
 
 ---
@@ -78,11 +78,11 @@ class Chip:
 
 ---
 
-## Bus Architecture (matches 03_wiring_guide)
+## Bus Architecture (matches 02_wiring_guide)
 
 ### Note: "Bus" = shared wires, not physical backplane
 
-In 03_wiring_guide, DBUS/IBUS/ABUS are **naming conventions** for groups of wires
+In 02_wiring_guide, DBUS/IBUS/ABUS are **naming conventions** for groups of wires
 that connect multiple chip pins together. They are NOT a separate bus backplane.
 
 In the simulator, a "bus" is simply a **set of wire nets** that multiple chips share.
@@ -130,13 +130,13 @@ class SharedWire:
 
 ```python
 # Each IB0-IB7 is a SharedWire
-# Connected pins (from 03_wiring_guide):
+# Connected pins (from 02_wiring_guide):
 #
-# IB0 wire connects to: U7-18, U6-19, U14-18, U12-1, U23-2, U5-2, U32-2
+# IB0 wire connects to: U7-2, U6-19, U14-18, U12-1, U23-2, U5-2, U32-2
 #   Drivers (tristate):
-#     U7-18  enabled when BUF_OE_SAFE=0 (U25-8=0)
-#     U6-19  enabled when /IRL_OE=0 (U26-3=0)
-#     U14-18 enabled when /AC_BUF=0 (U26-8=0)
+#     U7-2   enabled when BUF_OE_SAFE=0 (U25-8=0) — reads from DBUS
+#     U6-19  enabled when /IRL_OE=0 (U26-3=0) — immediate operand
+#     U14-18 enabled when /AC_BUF=0 (U26-8=0) — AC value for store
 #   Readers (always connected, high-impedance input):
 #     U12-1, U23-2, U5-2, U32-2
 ```
@@ -144,11 +144,11 @@ class SharedWire:
 ### DBUS — 8 shared wires
 
 ```python
-# D0 wire connects to: ROM-D0, RAM-D0, U7-2
+# D0 wire connects to: ROM-D0, RAM-D0, U7-18
 #   Drivers:
-#     ROM-D0  enabled when ROM /CE=0 and /OE=0
-#     RAM-D0  enabled when RAM /CE=0 and /OE=0 and /WE=1 (read)
-#     U7-2    enabled when DIR=1 and BUF_OE_SAFE=0 (write to external)
+#     ROM-D0  enabled when ROM /CE=0 and /OE=0 (A15=0)
+#     RAM-D0  enabled when RAM /CE=0 and /OE=0 and /WE=1 (A15=1, read)
+#     U7-18   enabled when DIR=1 and BUF_OE_SAFE=0 (write from IBUS to DBUS)
 ```
 
 ### ABUS — 16 wires (single driver, no tristate)
@@ -252,7 +252,7 @@ def step(self):
 
 ---
 
-## Wiring (from 03_wiring_guide.md)
+## Wiring (from 02_wiring_guide.md)
 
 Wiring defined as connection list:
 
@@ -273,7 +273,7 @@ def wire_cpu(sim):
         ('U7', 18), ('U6', 19), ('U14', 18),
         ('U12', 1), ('U23', 2), ('U5', 2), ('U32', 2)
     ])
-    # ... (all connections from 03_wiring_guide.md)
+    # ... (all connections from 02_wiring_guide.md)
 ```
 
 ---
@@ -301,12 +301,12 @@ sim.inject('ROM', 'data', 0x30)  # Force ROM output
 ```python
 # Step 1: Power on, check reset state
 sim.reset()
-assert sim.probe_bus('PC', 16) == 0x8000
+assert sim.probe_bus('PC', 16) == 0x0000
 assert sim.probe('U8', 3) == 1  # T0
 
 # Step 2: Single step, check ROM fetch
 sim.step()
-assert sim.probe_bus('ABUS', 16) == 0x8000
+assert sim.probe_bus('ABUS', 16) == 0x0000
 assert sim.probe_bus('DBUS', 8) == rom_data[0]
 
 # Step 3: Verify each instruction type
@@ -356,19 +356,22 @@ class TimingReport:
 
 ---
 
-## File Structure
+## File Structure (actual)
 
 ```
 sim/
-├── soft_debug.py           # Current high-level sim (keep)
-├── chip_sim.py             # NEW: Gate-level chip simulator
+├── chip_sim.py             # Gate-level CPU sim + 8 tests
+├── soft_debug.py           # High-level trace sim + 4 tests
+├── gate_sim.py             # Simplified gate model (educational)
+├── verify_wiring.py        # Wiring correctness checker
+├── wiring.py               # 247 pin connections from 02_wiring_guide
 ├── chips/
-│   ├── __init__.py
-│   ├── base.py             # Chip base class + Net
-│   ├── sequential.py       # HC574, HC161, HC164, HC74
-│   ├── combinational.py    # HC245, HC541, HC283, HC86, HC157, HC688, HC04, HC32, HC00, HC21
-│   └── memory.py           # ROM, RAM
-└── wiring.py               # Wire connections from 03_wiring_guide.md
+│   ├── __init__.py         # All chip classes (35 chip models)
+│   └── test_chips.py       # Unit tests for each chip type (141 vectors)
+├── sim_lab/
+│   ├── __init__.py         # Lab index
+│   └── lab01-14_*.py       # Per-lab simulation scripts
+└── chip_sim_design.md      # This document
 ```
 
 ---
@@ -379,20 +382,21 @@ sim/
 2. `sequential.py` — HC574 first (most used)
 3. `combinational.py` — HC04, HC00, HC32, HC86 first (simple gates)
 4. `memory.py` — ROM, RAM
-5. `wiring.py` — Connect everything per 03_wiring_guide
+5. `wiring.py` — Connect everything per 02_wiring_guide
 6. `chip_sim.py` — Main entry point + tests
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] All 35 chip objects created with correct pin count
-- [ ] All pins wired according to 03_wiring_guide.md
-- [ ] `LI $42` executes correctly (3 clocks)
-- [ ] `ADDI $05` gives correct AC
-- [ ] `SB` writes RAM correctly
-- [ ] `SETDP + LB` reads correct page
-- [ ] Probe any pin returns correct value
-- [ ] Step-by-step matches soft_debug.py output
-- [ ] Critical path timing reported per instruction
-- [ ] Max safe clock speed calculated automatically
+- [x] All 35 chip objects created with correct pin count
+- [x] All pins wired according to 02_wiring_guide.md (247 connections)
+- [x] `LI $42` executes correctly (3 clocks)
+- [x] `ADDI $05` gives correct AC
+- [x] `SB` writes RAM correctly
+- [x] `SETDP + LB` reads correct page
+- [x] Probe any pin returns correct value
+- [x] Step-by-step matches soft_debug.py output
+- [x] Critical path timing reported per instruction
+- [x] Max safe clock speed calculated automatically (9.7 MHz)
+- [x] verify_wiring.py passes clean (11K+ checks)

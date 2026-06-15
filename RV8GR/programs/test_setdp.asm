@@ -1,103 +1,103 @@
 ; RV8-GR Test: Large RAM access via SETDP
 ; Tests writing/reading across multiple pages (5KB+ usage)
-; Writes pattern to RAM pages $10-$23 (5120 bytes = 5KB)
+; Writes pattern to RAM pages $90-$A3 (5120 bytes = 5KB)
 ; Then reads back and verifies
 ;
 ; Expected: halt at 'pass' if all OK
 
-    .org $8000
+    .org $0000
 
 start:
     ; --- Write phase: fill 20 pages (5KB) with page number ---
-    ; Page $10: fill with $10
-    SETDP $10
-    LI $10
-    SB $00          ; RAM[$1000] = $10
-    SB $80          ; RAM[$1080] = $10
-    SB $FF          ; RAM[$10FF] = $10
+    ; Page $90: fill with $90
+    SETDP $90
+    LI $90
+    SB $00          ; RAM[$9000] = $90
+    SB $80          ; RAM[$9080] = $90
+    SB $FF          ; RAM[$90FF] = $90
 
-    ; Page $15: fill with $15
-    SETDP $15
-    LI $15
-    SB $00          ; RAM[$1500] = $15
-    SB $40          ; RAM[$1540] = $15
+    ; Page $95: fill with $95
+    SETDP $95
+    LI $95
+    SB $00          ; RAM[$9500] = $95
+    SB $40          ; RAM[$9540] = $95
 
-    ; Page $20: fill with $20
-    SETDP $20
-    LI $20
-    SB $00          ; RAM[$2000] = $20
-    SB $FF          ; RAM[$20FF] = $20
+    ; Page $A0: fill with $A0
+    SETDP $A0
+    LI $A0
+    SB $00          ; RAM[$A000] = $A0
+    SB $FF          ; RAM[$A0FF] = $A0
 
-    ; Page $23: fill with $23 (top of 5KB range)
-    SETDP $23
-    LI $23
-    SB $FF          ; RAM[$23FF] = $23
+    ; Page $A3: fill with $A3 (top of 5KB range)
+    SETDP $A3
+    LI $A3
+    SB $FF          ; RAM[$A3FF] = $A3
 
     ; --- Read phase: verify data ---
-    ; Read page $10
-    SETDP $10
-    LB $00          ; AC = RAM[$1000] should be $10
-    SUBI $10
+    ; Read page $90
+    SETDP $90
+    LB $00          ; AC = RAM[$9000] should be $90
+    SUBI $90
     BEQ t1ok
     J fail
 
 t1ok:
-    LB $FF          ; AC = RAM[$10FF] should be $10
-    SUBI $10
+    LB $FF          ; AC = RAM[$90FF] should be $90
+    SUBI $90
     BEQ t2ok
     J fail
 
 t2ok:
-    ; Read page $15
-    SETDP $15
-    LB $00          ; AC = RAM[$1500] should be $15
-    SUBI $15
+    ; Read page $95
+    SETDP $95
+    LB $00          ; AC = RAM[$9500] should be $95
+    SUBI $95
     BEQ t3ok
     J fail
 
 t3ok:
-    LB $40          ; AC = RAM[$1540] should be $15
-    SUBI $15
+    LB $40          ; AC = RAM[$9540] should be $95
+    SUBI $95
     BEQ t4ok
     J fail
 
 t4ok:
-    ; Read page $20
-    SETDP $20
-    LB $00          ; AC = RAM[$2000] should be $20
-    SUBI $20
+    ; Read page $A0
+    SETDP $A0
+    LB $00          ; AC = RAM[$A000] should be $A0
+    SUBI $A0
     BEQ t5ok
     J fail
 
 t5ok:
-    LB $FF          ; AC = RAM[$20FF] should be $20
-    SUBI $20
+    LB $FF          ; AC = RAM[$A0FF] should be $A0
+    SUBI $A0
     BEQ t6ok
     J fail
 
 t6ok:
-    ; Read page $23
-    SETDP $23
-    LB $FF          ; AC = RAM[$23FF] should be $23
-    SUBI $23
+    ; Read page $A3
+    SETDP $A3
+    LB $FF          ; AC = RAM[$A3FF] should be $A3
+    SUBI $A3
     BEQ t7ok
     J fail
 
 t7ok:
-    ; --- Test ROM read via SETDP $80+ ---
-    SETDP $80
-    LB $00          ; AC = ROM[$8000] = first byte of this program = $40 (SETDP)
+    ; --- Test ROM read via SETDP $00 ---
+    SETDP $00
+    LB $00          ; AC = ROM[$0000] = first byte of this program = $40 (SETDP)
     SUBI $40
     BEQ t8ok
     J fail
 
 t8ok:
-    ; --- Verify page 0 registers still work ---
-    SETDP $00
+    ; --- Verify default RAM page registers still work ---
+    SETDP $80
     LI $77
-    SB $05          ; RAM[$0005] = $77
+    SB $05          ; RAM[$8005] = $77
     LI $00
-    LB $05          ; AC = RAM[$0005] should be $77
+    LB $05          ; AC = RAM[$8005] should be $77
     SUBI $77
     BEQ pass
     J fail

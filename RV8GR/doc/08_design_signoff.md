@@ -8,7 +8,9 @@
 
 ```
 Opcode = Control Word (no decoder, no microcode ROM)
-18 instructions, 3 cycles each, 3.3 MIPS @ 10 MHz
+18 instructions, 3 cycles each
+333K instructions/sec @ 1 MHz (breadboard)
+1.67M instructions/sec @ 5 MHz (PCB future)
 64KB code + 64KB data access, IRQ, 40-pin system bus
 ```
 
@@ -21,11 +23,11 @@ Opcode = Control Word (no decoder, no microcode ROM)
 | Datapath (Verilog 127+160 cycles) | ✅ |
 | ISA (18 instructions) | ✅ |
 | SETDP decode (U33 pin-level) | ✅ |
-| IRQ entry ($FF00, software save-PC) | ✅ |
+| IRQ entry (v1.0 polling, v1.1 vector $FF00) | ✅ |
 | Memory Map (no address conflicts) | ✅ |
 | Bus guard SRC+STR (U25-8) | ✅ |
 | Opcode hazard (256 codes deterministic) | ✅ |
-| Timing @ 10 MHz | ✅ |
+| Timing @ 1 MHz (700ns+ margin) | ✅ |
 | RV8-Bus (40-pin defined) | ✅ |
 | BOM finalized | ✅ |
 | Programmer tools (46 tests) | ✅ |
@@ -53,13 +55,38 @@ Opcode = Control Word (no decoder, no microcode ROM)
 ## Memory Map (Final)
 
 ```
-$0000-$7FFF  RAM 32KB (read/write)
-$8000-$FEFF  ROM 32KB
-$FF00-$FF0F  ROM: IRQ vector
+$0000-$7EFF  ROM 32KB (read only)
+$7F00-$7FFF  ROM (available)
+$8000-$FEFF  RAM 32KB (read/write)
+$FF00-$FF0F  RAM: ISR vector (user must set up before EI)
 $FF10-$FF1F  I/O Slot 1
 $FF20-$FF2F  I/O Slot 2
-$FF30-$FFFF  ROM: ISR code
+$FF30-$FFFF  RAM (available)
 ```
+
+---
+
+## Known Risks (from architecture review)
+
+| # | Risk | Severity | Mitigation |
+|:-:|------|:--------:|------------|
+| 1 | ROM timing after data-access instruction (LB/SB/ADD/SUB/XOR) | 🟡 | Start at 1-2 MHz, step up to 5 MHz. PC stable during T2 ensures correctness. |
+| 2 | IRQ return burden on programmer | 🟡 | v1.0 uses software save/restore. v2.0 adds RTI (+2-3 chips). |
+| 3 | SB to ROM address silently ignored | 🟢 | By design (ROM /WE not connected). Document in ISA: "SB to ROM = no effect". |
+
+### Timing Verification Plan
+
+After physical build, verify with incremental clock speed:
+
+```
+Step 1: 1 MHz   — official target, verify all instructions
+Step 2: 2 MHz   — verify timing-critical sequences (LB then ADD)
+Step 3: 5 MHz   — experimental (PCB only), verify if achievable
+```
+
+Critical sequence to test: **two consecutive data-access instructions**
+(e.g., `LB $03` followed by `ADD $04`) where ADDR_MODE switches back
+to PC late. If this works at 5 MHz with 70ns ROM → design is proven.
 
 ---
 
@@ -67,17 +94,17 @@ $FF30-$FFFF  ROM: ISR code
 
 | # | Item | Notes |
 |:-:|------|-------|
-| 1 | IRQ hardware save-PC | +2-3 chips |
-| 2 | NOT instruction in assembler | 0 chips |
+| 1 | RTI instruction (hardware save-PC on IRQ) | +2-3 chips |
+| 2 | NOT instruction in assembler | 0 chips (alias $B0/$B8) |
 | 3 | I/O slot decode board | +1 chip (74HC138) |
-| 4 | RTI instruction | Design TBD |
+| 4 | High-speed option (10 MHz) | Needs breadboard timing proof |
 
 ---
 
 ## Sign-off
 
 ```
-RV8-GR v1.0: 32-chip horizontal-control CPU
+RV8-GR v1.0: 33-chip horizontal-control CPU
 - Full 64KB code + data
 - All 256 opcodes deterministic
 - Electrical hazard eliminated
@@ -87,8 +114,32 @@ RV8-GR v1.0: 32-chip horizontal-control CPU
 Hardware Design Frozen.
 ```
 
+### Status Levels
+
+| Domain | Status | Evidence |
+|--------|:------:|----------|
+| Architecture | 🔒 FROZEN | Design ISA + Wiring Guide signed off |
+| ISA | 🔒 FROZEN | 18 instructions, opcode allocation locked |
+| Wiring | 🔒 FROZEN | Pin-level wiring guide, gate-level sim |
+| Simulation | ✅ PASS | Verilog 127+160 cycles, chip_sim 3 programs |
+| Physical Build | ⏳ PENDING | Breadboard bring-up not started |
+| 1 MHz | ✅ VERIFIED (analysis) | 700ns+ margin proven by timing calculation |
+| 5 MHz | ⏳ PROJECTED | Timing analysis only — needs oscilloscope proof |
+| 256 opcodes | ✅ DETERMINISTIC (by design) | Horizontal encoding guarantees — full sweep testbench recommended |
+
+### Remaining Proof (before "Production Proven")
+
+```
+□ Breadboard bring-up (06_debug_plan steps 1-14)
+□ Golden Bring-up Program passes at 1 MHz
+□ Burn-in 1 hour stable
+□ Clock sweep: record actual max frequency
+□ 256-opcode sweep testbench (no X, no Z, no contention)
+□ Run 5+ real programs (monitor, blink, counter, game, BASIC stub)
+```
+
 *Date: 2026-06-09*
 *Chips: U1-U33 (33 logic) + ROM + RAM = 35 packages*
 *Guard: BUF_OE_SAFE (U25-8 → U7-19)*
 *Bus: RV8-Bus v2 (40-pin, Slot1=$FF10, Slot2=$FF20)*
-*IRQ: $FF00 (software save-PC for v1.0)*
+*IRQ: v1.0 polling (IRQ_FF latch, cleared by /RST only). v1.1 adds vector $FF00.*

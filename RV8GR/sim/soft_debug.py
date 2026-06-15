@@ -4,6 +4,12 @@ RV8-GR Soft Debug: Pin-level logic simulation
 Traces signals through all 33 chips clock-by-clock.
 Simulates with slow clock to verify wiring correctness.
 
+NOTE: This sim models the "ideal" CPU (matches Verilog behavioral model):
+  - DI ($48) clears IE (v1.0 hardware = NOP, v1.1 = hardware clear)
+  - DP/PG/AC/Z initialized to known values (hardware = indeterminate at power-on)
+  - IRQ hardware vector $FF00 (v1.0 hardware = polling only)
+  Physical v1.0 programs must begin with: SETDP $80, SETPG $00, LI $00
+
 Usage: python3 soft_debug.py
 """
 
@@ -14,12 +20,12 @@ Usage: python3 soft_debug.py
 class CPU:
     def __init__(self):
         # Registers
-        self.pc = 0x8000
+        self.pc = 0x0000
         self.ir_high = 0x00
         self.ir_low = 0x00
         self.ac = 0x00
-        self.page_reg = 0x80
-        self.data_page = 0x00
+        self.page_reg = 0x00
+        self.data_page = 0x80
         self.z_flag = 1
         self.ie = 0
         self.irq_ff = 0
@@ -42,7 +48,7 @@ class CPU:
         # Clock count
         self.clock = 0
 
-    def load_rom(self, data, base=0x8000):
+    def load_rom(self, data, base=0x0000):
         for i, b in enumerate(data):
             if i < 32768:
                 self.rom[i] = b
@@ -100,19 +106,19 @@ class CPU:
         """Compute ABUS, DBUS, IBUS values based on current state and signals."""
         s = self.signals
 
-        # Address bus (U15-U16, U29-U30)
-        if s['ADDR_MODE'] == 0:
-            # Fetch mode: ABUS = PC
-            self.abus = self.pc
-        else:
+        # Address bus (U15-U16, U29-U30): only switch to data address during T2
+        if self.phase == 2 and s['ADDR_MODE']:
             # Data mode: ABUS = {data_page, ir_low}
             self.abus = (self.data_page << 8) | self.ir_low
-
-        # Memory read
-        if self.abus >= 0x8000:
-            self.dbus = self.rom[self.abus - 0x8000]
         else:
-            self.dbus = self.ram[self.abus]
+            # Fetch mode: ABUS = PC
+            self.abus = self.pc
+
+        # Memory read: A15=0 → ROM, A15=1 → RAM
+        if self.abus >= 0x8000:
+            self.dbus = self.ram[self.abus - 0x8000]
+        else:
+            self.dbus = self.rom[self.abus]
 
         # IBUS source selection
         if self.phase == 2:
@@ -183,9 +189,9 @@ class CPU:
             self.decode_control()
             self.compute_buses()
 
-            # Store
-            if s['STR'] and self.abus < 0x8000:
-                self.ram[self.abus] = self.ac
+            # Store: RAM write only if A15=1
+            if s['STR'] and self.abus >= 0x8000:
+                self.ram[self.abus - 0x8000] = self.ac
 
             # AC update
             if s['AC_WR']:
@@ -251,7 +257,7 @@ class CPU:
             print(f"       U21:   Z_flag={self.z_flag}")
             print(f"       U22:   AC==0? {'YES' if self.ac==0 else 'NO'}")
             print(f"       U23:   PG=${self.page_reg:02X}")
-            print(f"       U24:   /A15={'0' if self.abus>=0x8000 else '1'}→ROM_CE "
+            print(f"       U24:   /A15={'0' if self.abus>=0x8000 else '1'}→RAM_CE "
                   f"/JUMP={1-s['JMP']} /AC_WR={1-s['AC_WR']} BUF_OE_N={s['BUF_OE_N']}")
             print(f"       U25:   ADDR_MODE={s['ADDR_MODE']} PC_INC={s['PC_INC']} "
                   f"BUF_OE_SAFE={s['BUF_OE_SAFE']} PG_Load={'1' if s['PG_LOAD'] else '0'}")
@@ -263,10 +269,10 @@ class CPU:
             print(f"       U31:   IE={self.ie} IRQ_FF={self.irq_ff}")
             print(f"       U32:   DP=${self.data_page:02X}")
             print(f"       U33:   DP_LOAD={'1' if s['DP_LOAD'] else '0'}")
-            print(f"       ROM:   /CE={'0(active)' if self.abus>=0x8000 else '1(off)'} "
-                  f"D=${self.rom[self.abus-0x8000] if self.abus>=0x8000 else 0:02X}")
-            print(f"       RAM:   /CE={'0(active)' if self.abus<0x8000 else '1(off)'} "
-                  f"D=${self.ram[self.abus] if self.abus<0x8000 else 0:02X} "
+            print(f"       ROM:   /CE={'0(active)' if self.abus<0x8000 else '1(off)'} "
+                  f"D=${self.rom[self.abus] if self.abus<0x8000 else 0:02X}")
+            print(f"       RAM:   /CE={'0(active)' if self.abus>=0x8000 else '1(off)'} "
+                  f"D=${self.ram[self.abus-0x8000] if self.abus>=0x8000 else 0:02X} "
                   f"/WE={s['/AC_BUF']}")
             print()
 
@@ -285,7 +291,7 @@ def test_basic():
         0x02, 0x08,  # BEQ $08 (pass)
         0x01, 0x08,  # J $08 (fail - shouldn't reach)
     ]
-    # pass: HLT at $8008
+    # pass: HLT at $0008
     program += [0x01, 0x08]  # J self (halt)
 
     cpu.load_rom(bytes(program))
@@ -301,26 +307,26 @@ def test_basic():
     cpu.trace()
     assert cpu.ac == 0x00, f"FAIL: AC=${cpu.ac:02X} expected $00"
     assert cpu.z_flag == 1, f"FAIL: Z={cpu.z_flag} expected 1"
-    assert cpu.pc == 0x8008, f"FAIL: PC=${cpu.pc:04X} expected $8008 (HLT loop)"
+    assert cpu.pc == 0x0008, f"FAIL: PC=${cpu.pc:04X} expected $0008 (HLT loop)"
     print("\n✅ PASS: Basic ALU + Branch\n")
 
 
 def test_setdp():
-    """Test: SETDP $10, LI $AA, SB $00, SETDP $10, LB $00"""
+    """Test: SETDP $90, LI $AA, SB $00, SETDP $90, LB $00"""
     cpu = CPU()
     program = [
-        0x40, 0x10,  # SETDP $10
+        0x40, 0x90,  # SETDP $90
         0x30, 0xAA,  # LI $AA
-        0x04, 0x00,  # SB $00 → RAM[$1000] = $AA
-        0x40, 0x10,  # SETDP $10
+        0x04, 0x00,  # SB $00 → RAM[$9000] = $AA
+        0x40, 0x90,  # SETDP $90
         0x30, 0x00,  # LI $00 → AC=0
-        0x38, 0x00,  # LB $00 → AC=RAM[$1000]=$AA
+        0x38, 0x00,  # LB $00 → AC=RAM[$9000]=$AA
         0x01, 0x0C,  # HLT
     ]
     cpu.load_rom(bytes(program))
 
     print("=" * 80)
-    print("TEST: SETDP $10, write/read RAM[$1000]")
+    print("TEST: SETDP $90, write/read RAM[$9000]")
     print("=" * 80)
 
     for _ in range(21):  # 7 instructions × 3 clocks
@@ -329,22 +335,22 @@ def test_setdp():
 
     cpu.trace()
     assert cpu.ac == 0xAA, f"FAIL: AC=${cpu.ac:02X} expected $AA"
-    assert cpu.data_page == 0x10, f"FAIL: DP=${cpu.data_page:02X} expected $10"
+    assert cpu.data_page == 0x90, f"FAIL: DP=${cpu.data_page:02X} expected $90"
     print("\n✅ PASS: SETDP + RAM page access\n")
 
 
 def test_rom_read():
-    """Test: SETDP $80, LB $00 → reads ROM[$8000] = first opcode ($40)"""
+    """Test: SETDP $00, LB $00 → reads ROM[$0000] = first opcode ($40)"""
     cpu = CPU()
     program = [
-        0x40, 0x80,  # SETDP $80
-        0x38, 0x00,  # LB $00 → AC=ROM[$8000]=$40
+        0x40, 0x00,  # SETDP $00
+        0x38, 0x00,  # LB $00 → AC=ROM[$0000]=$40
         0x01, 0x04,  # HLT
     ]
     cpu.load_rom(bytes(program))
 
     print("=" * 80)
-    print("TEST: SETDP $80, LB $00 → read own ROM")
+    print("TEST: SETDP $00, LB $00 → read own ROM")
     print("=" * 80)
 
     for _ in range(9):
@@ -357,20 +363,20 @@ def test_rom_read():
 
 
 def test_jump():
-    """Test: SETPG $90, J $00 → PC=$9000"""
+    """Test: SETPG $10, J $00 → PC=$1000"""
     cpu = CPU()
-    # At $8000:
+    # At $0000:
     program = bytearray(32768)
-    program[0] = 0x20; program[1] = 0x90   # SETPG $90
-    program[2] = 0x01; program[3] = 0x00   # J $00 → PC=$9000
-    # At $9000 (offset $1000 in ROM):
+    program[0] = 0x20; program[1] = 0x10   # SETPG $10
+    program[2] = 0x01; program[3] = 0x00   # J $00 → PC=$1000
+    # At $1000 (offset $1000 in ROM):
     program[0x1000] = 0x30; program[0x1001] = 0x77  # LI $77
     program[0x1002] = 0x01; program[0x1003] = 0x02  # HLT
 
     cpu.load_rom(bytes(program))
 
     print("=" * 80)
-    print("TEST: SETPG $90, J $00 → jump to $9000")
+    print("TEST: SETPG $10, J $00 → jump to $1000")
     print("=" * 80)
 
     for _ in range(12):
@@ -379,7 +385,7 @@ def test_jump():
 
     cpu.trace()
     assert cpu.ac == 0x77, f"FAIL: AC=${cpu.ac:02X} expected $77"
-    assert cpu.page_reg == 0x90, f"FAIL: PG=${cpu.page_reg:02X} expected $90"
+    assert cpu.page_reg == 0x10, f"FAIL: PG=${cpu.page_reg:02X} expected $10"
     print("\n✅ PASS: Cross-page jump\n")
 
 

@@ -1,7 +1,7 @@
 ; RV8-GR Assembly Test — exercises all instructions
 ; Run on Verilog sim to verify assembler output matches CPU behavior
 
-.org $8000
+.org $0000
 
 ; === TEST 1: LI ===
 test1:

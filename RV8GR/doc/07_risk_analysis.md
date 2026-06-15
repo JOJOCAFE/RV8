@@ -10,8 +10,8 @@
 |:-:|--------|:--------:|:------:|
 | 1 | Memory Map /CE polarity | 🟢 | Correct (active-low) |
 | 2 | Z Flag async preset | 🟡 | Safe (200ns settle) |
-| 3 | PG_Load_N timing | 🟢 | Sync with CLK |
-| 4 | RAM /WE margin | 🟢 | 70ns margin @ 10MHz |
+| 3 | PG_CLK timing | 🟢 | Sync with CLK |
+| 4 | RAM /WE margin | 🟢 | >700ns margin @ 1MHz |
 | 5 | SRC+STR bus conflict | 🟢 | **Fixed** (U25 gate 3) |
 | 6 | STR+AC_WR feedback | 🟢 | Deterministic (AC*2) |
 | 7 | Illegal ALU modes | 🟢 | All 8 modes deterministic |
@@ -69,26 +69,31 @@ Result: STR=1 → U7 always disabled → STORE wins → no bus fight.
 
 **SETDP** ($40) = XOR_MODE=1, MUX=0, SRC=0
 **SETPG** ($20) = XOR_MODE=0, MUX=1, SRC=0
-**DI** ($48) = XOR_MODE=1, SRC=1
 
-Decode:
-- pg_load = MUX AND NOT(AC_WR) AND NOT(XOR_MODE) → SETPG only ✓
-- dp_load = (ir_high == $40) → SETDP only ✓
-- DI = (ir_high == $48) → different from $40 ✓
+Hardware decode (from wiring guide):
+- **PG_CLK** = /T2 OR NAND(MUX, /AC_WR) → fires when MUX=1, AC_WR=0
+- **DP_Load** = T2 AND XOR AND /ADDR AND /AC_WR (U33 gate 1)
 
-**No conflicts.** Each uses unique bit pattern.
+| Opcode | MUX | XOR | PG fires? | DP fires? | Conflict? |
+|:------:|:---:|:---:|:---------:|:---------:|:---------:|
+| SETPG $20 | 1 | 0 | ✅ | ❌ | ✗ |
+| SETDP $40 | 0 | 1 | ❌ | ✅ | ✗ |
+| $60 (unused) | 1 | 1 | ✅ | ✅ | ⚠️ both! |
+
+**$60 triggers both PG and DP simultaneously** — but $60 is not in the ISA (harmless).
+For valid opcodes: no conflict. MUX and XOR bits naturally separate SETPG/SETDP.
 
 ---
 
 ## #10: Bus Signal Integrity
 
-| Cable Length | Max Clock | Status |
-|:------------:|:---------:|:------:|
-| <30cm | 10 MHz | 🟢 Safe |
-| 30-60cm | 5 MHz | 🟡 Add termination |
-| >60cm | 1 MHz | ⛔ Not recommended |
+| Cable Length | @ 1 MHz | @ 5 MHz | Notes |
+|:------------:|:-------:|:-------:|-------|
+| <30cm | 🟢 | 🟢 | No issues |
+| 30-60cm | 🟢 | 🟡 | Add termination for 5 MHz |
+| >60cm | 🟢 | ⛔ | 1 MHz OK, avoid 5 MHz |
 
-**Tips**: 100nF at peripheral VCC, series 33Ω on CLK if ringing.
+**Tips**: 100nF at peripheral VCC, series 33Ω on CLK if ringing at high speed.
 
 ---
 
@@ -104,25 +109,26 @@ Decode:
 
 ## IRQ Save-PC Status
 
-| Approach | v1.0 Build | v2.0 Future |
-|----------|:----------:|:-----------:|
-| Save PC to RAM[$0E:$0F] | Software | Hardware (2-3 chips) |
-| Jump to $FF00 | ✅ Hardware | ✅ Hardware |
-| Clear IE | ✅ Hardware | ✅ Hardware |
-| Return from ISR | Software (known addr) | Hardware (indirect jump) |
+| Approach | v1.0 Build (33 chips) | v1.1 (+2 chips) | v2.0 Future |
+|----------|:---------------------:|:----------------:|:-----------:|
+| Detect /IRQ edge | ✅ Hardware (U31) | ✅ Hardware | ✅ Hardware |
+| Jump to $FF00 | ❌ Software poll+branch | ✅ Hardware | ✅ Hardware |
+| Clear IE on IRQ | ❌ Manual (don't EI again) | ✅ Hardware | ✅ Hardware |
+| Save PC to RAM | ❌ Software (pre-save before EI) | ❌ Software | ✅ Hardware |
+| Return from ISR | Software (known addr) | Software | Hardware |
 
-**v1.0**: Programmer saves return address to RAM[$0E:$0F] before calling EI.
-ISR reads RAM[$0E:$0F] and returns to known address.
-
-**v2.0**: Add PC→DBUS mux + forced address logic for automatic save.
+**v1.0 (building now)**: IRQ_FF latch only. Software polls, branches to handler.
+IRQ_FF cleared only by /RST — sticky until reset (v1.1 adds software clear via /SLOT2).
+**v1.1**: +2 chips (74HC157 ×2) → hardware vector $FF00, auto-clear IE+IRQ_FF.
+**v2.0**: +additional logic → hardware save-PC to RAM[$800E:$800F].
 
 ---
 
 ## SETDP ROM Lookup (Design Strength)
 
 ```asm
-SETDP $90       ; point to ROM page $90
-LB $10          ; AC = ROM[$9010] — lookup table!
+SETDP $10       ; point to ROM page $10
+LB $10          ; AC = ROM[$1010] — lookup table!
 ```
 
 Enables memory-mapped constant tables (fonts, sin, tiles) with zero extra hardware.
@@ -135,6 +141,50 @@ Same LB instruction reads RAM or ROM depending on DP value.
 - **1 critical hazard** (SRC+STR): Fixed with spare gate, 0 chips added
 - **0 remaining electrical risks**: All other hazards are functional-only
 - **All 256 opcodes**: deterministic behavior (no undefined states)
-- **Bus**: safe at 10 MHz with <30cm cable
+- **Clock target**: 1 MHz breadboard (700ns+ margin), 5 MHz PCB only
+- **Bus**: safe with <30cm cable
 
 Design is electrically safe for physical build.
+
+---
+
+## Known Limitations (v1.0)
+
+### L1: Opcode $60-$6F triggers both PG and DP
+
+```
+$60: MUX=1, XOR=1 → PG_CLK fires AND DP_Load fires simultaneously
+Both U23 and U32 latch IBUS value on same cycle.
+```
+
+**Impact**: Not harmful (both registers get same value). Not in ISA.
+**Policy**: Reserved range. Assembler must not emit $60-$6F.
+**v2.0 fix option**: `DP_Load = XOR_MODE AND NOT(MUX_SEL) AND ...` — adds 1 gate.
+
+### L2: IRQ_FF is sticky (one-shot only)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  IRQ_FF cleared ONLY by /RST in v1.0.               │
+│                                                     │
+│  After first /IRQ event: IRQ_FF = 1 forever.        │
+│  Software cannot re-arm without reset.              │
+│                                                     │
+│  Intended use: wake-up / event latch (poll once).   │
+│  For repeated interrupts: poll I/O directly.        │
+│                                                     │
+│  v1.1 fix: Route /SLOT2 → U31 /CLR2 (+0 chips)     │
+└─────────────────────────────────────────────────────┘
+```
+
+### L3: "Hidden" free instructions (not in ISA but functional)
+
+| Opcode | Bits | Effect | Notes |
+|:------:|------|--------|-------|
+| $B0 imm | SUB+XOR+MUX+AC_WR | AC = NOT(imm) | Free NOT immediate |
+| $B8 rs | SUB+XOR+MUX+AC_WR+SRC | AC = NOT(RAM[rs]) | Free NOT register |
+| $60 imm | XOR+MUX | PG=imm, DP=imm | Both page regs loaded |
+| $11 addr | AC_WR+JMP | AC=ALU result + jump | Compute-and-jump |
+
+These are electrically safe and deterministic but **reserved** — not part of the frozen ISA.
+Assembler must not emit them. Future ISA revision may formally adopt $B0/$B8 as NOT.

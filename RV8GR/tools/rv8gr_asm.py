@@ -57,7 +57,7 @@ def parse_value(s, labels, pc):
         return v & 0xFF
     return int(s)
 
-def assemble(source, base_addr=0x8000):
+def assemble(source, base_addr=0x0000):
     lines = source.split('\n')
     labels = {}
     code = []  # list of (pc, bytes, source_line)
@@ -192,7 +192,7 @@ def assemble(source, base_addr=0x8000):
 
     return code, labels
 
-def make_bin(code, base_addr=0x8000, size=32768):
+def make_bin(code, base_addr=0x0000, size=32768):
     """Create binary image (32KB ROM at base_addr)."""
     rom = bytearray(size)
     for pc, bytes_list, _ in code:
@@ -215,7 +215,7 @@ def main():
     parser.add_argument('input', help='Input .asm file')
     parser.add_argument('-o', '--output', help='Output file')
     parser.add_argument('-f', '--format', choices=['bin', 'hex'], default='bin')
-    parser.add_argument('-b', '--base', default='0x8000', help='Base address (default $8000)')
+    parser.add_argument('-b', '--base', default='0x0000', help='Base address (default $0000)')
     args = parser.parse_args()
 
     base = int(args.base, 0)

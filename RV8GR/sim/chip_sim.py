@@ -1,6 +1,11 @@
 """
 RV8-GR Full CPU Simulation — runs programs through all 35 chips.
 Uses soft_debug logic (proven correct) but with chip-level probe interface.
+
+Models ideal CPU behavior (Verilog-equivalent):
+  - DP=$80, PG=$00, AC=$00, Z=1 at init (hardware = indeterminate)
+  - DI works, IRQ hardware vector $FF00 (v1.0 hardware = polling only)
+  Physical v1.0 boot must start with: SETDP $80, SETPG $00, LI $00
 """
 
 import sys
@@ -17,12 +22,12 @@ class CPUSim:
         self.phase = 0  # 0=T0, 1=T1, 2=T2
 
         # State registers (mirrors physical chip state)
-        self.pc = 0x8000
+        self.pc = 0x0000
         self.ir_high = 0x00
         self.ir_low = 0x00
         self.ac = 0x00
-        self.page_reg = 0x80
-        self.data_page = 0x00
+        self.page_reg = 0x00
+        self.data_page = 0x80
         self.z_flag = 1
 
         # Load ROM into chip
@@ -62,19 +67,19 @@ class CPUSim:
             elif not self._addr_mode(s):
                 return self.ir_low  # U6 drives (immediate)
             else:
-                # U7 drives (RAM read)
+                # U7 drives (ROM/RAM read)
                 addr = self._abus(s)
                 if addr >= 0x8000:
-                    return self.chips['ROM']._data[addr - 0x8000]
+                    return self.chips['RAM']._data[addr - 0x8000]
                 else:
-                    return self.chips['RAM']._data[addr]
+                    return self.chips['ROM']._data[addr]
         else:
             # T0/T1: U7 drives from ROM/RAM
             addr = self.pc
             if addr >= 0x8000:
-                return self.chips['ROM']._data[addr - 0x8000]
+                return self.chips['RAM']._data[addr - 0x8000]
             else:
-                return self.chips['RAM']._data[addr]
+                return self.chips['ROM']._data[addr]
 
     def _alu(self, s, ibus):
         xor_b = self.ac if s['XOR'] else (0xFF if s['SUB'] else 0x00)
@@ -142,10 +147,10 @@ class CPUSim:
             self.chips['ROM'].set(i+1, (abus>>i)&1)
             self.chips['RAM'].set(i+1, (abus>>i)&1)
         a15 = (abus >> 15) & 1
-        self.chips['ROM'].set(24, 1-a15)
+        self.chips['ROM'].set(24, a15)
         self.chips['ROM'].set(25, 0)
         self.chips['ROM'].set(26, 1)
-        self.chips['RAM'].set(24, a15)
+        self.chips['RAM'].set(24, 1-a15)
         self.chips['RAM'].set(25, 0)
         self.chips['RAM'].set(26, 1 if not (self.phase==2 and s['STR']) else 0)
         self.chips['ROM'].update()
@@ -224,8 +229,8 @@ class CPUSim:
 
             if s['STR']:
                 addr = self._abus(s)
-                if addr < 0x8000:
-                    self.chips['RAM']._data[addr] = self.ac
+                if addr >= 0x8000:
+                    self.chips['RAM']._data[addr - 0x8000] = self.ac
 
             if s['AC_WR']:
                 self.ac = self._alu(s, ibus)
@@ -351,7 +356,7 @@ if __name__ == '__main__':
     assert sim.ac == 0x00 and sim.z_flag == 1
     print(f"  ✅ LI $05, SUBI $05 → AC=$00, Z=1")
 
-    # Test 4: SB + LB
+    # Test 4: SB + LB (data_page=$80, so SB $10 → RAM[$8010])
     sim = CPUSim()
     trace = sim.run(bytes([0x30, 0xAA, 0x04, 0x10, 0x30, 0x00, 0x38, 0x10, 0x01, 0x08]))
     assert sim.ac == 0xAA, f"SB/LB: AC=${sim.ac:02X}"
@@ -363,30 +368,30 @@ if __name__ == '__main__':
     assert sim.ac == 0x00  # should NOT reach LI $FF
     print(f"  ✅ BEQ taken (Z=1) → skipped LI $FF")
 
-    # Test 6: SETDP + LB from page
+    # Test 6: SETDP + LB from page (SETDP $90 → read RAM[$9000])
     sim = CPUSim()
-    sim.chips['RAM']._data[0x1000] = 0x77
-    trace = sim.run(bytes([0x40, 0x10, 0x38, 0x00, 0x01, 0x04]))
+    sim.chips['RAM']._data[0x1000] = 0x77  # RAM[0x1000] = absolute $9000
+    trace = sim.run(bytes([0x40, 0x90, 0x38, 0x00, 0x01, 0x04]))
     assert sim.ac == 0x77, f"SETDP+LB: AC=${sim.ac:02X}"
-    print(f"  ✅ SETDP $10, LB $00 → AC=$77 (RAM[$1000])")
+    print(f"  ✅ SETDP $90, LB $00 → AC=$77 (RAM[$9000])")
 
-    # Test 7: SETPG + J (cross-page jump)
+    # Test 7: SETPG + J (cross-page jump within ROM)
     sim = CPUSim()
     rom = bytearray(32768)
-    rom[0] = 0x20; rom[1] = 0x90   # SETPG $90
+    rom[0] = 0x20; rom[1] = 0x10   # SETPG $10
     rom[2] = 0x01; rom[3] = 0x00   # J $00
-    rom[0x1000] = 0x30; rom[0x1001] = 0x77  # LI $77 at $9000
+    rom[0x1000] = 0x30; rom[0x1001] = 0x77  # LI $77 at $1000
     rom[0x1002] = 0x01; rom[0x1003] = 0x02  # HLT
     sim.load_rom(bytes(rom))
     trace = sim.run(bytes(rom))
     assert sim.ac == 0x77, f"Jump: AC=${sim.ac:02X}"
-    print(f"  ✅ SETPG $90, J $00 → AC=$77 (at $9000)")
+    print(f"  ✅ SETPG $10, J $00 → AC=$77 (at $1000)")
 
-    # Test 8: ROM read via SETDP $80
+    # Test 8: ROM read via SETDP $00 (ROM at $0000-$7FFF)
     sim = CPUSim()
-    trace = sim.run(bytes([0x40, 0x80, 0x38, 0x00, 0x01, 0x04]))
+    trace = sim.run(bytes([0x40, 0x00, 0x38, 0x00, 0x01, 0x04]))
     assert sim.ac == 0x40, f"ROM read: AC=${sim.ac:02X}"
-    print(f"  ✅ SETDP $80, LB $00 → AC=$40 (ROM[$8000])")
+    print(f"  ✅ SETDP $00, LB $00 → AC=$40 (ROM[$0000])")
 
     print()
     analyze_timing(sim.chips)
