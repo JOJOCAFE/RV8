@@ -1,5 +1,31 @@
 # RV8 Project — Changelog
 
+## 2026-06-19 — v3.8: Opcode Sweep, Page-Safe Assembler, Skills
+
+### Verification
+- **tb_rv8gr_opcode_sweep.v**: New exhaustive testbench — tests all 256 opcodes × Z={0,1} = 512 cases against horizontal control equations
+- All 5 testbenches pass: full (127 cycles), IRQ, SETDP (160 cycles), tasks, opcode sweep (512 cases)
+- chip_sim.py 8/8, soft_debug.py 4/4 — no regressions
+
+### Assembler (tools/rv8gr_asm.py)
+- Cross-page validation: J/BEQ/BNE error if target is on different page than PC
+- Overlap detection: error if two instructions write the same ROM address
+- Duplicate label detection
+- `memh` output format for Verilog `$readmemh`
+- `AssemblerError` exception class for clean error handling
+
+### Documentation
+- **doc/11_future_upgrades.md**: Documents potential v1.1/v2.0 improvements extracted from Codex evaluation (clock qualification, hardware DI, I/O decode, reset supervisor)
+- Clock targets clarified: 1 MHz breadboard, 4 MHz PCB (no hardware changes needed)
+
+### Skills (new)
+- **debug-mantra**: 4-step hardware debugging discipline adapted from 9arm-skills (reproduce → trace → falsify → breadcrumbs), with RV8-specific hazard checklist and sim layers
+- **scrutinize**: Outsider design review adapted from 9arm-skills, with chip:pin signal tracing, ISA encoding safety, 33-chip budget awareness
+
+### Cleanup
+- Evaluated RV8GR-Codex (40-chip AI redesign): rejected as unauthorized/unnecessary at 1 MHz; extracted useful assembler safety and opcode sweep TB
+- Evaluated 7 external GitHub repos: only 9arm-skills had applicable content
+
 ## 2026-06-16 — v3.7: Documentation Freeze & Consistency Pass
 
 ### Architecture Documentation (ALL FROZEN 🔒)

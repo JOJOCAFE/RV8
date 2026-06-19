@@ -1,5 +1,17 @@
 # RV8 Project — Development History
 
+## 2026-06-19 — v3.8: Opcode Sweep, Page-Safe Assembler, Agent Skills
+
+- Added exhaustive opcode sweep testbench (256 opcodes × Z=0/1 = 512 cases)
+- Assembler upgraded: cross-page validation, overlap detection, duplicate labels, memh format
+- Created debug-mantra skill (4-step hardware debugging discipline, adapted from 9arm-skills)
+- Created scrutinize skill (outsider design review, adapted from 9arm-skills)
+- Evaluated RV8GR-Codex (40-chip AI redesign): timing concerns real but irrelevant at 1 MHz, extracted useful bits, rejected the redesign
+- Documented future upgrades (doc/11_future_upgrades.md): clock qualification, hardware DI, I/O decode for v2.0
+- Clock targets: 1 MHz breadboard (808ns margin), 4 MHz PCB (88ns margin), no hardware changes
+- Evaluated 7 external GitHub repos for applicable content (only 9arm-skills was useful)
+- Status: 5 testbenches passing, assembler hardened, ready for physical build
+
 ## 2026-06-16 — v3.7: Documentation Freeze & Consistency Pass
 
 - All 9 RV8-GR docs reviewed, corrected, and frozen (design_isa, wiring_guide, instruction_trace, bank_switch, understand_by_module, debug_plan, risk_analysis, design_signoff, task_test_plan)

@@ -12,7 +12,7 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 | **Total** | 31 | 22 | 40 | 35 |
 | **MIPS @5MHz** | 1.25 | 1.0 | **2.5** | **0.33*** |
 
-\* RV8-GR: 1 MHz official target (breadboard). 0.33 MIPS @ 1 MHz. 1.67 MIPS if 5 MHz achieved on PCB.
+\* RV8-GR: 1 MHz breadboard, 4 MHz PCB. 0.33 MIPS @ 1 MHz. 1.33 MIPS @ 4 MHz PCB.
 | **ISA** | Full (35) | Full (35) | Full (35) | 18 instr |
 | **Microcode** | Yes | Yes | **No** | **No** |
 | **AND/OR/XOR** | ✅ | ✅ | ✅ | XOR only |
@@ -64,12 +64,12 @@ RV8/
 | | RV8 | RV8-R | RV8-G | RV8-GR |
 |--|:---:|:---:|:---:|:---:|
 | Instruction trace | ✅ | ✅ | ⬜ | ✅ |
-| Verilog | ✅ 8/8 | ✅ (141 cycles) | ⬜ | ✅ (127 cycles) |
+| Verilog | ✅ 8/8 | ✅ (141 cycles) | ⬜ | ✅ (5 TBs, 512 opcode sweep) |
 | Wiring guide (pin-level) | ✅ | ⬜ | ✅ | ✅ |
 | Wiring Guide | ✅ | ✅ | ⬜ | ✅ |
 | Module guide (Thai) | ✅ | ⬜ | ⬜ | ✅ |
 | ISA reference | ✅ | ✅ | ⬜ | ✅ |
-| Assembler | ⬜ | ⬜ | ⬜ | ✅ |
+| Assembler | ⬜ | ⬜ | ⬜ | ✅ (page-safe) |
 | Test ROM | ⬜ | ⬜ | ⬜ | ✅ |
 | Hardware Labs | ⬜ | ⬜ | ⬜ | ✅ (14 labs) |
 | Programmer | ✅ | ✅ | ✅ | ✅ |

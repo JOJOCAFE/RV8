@@ -226,6 +226,10 @@ iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
 iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_setdp.v && vvp /tmp/tb.vvp
 # === SETDP TEST PASSED === (160 cycles)
 
+# Opcode sweep (256 opcodes × Z=0/1 = 512 cases)
+iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_opcode_sweep.v && vvp /tmp/tb.vvp
+# === OPCODE SWEEP PASSED: 512 cases (256 opcodes x Z=0/1) ===
+
 # Python gate-level sim
 python3 sim/chip_sim.py
 # ALL 8 CPU TESTS PASSED ✅
@@ -300,24 +304,24 @@ python3 tools/rv8gr_asm.py programs/testrom.asm -o programs/testrom.bin
 - **Hardware labs**: 14 of 14 written (Thai, middle school level)
 - **Source of truth**: `doc/00_design_isa.md` + `doc/02_wiring_guide.md`
 
-## TODO
+## Skills (Agent)
+- `debug-mantra`: 4-step hardware debugging discipline (reproduce → trace → falsify → breadcrumbs)
+- `scrutinize`: Outsider-perspective review of hardware/RTL changes
 
 ## Current TODO
-- Wiring Guide แบบรูปภาพ (visual diagrams per module)
-- Bring-up Labs (hands-on build, labs 01-14)
-- Debug Labs (fault injection exercises)
-- Example Programs (.asm collection: blink, counter, game)
-- Assembler Tutorial (rv8gr_asm.py usage guide)
 - Order parts for physical build
-- Build Lab 01-14 on breadboard
+- Build Lab 01-14 on breadboard (1 MHz)
+- PCB layout for 4 MHz version (when breadboard verified)
+- Example Programs (.asm collection: blink, counter, game)
 - RV8-R architecture design (when ready)
 
 ## Design Status
-- RV8-GR: **Architecture Frozen v1.0** — all 9 docs consistent and signed off
-- Verilog: ALL TESTS PASSED (127 cycles + IRQ + SETDP)
-- Gate-level sim: 3 .bin programs pass through all 35 chips
-- Wiring sim: 257 connections verified, all critical nets confirmed
-- Timing: max 9.7 MHz, safe at 1 MHz (700ns+ margin)
+- RV8-GR: **Architecture Frozen v1.0** — all 11 docs consistent and signed off
+- Verilog: ALL 5 TESTBENCHES PASS (full 127 cycles, IRQ, SETDP, tasks, opcode sweep 512 cases)
+- Gate-level sim: chip_sim.py 8/8, soft_debug.py 4/4
+- Assembler: cross-page validation, overlap detection, memh output
+- Timing: 1 MHz breadboard (808ns margin), 4 MHz PCB target (88ns margin)
 - BOM finalized, 5-board breadboard layout planned
-- Hardware labs: 14 written (Thai, middle school level), synced with debug plan
-- Documentation freeze date: 2026-06-16
+- Hardware labs: 14 written (Thai, middle school level)
+- Future upgrades documented (doc/11_future_upgrades.md)
+- RV8GR-Codex (speculative AI redesign) evaluated and rejected; useful bits extracted
