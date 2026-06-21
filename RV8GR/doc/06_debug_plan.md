@@ -389,7 +389,7 @@ After T2:  AC = $42 ← LI $42 ทำงานแล้ว!
 
 **U33 wiring (SETDP decode — 74HC21 gate 1)**:
 - Pin 1 ← T2 (U8-5)
-- Pin 2 ← XOR_MODE (U5-16)
+- Pin 2 ← XOR_MODE (U5-13)
 - Pin 4 ← /ADDR_MODE (U24 — inverted SRC|STR)
 - Pin 5 ← /AC_WR (U24 — inverted AC_WR)
 - Pin 6 → U32 CLK (DP_Load)
