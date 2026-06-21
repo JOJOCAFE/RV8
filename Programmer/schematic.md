@@ -1,288 +1,236 @@
-# Programmer Board — Schematic (ผังวงจร)
+# RV8 Programmer — Combined Schematic (Bus + Direct ROM)
 
-**แนวคิด**: Programmer ต่อเข้ากับ CPU board ผ่าน **RV8-Bus (40-pin)** ไม่ได้ต่อตรงกับ ROM
-ข้อดี: ใช้กับ CPU board ทุกรุ่น (RV8, RV8-R, RV8-G, RV8-GR) และยังใช้เป็น Terminal bridge ได้ด้วย
+**แนวคิด**: บอร์ดเดียว ใช้ได้ 2 แบบ — เสียบสาย Bus ไปยัง CPU board หรือเสียบ ROM ลง ZIF
+**กฎ**: ใช้ทีละอย่าง — เสียบ Bus cable หรือ เสียบ ROM ใน ZIF (ไม่ใช้พร้อมกัน)
+
+**KiCad project**: `KICAD/.history/RV8Programmer.kicad_sch`
+**PDF export**: `RV8Programmer.pdf`
 
 ---
 
 ## ภาพรวมระบบ
 
 ```
-PC ←─USB─→ [ESP32-WROOM-32] ←─3.3V─→ [TXS0108E ×2] ←─5V─→ [74HC595 ×2] ──┐
-                                                                              │
-                                                              ┌───────────────┘
-                                                              │
-                                                              ▼
-                                                 ┌─────────────────────┐
-                                                 │  RV8-Bus (40-pin)   │
-                                                 │  A[14:0], D[7:0]    │
-                                                 │  /WR, /RD, /RST     │
-                                                 │  /SLOT1, VCC, GND   │
-                                                 └──────────┬──────────┘
-                                                            │
-                                                   CPU Board (RV8-GR etc.)
-                                                   ROM + RAM อยู่บน CPU board
-```
+                                              ┌─────────────────────┐
+                                         ┌──→ │  RV8-Bus (40-pin)   │ → CPU Board
+                                         │    └─────────────────────┘
+                                         │
+PC ←USB→ [ESP32] ←→ [TXS ×2] ←→ [595 ×2]┤
+                                         │
+                                         │    ┌─────────────────────┐
+                                         └──→ │  AT28C256 (ZIF 28)  │ → ถอดไปเสียบบอร์ด
+                                              └─────────────────────┘
 
-**PROG mode**: ESP32 ยึด /RST=LOW (CPU หยุด), ขับ Address + Data + /WR ผ่าน bus → เขียน ROM บน CPU board
-**RUN mode**: ESP32 ปล่อย bus ทั้งหมด, ฟังที่ /SLOT1 สำหรับ UART bridge
+          เลือกใช้ทีละอย่าง: เสียบสาย Bus  หรือ  เสียบ ROM ใน ZIF
+```
 
 ---
 
-## 1. ผังการต่อระบบไฟเลี้ยง (Power & Ground)
-
-ต่อสายไฟเลี้ยงหลักให้ครบทุกจุดก่อนเริ่มเดินสายสัญญาณ
+## 1. Power & Ground
 
 ```
-[ ESP32 บอร์ด ] ─── (3V3) ───────→ [ TXS0108E ตัวที่ 1 และ 2: พิน 1 (V_A) ]
-                                    [ TXS0108E ตัวที่ 1 และ 2: พิน 10 (OE) ] (Pull-up 10kΩ เข้า 3.3V)
+ESP32 (3V3) ───→ TXS0108E ×2: V_A (พิน 1)
+                 TXS0108E ×2: OE (พิน 10) — pull-up R1=10K เข้า 3.3V
 
-                ─── (VN / 5V) ────→ [ 74HC595 ตัวที่ 1 และ 2: พิน 16 (VCC) ]
-                                    [ TXS0108E ตัวที่ 1 และ 2: พิน 20 (V_B) ]
+ESP32 (5V)  ───→ TXS0108E ×2: V_B (พิน 20)
+                 74HC595 ×2: VCC (พิน 16)
+                 AT28C256: VCC (พิน 28)
+                 Bus header: pin 39 (VCC)
 
-                ─── (GND) ────────→ ต่อพ่วง GND ของ IC ทุกตัว
-                                    - TXS0108E ตัวที่ 1 และ 2: พิน 11 (GND)
-                                    - 74HC595 ตัวที่ 1 และ 2: พิน 8 (GND)
+ESP32 (GND) ───→ ทุก IC GND
+                 AT28C256: GND (พิน 14)
+                 Bus header: pin 40 (GND)
 ```
-
-หมายเหตุ: VCC (+5V) และ GND รับจาก RV8-Bus pin 39 (VCC) และ pin 40 (GND) ก็ได้
 
 ---
 
-## 2. ผังวงจรฝั่งสัญญาณควบคุมและ Address Bus
-
-ใช้ TXS0108E ตัวที่ 1 แปลง 3.3V → 5V ส่งเข้า 74HC595 และขา Control
+## 2. Control Signals (TXS0108E #2 = U4)
 
 ```
-[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 1 ]              [ ปลายทาง 5V ]
+[ ESP32 ]         [ TXS #2 (U4) ]              [ ปลายทาง ×2 ]
 
-📌 กลุ่มขับ Shift Register (กำหนด Address)
-GPIO 23 ──────→ พิน 2 (A1) ←══→ พิน 19 (B1) ──→ [ 74HC595 #1: พิน 14 (SER) ]
-GPIO 18 ──────→ พิน 3 (A2) ←══→ พิน 18 (B2) ──→ [ 74HC595 ทั้ง 2: พิน 11 (SRCLK) ]
-GPIO 19 ──────→ พิน 4 (A3) ←══→ พิน 17 (B3) ──→ [ 74HC595 ทั้ง 2: พิน 12 (RCLK) ]
+GPIO 23 ──→ A1 ←═══→ B1 ──→ 595 #1 SER (พิน 14)
+GPIO 18 ──→ A2 ←═══→ B2 ──→ 595 ×2 SRCLK (พิน 11)
+GPIO 19 ──→ A3 ←═══→ B3 ──→ 595 ×2 RCLK (พิน 12)
 
-📌 กลุ่มสัญญาณควบคุม → ออก RV8-Bus
-GPIO 4  ──────→ พิน 5 (A4) ←══→ พิน 16 (B4) ──→ RV8-Bus pin 26 (/RST)
-GPIO 16 ──────→ พิน 6 (A5) ←══→ พิน 15 (B5) ──→ RV8-Bus pin 27 (/WR)
-GPIO 17 ──────→ พิน 7 (A6) ←══→ พิน 14 (B6) ──→ RV8-Bus pin 28 (/RD)
+GPIO 4  ──→ A4 ←═══→ B4 ──┬→ Bus pin 26 (/RST)
+                           └→ ZIF ROM พิน 20 (/CE)
 
-(ขา A7/B7 และ A8/B8 ของ TXS ตัวที่ 1 ไม่ได้ใช้ — ปล่อยลอย)
+GPIO 16 ──→ A5 ←═══→ B5 ──┬→ Bus pin 27 (/WR)      ← ⚡ SWAP จาก KiCad เดิม
+                           └→ ZIF ROM พิน 27 (/WE)
+
+GPIO 17 ──→ A6 ←═══→ B6 ──┬→ Bus pin 28 (/RD)      ← ⚡ SWAP จาก KiCad เดิม
+                           └→ ZIF ROM พิน 22 (/OE)
+
+(A7/B7, A8/B8 ไม่ใช้)
 ```
 
-### การเชื่อมต่อ 74HC595 → RV8-Bus Address
+### Pull-ups ที่ ZIF ROM (ป้องกัน glitch ตอน ESP32 boot)
 
 ```
-📌 ขาพิเศษของ 74HC595 ทั้ง 2 ตัว:
-- พิน 10 (/SRCLR) → ต่อ VCC (5V) — ไม่เคลียร์
-- พิน 13 (/G)     → ต่อ GND     — เปิด output ตลอด
+R2 (10K): ZIF /OE (พิน 22) pull-up → +5V
+R3 (10K): ZIF /CE (พิน 20) pull-up → +5V
+```
+
+---
+
+## 3. Address Bus (74HC595 ×2 → Bus + ZIF)
+
+```
+📌 74HC595 ขาพิเศษ:
+- พิน 10 (/SRCLR) → VCC
+- พิน 13 (/OE)    → GND
 
 📌 Daisy Chain:
-- 74HC595 #1: พิน 9 (Q7S) → 74HC595 #2: พิน 14 (SER)
+- 595 #1 (U2) พิน 9 (QH') → 595 #2 (U3) พิน 14 (SER)
 
-📌 74HC595 #1 → RV8-Bus Address ต่ำ (A0-A7):
-  พิน 15 (Q0) → Bus pin 1 (A0)
-  พิน 1  (Q1) → Bus pin 2 (A1)
-  พิน 2  (Q2) → Bus pin 3 (A2)
-  พิน 3  (Q3) → Bus pin 4 (A3)
-  พิน 4  (Q4) → Bus pin 5 (A4)
-  พิน 5  (Q5) → Bus pin 6 (A5)
-  พิน 6  (Q6) → Bus pin 7 (A6)
-  พิน 7  (Q7) → Bus pin 8 (A7)
+📌 595 #1 (U2) → A[7:0]:
+  พิน 15 (QA) ──┬→ Bus pin 1  (A0)  └→ ZIF ROM พิน 10 (A0)
+  พิน 1  (QB) ──┬→ Bus pin 2  (A1)  └→ ZIF ROM พิน 9  (A1)
+  พิน 2  (QC) ──┬→ Bus pin 3  (A2)  └→ ZIF ROM พิน 8  (A2)
+  พิน 3  (QD) ──┬→ Bus pin 4  (A3)  └→ ZIF ROM พิน 7  (A3)
+  พิน 4  (QE) ──┬→ Bus pin 5  (A4)  └→ ZIF ROM พิน 6  (A4)
+  พิน 5  (QF) ──┬→ Bus pin 6  (A5)  └→ ZIF ROM พิน 5  (A5)
+  พิน 6  (QG) ──┬→ Bus pin 7  (A6)  └→ ZIF ROM พิน 4  (A6)
+  พิน 7  (QH) ──┬→ Bus pin 8  (A7)  └→ ZIF ROM พิน 3  (A7)
 
-📌 74HC595 #2 → RV8-Bus Address สูง (A8-A14):
-  พิน 15 (Q0) → Bus pin 9  (A8)
-  พิน 1  (Q1) → Bus pin 10 (A9)
-  พิน 2  (Q2) → Bus pin 11 (A10)
-  พิน 3  (Q3) → Bus pin 12 (A11)
-  พิน 4  (Q4) → Bus pin 13 (A12)
-  พิน 5  (Q5) → Bus pin 14 (A13)
-  พิน 6  (Q6) → Bus pin 15 (A14)
-  พิน 7  (Q7) → (ปล่อยลอย ไม่ใช้)
+📌 595 #2 (U3) → A[14:8]:
+  พิน 15 (QA) ──┬→ Bus pin 9  (A8)  └→ ZIF ROM พิน 25 (A8)
+  พิน 1  (QB) ──┬→ Bus pin 10 (A9)  └→ ZIF ROM พิน 24 (A9)
+  พิน 2  (QC) ──┬→ Bus pin 11 (A10) └→ ZIF ROM พิน 21 (A10)
+  พิน 3  (QD) ──┬→ Bus pin 12 (A11) └→ ZIF ROM พิน 23 (A11)
+  พิน 4  (QE) ──┬→ Bus pin 13 (A12) └→ ZIF ROM พิน 2  (A12)
+  พิน 5  (QF) ──┬→ Bus pin 14 (A13) └→ ZIF ROM พิน 26 (A13)
+  พิน 6  (QG) ──┬→ Bus pin 15 (A14) └→ ZIF ROM พิน 1  (A14)
+  พิน 7  (QH) ──  (ไม่ใช้)
 ```
 
 ---
 
-## 3. ผังวงจรฝั่ง Data Bus (สื่อสารแบบ 2 ทาง)
-
-ใช้ TXS0108E ตัวที่ 2 รับ-ส่ง 8 บิต ระหว่าง ESP32 (3.3V) และ RV8-Bus D[7:0] (5V)
+## 4. Data Bus (TXS0108E #1 = U5 → Bus + ZIF)
 
 ```
-[ ESP32 ฝั่ง 3.3V ]       [ TXS0108E ตัวที่ 2 ]          [ RV8-Bus Data ]
+[ ESP32 ]        [ TXS #1 (U5) ]         [ Bus + ZIF ]
 
-GPIO 13 ──────→ พิน 2 (A1) ←══→ พิน 19 (B1) ──→ Bus pin 17 (D0)
-GPIO 12 ──────→ พิน 3 (A2) ←══→ พิน 18 (B2) ──→ Bus pin 18 (D1)
-GPIO 14 ──────→ พิน 4 (A3) ←══→ พิน 17 (B3) ──→ Bus pin 19 (D2)
-GPIO 27 ──────→ พิน 5 (A4) ←══→ พิน 16 (B4) ──→ Bus pin 20 (D3)
-GPIO 26 ──────→ พิน 6 (A5) ←══→ พิน 15 (B5) ──→ Bus pin 21 (D4)
-GPIO 25 ──────→ พิน 7 (A6) ←══→ พิน 14 (B6) ──→ Bus pin 22 (D5)
-GPIO 33 ──────→ พิน 8 (A7) ←══→ พิน 13 (B7) ──→ Bus pin 23 (D6)
-GPIO 32 ──────→ พิน 9 (A8) ←══→ พิน 12 (B8) ──→ Bus pin 24 (D7)
+GPIO 13 ──→ A1 ←═══→ B1 ──┬→ Bus pin 17 (D0)  └→ ZIF ROM พิน 11 (D0)
+GPIO 12 ──→ A2 ←═══→ B2 ──┬→ Bus pin 18 (D1)  └→ ZIF ROM พิน 12 (D1)
+GPIO 14 ──→ A3 ←═══→ B3 ──┬→ Bus pin 19 (D2)  └→ ZIF ROM พิน 13 (D2)
+GPIO 27 ──→ A4 ←═══→ B4 ──┬→ Bus pin 20 (D3)  └→ ZIF ROM พิน 15 (D3)
+GPIO 26 ──→ A5 ←═══→ B5 ──┬→ Bus pin 21 (D4)  └→ ZIF ROM พิน 16 (D4)
+GPIO 25 ──→ A6 ←═══→ B6 ──┬→ Bus pin 22 (D5)  └→ ZIF ROM พิน 17 (D5)
+GPIO 33 ──→ A7 ←═══→ B7 ──┬→ Bus pin 23 (D6)  └→ ZIF ROM พิน 18 (D6)
+GPIO 32 ──→ A8 ←═══→ B8 ──┬→ Bus pin 24 (D7)  └→ ZIF ROM พิน 19 (D7)
 ```
 
 ---
 
-## 4. สัญญาณฟังจาก RV8-Bus (Input-only)
-
-สัญญาณเหล่านี้ ESP32 ฟังอย่างเดียว (INPUT) สำหรับ RUN mode:
+## 5. Bus-only Signals (Input for RUN mode)
 
 ```
-RV8-Bus pin 30 (/SLOT1) ──→ ESP32 GPIO 34  (ตรวจจับ CPU เข้าถึง I/O slot)
-RV8-Bus pin 28 (/RD)    ──→ ESP32 GPIO 35  (CPU อ่านข้อมูล)
-RV8-Bus pin 27 (/WR)    ──→ ESP32 GPIO 36  (CPU เขียนข้อมูล)
+Bus pin 30 (/SLOT1) ──→ ESP32 GPIO 34
+Bus pin 28 (/RD)    ──→ ESP32 GPIO 35  (sense)
+Bus pin 27 (/WR)    ──→ ESP32 GPIO 36  (sense)
+MODE switch         ──→ ESP32 GPIO 39  (LOW=PROG, HIGH=RUN)
 ```
 
-หมายเหตุ: GPIO 34-39 เป็น input-only บน ESP32 (ไม่มี pull-up ภายใน)
-ใช้ตัวต้านทาน pull-up 10kΩ ภายนอกเข้า 5V ถ้าจำเป็น
+เมื่อใช้ ZIF (ไม่ได้เสียบ Bus): GPIO 34/35/36 ลอย (input-only, ไม่มีผล)
+GPIO 39: ต่อ pull-down 10K → GND (ค้าง PROG mode) หรือ ใช้สวิตช์เหมือนเดิม
 
 ---
 
-## 5. PROG/RUN Switch
+## 6. Bypass Capacitors (C 104 = 0.1µF)
 
-```
-GPIO 39 (MODE) ──→ สวิตช์:
-  - ต่อ GND = PROG mode (ESP32 ยึด bus, เขียน ROM)
-  - ปล่อยลอย/ต่อ VCC = RUN mode (ESP32 ปล่อย bus, เป็น UART bridge)
-```
+| Ref | IC |
+|-----|-----|
+| C1 | 74HC595 #1 (U2) |
+| C2 | 74HC595 #2 (U3) |
+| C3 | TXS0108E #1 (U5) — V_B side |
+| C4 | TXS0108E #2 (U4) — V_A side |
+| C5 | TXS0108E #2 (U4) — V_B side |
+| C6 | TXS0108E #1 (U5) — V_A side |
+| C7 | AT28C256 (U1) |
 
----
-
-## 6. RV8-Bus Pinout (อ้างอิง)
-
-| Pin | Signal | Dir (CPU) | ใช้โดย Programmer |
-|:---:|--------|:---------:|:-----------------:|
-| 1-8 | A[7:0] | out | ✅ ขับผ่าน 595 #1 (PROG) |
-| 9-15 | A[14:8] | out | ✅ ขับผ่าน 595 #2 (PROG) |
-| 16 | A15 | out | ✅ ขับผ่าน 595 #2 (=0 for ROM) |
-| 17-24 | D[7:0] | bidir | ✅ อ่าน/เขียนผ่าน TXS #2 |
-| 25 | CLK | out | ❌ ไม่ใช้ |
-| 26 | /RST | out | ✅ ESP32 ยึด LOW ตอน PROG |
-| 27 | /WR | out | ✅ ESP32 pulse LOW ตอนเขียน |
-| 28 | /RD | out | ✅ ESP32 pulse LOW ตอนอ่าน (→ ROM /OE) |
-| 29 | /IRQ | in | ❌ ไม่ใช้ |
-| 30 | /SLOT1 | out | ✅ ฟัง (RUN mode, UART bridge) |
-| 31 | /SLOT2 | out | ❌ ไม่ใช้ |
-| 32 | T2 | out | ❌ ไม่ใช้ |
-| 39 | VCC | — | ✅ จ่ายไฟ 5V |
-| 40 | GND | — | ✅ Ground |
+**รวม 7 ตัว**
 
 ---
 
-## 7. การทำงานในแต่ละ Mode
-
-### PROG Mode (เขียน/อ่าน ROM ผ่าน bus)
-
-```
-เขียน (Write):
-1. ESP32 ยึด /RST = LOW (CPU หยุดทำงาน, ปล่อย bus)
-2. ESP32 ขับ A[14:0] ผ่าน 74HC595 (A15=0 → ROM /CE active)
-3. ESP32 ขับ D[7:0] ผ่าน TXS #2
-4. ESP32 pulse /WR = LOW (1µs) → ROM รับข้อมูล
-5. ทำซ้ำจนครบ
-
-อ่าน (Read/Verify):
-1. ESP32 ยึด /RST = LOW
-2. ESP32 ขับ A[14:0] (A15=0 → ROM /CE active)
-3. ESP32 ปล่อย D[7:0] เป็น input
-4. ESP32 pulse /RD = LOW → ROM ปล่อยข้อมูลออกมา (/OE active)
-5. ESP32 อ่าน D[7:0]
-```
-
-หมายเหตุ: ROM /CE ต่อกับ /A15 บน CPU board → Programmer ตั้ง A15=0 → ROM ถูกเลือกอัตโนมัติ
-ถ้าไม่มี CPU (ROM อย่างเดียว) ก็ทำงานได้เหมือนกัน เพราะ Programmer ขับ /WR + /RD เอง
-
-### RUN Mode (UART bridge ผ่าน /SLOT1)
-
-```
-1. ESP32 ปล่อย /RST = HIGH (CPU ทำงาน)
-2. ESP32 ปล่อย address bus (595 output ไม่ conflict เพราะ CPU ขับแรงกว่า)
-3. ESP32 ฟัง /SLOT1 + /WR → CPU เขียนข้อมูลมาที่ I/O → ส่งไป PC
-4. ESP32 ฟัง /SLOT1 + /RD → CPU อ่านข้อมูล → ESP32 ขับ D[7:0] ตอบ
-```
-
----
-
-## 8. Bypass Capacitors
-
-C 104 (0.1µF) เซรามิก คร่อม VCC-GND ของทุก IC:
-- TXS0108E ตัวที่ 1: 1 ตัว
-- TXS0108E ตัวที่ 2: 1 ตัว
-- 74HC595 ตัวที่ 1: 1 ตัว
-- 74HC595 ตัวที่ 2: 1 ตัว
-
-**รวม 4 ตัว**
-
----
-
-## 9. รายการอุปกรณ์ (BOM)
+## 7. BOM
 
 | Part | Qty | หน้าที่ |
 |------|:---:|---------|
 | ESP32-WROOM-32 | 1 | สมองหลัก |
-| TXS0108E module (8-ch) | 2 | แปลงระดับไฟ 3.3V↔5V |
-| 74HC595 | 2 | Shift register ขับ Address |
-| 40-pin IDC connector | 1 | ต่อ RV8-Bus |
-| 40-pin ribbon cable | 1 | เชื่อมไป CPU board |
-| 100nF capacitor | 4 | Bypass |
-| สวิตช์ SPDT | 1 | PROG/RUN |
-| USB cable (micro-B) | 1 | PC → ESP32 |
+| TXS0108E module | 2 | Level shift 3.3V↔5V |
+| 74HC595 | 2 | Shift register → address |
+| AT28C256 | (ใส่ใน ZIF เวลาใช้) | ROM |
+| ZIF socket 28-pin wide | 1 | ใส่/ถอด ROM |
+| 40-pin IDC header | 1 | Bus connector |
+| 40-pin ribbon cable | 1 | ไป CPU board |
+| R1 (10K) | 1 | TXS OE pull-up |
+| R2 (10K) | 1 | ZIF /OE pull-up |
+| R3 (10K) | 1 | ZIF /CE pull-up |
+| C1-C7 (100nF) | 7 | Bypass |
+| SPDT switch | 1 | PROG/RUN (Bus mode) |
+| USB cable | 1 | PC → ESP32 |
 
 ---
 
-## 10. ESP32 GPIO Summary
+## 8. ESP32 GPIO Summary
 
-| GPIO | Function | Direction | Via |
-|:----:|----------|:---------:|-----|
-| 23 | SR_DATA | OUT | TXS #1 → 595 SER |
-| 18 | SR_CLK | OUT | TXS #1 → 595 SRCLK |
-| 19 | SR_LATCH | OUT | TXS #1 → 595 RCLK |
-| 4 | /RST | OUT | TXS #1 → Bus pin 26 |
-| 16 | /WR | OUT | TXS #1 → Bus pin 27 |
-| 17 | /RD | OUT/IN | TXS #1 → Bus pin 28 (OUT in PROG, IN in RUN) |
-| 13 | D0 | BIDIR | TXS #2 → Bus pin 17 |
-| 12 | D1 | BIDIR | TXS #2 → Bus pin 18 |
-| 14 | D2 | BIDIR | TXS #2 → Bus pin 19 |
-| 27 | D3 | BIDIR | TXS #2 → Bus pin 20 |
-| 26 | D4 | BIDIR | TXS #2 → Bus pin 21 |
-| 25 | D5 | BIDIR | TXS #2 → Bus pin 22 |
-| 33 | D6 | BIDIR | TXS #2 → Bus pin 23 |
-| 32 | D7 | BIDIR | TXS #2 → Bus pin 24 |
-| 34 | /SLOT1 | IN | Bus pin 30 |
-| 35 | /RD (sense) | IN | Bus pin 28 |
-| 36 | /WR (sense) | IN | Bus pin 27 |
-| 39 | MODE | IN | PROG/RUN switch |
+| GPIO | Function | Dir | ปลายทาง |
+|:----:|----------|:---:|---------|
+| 23 | SR_DATA | OUT | 595 SER |
+| 18 | SR_CLK | OUT | 595 SRCLK |
+| 19 | SR_LATCH | OUT | 595 RCLK |
+| 4 | /RST + /CE | OUT | Bus /RST & ZIF /CE |
+| 16 | /WR + /WE | OUT | Bus /WR & ZIF /WE |
+| 17 | /RD + /OE | OUT | Bus /RD & ZIF /OE |
+| 13 | D0 | BIDIR | Bus D0 & ZIF D0 |
+| 12 | D1 | BIDIR | Bus D1 & ZIF D1 |
+| 14 | D2 | BIDIR | Bus D2 & ZIF D2 |
+| 27 | D3 | BIDIR | Bus D3 & ZIF D3 |
+| 26 | D4 | BIDIR | Bus D4 & ZIF D4 |
+| 25 | D5 | BIDIR | Bus D5 & ZIF D5 |
+| 33 | D6 | BIDIR | Bus D6 & ZIF D6 |
+| 32 | D7 | BIDIR | Bus D7 & ZIF D7 |
+| 34 | /SLOT1 | IN | Bus pin 30 (RUN mode) |
+| 35 | /RD sense | IN | Bus pin 28 (RUN mode) |
+| 36 | /WR sense | IN | Bus pin 27 (RUN mode) |
+| 39 | MODE | IN | Switch (PROG/RUN) |
 
-**Total: 18 GPIO used**
+**Total: 18 GPIO**
 
 ---
 
-and this is RV8-Bus
+## 9. วิธีใช้
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   RV8-Bus (40 pins)                        │
-├──────────────────────────────────────────────────────────┤
-│ Pin  Signal    Dir   │ Pin  Signal    Dir                 │
-│  1   A0        out   │  2   A1        out                 │
-│  3   A2        out   │  4   A3        out                 │
-│  5   A4        out   │  6   A5        out                 │
-│  7   A6        out   │  8   A7        out                 │
-│  9   A8        out   │ 10   A9        out                 │
-│ 11   A10       out   │ 12   A11       out                 │
-│ 13   A12       out   │ 14   A13       out                 │
-│ 15   A14       out   │ 16   A15       out                 │
-│ 17   D0        bidir │ 18   D1        bidir               │
-│ 19   D2        bidir │ 20   D3        bidir               │
-│ 21   D4        bidir │ 22   D5        bidir               │
-│ 23   D6        bidir │ 24   D7        bidir               │
-│ 25   CLK       out   │ 26   /RST      out                 │
-│ 27   /WR       out   │ 28   /RD       out                 │
-│ 29   /IRQ      in    │ 30   /SLOT1    out                 │
-│ 31   /SLOT2    out   │ 32   T2        out                 │
-│ 33   A15       out   │ 34   (reserved)                    │
-│ 35   (reserved)      │ 36   (reserved)                    │
-│ 37   (reserved)      │ 38   (reserved)                    │
-│ 39   VCC (+5V)       │ 40   GND                           │
-└──────────────────────────────────────────────────────────┘
-```
+### ใช้กับ ZIF (โปรแกรม ROM เปล่า)
 
+1. ❌ ถอดสาย Bus ออก (ถ้ามี)
+2. เสียบ ROM ลง ZIF → ล็อค
+3. สวิตช์ → PROG (หรือ ground GPIO 39)
+4. `python3 rv8flash.py -w program.bin`
+5. `python3 rv8flash.py -v program.bin`
+6. ปลดล็อค ZIF → ถอด ROM ไปเสียบ CPU board
+
+### ใช้กับ Bus (โปรแกรม in-system)
+
+1. ❌ ZIF ว่าง (ไม่เสียบ ROM)
+2. เสียบสาย Bus ไป CPU board
+3. สวิตช์ → PROG → flash
+4. สวิตช์ → RUN → terminal (`rv8term.py`)
+
+---
+
+## 10. ทำไมปลอดภัย (ไม่ conflict)
+
+| สถานการณ์ | เกิดอะไร |
+|-----------|----------|
+| ZIF มี ROM + Bus ไม่ได้เสียบ | Bus header ลอย, ไม่มีอะไรขับสาย ✅ |
+| Bus เสียบ + ZIF ว่าง | ZIF ไม่มี chip, /CE pull-up HIGH, ไม่ตอบ ✅ |
+| ⚠️ ทั้ง 2 เสียบพร้อมกัน | **ห้าม!** data bus fight → ชิปพัง |
+
+---
+
+*ตรงกับ KiCad schematic หลัง swap GPIO 16↔17*
+*Firmware ไม่ต้องแก้*
 *เขียนสำหรับน้อง ๆ ม.ต้น — ถ้าติดตรงไหนถามพี่ได้เลย!*
