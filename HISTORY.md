@@ -1,5 +1,12 @@
 # RV8 Project — Development History
 
+## 2026-06-21 — v3.9: KiCad Module Definitions
+
+- Created doc/10_kicad_modules.md: 6 hierarchical sheets for KiCad (CLK_RST, PC, ADDR_MEM, IR_BUF, ALU_AC, CTRL)
+- Each module has sheet ports, pin-level wiring, placement notes
+- Aligned with 06_debug_plan.md (14 steps) and hardware labs
+- Cross-verified against 02_wiring_guide.md — all connections match
+
 ## 2026-06-19 — v3.8: Opcode Sweep, Page-Safe Assembler, Agent Skills
 
 - Added exhaustive opcode sweep testbench (256 opcodes × Z=0/1 = 512 cases)

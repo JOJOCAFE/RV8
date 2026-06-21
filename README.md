@@ -72,5 +72,6 @@ RV8/
 | Assembler | ⬜ | ⬜ | ⬜ | ✅ (page-safe) |
 | Test ROM | ⬜ | ⬜ | ⬜ | ✅ |
 | Hardware Labs | ⬜ | ⬜ | ⬜ | ✅ (14 labs) |
+| KiCad modules | ⬜ | ⬜ | ⬜ | ✅ (6 modules) |
 | Programmer | ✅ | ✅ | ✅ | ✅ |
 | Physical build | ⬜ | ⬜ | ⬜ | ⬜ |

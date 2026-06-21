@@ -1,5 +1,19 @@
 # RV8 Project — Changelog
 
+## 2026-06-21 — v3.9: KiCad Module Definitions
+
+### Documentation
+- **doc/10_kicad_modules.md**: Split 35-chip CPU into 6 hierarchical KiCad sheets
+  - CLK_RST (U8), PC (U1-U4), ADDR_MEM (U15/U16/U29/U30+ROM+RAM), IR_BUF (U5-U7,U14), ALU_AC (U9-U13,U17-U22), CTRL (U23-U28,U31-U33)
+  - Full sheet port tables, pin-level wiring, inter-module signal names
+  - Aligned with debug plan (14 steps) and hardware labs (14 labs)
+  - Build/test order matches existing bring-up sequence
+
+### Verification
+- All 35 chips accounted for (no duplicates, no gaps)
+- Cross-referenced with 02_wiring_guide.md (source of truth) — all pin assignments match
+- Module boundaries consistent with 05_understand_by_module.md groupings
+
 ## 2026-06-19 — v3.8: Opcode Sweep, Page-Safe Assembler, Skills
 
 ### Verification
