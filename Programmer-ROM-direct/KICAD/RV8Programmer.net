@@ -1,0 +1,3254 @@
+(export
+	(version "E")
+	(design
+		(source "C:\\Users\\User\\Documents\\RV8\\RV8Programmer\\RV8Programmer.kicad_sch")
+		(date "2026-06-20T15:29:56")
+		(tool "Eeschema 10.0.2")
+		(sheet
+			(number "1")
+			(name "/")
+			(tstamps "/")
+			(title_block
+				(title "RV8 Programmer")
+				(company "JOJOCAFE")
+				(rev)
+				(date "2026-06-20")
+				(source "RV8Programmer.kicad_sch")
+				(comment
+					(number "1")
+					(value "ESP32 WROOM32 Direct to ROM 28C256")
+				)
+				(comment
+					(number "2")
+					(value "")
+				)
+				(comment
+					(number "3")
+					(value "")
+				)
+				(comment
+					(number "4")
+					(value "")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+	)
+	(components
+		(comp
+			(ref "C1")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "5a863017-a9b7-43b3-83a3-36722358232f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C2")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "5556f87d-02ab-4a1b-bde0-c65ac8ef0cc7")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C3")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "306d7408-5879-4b13-bfce-a3938c6895b7")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C4")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "4d2a4f70-7ae6-412f-98ce-776567a35de4")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C5")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "f10af74f-2139-4740-8a89-3ea0ca8f9159")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C6")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "33d43576-76f8-4575-af62-e05af7735fef")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C7")
+			(value "104")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "616a7f7b-1208-461a-9472-cc2a50282513")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "ESP32-Wroom1")
+			(value "ESP32-WROOM32_RV8")
+			(footprint "RF_Module:ESP32-WROOM-32")
+			(datasheet "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf")
+			(description "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD")
+			(fields
+				(field
+					(name "Footprint") "RF_Module:ESP32-WROOM-32")
+				(field
+					(name "Datasheet") "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf")
+				(field
+					(name "Description") "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD")
+			)
+			(libsource
+				(lib "RV8CPU")
+				(part "ESP32-WROOM32_RV8")
+				(description "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "RF Radio BT ESP ESP32 Espressif onboard PCB antenna")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "ESP32?WROOM?32*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "6d9bf50e-8e74-4c9e-853a-4d59c623673c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "30")
+						)
+						(pin
+							(num "29")
+						)
+						(pin
+							(num "28")
+						)
+						(pin
+							(num "27")
+						)
+						(pin
+							(num "26")
+						)
+						(pin
+							(num "25")
+						)
+						(pin
+							(num "24")
+						)
+						(pin
+							(num "23")
+						)
+						(pin
+							(num "22")
+						)
+						(pin
+							(num "21")
+						)
+						(pin
+							(num "20")
+						)
+						(pin
+							(num "19")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "16")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R1")
+			(value "10K")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "bcb7ba1b-ff0c-4589-b333-7045932a7f2a")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R2")
+			(value "10K")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c2f5c4eb-c3b0-49ff-a707-cc0acc02f241")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R3")
+			(value "10K")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "7b968b88-bb2b-4a75-8143-2ce9090ad6e9")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TXS0108e1")
+			(value "U5")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "")
+				(part "TXS0108E_1")
+				(description "")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "062eadb6-3d27-4171-801e-273df68559e3")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "19")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "11")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TXS0108e2")
+			(value "U4")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "RV8CPU")
+				(part "TXS0108E")
+				(description "")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "dc5c2643-8697-4be0-8b53-42214ca28340")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "19")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "11")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U1")
+			(value "28C256")
+			(datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf")
+			(description "Paged Parallel EEPROM 256Kb (32K x 8), DIP-28/SOIC-28")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf")
+				(field
+					(name "Description") "Paged Parallel EEPROM 256Kb (32K x 8), DIP-28/SOIC-28")
+			)
+			(libsource
+				(lib "Memory_EEPROM")
+				(part "28C256")
+				(description "Paged Parallel EEPROM 256Kb (32K x 8), DIP-28/SOIC-28")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Parallel EEPROM 256Kb")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "DIP*W15.24mm* SOIC*7.5x17.9mm*P1.27mm*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "98c9cb9a-4427-4455-8262-ea78ab993130")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "25")
+						)
+						(pin
+							(num "24")
+						)
+						(pin
+							(num "21")
+						)
+						(pin
+							(num "23")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "26")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "27")
+						)
+						(pin
+							(num "22")
+						)
+						(pin
+							(num "20")
+						)
+						(pin
+							(num "28")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "19")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U2")
+			(value "74HC595")
+			(datasheet "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+			(description "8-bit serial in/out Shift Register 3-State Outputs")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+				(field
+					(name "Description") "8-bit serial in/out Shift Register 3-State Outputs")
+			)
+			(libsource
+				(lib "74xx")
+				(part "74HC595")
+				(description "8-bit serial in/out Shift Register 3-State Outputs")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "HCMOS SR 3State")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "DIP*W7.62mm* SOIC*3.9x9.9mm*P1.27mm* TSSOP*4.4x5mm*P0.65mm* SOIC*5.3x10.2mm*P1.27mm* SOIC*7.5x10.3mm*P1.27mm*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "f362acf1-ca82-4a59-9009-8a4bb42bfa1c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "9")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U3")
+			(value "74HC595")
+			(datasheet "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+			(description "8-bit serial in/out Shift Register 3-State Outputs")
+			(fields
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+				(field
+					(name "Description") "8-bit serial in/out Shift Register 3-State Outputs")
+			)
+			(libsource
+				(lib "74xx")
+				(part "74HC595")
+				(description "8-bit serial in/out Shift Register 3-State Outputs")
+			)
+			(property
+				(name "Sheetname")
+				(value "Root")
+			)
+			(property
+				(name "Sheetfile")
+				(value "RV8Programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "HCMOS SR 3State")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "DIP*W7.62mm* SOIC*3.9x9.9mm*P1.27mm* TSSOP*4.4x5mm*P0.65mm* SOIC*5.3x10.2mm*P1.27mm* SOIC*7.5x10.3mm*P1.27mm*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e1ad0df3-b73a-42e0-a981-61d2c9918dac")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "9")
+						)
+					)
+				)
+			)
+		)
+	)
+	(groups)
+	(variants)
+	(libparts
+		(libpart
+			(lib "")
+			(part "TXS0108E_1")
+			(fields
+				(field
+					(name "Reference") "TXS0108e")
+				(field
+					(name "Value")
+				)
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "VA_3.6v")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "A1")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "A2")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "A3")
+					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "A4")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "A5")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "A6")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "A7")
+					(type "input")
+				)
+				(pin
+					(num "9")
+					(name "A8")
+					(type "input")
+				)
+				(pin
+					(num "10")
+					(name "OE")
+					(type "input")
+				)
+				(pin
+					(num "11")
+					(name "GND")
+					(type "input")
+				)
+				(pin
+					(num "12")
+					(name "B8")
+					(type "input")
+				)
+				(pin
+					(num "13")
+					(name "B7")
+					(type "input")
+				)
+				(pin
+					(num "14")
+					(name "B6")
+					(type "input")
+				)
+				(pin
+					(num "15")
+					(name "B5")
+					(type "input")
+				)
+				(pin
+					(num "16")
+					(name "B4")
+					(type "input")
+				)
+				(pin
+					(num "17")
+					(name "B3")
+					(type "input")
+				)
+				(pin
+					(num "18")
+					(name "B2")
+					(type "input")
+				)
+				(pin
+					(num "19")
+					(name "B1")
+					(type "input")
+				)
+			)
+		)
+		(libpart
+			(lib "74xx")
+			(part "74HC595")
+			(description "8-bit serial in/out Shift Register 3-State Outputs")
+			(docs "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+			(footprints
+				(fp "DIP*W7.62mm*")
+				(fp "SOIC*3.9x9.9mm*P1.27mm*")
+				(fp "TSSOP*4.4x5mm*P0.65mm*")
+				(fp "SOIC*5.3x10.2mm*P1.27mm*")
+				(fp "SOIC*7.5x10.3mm*P1.27mm*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "74HC595")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf")
+				(field
+					(name "Description") "8-bit serial in/out Shift Register 3-State Outputs")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "QB")
+					(type "tri_state")
+				)
+				(pin
+					(num "2")
+					(name "QC")
+					(type "tri_state")
+				)
+				(pin
+					(num "3")
+					(name "QD")
+					(type "tri_state")
+				)
+				(pin
+					(num "4")
+					(name "QE")
+					(type "tri_state")
+				)
+				(pin
+					(num "5")
+					(name "QF")
+					(type "tri_state")
+				)
+				(pin
+					(num "6")
+					(name "QG")
+					(type "tri_state")
+				)
+				(pin
+					(num "7")
+					(name "QH")
+					(type "tri_state")
+				)
+				(pin
+					(num "8")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "9")
+					(name "QH'")
+					(type "output")
+				)
+				(pin
+					(num "10")
+					(name "~{SRCLR}")
+					(type "input")
+				)
+				(pin
+					(num "11")
+					(name "SRCLK")
+					(type "input")
+				)
+				(pin
+					(num "12")
+					(name "RCLK")
+					(type "input")
+				)
+				(pin
+					(num "13")
+					(name "~{OE}")
+					(type "input")
+				)
+				(pin
+					(num "14")
+					(name "SER")
+					(type "input")
+				)
+				(pin
+					(num "15")
+					(name "QA")
+					(type "tri_state")
+				)
+				(pin
+					(num "16")
+					(name "VCC")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "C")
+			(description "Unpolarized capacitor")
+			(footprints
+				(fp "C_*")
+			)
+			(fields
+				(field
+					(name "Reference") "C")
+				(field
+					(name "Value") "C")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "R")
+			(description "Resistor")
+			(footprints
+				(fp "R_*")
+			)
+			(fields
+				(field
+					(name "Reference") "R")
+				(field
+					(name "Value") "R")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Memory_EEPROM")
+			(part "28C256")
+			(description "Paged Parallel EEPROM 256Kb (32K x 8), DIP-28/SOIC-28")
+			(docs "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf")
+			(footprints
+				(fp "DIP*W15.24mm*")
+				(fp "SOIC*7.5x17.9mm*P1.27mm*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "28C256")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf")
+				(field
+					(name "Description") "Paged Parallel EEPROM 256Kb (32K x 8), DIP-28/SOIC-28")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "A14")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "A12")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "A7")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "A6")
+					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "A5")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "A4")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "A3")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "A2")
+					(type "input")
+				)
+				(pin
+					(num "9")
+					(name "A1")
+					(type "input")
+				)
+				(pin
+					(num "10")
+					(name "A0")
+					(type "input")
+				)
+				(pin
+					(num "11")
+					(name "D0")
+					(type "tri_state")
+				)
+				(pin
+					(num "12")
+					(name "D1")
+					(type "tri_state")
+				)
+				(pin
+					(num "13")
+					(name "D2")
+					(type "tri_state")
+				)
+				(pin
+					(num "14")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "15")
+					(name "D3")
+					(type "tri_state")
+				)
+				(pin
+					(num "16")
+					(name "D4")
+					(type "tri_state")
+				)
+				(pin
+					(num "17")
+					(name "D5")
+					(type "tri_state")
+				)
+				(pin
+					(num "18")
+					(name "D6")
+					(type "tri_state")
+				)
+				(pin
+					(num "19")
+					(name "D7")
+					(type "tri_state")
+				)
+				(pin
+					(num "20")
+					(name "~{CS}")
+					(type "input")
+				)
+				(pin
+					(num "21")
+					(name "A10")
+					(type "input")
+				)
+				(pin
+					(num "22")
+					(name "~{OE}")
+					(type "input")
+				)
+				(pin
+					(num "23")
+					(name "A11")
+					(type "input")
+				)
+				(pin
+					(num "24")
+					(name "A9")
+					(type "input")
+				)
+				(pin
+					(num "25")
+					(name "A8")
+					(type "input")
+				)
+				(pin
+					(num "26")
+					(name "A13")
+					(type "input")
+				)
+				(pin
+					(num "27")
+					(name "~{WE}")
+					(type "input")
+				)
+				(pin
+					(num "28")
+					(name "VCC")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "RV8CPU")
+			(part "ESP32-WROOM32_RV8")
+			(description "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD")
+			(docs "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf")
+			(footprints
+				(fp "ESP32?WROOM?32*")
+			)
+			(fields
+				(field
+					(name "Reference") "ESP32-Wroom32")
+				(field
+					(name "Value") "ESP32-WROOM32_RV8")
+				(field
+					(name "Footprint") "RF_Module:ESP32-WROOM-32")
+				(field
+					(name "Datasheet") "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf")
+				(field
+					(name "Description") "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD")
+			)
+			(pins
+				(pin
+					(num "")
+					(name "")
+					(type "input")
+				)
+				(pin
+					(num "1")
+					(name "EN")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "SensVP/IO36")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "SensVN/IO39")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "IO34/ADC1.6")
+					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "IO35/ADC1.7")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "IO32/XTAL32")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "IO33/XTAL32")
+					(type "bidirectional")
+				)
+				(pin
+					(num "8")
+					(name "IO25/DAC1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "9")
+					(name "IO26/DAC2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "10")
+					(name "IO27/ADC1.7")
+					(type "bidirectional")
+				)
+				(pin
+					(num "11")
+					(name "IO14/HSPL_CLK")
+					(type "bidirectional")
+				)
+				(pin
+					(num "12")
+					(name "IO12/HSPL_Q")
+					(type "bidirectional")
+				)
+				(pin
+					(num "13")
+					(name "IO13/HSPL_ID")
+					(type "bidirectional")
+				)
+				(pin
+					(num "14")
+					(name "GND")
+					(type "bidirectional")
+				)
+				(pin
+					(num "15")
+					(name "VN")
+					(type "bidirectional")
+				)
+				(pin
+					(num "16")
+					(name "3V3")
+					(type "input")
+				)
+				(pin
+					(num "17")
+					(name "GND")
+					(type "input")
+				)
+				(pin
+					(num "18")
+					(name "IO15")
+					(type "input")
+				)
+				(pin
+					(num "19")
+					(name "CS/IO2")
+					(type "input")
+				)
+				(pin
+					(num "20")
+					(name "ADC2.0/IO4")
+					(type "input")
+				)
+				(pin
+					(num "21")
+					(name "U2-RX0/IO16")
+					(type "input")
+				)
+				(pin
+					(num "22")
+					(name "U2-TX0/IO17")
+					(type "input")
+				)
+				(pin
+					(num "23")
+					(name "V_SPi/IO5")
+					(type "input")
+				)
+				(pin
+					(num "24")
+					(name "SCK/IO18")
+					(type "input")
+				)
+				(pin
+					(num "25")
+					(name "MISO/IO19")
+					(type "input")
+				)
+				(pin
+					(num "26")
+					(name "U0-CTS/SDA/IO21")
+					(type "input")
+				)
+				(pin
+					(num "27")
+					(name "U0-RXD/CLK2/IO3")
+					(type "input")
+				)
+				(pin
+					(num "28")
+					(name "U0-TXD/CLK3/IO1")
+					(type "input")
+				)
+				(pin
+					(num "29")
+					(name "SCL/IO22")
+					(type "input")
+				)
+				(pin
+					(num "30")
+					(name "MOSI/IO23")
+					(type "input")
+				)
+			)
+		)
+		(libpart
+			(lib "RV8CPU")
+			(part "TXS0108E")
+			(fields
+				(field
+					(name "Reference") "TXS0108e")
+				(field
+					(name "Value")
+				)
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "VA_3.6v")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "A1")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "A2")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "A3")
+					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "A4")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "A5")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "A6")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "A7")
+					(type "input")
+				)
+				(pin
+					(num "9")
+					(name "A8")
+					(type "input")
+				)
+				(pin
+					(num "10")
+					(name "OE")
+					(type "input")
+				)
+				(pin
+					(num "11")
+					(name "GND")
+					(type "input")
+				)
+				(pin
+					(num "12")
+					(name "B8")
+					(type "input")
+				)
+				(pin
+					(num "13")
+					(name "B7")
+					(type "input")
+				)
+				(pin
+					(num "14")
+					(name "B6")
+					(type "input")
+				)
+				(pin
+					(num "15")
+					(name "B5")
+					(type "input")
+				)
+				(pin
+					(num "16")
+					(name "B4")
+					(type "input")
+				)
+				(pin
+					(num "17")
+					(name "B3")
+					(type "input")
+				)
+				(pin
+					(num "18")
+					(name "B2")
+					(type "input")
+				)
+				(pin
+					(num "19")
+					(name "B1")
+					(type "input")
+				)
+			)
+		)
+	)
+	(libraries
+		(library
+			(logical "74xx")
+			(uri "${KICAD10_SYMBOL_DIR}/74xx.kicad_sym")
+		)
+		(library
+			(logical "Device")
+			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
+		)
+		(library
+			(logical "Memory_EEPROM")
+			(uri "${KICAD10_SYMBOL_DIR}/Memory_EEPROM.kicad_sym")
+		)
+		(library
+			(logical "RV8CPU")
+			(uri "C:/Users/User/Documents/RV8/RV8/RV8/RV8CPU.kicad_sym")
+		)
+	)
+	(nets
+		(net
+			(code "1")
+			(name "+3.3V")
+			(class "Default")
+			(node
+				(ref "C4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C6")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "16")
+				(pinfunction "3V3_16")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "1")
+				(pinfunction "VA_3.6v_1")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "1")
+				(pinfunction "VA_3.6v_1")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "2")
+			(name "+5V")
+			(class "Default")
+			(node
+				(ref "C1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C7")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "15")
+				(pinfunction "VN_15")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "R2")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "1")
+				(pinfunction "VB_5V_1")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "1")
+				(pinfunction "VB_5V_1")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "28")
+				(pinfunction "VCC_28")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "10")
+				(pinfunction "~{SRCLR}_10")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "16")
+				(pinfunction "VCC_16")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "10")
+				(pinfunction "~{SRCLR}_10")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "16")
+				(pinfunction "VCC_16")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "3")
+			(name "D4")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "20")
+				(pinfunction "ADC2.0/IO4_20")
+				(pintype "input")
+			)
+			(node
+				(ref "R1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "10")
+				(pinfunction "OE_10")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "10")
+				(pinfunction "OE_10")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "4")
+			(name "D12")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "12")
+				(pinfunction "IO12/HSPL_Q_12")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "3")
+				(pinfunction "A2_3")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "5")
+			(name "D13")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "13")
+				(pinfunction "IO13/HSPL_ID_13")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "2")
+				(pinfunction "A1_2")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "6")
+			(name "D14")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "11")
+				(pinfunction "IO14/HSPL_CLK_11")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "4")
+				(pinfunction "A3_4")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "7")
+			(name "D16")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "21")
+				(pinfunction "U2-RX0/IO16_21")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "5")
+				(pinfunction "A4_5")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "8")
+			(name "D17")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "22")
+				(pinfunction "U2-TX0/IO17_22")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "6")
+				(pinfunction "A5_6")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "9")
+			(name "D18")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "24")
+				(pinfunction "SCK/IO18_24")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "3")
+				(pinfunction "A2_3")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "10")
+			(name "D19")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "25")
+				(pinfunction "MISO/IO19_25")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "4")
+				(pinfunction "A3_4")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "11")
+			(name "D23")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "30")
+				(pinfunction "MOSI/IO23_30")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "2")
+				(pinfunction "A1_2")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "12")
+			(name "D25")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "8")
+				(pinfunction "IO25/DAC1_8")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "7")
+				(pinfunction "A6_7")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "13")
+			(name "D26")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "9")
+				(pinfunction "IO26/DAC2_9")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "6")
+				(pinfunction "A5_6")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "14")
+			(name "D27")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "10")
+				(pinfunction "IO27/ADC1.7_10")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "5")
+				(pinfunction "A4_5")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "15")
+			(name "D32")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "6")
+				(pinfunction "IO32/XTAL32_6")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "9")
+				(pinfunction "A8_9")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "16")
+			(name "D33")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "7")
+				(pinfunction "IO33/XTAL32_7")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "8")
+				(pinfunction "A7_8")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "17")
+			(name "GND")
+			(class "Default")
+			(node
+				(ref "C1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C6")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C7")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "14")
+				(pinfunction "GND_14")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "17")
+				(pinfunction "GND_17")
+				(pintype "input")
+			)
+			(node
+				(ref "R1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TXS0108e1")
+				(pin "11")
+				(pinfunction "GND_11")
+				(pintype "input")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "11")
+				(pinfunction "GND_11")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "14")
+				(pinfunction "GND_14")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U1")
+				(pin "20")
+				(pinfunction "~{CS}_20")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "13")
+				(pinfunction "~{OE}_13")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "8")
+				(pinfunction "GND_8")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "13")
+				(pinfunction "~{OE}_13")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "8")
+				(pinfunction "GND_8")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "18")
+			(name "Net-(TXS0108e1-B1)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "19")
+				(pinfunction "B1_19")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "11")
+				(pinfunction "D0_11")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "19")
+			(name "Net-(TXS0108e1-B2)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "18")
+				(pinfunction "B2_18")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "12")
+				(pinfunction "D1_12")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "20")
+			(name "Net-(TXS0108e1-B3)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "17")
+				(pinfunction "B3_17")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "13")
+				(pinfunction "D2_13")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "21")
+			(name "Net-(TXS0108e1-B4)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "16")
+				(pinfunction "B4_16")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "15")
+				(pinfunction "D3_15")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "22")
+			(name "Net-(TXS0108e1-B5)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "15")
+				(pinfunction "B5_15")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "16")
+				(pinfunction "D4_16")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "23")
+			(name "Net-(TXS0108e1-B6)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "14")
+				(pinfunction "B6_14")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "17")
+				(pinfunction "D5_17")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "24")
+			(name "Net-(TXS0108e1-B8)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "12")
+				(pinfunction "B8_12")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "19")
+				(pinfunction "D7_19")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "25")
+			(name "Net-(TXS0108e2-B1)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "19")
+				(pinfunction "B1_19")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "14")
+				(pinfunction "SER_14")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "26")
+			(name "Net-(TXS0108e2-B2)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "18")
+				(pinfunction "B2_18")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "11")
+				(pinfunction "SRCLK_11")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "11")
+				(pinfunction "SRCLK_11")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "27")
+			(name "Net-(TXS0108e2-B3)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "17")
+				(pinfunction "B3_17")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "12")
+				(pinfunction "RCLK_12")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "12")
+				(pinfunction "RCLK_12")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "28")
+			(name "Net-(TXS0108e2-B4)")
+			(class "Default")
+			(node
+				(ref "R2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "16")
+				(pinfunction "B4_16")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "27")
+				(pinfunction "~{WE}_27")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "29")
+			(name "Net-(TXS0108e2-B5)")
+			(class "Default")
+			(node
+				(ref "R3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "TXS0108e2")
+				(pin "15")
+				(pinfunction "B5_15")
+				(pintype "input")
+			)
+			(node
+				(ref "U1")
+				(pin "22")
+				(pinfunction "~{OE}_22")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "30")
+			(name "Net-(U1-A0)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "10")
+				(pinfunction "A0_10")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "15")
+				(pinfunction "QA_15")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "31")
+			(name "Net-(U1-A1)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "9")
+				(pinfunction "A1_9")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "1")
+				(pinfunction "QB_1")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "32")
+			(name "Net-(U1-A2)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "8")
+				(pinfunction "A2_8")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "2")
+				(pinfunction "QC_2")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "33")
+			(name "Net-(U1-A3)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "7")
+				(pinfunction "A3_7")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "3")
+				(pinfunction "QD_3")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "34")
+			(name "Net-(U1-A4)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "6")
+				(pinfunction "A4_6")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "4")
+				(pinfunction "QE_4")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "35")
+			(name "Net-(U1-A5)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "5")
+				(pinfunction "A5_5")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "5")
+				(pinfunction "QF_5")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "36")
+			(name "Net-(U1-A6)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "4")
+				(pinfunction "A6_4")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "6")
+				(pinfunction "QG_6")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "37")
+			(name "Net-(U1-A7)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "3")
+				(pinfunction "A7_3")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "7")
+				(pinfunction "QH_7")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "38")
+			(name "Net-(U1-A8)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "25")
+				(pinfunction "A8_25")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "15")
+				(pinfunction "QA_15")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "39")
+			(name "Net-(U1-A9)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "24")
+				(pinfunction "A9_24")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "1")
+				(pinfunction "QB_1")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "40")
+			(name "Net-(U1-A10)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "21")
+				(pinfunction "A10_21")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "2")
+				(pinfunction "QC_2")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "41")
+			(name "Net-(U1-A11)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "23")
+				(pinfunction "A11_23")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "3")
+				(pinfunction "QD_3")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "42")
+			(name "Net-(U1-A12)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "2")
+				(pinfunction "A12_2")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "4")
+				(pinfunction "QE_4")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "43")
+			(name "Net-(U1-A13)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "26")
+				(pinfunction "A13_26")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "5")
+				(pinfunction "QF_5")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "44")
+			(name "Net-(U1-A14)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "1")
+				(pinfunction "A14_1")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "6")
+				(pinfunction "QG_6")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "45")
+			(name "Net-(U2-QH')")
+			(class "Default")
+			(node
+				(ref "U2")
+				(pin "9")
+				(pinfunction "QH'_9")
+				(pintype "output")
+			)
+			(node
+				(ref "U3")
+				(pin "14")
+				(pinfunction "SER_14")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "46")
+			(name "unconnected-(ESP32-Wroom1-CS{slash}IO2-Pad19)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "19")
+				(pinfunction "CS/IO2_19")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "47")
+			(name "unconnected-(ESP32-Wroom1-EN-Pad1)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "")
+				(pintype "input")
+			)
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "1")
+				(pinfunction "EN_1")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "48")
+			(name "unconnected-(ESP32-Wroom1-IO15-Pad18)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "18")
+				(pinfunction "IO15_18")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "49")
+			(name "unconnected-(ESP32-Wroom1-IO34{slash}ADC1.6-Pad4)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "4")
+				(pinfunction "IO34/ADC1.6_4")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "50")
+			(name "unconnected-(ESP32-Wroom1-IO35{slash}ADC1.7-Pad5)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "5")
+				(pinfunction "IO35/ADC1.7_5")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "51")
+			(name "unconnected-(ESP32-Wroom1-SCL{slash}IO22-Pad29)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "29")
+				(pinfunction "SCL/IO22_29")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "52")
+			(name "unconnected-(ESP32-Wroom1-SensVN{slash}IO39-Pad3)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "3")
+				(pinfunction "SensVN/IO39_3")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "53")
+			(name "unconnected-(ESP32-Wroom1-SensVP{slash}IO36-Pad2)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "2")
+				(pinfunction "SensVP/IO36_2")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "54")
+			(name "unconnected-(ESP32-Wroom1-U0-CTS{slash}SDA{slash}IO21-Pad26)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "26")
+				(pinfunction "U0-CTS/SDA/IO21_26")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "55")
+			(name "unconnected-(ESP32-Wroom1-U0-RXD{slash}CLK2{slash}IO3-Pad27)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "27")
+				(pinfunction "U0-RXD/CLK2/IO3_27")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "56")
+			(name "unconnected-(ESP32-Wroom1-U0-TXD{slash}CLK3{slash}IO1-Pad28)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "28")
+				(pinfunction "U0-TXD/CLK3/IO1_28")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "57")
+			(name "unconnected-(ESP32-Wroom1-V_SPi{slash}IO5-Pad23)")
+			(class "Default")
+			(node
+				(ref "ESP32-Wroom1")
+				(pin "23")
+				(pinfunction "V_SPi/IO5_23")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "58")
+			(name "unconnected-(TXS0108e1-B7-Pad13)")
+			(class "Default")
+			(node
+				(ref "TXS0108e1")
+				(pin "13")
+				(pinfunction "B7_13")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "59")
+			(name "unconnected-(TXS0108e2-A6-Pad7)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "7")
+				(pinfunction "A6_7")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "60")
+			(name "unconnected-(TXS0108e2-A7-Pad8)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "8")
+				(pinfunction "A7_8")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "61")
+			(name "unconnected-(TXS0108e2-A8-Pad9)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "9")
+				(pinfunction "A8_9")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "62")
+			(name "unconnected-(TXS0108e2-B6-Pad14)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "14")
+				(pinfunction "B6_14")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "63")
+			(name "unconnected-(TXS0108e2-B7-Pad13)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "13")
+				(pinfunction "B7_13")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "64")
+			(name "unconnected-(TXS0108e2-B8-Pad12)")
+			(class "Default")
+			(node
+				(ref "TXS0108e2")
+				(pin "12")
+				(pinfunction "B8_12")
+				(pintype "input+no_connect")
+			)
+		)
+		(net
+			(code "65")
+			(name "unconnected-(U1-D6-Pad18)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "18")
+				(pinfunction "D6_18")
+				(pintype "tri_state")
+			)
+		)
+		(net
+			(code "66")
+			(name "unconnected-(U3-QH'-Pad9)")
+			(class "Default")
+			(node
+				(ref "U3")
+				(pin "9")
+				(pinfunction "QH'_9")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "67")
+			(name "unconnected-(U3-QH-Pad7)")
+			(class "Default")
+			(node
+				(ref "U3")
+				(pin "7")
+				(pinfunction "QH_7")
+				(pintype "tri_state")
+			)
+		)
+	)
+)

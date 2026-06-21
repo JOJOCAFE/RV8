@@ -49,10 +49,10 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 | 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ | มี 6 ตัว|
 | 74HC245 | 1 | 20DIP | Bus buffer |✅ | มี 3 ตัว|
 | 74HC164 | 1 | 14DIP | Ring counter |✅ |   |
-| 74HC283 | 2 | 16DIP | Adder | waiting|  |
+| 74HC283 | 2 | 16DIP | Adder |✅ |มี 10 ตัว   |
 | 74HC86 | 3 | 14DIP | XOR |✅ |✅ |  |
 | 74HC541 | 1 | 20DIP | AC buffer |✅ |  |
-| 74HC157 | 8 | 16DIP | Muxes | waiting|  |
+| 74HC157 | 8 | 16DIP | Muxes | ✅ |  มี 10 ตัว |
 | 74HC74 | 2 | 14DIP | Z flag, IRQ |✅ |  |
 | 74HC688 | 1 | 20DIP | Zero detect |✅ |  |
 | 74HC04 | 1 | 14DIP | Inverters |✅ |  |

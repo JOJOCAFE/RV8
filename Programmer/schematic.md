@@ -255,4 +255,34 @@ C 104 (0.1µF) เซรามิก คร่อม VCC-GND ของทุก 
 
 ---
 
+and this is RV8-Bus
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   RV8-Bus (40 pins)                        │
+├──────────────────────────────────────────────────────────┤
+│ Pin  Signal    Dir   │ Pin  Signal    Dir                 │
+│  1   A0        out   │  2   A1        out                 │
+│  3   A2        out   │  4   A3        out                 │
+│  5   A4        out   │  6   A5        out                 │
+│  7   A6        out   │  8   A7        out                 │
+│  9   A8        out   │ 10   A9        out                 │
+│ 11   A10       out   │ 12   A11       out                 │
+│ 13   A12       out   │ 14   A13       out                 │
+│ 15   A14       out   │ 16   A15       out                 │
+│ 17   D0        bidir │ 18   D1        bidir               │
+│ 19   D2        bidir │ 20   D3        bidir               │
+│ 21   D4        bidir │ 22   D5        bidir               │
+│ 23   D6        bidir │ 24   D7        bidir               │
+│ 25   CLK       out   │ 26   /RST      out                 │
+│ 27   /WR       out   │ 28   /RD       out                 │
+│ 29   /IRQ      in    │ 30   /SLOT1    out                 │
+│ 31   /SLOT2    out   │ 32   T2        out                 │
+│ 33   A15       out   │ 34   (reserved)                    │
+│ 35   (reserved)      │ 36   (reserved)                    │
+│ 37   (reserved)      │ 38   (reserved)                    │
+│ 39   VCC (+5V)       │ 40   GND                           │
+└──────────────────────────────────────────────────────────┘
+```
+
 *เขียนสำหรับน้อง ๆ ม.ต้น — ถ้าติดตรงไหนถามพี่ได้เลย!*
