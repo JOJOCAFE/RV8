@@ -4,6 +4,31 @@
 
 ---
 
+## Student Baseline Contract
+
+This is the build target for RV8GR-V2. Do not add future features while
+building the baseline CPU.
+
+- **33 logic chips + ROM + RAM = 35 packages**
+- **No microcode ROM**
+- **No hardware IRQ vector**: IRQ is a polling latch only
+- **Every instruction is 3 phases**: T0 fetch opcode, T1 fetch operand, T2 execute
+- **Only one IBUS driver may be active at a time**
+- **Only one DBUS driver may be active at a time**
+- **Build one module, test it, then continue**
+
+Recommended reading order:
+
+| Role | Start here | Use for |
+|------|------------|---------|
+| Student | `doc/labs/README.md` | Lab-by-lab physical build |
+| Teacher | `doc/build_plan/01_student_incremental_build_plan.md` | Supervised stage plan |
+| Debug | `doc/06_debug_plan.md` | Probe points and fault tracing |
+| Wiring | `doc/02_wiring_guide.md` | Official pin-level source of truth |
+| KiCad | `doc/10_kicad_modules.md` | Schematic sheet/module split |
+
+---
+
 ## Specs
 
 | Spec | Value |

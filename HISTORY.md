@@ -1,5 +1,16 @@
 # RV8 Project — Development History
 
+## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
+
+- Made `RV8GR-V2/` the active 33-chip student baseline in the top-level project docs
+- Added Student Baseline Contract: 33 logic chips + ROM + RAM, no microcode, no hardware IRQ vector, fixed T0/T1/T2 execution, one active IBUS/DBUS driver
+- Added recommended reading order: labs for students, build plan for teachers, debug plan for probing, wiring guide as source of truth, KiCad module split for schematic work
+- Added temporary-wire removal checkpoints to the incremental build plan to prevent test jumpers from becoming hidden wiring bugs
+- Added probe-point map to the physical debug plan for clock/reset, buses, enables, PC, PG, DP, AC, Z, and IRQ latch signals
+- Marked ROM banking and hardware IRQ vectoring as future-only, not part of the V2 baseline
+- Cleaned generated VCD/VVP traces, Python caches, and Zone.Identifier metadata from RV8GR-V2
+- Verification passed: assembler tests, Python chip sim, wiring verifier, all RTL benches, and 512-case opcode sweep
+
 ## 2026-06-21 — v3.9: KiCad Module Definitions
 
 - Created doc/10_kicad_modules.md: 6 hierarchical sheets for KiCad (CLK_RST, PC, ADDR_MEM, IR_BUF, ALU_AC, CTRL)

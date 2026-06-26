@@ -1,30 +1,42 @@
 # RV8 Project — Memory
 
-**Last updated**: 2026-06-21
+**Last updated**: 2026-06-26
 
-## Focus: RV8-GR (33 chips) — preparing for physical breadboard build
+## Focus: RV8GR-V2 (33 chips) — student-friendly physical breadboard build
 
 ### Active folders:
-- `RV8GR/` — CPU design (33 logic + ROM + RAM = 35 packages, Verilog 5/5, gate-level sim passing)
+- `RV8GR-V2/` — active CPU design (33 logic + ROM + RAM = 35 packages, student baseline contract, labs, Verilog benches, gate-level sim passing)
+- `RV8GR-V1/` — previous RV8-GR reference snapshot
 - `Programmer/` — ESP32 board (bus-based, firmware+tools verified, 46 tests)
 - `RV8/` — microcode variant (28 chips, Verilog 8/8, reference)
 - `RV8R/` — RAM register variant (19 chips, next project)
 - `RV8G/` — full ISA no-microcode variant (38 chips, concept)
 
-### Current version: v3.9
+### Current version: v4.0
 
-### What was done today (2026-06-21):
-1. Created `RV8GR/doc/10_kicad_modules.md` — splits 35-chip design into 6 KiCad hierarchical sheets:
-   - CLK_RST (U8), PC (U1-U4), ADDR_MEM (U15/U16/U29/U30+ROM+RAM), IR_BUF (U5-U7,U14), ALU_AC (U9-U13,U17-U22), CTRL (U23-U28,U31-U33)
-2. Verified alignment with debug plan (14 steps), hardware labs (14 labs), and wiring guide
-3. Fixed typo in `06_debug_plan.md`: U33 pin 2 source was `U5-16` (SRC) → corrected to `U5-13` (XOR_MODE)
-4. Updated README, CHANGELOG, HISTORY — pushed as v3.9
+### What was done today (2026-06-26):
+1. Added RV8GR-V2 student build guardrails:
+   - Student Baseline Contract in README and build plan
+   - clear reading order for students, teachers, debug, wiring, and KiCad work
+   - temporary-wire removal checkpoints in the incremental build plan
+   - probe-point map in the physical debug plan
+   - future-only warnings for hardware IRQ vectoring and ROM banking
+2. Cleaned RV8GR-V2 generated artifacts:
+   - removed VCD/VVP traces, Python caches, and Zone.Identifier metadata
+   - updated `.gitignore` for `*.pyc` and `*:Zone.Identifier*`
+3. Verified RV8GR-V2:
+   - assembler tests: 11 pass
+   - Python chip sim: 8 CPU tests pass
+   - wiring verifier: all wiring verified
+   - RTL benches: full, IRQ, SETDP, tasks, assembler ROM, opcode sweep all pass
+   - opcode sweep: 512 cases pass
 
 ### Key design facts:
 - 33 logic chips + ROM + RAM = 35 packages
 - 18 instructions, 3-cycle (T0/T1/T2), no microcode
 - Clock: 1 MHz breadboard (official), 4 MHz PCB
 - Horizontal control: opcode = control word directly
+- IRQ is polling-only in V2; no hardware vector
 - ISA frozen, design signed off, ready for physical build
 
 ### RV8-Bus pinout (40-pin):
@@ -42,7 +54,8 @@ pin 39: VCC, pin 40: GND
 - Data: GPIO {13,12,14,27,26,25,33,32} = D[7:0]
 
 ### Next steps:
-- Create KiCad schematics from 10_kicad_modules.md (6 sheets)
-- Hardware Labs 04-14 (continue from lab03)
+- Build RV8GR-V2 physically from `RV8GR-V2/doc/labs/README.md`
+- Use `RV8GR-V2/doc/06_debug_plan.md` probe map during bring-up
+- Create KiCad schematics from `RV8GR-V2/doc/10_kicad_modules.md` (6 sheets)
 - Order parts for physical build
 - RV8-R architecture design (when ready)

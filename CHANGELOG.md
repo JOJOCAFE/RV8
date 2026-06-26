@@ -1,5 +1,26 @@
 # RV8 Project — Changelog
 
+## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
+
+### Documentation
+- **RV8GR-V2/README.md**: Added Student Baseline Contract and recommended reading order for student, teacher, debug, wiring, and KiCad paths
+- **RV8GR-V2/doc/build_plan/01_student_incremental_build_plan.md**: Added baseline contract, explicit temporary-wire removal checks, "do not add" warnings for vector/IRQ upgrade wiring, and stage checklist field for temporary wires
+- **RV8GR-V2/doc/06_debug_plan.md**: Added Baseline Boundary and Probe Point Map for clock/reset, buses, control signals, PC, PG, DP, IRQ, and latch debug
+- **RV8GR-V2/doc/labs/README.md**: Added Thai V2 baseline rules for students
+- **RV8GR-V2/doc/04_bank_switch.md**: Marked ROM banking as future-only, not part of the student baseline
+- **Top-level README.md**: Updated project routing to make RV8GR-V2 the active 33-chip student baseline
+
+### Cleanup
+- **RV8GR-V2/.gitignore**: Added rules for `*.pyc` and `*:Zone.Identifier*`
+- Removed generated VCD/VVP traces, Python caches, and Windows Zone.Identifier metadata from RV8GR-V2
+
+### Verification
+- `python3 RV8GR-V2/tools/test_rv8gr_asm.py` — 11 tests pass
+- `python3 RV8GR-V2/sim/chip_sim.py` — 8 CPU tests pass
+- `python3 RV8GR-V2/sim/verify_wiring.py` — all wiring verified
+- Icarus Verilog benches pass: full, IRQ polling, SETDP, tasks, assembler ROM, opcode sweep
+- Opcode sweep: 512 cases pass
+
 ## 2026-06-21 — v3.9: KiCad Module Definitions
 
 ### Documentation

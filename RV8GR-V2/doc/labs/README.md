@@ -11,6 +11,17 @@
 3. ใช้ single-step clock (กดปุ่ม) ทดสอบ ก่อนใส่ crystal
 4. ดู LED เพื่อเช็คว่าถูก
 
+## ข้อตกลงของรุ่น V2
+
+- สร้างเฉพาะ baseline: 33 logic chips + ROM + RAM.
+- ไม่มี microcode.
+- ไม่มี hardware IRQ vector.
+- IRQ เป็น polling latch เท่านั้น.
+- ถ้าต่อสายทดลองชั่วคราวใน Lab ใด ต้องถอดออกก่อนต่อ Lab ถัดไป.
+
+ถ้าอยากเพิ่ม feature เช่น hardware vector, ROM bank, RETI ให้ทำหลังจาก Lab
+14 ผ่านแล้วเท่านั้น และต้องแยกเป็น upgrade document.
+
 ---
 
 ## Lab List
@@ -67,4 +78,4 @@ Labs 01-14 ตรงกับ **ขั้นที่ 1-14** ใน `../06_debug
 2. 📺 ต่อ 7-segment / LED array ที่ I/O slot
 3. 🎮 เขียนเกม (นับเลข, ไฟวิ่ง, reaction timer)
 4. 💻 ต่อ UART ผ่าน /SLOT1
-5. 🚀 รัน BASIC interpreter!
+5. รัน BASIC interpreter

@@ -2,6 +2,10 @@
 
 **CPU has 33 chips with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
 
+> FUTURE ONLY: ROM banking is not part of the RV8GR-V2 student baseline.
+> Build and verify the 33-logic-chip CPU first. Do not add bank-switch wiring
+> until the baseline passes the full instruction smoke test.
+
 ---
 
 ## Base Memory Map

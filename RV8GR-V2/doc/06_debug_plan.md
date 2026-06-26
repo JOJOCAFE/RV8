@@ -16,6 +16,53 @@
 
 ---
 
+## Baseline Boundary
+
+Debug only the RV8GR-V2 baseline first:
+
+- 33 logic chips + ROM + RAM.
+- IRQ is polling-only.
+- DI has no hardware effect.
+- No hardware vector to `$FF00`.
+- No automatic PC save, restore, acknowledge, or RETI circuit.
+
+If the CPU jumps when `/IRQ` is asserted, that is a wiring mistake for v2.
+
+---
+
+## Probe Point Map
+
+Use these points before guessing. A stage is not passed until the listed signal
+matches the expected behavior.
+
+| Signal | Probe at | Expected use |
+|--------|----------|--------------|
+| `CLK` | U8-8, U1-U4 pin 2 | One clean pulse per button press |
+| `/RST` | U1-U4 pin 1, U8-9, U31-1/13 | LOW during reset, HIGH when running |
+| `T0` | U8-3 | Opcode fetch phase |
+| `T1` | U8-4 | Operand fetch phase |
+| `T2` | U8-5 | Execute phase |
+| `PC0..PC7` | U1/U2 Q outputs | Counts during T0/T1, loads on jump |
+| `ABUS0..ABUS7` | U15/U16 outputs | PC or IRL selected by `ADDR_MODE` |
+| `ABUS8..ABUS15` | U29/U30 outputs | PC high or DP selected by `ADDR_MODE` |
+| `DBUS0..DBUS7` | ROM/RAM data pins, U7 B side | External memory data bus |
+| `IBUS0..IBUS7` | U7 A side, U6 output, U14 output | Internal CPU data bus |
+| `BUF_OE_N` | U24-12, U7-19 | LOW when U7 is enabled |
+| `WR_DIR` | U28-8, U7-1, ROM `/OE` | 0 read, 1 store/write direction |
+| `/IRL_OE` | U26-3, U6-1 | LOW when operand drives IBUS |
+| `/AC_BUF` | U26-8, U14 enables, RAM `/WE` | LOW when AC stores to memory |
+| `ACC_CLK` | U27-11, U9-11, U21-3 | AC/Z update pulse |
+| `AC0..AC7` | U9 Q outputs | Accumulator value |
+| `Z_flag` | U21-5 | HIGH when AC is zero |
+| `/PC_LD` | U26-11, U1-U4 pin 9 | LOW only for taken jump/branch at T2 |
+| `PG0..PG7` | U23 Q outputs | Jump page high byte |
+| `DP0..DP7` | U32 Q outputs | Data page high byte |
+| `DP_Load` | U33-6, U32-11 | Pulse on SETDP |
+| `IE` | U31-5 | Set by EI, cleared by reset only |
+| `IRQ_FF` | U31-9 | Latches after `/IRQ` release, cleared by reset |
+
+---
+
 ## Clock Options
 
 ```
@@ -543,7 +590,10 @@ handler:
 
 **LED**: 1 ดวงบน IE (U31-5), 1 ดวงบน IRQ_FF (U31-9)
 
-**Future hardware vector**: not part of v1.0; requires PC mux, /PC_LD control, IRQ_ack, and clear logic.
+**FUTURE ONLY - DO NOT WIRE IN V2 BASELINE**: hardware vector is not part of
+v1.0/v2. It requires PC mux, /PC_LD control, IRQ_ack, and clear logic. If this
+is connected during the student build, the v2 tests and wiring guide no longer
+match the hardware.
 
 ---
 
