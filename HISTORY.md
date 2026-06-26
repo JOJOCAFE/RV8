@@ -1,5 +1,15 @@
 # RV8 Project — Development History
 
+## 2026-06-26 — v4.2: RV8-R FullHW Real Hardware Path
+
+- Reframed RV8-R as **FullHW**, a larger but real full-ISA TTL hardware path instead of the old 19-chip reduced concept
+- Updated package target to **49 logic chips + 4 memory/ROM packages = 53 total**
+- Defined real hardware paths for PC load/save, ALU logic operations, high-RAM register addressing, fast-page RAM, stack, `JAL/JALR`, IRQ entry, and `IRET`
+- Changed RV8-R control model to **16-bit direct-control microcode** with a **15-bit microcode address**: `{IRQ_ACTIVE, C, Z, step[3:0], opcode[7:0]}`
+- Marked the old 19-chip instruction trace as legacy design history
+- Marked the existing Python microcode generator as a legacy 14-bit prototype; FullHW needs a new generator, RTL migration, and KiCad/ERC proof
+- Updated the top-level README so RV8GR-V2 remains the physical student baseline and RV8-R FullHW becomes the full RV8-style TTL investigation path
+
 ## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
 
 - Rechecked `Programmer/` against the current `RV8GR-V2` RV8-Bus pinout and ROM wiring contract

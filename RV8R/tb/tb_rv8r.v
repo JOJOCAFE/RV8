@@ -3,14 +3,14 @@
 
 module tb_rv8r;
 
-reg clk, rst_n;
+reg clk, rst_n, irq_n;
 wire [15:0] addr;
 wire [7:0] data_out;
 wire mem_rd, mem_wr;
 reg [7:0] data_in;
 
 rv8r_cpu uut (
-    .clk(clk), .rst_n(rst_n),
+    .clk(clk), .rst_n(rst_n), .irq_n(irq_n),
     .addr(addr), .data_out(data_out), .data_in(data_in),
     .mem_rd(mem_rd), .mem_wr(mem_wr)
 );
@@ -187,14 +187,42 @@ initial begin
     mem[16'h802E] = 8'hAE; // POP rd=6 (10_101_110)
     mem[16'h802F] = 8'hE0; // rs=7(sp)
     //
-    // HLT
+    // Test 16: EI, external IRQ, ISR writes mem[$21]=$77, IRET
     mem[16'h8030] = 8'hF8; // SYS (11_111_000)
-    mem[16'h8031] = 8'h01; // HLT
+    mem[16'h8031] = 8'h02; // EI
+    mem[16'h8032] = 8'hF8; // SYS
+    mem[16'h8033] = 8'h00; // NOP; IRQ should interrupt before/around here
+    mem[16'h8034] = 8'hF8; // SYS
+    mem[16'h8035] = 8'h00; // NOP after return
+    // HLT
+    mem[16'h8036] = 8'hF8; // SYS (11_111_000)
+    mem[16'h8037] = 8'h01; // HLT
+
+    // ISR at $FF00
+    mem[16'hFF00] = 8'h44; // LI r4, $77
+    mem[16'hFF01] = 8'h77;
+    mem[16'hFF02] = 8'h9C; // SB r4, [$21]
+    mem[16'hFF03] = 8'h21;
+    mem[16'hFF04] = 8'h44; // LI r4, $00 (restore test register)
+    mem[16'hFF05] = 8'h00;
+    mem[16'hFF06] = 8'hF8; // SYS
+    mem[16'hFF07] = 8'h04; // IRET
 
     // --- RUN ---
+    irq_n = 1;
     rst_n = 0;
     repeat(3) @(posedge clk);
     rst_n = 1;
+
+    fork
+        begin
+            wait (uut.ie === 1'b1);
+            @(posedge clk);
+            irq_n = 0;
+            @(posedge clk);
+            irq_n = 1;
+        end
+    join_none
 
     wait_halt(2000);
 
@@ -231,6 +259,10 @@ initial begin
 
     $display("SP after PUSH+POP:");
     check_reg(7, 8'h80); // SP should be back to $80
+
+    $display("Test 16: IRQ vector wrote mem[$21] = $77");
+    check_mem_val(16'h0021, 8'h77);
+    check_mem_val(16'h000F, 8'h80); // saved PC high byte from interrupt entry
 
     $display("");
     if (errors == 0)

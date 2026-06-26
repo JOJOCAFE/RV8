@@ -1,10 +1,11 @@
 `timescale 1ns / 1ps
-// RV8-R — 18-chip RISC-V style 8-bit CPU (behavioral model)
+// RV8-R — 19-chip RV8-style 8-bit CPU (behavioral model)
 // Registers in RAM ($0000-$0007), microcode-driven, register cache
 
 module rv8r_cpu (
     input  wire        clk,
     input  wire        rst_n,
+    input  wire        irq_n,
     output reg  [15:0] addr,
     output reg  [7:0]  data_out,
     input  wire [7:0]  data_in,
@@ -21,6 +22,11 @@ reg [7:0]  addr_lo;
 reg        flag_z, flag_c;
 reg [2:0]  step;
 reg        halt;
+reg        ie;
+reg        irq_pending;
+reg        irq_n_d;
+reg [1:0]  irq_state;
+reg [7:0]  iret_lo;
 
 // --- Decode ---
 wire [1:0] iclass = ir[7:6];
@@ -65,12 +71,43 @@ always @(posedge clk or negedge rst_n) begin
         flag_z <= 0; flag_c <= 0;
         step <= 0;
         halt <= 0;
+        ie <= 0;
+        irq_pending <= 0;
+        irq_n_d <= 1;
+        irq_state <= 0;
+        iret_lo <= 0;
         addr <= 0; data_out <= 0;
         mem_rd <= 0; mem_wr <= 0;
     end else if (!halt) begin
         mem_rd <= 0;
         mem_wr <= 0;
+        irq_n_d <= irq_n;
+        if (irq_n_d && !irq_n)
+            irq_pending <= 1;
 
+        if (irq_state != 0) begin
+            case (irq_state)
+            2'd1: begin
+                addr <= 16'h000F;
+                data_out <= pc[15:8];
+                mem_wr <= 1;
+                irq_state <= 2;
+            end
+            2'd2: begin
+                pc <= 16'hFF00;
+                step <= 0;
+                irq_state <= 0;
+            end
+            default: irq_state <= 0;
+            endcase
+        end else if (step == 0 && ie && irq_pending) begin
+            addr <= 16'h000E;
+            data_out <= pc[7:0];
+            mem_wr <= 1;
+            ie <= 0;
+            irq_pending <= 0;
+            irq_state <= 1;
+        end else begin
         case (step)
         // ═══ FETCH ═══
         3'd0: begin
@@ -173,8 +210,26 @@ always @(posedge clk or negedge rst_n) begin
                     step <= 0;
                 end
                 3'd7: begin // SYS
-                    if (opr == 8'h01) halt <= 1;
-                    step <= 0;
+                    case (opr)
+                    8'h01: begin // HLT
+                        halt <= 1;
+                        step <= 0;
+                    end
+                    8'h02: begin // EI
+                        ie <= 1;
+                        step <= 0;
+                    end
+                    8'h03: begin // DI
+                        ie <= 0;
+                        step <= 0;
+                    end
+                    8'h04: begin // IRET: read saved PC low
+                        addr <= 16'h000E;
+                        mem_rd <= 1;
+                        step <= 4;
+                    end
+                    default: step <= 0; // SYS 0 = NOP, others reserved
+                    endcase
                 end
                 endcase
             end
@@ -250,6 +305,12 @@ always @(posedge clk or negedge rst_n) begin
                 end
                 3'd5: begin // JALR — PC saved, now read rs
                     addr <= {13'd0, opr[7:5]};
+                    mem_rd <= 1;
+                    step <= 5;
+                end
+                3'd7: begin // IRET — saved PC low arrived, read saved high
+                    iret_lo <= data_in;
+                    addr <= 16'h000F;
                     mem_rd <= 1;
                     step <= 5;
                 end
@@ -381,6 +442,11 @@ always @(posedge clk or negedge rst_n) begin
                     pc <= {8'h00, data_in};
                     step <= 0;
                 end
+                3'd7: begin // IRET — saved PC high arrived
+                    pc <= {data_in, iret_lo};
+                    ie <= 1;
+                    step <= 0;
+                end
                 endcase
             end
             endcase
@@ -435,6 +501,7 @@ always @(posedge clk or negedge rst_n) begin
             endcase
         end
         endcase
+        end
 
         // r0 protection: if we just wrote to addr 0, it stays 0
         // (handled by writing 0 back — or gate in hardware)

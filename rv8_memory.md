@@ -2,17 +2,17 @@
 
 **Last updated**: 2026-06-26
 
-## Focus: RV8GR-V2 (33 chips) + dual-mode Programmer — student-friendly physical build
+## Focus: RV8GR-V2 student build + RV8-R FullHW investigation
 
 ### Active folders:
 - `RV8GR-V2/` — active CPU design (33 logic + ROM + RAM = 35 packages, student baseline contract, labs, Verilog benches, gate-level sim passing)
 - `RV8GR-V1/` — previous RV8-GR reference snapshot
 - `Programmer/` — ESP32 board (dual ZIF/RV8-Bus mode, firmware+tools verified, 36 current tests)
 - `RV8/` — microcode variant (28 chips, Verilog 8/8, reference)
-- `RV8R/` — RAM register variant (19 chips, next project)
+- `RV8R/` — FullHW RAM-register variant (49 logic + 4 ROM/RAM = 53 packages, full RV8-style TTL hardware path, RTL/KiCad/generator migration pending)
 - `RV8G/` — full ISA no-microcode variant (38 chips, concept)
 
-### Current version: v4.1
+### Current version: v4.2
 
 ### What was done today (2026-06-26):
 1. Added RV8GR-V2 student build guardrails:
@@ -41,14 +41,30 @@
    - Programmer tests: 36 pass
    - RV8GR-V2 wiring verifier: all wiring verified
    - RV8GR-V2 assembler tests: 11 pass
+6. Promoted RV8-R to FullHW:
+   - old 19-chip reduced sketch is now legacy design history
+   - FullHW target is 49 logic chips + 2 microcode ROM + 1 program ROM + 1 RAM = 53 packages
+   - full-ISA hardware paths are real in docs for PC load/save, ALU logic, register addressing, fast page, stack, IRQ entry, and IRET
+   - control is now 16-bit direct-control microcode with 15-bit address `{IRQ_ACTIVE,C,Z,step[3:0],opcode[7:0]}`
+   - existing `RV8R/tools/microcode_gen.py` is legacy 14-bit prototype; FullHW generator, RTL, and KiCad proof are pending
 
 ### Key design facts:
+#### RV8GR-V2 student baseline
 - 33 logic chips + ROM + RAM = 35 packages
 - 18 instructions, 3-cycle (T0/T1/T2), no microcode
 - Clock: 1 MHz breadboard (official), 4 MHz PCB
 - Horizontal control: opcode = control word directly
 - IRQ is polling-only in V2; no hardware vector
 - ISA frozen, design signed off, ready for physical build
+
+#### RV8-R FullHW investigation
+- 49 logic chips + 4 ROM/RAM packages = 53 total
+- ROM-low boot: Program ROM `$0000-$7FFF`, RAM `$8000-$FFFF`
+- registers live in high RAM at `$FFF8-$FFFF`
+- fast page is `$FF00+imm8`, with `$FFF6-$FFFF` reserved for IRQ save slots and registers
+- FullHW uses 2 microcode ROMs, 16-bit direct-control word, 15-bit microcode address
+- `SRL` remains software macro; `LUI` is assembler pre-shift
+- not ready for physical build until FullHW microcode generator, RTL/testbench, KiCad/ERC, and Programmer/RV8-Bus pin audit are done
 
 ### RV8-Bus pinout (40-pin):
 ```
@@ -74,4 +90,4 @@ pin 39: VCC, pin 40: GND
 - Use `RV8GR-V2/doc/06_debug_plan.md` probe map during bring-up
 - Create KiCad schematics from `RV8GR-V2/doc/10_kicad_modules.md` (6 sheets)
 - Order parts for physical build
-- RV8-R architecture design (when ready)
+- RV8-R FullHW: write 15-bit direct-control microcode generator, migrate RTL/testbench, then convert `doc/02_wiring_guide.md` into KiCad sheets

@@ -1,5 +1,29 @@
 # RV8 Project — Changelog
 
+## 2026-06-26 — v4.2: RV8-R FullHW Real Hardware Path
+
+### RV8-R FullHW
+- Promoted RV8-R from the old 19-chip reduced sketch to a **FullHW** full-ISA hardware path
+- Documented **49 logic chips + 2 microcode ROM + 1 program ROM + 1 RAM = 53 packages**
+- Replaced conceptual/blocker-only paths with concrete hardware routes for:
+  - 16-bit PC reset, increment, load, same-page jump, IRQ vector, and IRET restore
+  - full ALU `ADD`, `SUB`, `AND`, `OR`, `XOR`, `SLL`, plus `SLT`/`SLTI` through carry/borrow and `$00/$01` constant writeback
+  - RAM register window at `$FFF8-$FFFF`
+  - fast-page RAM access at `$FF00+imm8`
+  - stack operations through `r7` as SP
+  - `JAL`, `JALR`, IRQ entry, `EI`, `DI`, `HLT`, and `IRET`
+- Switched RV8-R architecture docs to **15-bit microcode address** and **16-bit direct-control word**
+- Marked the old 19-chip trace as legacy and retained it only as design history
+
+### Project Status
+- Top-level README now presents RV8-R FullHW as the real full RV8-style TTL path, not the fewest-chip option
+- RV8GR-V2 remains the active student-friendly physical build target
+- Existing RV8-R microcode generator is explicitly marked as legacy 14-bit prototype; FullHW needs a new 15-bit direct-control generator
+
+### Verification
+- Documentation consistency scan completed for stale zero-page, 19-chip, and old blocked-path claims
+- RTL, KiCad/ERC, and FullHW microcode generator migration remain pending
+
 ## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
 
 ### Programmer

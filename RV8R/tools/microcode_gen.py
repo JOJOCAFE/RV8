@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""RV8-R Microcode Generator — 8-bit group-encoded control word
+"""RV8-R legacy microcode generator — 8-bit group-encoded prototype.
 
-ROM Address (13 bits):
+NOTE: RV8-R FullHW now uses a 15-bit address and 16-bit direct-control word.
+This generator is kept only as the old 14-bit prototype until it is migrated.
+
+ROM Address (14 bits):
   A[7:0]  = opcode (from IR)
   A[10:8] = step (0-7)
   A[11]   = flag_Z
   A[12]   = flag_C
+  A[13]   = IRQ_ACTIVE (IE and IRQ_PENDING at instruction boundary)
 
 ROM Data (8 bits):
   [7:6] = GROUP (00=BUS, 01=ALU, 10=BRANCH, 11=SPECIAL)
@@ -99,16 +103,20 @@ def SPECIAL(action):
 NOP  = SPECIAL(0)
 HLT  = SPECIAL(1)
 END  = SPECIAL(2)  # step_rst only
+IRQ_SAVE_PC_LO = SPECIAL(3)
+IRQ_SAVE_PC_HI = SPECIAL(4)
+IRQ_VECTOR     = SPECIAL(5)
+SYS_OP         = SPECIAL(6)  # OPR subdecode: NOP/HLT/EI/DI/IRET
 
 
 # === ROM ===
-ROM_SIZE = 8192  # 2^13
+ROM_SIZE = 16384  # 2^14
 ucode = [END] * ROM_SIZE  # default: end immediately (safe)
 
 
-def rom_addr(opcode, step, z=0, c=0):
+def rom_addr(opcode, step, z=0, c=0, irq=0):
     """Calculate microcode ROM address."""
-    return (c << 12) | (z << 11) | (step << 8) | opcode
+    return (irq << 13) | (c << 12) | (z << 11) | (step << 8) | opcode
 
 
 def emit(opcode, steps, cond_steps=None):
@@ -120,15 +128,26 @@ def emit(opcode, steps, cond_steps=None):
     for c in range(2):
         for z in range(2):
             # Steps 0,1 always fetch
-            ucode[rom_addr(opcode, 0, z, c)] = FETCH0
-            ucode[rom_addr(opcode, 1, z, c)] = FETCH1
+            ucode[rom_addr(opcode, 0, z, c, 0)] = FETCH0
+            ucode[rom_addr(opcode, 1, z, c, 0)] = FETCH1
             # Steps 2+ 
             if cond_steps and (z, c) in cond_steps:
                 seq = cond_steps[(z, c)]
             else:
                 seq = steps
             for s, ctrl in enumerate(seq):
-                ucode[rom_addr(opcode, s + 2, z, c)] = ctrl
+                ucode[rom_addr(opcode, s + 2, z, c, 0)] = ctrl
+
+
+def emit_irq_entry():
+    """IRQ_ACTIVE overrides normal fetch at instruction boundary."""
+    for opcode in range(256):
+        for c in range(2):
+            for z in range(2):
+                ucode[rom_addr(opcode, 0, z, c, 1)] = IRQ_SAVE_PC_LO
+                ucode[rom_addr(opcode, 1, z, c, 1)] = IRQ_SAVE_PC_HI
+                ucode[rom_addr(opcode, 2, z, c, 1)] = IRQ_VECTOR
+                ucode[rom_addr(opcode, 3, z, c, 1)] = END
 
 
 # === INSTRUCTION DEFINITIONS ===
@@ -424,15 +443,17 @@ for rd in range(8):
     # Solution: make TO_MEM imply END. Redefine dest 111 as "→MEM[addr]+end".
     # For now leave as-is, the hardware will auto-end at step 7 overflow.
     
-    # LB rd, addr (zero-page) — 6 cycles
+    # LB rd, addr (fast-page target) — 6 cycles
+    # Frozen memory map requires $FF00+OPR; address-high force is still a hardware proof item.
     emit(0b10_010_000 | rd, [
         LOAD_OPR_A,                      # step 2: OPR → REG_A (address low)
         ALU(PASS_A, TO_ADDR_LO),         # step 3: A → addr_lo
-        LOAD_MEM_A,                      # step 4: MEM[{0,addr}] → REG_A
+        LOAD_MEM_A,                      # step 4: MEM[{fast_page,addr}] → REG_A
         ALU(PASS_A, TO_RD_END),          # step 5: A → MEM[rd], END
     ])
     
-    # SB rd, addr (zero-page) — 6 cycles
+    # SB rd, addr (fast-page target) — 6 cycles
+    # Frozen memory map requires $FF00+OPR; address-high force is still a hardware proof item.
     emit(0b10_011_000 | rd, [
         LOAD_OPR_A,                      # step 2: OPR → REG_A (address low)
         ALU(PASS_A, TO_ADDR_LO),         # step 3: A → addr_lo
@@ -676,8 +697,11 @@ for rd in range(8):
     
     # SYS — 3 cycles (NOP/HLT based on operand)
     emit(0b11_111_000 | rd, [
-        END,                             # step 2: just end (NOP). HLT = halt clock (hardware)
+        SYS_OP,                          # step 2: OPR subdecode handles NOP/HLT/EI/DI/IRET
     ])
+
+
+emit_irq_entry()
 
 
 # === OUTPUT ===
@@ -697,19 +721,23 @@ def output_bin(filename):
 def print_stats():
     """Print microcode statistics."""
     used = sum(1 for x in ucode if x != END)
-    print(f"\nRV8-R Microcode Generator")
+    print(f"\nRV8-R Legacy Microcode Generator")
     print(f"{'='*40}")
-    print(f"ROM size:     {ROM_SIZE} entries (8KB)")
+    print(f"ROM size:     {ROM_SIZE} entries (16KB)")
     print(f"Data width:   8 bits")
-    print(f"Address:      13 bits [C,Z,step(3),opcode(8)]")
+    print(f"Address:      14 bits [IRQ,C,Z,step(3),opcode(8)]")
+    print(f"WARNING:      FullHW requires 15-bit [IRQ,C,Z,step(4),opcode(8)] direct control")
     print(f"Used entries: {used}/{ROM_SIZE} ({100*used//ROM_SIZE}%)")
     print(f"\nInstructions defined:")
     print(f"  Class 00 (ALU reg):  ADD SUB AND OR XOR SLT SLL [SRL=sw]")
     print(f"  Class 01 (ALU imm):  LI ADDI SUBI ANDI ORI XORI SLTI LUI")
-    print(f"  Class 10 (Memory):   LB SB LBzp SBzp PUSH POP LBsp SBsp")
+    print(f"  Class 10 (Memory):   LB SB LBfp SBfp PUSH POP LBsp SBsp")
     print(f"  Class 11 (Control):  BEQ BNE BLT BGE JAL JALR J SYS")
+    print(f"  SYS subcodes:         0=NOP 1=HLT 2=EI 3=DI 4=IRET")
     print(f"\nNOTE: PUSH/POP/SLT need ALU carry-in support (1 gate)")
     print(f"NOTE: SRL = software macro (not in microcode)")
+    print(f"NOTE: Frozen map uses IRQ save $FFF6/$FFF7 and vector $7F00")
+    print(f"NOTE: RTL/testbench migration from the old $8000/$FF00 map is pending")
 
 if __name__ == "__main__":
     print_stats()

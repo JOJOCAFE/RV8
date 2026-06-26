@@ -1,6 +1,6 @@
 # RV8-R — ISA Encoding (2-byte format)
 
-**Identical to RV8. Same assembler, same binaries.**
+**Same 2-byte RV8-style encoding shape. RV8-R defines hardware, macro, and system subcode levels explicitly.**
 
 ---
 
@@ -71,22 +71,22 @@ Byte 1: [imm8:8]
 ```
 Byte 0: [10][op:3][rd:3]
 Byte 1: [rs:3][off5:5]    (signed offset, -16..+15)
-    OR: [imm8:8]           (zero-page / stack variants)
+    OR: [imm8:8]           (fast-page / stack variants)
 ```
 
 | Opcode | op | Mnemonic | Operation |
 |:------:|:--:|----------|-----------|
 | $80+rd | 000 | LB rd, off(rs) | rd ← mem[rs + sext(off5)] |
 | $88+rd | 001 | SB rd, off(rs) | mem[rs + sext(off5)] ← rd |
-| $90+rd | 010 | LB rd, addr | rd ← mem[{$00, imm8}] |
-| $98+rd | 011 | SB rd, addr | mem[{$00, imm8}] ← rd |
+| $90+rd | 010 | LB rd, addr | rd ← mem[{$FF, imm8}] |
+| $98+rd | 011 | SB rd, addr | mem[{$FF, imm8}] ← rd |
 | $A0+rd | 100 | PUSH rd | sp--, mem[sp] ← rd |
 | $A8+rd | 101 | POP rd | rd ← mem[sp], sp++ |
 | $B0+rd | 110 | LB rd, off(sp) | rd ← mem[sp + off5] |
 | $B8+rd | 111 | SB rd, off(sp) | mem[sp + off5] ← rd |
 
 **Notes:**
-- Zero-page ($0000-$00FF) for fast variable access
+- Fast page (`$FF00-$FFFF`) for quick RAM variables. `$FFF6-$FFFF` is reserved for IRQ save slots and registers.
 - Stack-relative for local variables (function frames)
 - PUSH/POP: sp = r7, auto decrement/increment
 
@@ -111,14 +111,14 @@ Jump:   Byte 0: [11][op:3][rd:3]
 | $E0+rd | 100 | JAL rd, off8 | rd ← PC, PC += sext(off8) |
 | $E8+rd | 101 | JALR rd, rs | rd ← PC, PC ← rs |
 | $F0+xx | 110 | J off8 | PC += sext(off8) |
-| $F8+xx | 111 | SYS imm | NOP/HLT/ECALL (sub-decoded) |
+| $F8+xx | 111 | SYS imm | NOP/HLT/EI/DI/IRET (sub-decoded) |
 
 **Notes:**
 - Branch compares two registers directly (RISC-V style, no flags visible to programmer)
 - JAL: saves PC_LO to rd (same-page return), jumps relative ±128
 - JALR: saves PC_LO to rd, jumps to absolute address in rs (full 16-bit via page reg)
 - J: unconditional relative jump (= JAL r0, off8)
-- SYS: operand byte selects sub-function (0=NOP, 1=HLT, 2=ECALL, 3=EBREAK)
+- SYS: operand byte selects sub-function (`0=NOP`, `1=HLT`, `2=EI`, `3=DI`, `4=IRET`)
 
 ---
 
@@ -147,8 +147,8 @@ Jump:   Byte 0: [11][op:3][rd:3]
       ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 80-87 │ LB  │ LB  │ LB  │ LB  │ LB  │ LB  │ LB  │ LB  │ Class 10
 88-8F │ SB  │ SB  │ SB  │ SB  │ SB  │ SB  │ SB  │ SB  │
-90-97 │LBzp │LBzp │LBzp │LBzp │LBzp │LBzp │LBzp │LBzp │
-98-9F │SBzp │SBzp │SBzp │SBzp │SBzp │SBzp │SBzp │SBzp │
+90-97 │LBfp │LBfp │LBfp │LBfp │LBfp │LBfp │LBfp │LBfp │
+98-9F │SBfp │SBfp │SBfp │SBfp │SBfp │SBfp │SBfp │SBfp │
 A0-A7 │PUSH │PUSH │PUSH │PUSH │PUSH │PUSH │PUSH │PUSH │
 A8-AF │ POP │ POP │ POP │ POP │ POP │ POP │ POP │ POP │
 B0-B7 │LBsp │LBsp │LBsp │LBsp │LBsp │LBsp │LBsp │LBsp │
@@ -181,6 +181,9 @@ J -5           → $F0 $FB    (class=11, op=110, rd=000, off8=$FB = -5)
 PUSH r2        → $A2 $00    (class=10, op=100, rd=010, operand unused)
 POP r4         → $AC $00    (class=10, op=101, rd=100, operand unused)
 SYS 1 (HLT)   → $F8 $01    (class=11, op=111, rd=000, imm8=01)
+SYS 2 (EI)    → $F8 $02    (enable interrupts)
+SYS 3 (DI)    → $F8 $03    (disable interrupts)
+SYS 4 (IRET)  → $F8 $04    (return from interrupt)
 ```
 
 ---
@@ -191,8 +194,8 @@ The encoding maps directly to microcode ROM addressing:
 
 1. **opcode[7:6] (class)** tells microcode the general step pattern
 2. **opcode[5:3] (op)** selects ALU operation or memory mode
-3. **opcode[2:0] (rd)** is wired directly to address bus A[2:0] for register access
-4. **operand[7:5] (rs)** is wired via ADDR_SEL mux to A[2:0] for source register
+3. **opcode[2:0] (rd)** feeds register-address mode: `A[15:3]=1`, `A[2:0]=rd`, so `rd` maps to `$FFF8-$FFFF`
+4. **operand[7:5] (rs)** feeds the same register-address path for source register access
 5. **operand[4:0] or [7:0]** stays in OPR register for immediate/offset use
 
 The microcode ROM sees the **full 8-bit opcode** so each of the 256 possible opcodes gets its own step sequence. This means:
@@ -216,6 +219,9 @@ The microcode ROM sees the **full 8-bit opcode** so each of the 256 possible opc
 | NEG rd | SUBI rd, 0... | (SUB r0, rd → needs temp) |
 | CALL off8 | JAL r1, off8 | $E1 off8 |
 | RET | JALR r1, r1 | $E9 $20 (rd=r1, rs=r1) |
+| EI | SYS 2 | $F8 $02 |
+| DI | SYS 3 | $F8 $03 |
+| IRET | SYS 4 | $F8 $04 |
 
 **MOV rd, rs** needs care: there's no dedicated MOV. Options:
 - `ADD rd, rs` only works if rd=0 first → 2 instructions: `LI rd,0` + `ADD rd,rs`
@@ -233,4 +239,4 @@ But `$30+rd` with rs≠0 is technically a different opcode in microcode... we co
 ---
 
 *Document version: 2026-06-14*
-*Compatible with RV8 ISA (same binary format)*
+*RV8-style binary format with RV8-R-specific hardware and system behavior*
