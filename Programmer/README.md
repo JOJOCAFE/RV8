@@ -95,9 +95,11 @@ Programmer/
 ```bash
 # Flash ROM
 python3 tools/rv8flash.py -w program.bin
+python3 tools/rv8flash.py program program.bin --base 0x0000
 
 # Verify ROM
 python3 tools/rv8flash.py -v program.bin
+python3 tools/rv8flash.py verify program.bin --base 0x0000
 
 # Terminal (RUN mode)
 python3 tools/rv8term.py
@@ -113,6 +115,10 @@ python3 tools/rv8ram-boot.py program.bin
 | ⚠️ Never connect BOTH Bus cable AND ROM in ZIF at the same time! |
 |:---:|
 | Data bus fight → chip damage |
+
+AT28C256 note: current firmware performs normal byte write cycles. Use ROM chips
+with software data protection disabled, or add/enable an SDP unlock sequence
+before relying on protected AT28C256 parts.
 
 ---
 

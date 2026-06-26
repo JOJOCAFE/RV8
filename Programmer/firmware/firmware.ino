@@ -209,6 +209,7 @@ Mode detectMode() {
 void enterProgMode() {
   Serial.println("[PROG]");
   digitalWrite(PIN_nRST, LOW);
+  pinMode(PIN_nWR, OUTPUT);     // reclaim /WR for ROM write cycles
   digitalWrite(PIN_nWR, HIGH);
   pinMode(PIN_nRD_O, OUTPUT);   // reclaim /RD for read operations
   digitalWrite(PIN_nRD_O, HIGH);
@@ -220,6 +221,7 @@ void enterRunMode() {
   dataBusInput();
   digitalWrite(PIN_nWR, HIGH);
   digitalWrite(PIN_nRD_O, HIGH);
+  pinMode(PIN_nWR, INPUT);      // release /WR — let CPU drive it
   pinMode(PIN_nRD_O, INPUT);    // release /RD — let CPU drive it
   digitalWrite(PIN_nRST, HIGH);
   rxReady = false;

@@ -50,10 +50,9 @@ class VirtualESP32:
 ## Behavior
 
 1. Open serial port (2s boot delay + buffer drain)
-2. Send `?`, expect `Connected\n` (verify programmer alive)
-3. If `-c`: print status and exit
-4. Enter terminal mode: bidirectional byte bridge (PC ↔ CPU via /SLOT1)
-5. Ctrl+C to exit
+2. If `-c`: send `?`, expect `Connected\n`, print status, and exit. Use this only with the board in PROG mode.
+3. Otherwise enter terminal mode directly with the board switched to RUN: bidirectional byte bridge (PC ↔ CPU via /SLOT1)
+4. Ctrl+C to exit
 
 ---
 
@@ -66,7 +65,6 @@ Programmer: Connected
 
 $ python3 rv8term.py
 Port: /dev/ttyUSB0 @ 115200 baud
-Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
 ---
 RV8 BASIC 1.0
@@ -74,7 +72,6 @@ RV8 BASIC 1.0
 
 $ python3 rv8term.py -b 9600
 Port: /dev/ttyUSB0 @ 9600 baud
-Programmer: Connected
 Terminal mode. Press Ctrl+C to exit.
 ---
 ```
@@ -92,7 +89,7 @@ Terminal mode. Press Ctrl+C to exit.
 
 ## Boot Delay
 
-ESP32 resets when serial port opens (DTR). Tool waits 2s + drains buffer before sending `?`.
+ESP32 resets when serial port opens (DTR). Tool waits 2s + drains buffer before either running the PROG-mode `-c` check or entering terminal mode.
 
 ---
 
@@ -111,7 +108,7 @@ tools/
 
 - [x] VirtualESP32 at top (bus-based pins)
 - [x] SerialPort context manager with boot delay
-- [x] Connection check (`?` → `Connected\n`)
+- [x] Optional PROG-mode connection check (`-c`, `?` → `Connected\n`)
 - [x] `-c` option (check and exit)
 - [x] Port + baud display before operations
 - [x] Terminal mode (bidirectional bridge)

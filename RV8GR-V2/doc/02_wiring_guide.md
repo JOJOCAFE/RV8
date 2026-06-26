@@ -1042,7 +1042,9 @@ ROM (AT28C256 / SST39SF010A)
 Note: Bus pin 27 (/WR) is driven by /AC_BUF during CPU STORE operations.
 ROM sees /WE pulse when SETDP<$80 + SB, but AT28C256 has built-in software data
 protection (SDP) — single pulses without unlock sequence are ignored.
-Programmer board unlocks SDP before flashing (while /RST=LOW, CPU stopped).
+The current Programmer firmware performs normal byte write cycles while /RST=LOW
+and the CPU is stopped. Use an AT28C256 with SDP disabled, or add/enable an SDP
+unlock sequence in Programmer firmware before relying on protected chips.
 SETDP <$80 + LB = read from ROM (lookup tables, safe).
 
 RAM (62256)

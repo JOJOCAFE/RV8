@@ -193,8 +193,8 @@ $0007: $04
 ### Test 5: Programmer via bus
 
 - [ ] ต่อ Programmer board ผ่าน ribbon cable
-- [ ] `python3 rv8flash.py -c` → "Connected" ✅
-- [ ] `python3 rv8flash.py -v test.bin --base 0x0000` → verify pass ✅
+- [ ] `python3 /home/jo/Codex/Programmer/tools/rv8flash.py -c` → "Connected" ✅
+- [ ] `python3 /home/jo/Codex/Programmer/tools/rv8flash.py verify test.bin --base 0x0000` → verify pass ✅
 
 ---
 

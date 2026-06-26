@@ -1,5 +1,29 @@
 # RV8 Project — Changelog
 
+## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
+
+### Programmer
+- **Programmer/firmware/firmware.ino**: RUN mode now releases both `/WR` and `/RD`; PROG mode reclaims `/WR` before ROM write cycles
+- **Programmer/tools/rv8term.py**: Normal terminal mode now starts directly in RUN mode without sending the PROG-only `?` handshake; `-c` remains the explicit connection check
+- **Programmer/tools/rv8flash.py**: Added RV8GR-V2 documented command aliases: `program FILE --base 0x0000` and `verify FILE --base 0x0000`; nonzero `--base` fails loudly
+- **Programmer/tools/test_rv8flash.py** and **test_rv8term.py**: Added regression coverage for RV8GR-V2 CLI aliases and PROG/RUN handshake boundary
+- **Programmer/README.md**, **schematic.md**, and requirement docs: Documented ZIF-direct vs RV8-Bus in-system use, never-both safety rule, and AT28C256 SDP limitation
+
+### RV8GR-V2 Integration
+- **RV8GR-V2/doc/02_wiring_guide.md**: Clarified that ROM `/WE` connects to RV8-Bus `/WR` pin 27 for Programmer support, and that current firmware does normal byte writes unless SDP unlock is added
+- **RV8GR-V2/doc/labs/lab05_rom_buffer.md**: Separated early standalone ROM `/WE -> 5V` lab wiring from final Programmer/RV8-Bus `/WE -> /WR` wiring
+- **RV8GR-V2/doc/labs/lab13_full_system.md**, **lab14_irq_bus.md**, and **doc/06_debug_plan.md**: Updated Programmer command examples to the actual `Programmer/tools/rv8flash.py` path and RV8GR-V2-compatible command form
+
+### KiCad Exports
+- Regenerated `Programmer/KICAD/RV8Programmer.pdf`
+- Regenerated `Programmer/KICAD/RV8Programmer.svg` and `Programmer/KICAD/RV8Programmer/RV8Programmer.svg` with KiCad 10.0.4
+
+### Verification
+- `python3 -m unittest discover -s Programmer/tools -p 'test_*.py'` — 36 tests pass
+- `python3 RV8GR-V2/sim/verify_wiring.py` — all wiring verified
+- `python3 RV8GR-V2/tools/test_rv8gr_asm.py` — 11 tests pass
+- Cleaned Python caches and Zone.Identifier artifacts after validation
+
 ## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
 
 ### Documentation

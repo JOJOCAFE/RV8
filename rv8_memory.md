@@ -2,17 +2,17 @@
 
 **Last updated**: 2026-06-26
 
-## Focus: RV8GR-V2 (33 chips) — student-friendly physical breadboard build
+## Focus: RV8GR-V2 (33 chips) + dual-mode Programmer — student-friendly physical build
 
 ### Active folders:
 - `RV8GR-V2/` — active CPU design (33 logic + ROM + RAM = 35 packages, student baseline contract, labs, Verilog benches, gate-level sim passing)
 - `RV8GR-V1/` — previous RV8-GR reference snapshot
-- `Programmer/` — ESP32 board (bus-based, firmware+tools verified, 46 tests)
+- `Programmer/` — ESP32 board (dual ZIF/RV8-Bus mode, firmware+tools verified, 36 current tests)
 - `RV8/` — microcode variant (28 chips, Verilog 8/8, reference)
 - `RV8R/` — RAM register variant (19 chips, next project)
 - `RV8G/` — full ISA no-microcode variant (38 chips, concept)
 
-### Current version: v4.0
+### Current version: v4.1
 
 ### What was done today (2026-06-26):
 1. Added RV8GR-V2 student build guardrails:
@@ -30,6 +30,17 @@
    - wiring verifier: all wiring verified
    - RTL benches: full, IRQ, SETDP, tasks, assembler ROM, opcode sweep all pass
    - opcode sweep: 512 cases pass
+
+4. Hardened Programmer/RV8GR-V2 integration:
+   - confirmed dual ZIF-direct and RV8-Bus in-system programming paths
+   - fixed RUN-mode bus release and terminal handshake boundary
+   - added RV8GR-V2 `program/verify --base 0x0000` CLI aliases
+   - regenerated Programmer KiCad PDF/SVG exports with KiCad 10.0.4
+   - documented ROM `/WE -> /WR` final wiring and AT28C256 SDP limitation
+5. Verified integration:
+   - Programmer tests: 36 pass
+   - RV8GR-V2 wiring verifier: all wiring verified
+   - RV8GR-V2 assembler tests: 11 pass
 
 ### Key design facts:
 - 33 logic chips + ROM + RAM = 35 packages
@@ -49,9 +60,14 @@ pin 39: VCC, pin 40: GND
 
 ### Programmer board:
 - ESP32-WROOM-32 + 2× TXS0108E + 2× 74HC595
-- Connects via RV8-Bus (40-pin), holds /RST during flash
+- Dual mode, use exactly one at a time:
+  - ZIF direct: insert bare AT28C256 in Programmer ZIF, disconnect RV8-Bus
+  - RV8-Bus in-system: leave ZIF empty, connect Programmer to RV8GR-V2 bus, hold CPU reset during flash
 - GPIO: 23(SR_DATA), 18(SR_CLK), 19(SR_LATCH), 4(/RST), 16(/WR), 17(/RD)
 - Data: GPIO {13,12,14,27,26,25,33,32} = D[7:0]
+- RUN mode releases `/WR` and `/RD`; `rv8term.py` terminal mode does not use the PROG-only `?` handshake
+- `rv8flash.py` accepts both legacy flags and RV8GR-V2 aliases: `program FILE --base 0x0000`, `verify FILE --base 0x0000`
+- AT28C256 caveat: current firmware performs normal byte write cycles; use SDP-disabled chips or add SDP unlock support before protected parts
 
 ### Next steps:
 - Build RV8GR-V2 physically from `RV8GR-V2/doc/labs/README.md`

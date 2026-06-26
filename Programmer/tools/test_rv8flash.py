@@ -9,6 +9,8 @@ import sys
 import unittest
 from unittest.mock import patch, MagicMock
 import io
+import importlib.util
+from pathlib import Path
 
 # =============================================================================
 # MOCK SERIAL CLASS
@@ -344,6 +346,43 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(len(bar), 10)
 
 
+class TestRv8grCliCompatibility(unittest.TestCase):
+    """Regression tests for RV8GR-V2 documented rv8flash command form."""
+
+    @classmethod
+    def setUpClass(cls):
+        module_path = Path(__file__).with_name('rv8flash.py')
+        spec = importlib.util.spec_from_file_location('rv8flash_module', module_path)
+        cls.rv8flash_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.rv8flash_module)
+
+    def test_program_command_maps_to_write_base_zero(self):
+        with patch.object(sys, 'argv', ['rv8flash.py', 'program', 'test.bin', '--base', '0x0000']):
+            opts = self.rv8flash_module.parse_args()
+
+        self.assertEqual(opts.write, 'test.bin')
+        self.assertIsNone(opts.verify)
+        self.assertEqual(opts.base, 0)
+
+    def test_verify_command_maps_to_verify_base_zero(self):
+        with patch.object(sys, 'argv', ['rv8flash.py', 'verify', 'test.bin', '--base', '0']):
+            opts = self.rv8flash_module.parse_args()
+
+        self.assertEqual(opts.verify, 'test.bin')
+        self.assertIsNone(opts.write)
+        self.assertEqual(opts.base, 0)
+
+    def test_nonzero_base_rejected_before_serial(self):
+        opts = self.rv8flash_module.Options()
+        opts.base = 0x1000
+
+        with patch('sys.stdout', new_callable=io.StringIO) as stdout:
+            result = self.rv8flash_module.rv8flash(opts)
+
+        self.assertEqual(result, 1)
+        self.assertIn('not supported', stdout.getvalue())
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -362,6 +401,7 @@ if __name__ == '__main__':
     suite.addTests(loader.loadTestsFromTestCase(TestChecksum))
     suite.addTests(loader.loadTestsFromTestCase(TestHexParser))
     suite.addTests(loader.loadTestsFromTestCase(TestIntegration))
+    suite.addTests(loader.loadTestsFromTestCase(TestRv8grCliCompatibility))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

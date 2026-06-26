@@ -58,7 +58,7 @@ U7 (74HC245) = สะพาน 2 ทิศทาง:
 
 Flash ROM ด้วย:
 ```bash
-python3 rv8flash.py program test_bytes.bin --base 0x0000
+python3 /home/jo/Codex/Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
 ```
 
 ---
@@ -109,10 +109,14 @@ python3 rv8flash.py program test_bytes.bin --base 0x0000
 ROM ไฟเลี้ยง:
   pin 28 (VCC) → 5V
   pin 14 (GND) → GND
-  pin 27 (/WE) → 5V (ไม่เขียน)
+  pin 27 (/WE) → 5V (ไม่เขียน ระหว่าง Lab 05 แบบ standalone)
   pin 22 (/OE) → GND (อ่านตลอด)
   pin 20 (/CE) ← A15 (ถ้ายังไม่มี ให้ต่อ GND = enable ตลอด)
   100nF คร่อม VCC-GND
+
+หมายเหตุสำหรับบอร์ดจริง: เมื่อถึงขั้น RV8-Bus/Programmer ให้ย้าย ROM pin 27
+(`/WE`) ไปที่ RV8-Bus pin 27 (`/WR`) เพื่อให้ Programmer เขียน ROM ได้
+ขณะ CPU ถูก hold reset.
 
 ROM Address ← จาก ABUS (Lab 04):
   pin 10 (A0) ← A0 (U15 pin 4)

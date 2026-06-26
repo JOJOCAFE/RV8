@@ -90,6 +90,7 @@ const uint8_t DATA_PINS[] = {13, 12, 14, 27, 26, 25, 33, 32};
 
 ### RUN mode
 - `/RST` released HIGH (CPU runs)
+- `/WR` set as INPUT (CPU drives /WR)
 - `/RD_O` set as INPUT (CPU drives /RD)
 - Listens for `/SLOT1` activity for UART bridging
 
@@ -129,7 +130,7 @@ const uint8_t DATA_PINS[] = {13, 12, 14, 27, 26, 25, 33, 32};
 - [x] `V` → drives /RD per byte, sends 32KB
 - [x] `R` → pulse /RST
 - [x] MODE switch selects PROG/RUN
-- [x] RUN mode releases /RD_O as input
+- [x] RUN mode releases /WR and /RD_O as inputs
 - [x] PROG mode reclaims /RD_O as output
 - [x] Compiles clean (286KB)
 - [x] 31 Python tests pass

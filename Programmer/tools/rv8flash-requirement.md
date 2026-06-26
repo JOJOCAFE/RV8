@@ -44,6 +44,9 @@ class VirtualESP32:
 | `-w FILE` | Write FILE to ROM |
 | `-r FILE` | Read ROM to FILE |
 | `-v FILE` | Verify ROM against FILE |
+| `program FILE --base 0x0000` | RV8GR-V2 documented alias for write |
+| `verify FILE --base 0x0000` | RV8GR-V2 documented alias for verify |
+| `--base ADDR` | Base address compatibility option; current firmware supports only `0x0000` |
 | `-d` | Debug (show serial traffic) |
 | `-q` | Quiet (minimal output) |
 | `-t N` | Retry N times (default: 3) |
@@ -82,6 +85,9 @@ Programmer: Connected
 Verifying...
 [██████████] 100%
 Verified
+
+$ python3 rv8flash.py program testrom.bin --base 0x0000
+# same as -w testrom.bin
 ```
 
 ---
@@ -94,6 +100,12 @@ Verified
 | 1 | Error (message printed to stderr) |
 
 Errors: no port, programmer not responding, timeout, file not found, file too large (>32KB), verify mismatch.
+Nonzero `--base` is rejected because the current serial protocol always starts
+at ROM address `$0000`.
+
+AT28C256 note: current firmware performs normal byte write cycles. Use chips with
+software data protection disabled, or add/enable an SDP unlock sequence before
+relying on protected parts.
 
 ---
 
@@ -123,4 +135,4 @@ tools/
 - [x] Read (`V` → 32768 bytes)
 - [x] Verify (read + compare)
 - [x] Port + baud display before operations
-- [x] 16/16 tests passing
+- [x] RV8GR-V2 `program/verify --base 0x0000` compatibility aliases

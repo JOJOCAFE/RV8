@@ -1,5 +1,17 @@
 # RV8 Project — Development History
 
+## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
+
+- Rechecked `Programmer/` against the current `RV8GR-V2` RV8-Bus pinout and ROM wiring contract
+- Confirmed the board supports two mutually exclusive programming paths: ZIF direct ROM programming, or in-system RV8-Bus programming with the ZIF empty
+- Fixed RUN-mode bus release in firmware: `/WR` and `/RD` are both released when switching to RUN, then reclaimed in PROG
+- Fixed `rv8term.py` so normal RUN terminal mode no longer requires the PROG-only `? -> Connected` handshake; `-c` remains the explicit PROG-mode health check
+- Added RV8GR-V2-compatible `rv8flash.py program FILE --base 0x0000` and `verify FILE --base 0x0000` aliases; nonzero base is rejected explicitly
+- Documented the AT28C256 software data protection boundary: current firmware performs normal byte write cycles, so use SDP-disabled ROM chips or add an unlock sequence before protected parts
+- Updated RV8GR-V2 docs and labs so Programmer command examples use the actual `Programmer/tools/rv8flash.py` path and final ROM `/WE -> RV8-Bus /WR` wiring is clear
+- Regenerated `Programmer/KICAD/RV8Programmer.pdf` and SVG exports with KiCad 10.0.4
+- Verification passed: Programmer Python tests (36), RV8GR-V2 wiring verifier, and RV8GR-V2 assembler tests
+
 ## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
 
 - Made `RV8GR-V2/` the active 33-chip student baseline in the top-level project docs

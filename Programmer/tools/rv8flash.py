@@ -17,7 +17,12 @@ Options:
   -t N, --retry N     Retry N times (default: 3)
   -R, --reset         Pulse /RST after flash
   --format FORMAT     File format: bin or hex (default: bin)
+  --base ADDR         Base address for RV8GR docs compatibility (only 0 supported)
   -q, --quiet         Minimal output
+
+Compatibility:
+  python3 tools/rv8flash.py program FILE --base 0x0000
+  python3 tools/rv8flash.py verify  FILE --base 0x0000
 """
 
 import sys
@@ -82,6 +87,7 @@ class Options:
         self.auto_reset = False
         self.format = 'bin'
         self.quiet = False
+        self.base = 0
 
 
 # =============================================================================
@@ -387,7 +393,12 @@ def parse_args():
     opt_group.add_argument('-t', '--retry', type=int, default=3)
     opt_group.add_argument('-R', '--reset', action='store_true', dest='auto_reset')
     opt_group.add_argument('--format', choices=['bin', 'hex', 'auto'], default='bin')
+    opt_group.add_argument('--base', default='0x0000',
+                           help='Base address for RV8GR docs compatibility; only 0x0000 is supported')
     opt_group.add_argument('-q', '--quiet', action='store_true')
+    parser.add_argument('command', nargs='?', choices=['program', 'write', 'verify', 'read', 'check'],
+                        help='Compatibility command: program/write/verify/read/check')
+    parser.add_argument('file', nargs='?', help='File for compatibility command')
 
     args = parser.parse_args()
 
@@ -405,6 +416,22 @@ def parse_args():
     opts.auto_reset = args.auto_reset
     opts.format = args.format
     opts.quiet = args.quiet
+    try:
+        opts.base = int(str(args.base), 0)
+    except ValueError:
+        parser.error(f"invalid --base address: {args.base}")
+
+    if args.command:
+        if args.command == 'check':
+            opts.check = True
+        elif not args.file:
+            parser.error(f"{args.command} requires FILE")
+        elif args.command in ('program', 'write'):
+            opts.write = args.file
+        elif args.command == 'verify':
+            opts.verify = args.file
+        elif args.command == 'read':
+            opts.read = args.file
 
     return opts
 
@@ -422,6 +449,10 @@ def rv8flash(opts: Options) -> int:
         for i, p in enumerate(ports):
             print(f"[{i}] {p}")
         return 0
+
+    if opts.base != 0:
+        print("Error: --base other than 0x0000 is not supported by the current programmer firmware")
+        return 1
 
     # Get port
     ports = get_serial_ports()

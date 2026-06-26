@@ -256,6 +256,10 @@ Clock 16: 00010000  ← U2 เริ่มนับ (cascade ทำงาน!)
 > RAM /CE = /A15 (active when A15=1, address $8000-$FFFF)
 
 **เตรียม ROM**: Flash test pattern ด้วย Programmer board:
+```bash
+python3 /home/jo/Codex/Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
+```
+
 ```
 $0000: $30  (LI opcode)
 $0001: $42  (operand)
@@ -621,8 +625,8 @@ Pin 40:    GND
 
 **ทดสอบ**:
 - [ ] ต่อ Programmer board ผ่าน ribbon cable
-- [ ] `rv8flash.py -c` → "Connected"
-- [ ] Flash test ROM → verify ด้วย `rv8flash.py -v`
+- [ ] `python3 /home/jo/Codex/Programmer/tools/rv8flash.py -c` → "Connected"
+- [ ] Flash test ROM → verify ด้วย `python3 /home/jo/Codex/Programmer/tools/rv8flash.py verify test.bin --base 0x0000`
 - [ ] CLK บน bus pin 25 = oscillator (วัดด้วย probe)
 - [ ] /RST บน bus pin 26 = HIGH ตอนปกติ, LOW ตอนกด reset
 - [ ] /WR บน bus pin 27 = pulse LOW เฉพาะตอน STORE

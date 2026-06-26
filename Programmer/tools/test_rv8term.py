@@ -10,6 +10,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import io
 import threading
+import importlib.util
+from pathlib import Path
 
 # =============================================================================
 # MOCK SERIAL CLASS
@@ -261,6 +263,49 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(self.mock.tx_buffer[-1], 0x03)
 
 
+class TestRv8TermProgrammerModeBoundary(unittest.TestCase):
+    """Regression tests for PROG-mode check vs RUN-mode terminal startup."""
+
+    @classmethod
+    def setUpClass(cls):
+        module_path = Path(__file__).with_name('rv8term.py')
+        spec = importlib.util.spec_from_file_location('rv8term_module', module_path)
+        cls.rv8term_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.rv8term_module)
+
+    def make_opts(self, check=False, quiet=True):
+        opts = self.rv8term_module.Options()
+        opts.check = check
+        opts.quiet = quiet
+        return opts
+
+    def test_terminal_mode_skips_prog_handshake(self):
+        opts = self.make_opts(check=False)
+        with patch.object(self.rv8term_module, 'get_serial_ports', return_value=['ttyUSB0']), \
+             patch.object(self.rv8term_module, 'SerialPort') as serial_port, \
+             patch.object(self.rv8term_module, 'cmd_check') as cmd_check, \
+             patch.object(self.rv8term_module, 'terminal_loop', side_effect=KeyboardInterrupt):
+            serial_port.return_value.__enter__.return_value = MagicMock()
+            result = self.rv8term_module.rv8term(opts)
+
+        self.assertEqual(result, 0)
+        cmd_check.assert_not_called()
+
+    def test_check_mode_uses_prog_handshake(self):
+        opts = self.make_opts(check=True)
+        with patch.object(self.rv8term_module, 'get_serial_ports', return_value=['ttyUSB0']), \
+             patch.object(self.rv8term_module, 'SerialPort') as serial_port, \
+             patch.object(self.rv8term_module, 'cmd_check', return_value=True) as cmd_check, \
+             patch.object(self.rv8term_module, 'terminal_loop') as terminal_loop:
+            port = MagicMock()
+            serial_port.return_value.__enter__.return_value = port
+            result = self.rv8term_module.rv8term(opts)
+
+        self.assertEqual(result, 0)
+        cmd_check.assert_called_once_with(port, opts.debug)
+        terminal_loop.assert_not_called()
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -279,6 +324,7 @@ if __name__ == '__main__':
     suite.addTests(loader.loadTestsFromTestCase(TestChecksum))
     suite.addTests(loader.loadTestsFromTestCase(TestTerminalModes))
     suite.addTests(loader.loadTestsFromTestCase(TestIntegration))
+    suite.addTests(loader.loadTestsFromTestCase(TestRv8TermProgrammerModeBoundary))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

@@ -8,6 +8,7 @@ Options:
   -h, --help          Show help
   -pl, --portlist     List available serial ports
   -p N, --port N      Use port N (default: 0)
+  -c, --check         Check programmer connection in PROG mode and exit
   -b N, --baud N      Baud rate (default: 115200)
   -t N, --timeout N   Serial timeout in seconds (default: 0.1)
   -d, --debug         Show serial traffic
@@ -271,16 +272,15 @@ def rv8term(opts: Options) -> int:
             if not opts.quiet:
                 print(f"Port: {port_name} @ {opts.baud} baud")
 
-            # Check programmer is alive (same as rv8flash.py)
-            if not cmd_check(port, opts.debug):
-                print("Error: Programmer not responding")
-                return 1
-
-            if not opts.quiet:
-                print("Programmer: Connected")
-
-            # -c: just check and exit
+            # -c is a PROG-mode health check. Normal terminal mode runs with the
+            # board switched to RUN, where firmware bridges /SLOT1 and does not
+            # answer the PROG-mode '?' command.
             if opts.check:
+                if not cmd_check(port, opts.debug):
+                    print("Error: Programmer not responding")
+                    return 1
+                if not opts.quiet:
+                    print("Programmer: Connected")
                 return 0
 
             if not opts.quiet:
