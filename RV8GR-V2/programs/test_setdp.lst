@@ -1,0 +1,77 @@
+$0000: $40 $90              ;     SETDP $90
+$0002: $30 $90              ;     LI $90
+$0004: $04 $00              ;     SB $00          ; RAM[$9000] = $90
+$0006: $04 $80              ;     SB $80          ; RAM[$9080] = $90
+$0008: $04 $FF              ;     SB $FF          ; RAM[$90FF] = $90
+$000A: $40 $95              ;     SETDP $95
+$000C: $30 $95              ;     LI $95
+$000E: $04 $00              ;     SB $00          ; RAM[$9500] = $95
+$0010: $04 $40              ;     SB $40          ; RAM[$9540] = $95
+$0012: $40 $A0              ;     SETDP $A0
+$0014: $30 $A0              ;     LI $A0
+$0016: $04 $00              ;     SB $00          ; RAM[$A000] = $A0
+$0018: $04 $FF              ;     SB $FF          ; RAM[$A0FF] = $A0
+$001A: $40 $A3              ;     SETDP $A3
+$001C: $30 $A3              ;     LI $A3
+$001E: $04 $FF              ;     SB $FF          ; RAM[$A3FF] = $A3
+$0020: $40 $90              ;     SETDP $90
+$0022: $38 $00              ;     LB $00          ; AC = RAM[$9000] should be $90
+$0024: $90 $90              ;     SUBI $90
+$0026: $02 $2A              ;     BEQ t1ok
+$0028: $01 $7C              ;     J fail
+$002A: $38 $FF              ;     LB $FF          ; AC = RAM[$90FF] should be $90
+$002C: $90 $90              ;     SUBI $90
+$002E: $02 $32              ;     BEQ t2ok
+$0030: $01 $7C              ;     J fail
+$0032: $40 $95              ;     SETDP $95
+$0034: $38 $00              ;     LB $00          ; AC = RAM[$9500] should be $95
+$0036: $90 $95              ;     SUBI $95
+$0038: $02 $3C              ;     BEQ t3ok
+$003A: $01 $7C              ;     J fail
+$003C: $38 $40              ;     LB $40          ; AC = RAM[$9540] should be $95
+$003E: $90 $95              ;     SUBI $95
+$0040: $02 $44              ;     BEQ t4ok
+$0042: $01 $7C              ;     J fail
+$0044: $40 $A0              ;     SETDP $A0
+$0046: $38 $00              ;     LB $00          ; AC = RAM[$A000] should be $A0
+$0048: $90 $A0              ;     SUBI $A0
+$004A: $02 $4E              ;     BEQ t5ok
+$004C: $01 $7C              ;     J fail
+$004E: $38 $FF              ;     LB $FF          ; AC = RAM[$A0FF] should be $A0
+$0050: $90 $A0              ;     SUBI $A0
+$0052: $02 $56              ;     BEQ t6ok
+$0054: $01 $7C              ;     J fail
+$0056: $40 $A3              ;     SETDP $A3
+$0058: $38 $FF              ;     LB $FF          ; AC = RAM[$A3FF] should be $A3
+$005A: $90 $A3              ;     SUBI $A3
+$005C: $02 $60              ;     BEQ t7ok
+$005E: $01 $7C              ;     J fail
+$0060: $40 $00              ;     SETDP $00
+$0062: $38 $00              ;     LB $00          ; AC = ROM[$0000] = first byte of this program = $40 (SETDP)
+$0064: $90 $40              ;     SUBI $40
+$0066: $02 $6A              ;     BEQ t8ok
+$0068: $01 $7C              ;     J fail
+$006A: $40 $80              ;     SETDP $80
+$006C: $30 $77              ;     LI $77
+$006E: $04 $05              ;     SB $05          ; RAM[$8005] = $77
+$0070: $30 $00              ;     LI $00
+$0072: $38 $05              ;     LB $05          ; AC = RAM[$8005] should be $77
+$0074: $90 $77              ;     SUBI $77
+$0076: $02 $7A              ;     BEQ pass
+$0078: $01 $7C              ;     J fail
+$007A: $01 $7A              ;     HLT             ; SUCCESS
+$007C: $30 $FF              ;     LI $FF          ; AC=$FF = error marker
+$007E: $01 $7E              ;     HLT             ; FAIL
+
+; Labels:
+;   start = $0000
+;   t1ok = $002A
+;   t2ok = $0032
+;   t3ok = $003C
+;   t4ok = $0044
+;   t5ok = $004E
+;   t6ok = $0056
+;   t7ok = $0060
+;   t8ok = $006A
+;   pass = $007A
+;   fail = $007C

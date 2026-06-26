@@ -8,9 +8,9 @@
 
 ```
 $0000-$7EFF  ROM 32KB (bankable to 128KB)
-$7F00-$7FFF  ROM (available)
+$7F00-$7FFF  ROM (available)  ## ********* For Future Use in Rom Switch*##
 $8000-$FEFF  RAM 32KB (registers at $8000-$8007, data, executable)
-$FF00-$FF0F  RAM (ISR vector — user must set up before EI)
+$FF00-$FF0F  RAM (available; future vector area)
 $FF10-$FF1F  I/O Slot 1 (/SLOT1 on bus)
 $FF20-$FF2F  I/O Slot 2 (/SLOT2 on bus)
 $FF30-$FFFF  RAM: available
@@ -129,6 +129,7 @@ Start breadboard at 1 MHz. Test up to 2 MHz if desired. 5 MHz = PCB/wire-wrap on
 | SETPG | PG_CLK↑ | IBUS→U23 (PG register) |
 | SETDP | DP_Load↑ | IBUS→U32 (DP register) |
 | EI | EI_decode↑ | U31 IE=1 |
+| DI | no v1.0 state change | Software marker; reset clears IE |
 | NOP | (nothing) | PC already incremented |
 
 **Key rule**: Only ONE IBUS driver active at T2:
@@ -268,11 +269,11 @@ CPU board ↔ Expansion/Programmer ผ่าน 40-pin IDC connector
 |:---:|--------|:---:|--------|-------------|
 | 1-16 | A[15:0] | out | Addr Mux | 16-bit address bus |
 | 17-24 | D[7:0] | bidir | U7/ROM/RAM | 8-bit data bus |
-| 25 | CLK | out | Oscillator | System clock (5 MHz) |
+| 25 | CLK | out | Oscillator | System clock (1 MHz breadboard target; 5 MHz PCB-only experiment) |
 | 26 | /RST | out | RC+button | Active-low reset |
 | 27 | /WR | out | /AC_BUF (U26-8) | Write strobe (LOW during T2+STORE) |
 | 28 | /RD | out | /T2 or fetch | Read strobe |
-| 29 | /IRQ | in | Peripheral | Interrupt request (falling edge) |
+| 29 | /IRQ | in | Peripheral | Active-low IRQ request; U31 latches on release/rising edge |
 | 30 | /SLOT1 | out | Address decode | I/O slot 1 select |
 | 31 | /SLOT2 | out | Address decode | I/O slot 2 select |
 | 32 | T2 | out | U8-5 | Execute phase (for expansion timing) |
@@ -294,50 +295,101 @@ D[7:0]:  ←─ ctrl ─→←─ oper ─→←─ data ─→←─ ctrl ─�
 
 ---
 
-## Buses
+## Virtual Internal Net Names
 
-### DBUS — External Data Bus (D0-D7)
+These names are wiring labels for the existing physical nets. They do not add
+chips or extra buses. Use them on the schematic and breadboard labels so every
+module can be wired and debugged without tracing long source/destination notes.
+
+### External RV8-Bus vs Internal Nets
+
+| Name | Scope | Meaning |
+|------|-------|---------|
+| RV8_A0..RV8_A15 | 40-pin connector | External address pins. Same physical nets as `ABUS0..ABUS15`. |
+| RV8_D0..RV8_D7 | 40-pin connector | External data pins. Same physical nets as `DBUS0..DBUS7`. |
+| RV8_CLK, RV8_/RST, RV8_/WR, RV8_/RD, RV8_/IRQ | 40-pin connector | External control pins. |
+| PC0..PC15 | CPU internal | Program counter register outputs. |
+| IRL0..IRL7 | CPU internal | Operand register outputs from U6. Also feed PC load and address mux. |
+| PG0..PG7 | CPU internal | Code page register outputs from U23. Feed PC high load inputs. |
+| DP0..DP7 | CPU internal | Data page register outputs from U32. Feed address mux high B inputs. |
+| AC0..AC7 | CPU internal | Accumulator outputs from U9. Feed ALU, zero detect, and U14 store buffer. |
+| IBUS0..IBUS7 | CPU internal | Internal data bus. Used for instruction fetch, immediates, ALU input, SETPG/SETDP, and store source. |
+| DBUS0..DBUS7 | Memory/RV8-Bus | Memory data bus shared by ROM, RAM, U7, and RV8 data pins. |
+| ABUS0..ABUS15 | Memory/RV8-Bus | Address mux outputs shared by ROM, RAM, decode, and RV8 address pins. |
+| SUM0..SUM7 | CPU internal | 74HC283 adder outputs. |
+| XOR_Y0..XOR_Y7 | CPU internal | XOR array outputs. |
+
+Naming rules:
+- Bit 0 is always the least significant bit.
+- A leading `/` means active-low (`/RST`, `/PC_LD`, `/IRL_OE`).
+- A `_N` suffix also means active-low when `/` is awkward in labels (`BUF_OE_N`).
+- A `*` after a pin in the bus tables means that chip only drives the bus when
+  its output enable is active.
+
+---
+
+## Virtual Internal Buses
+
+### DBUS0..DBUS7 — Memory/RV8 Data Bus
+
+DBUS is the real bidirectional memory data bus. It is also exported as RV8-Bus
+pins 17-24 (`RV8_D0..RV8_D7`).
 
 ```
-D0 ←→ ROM D0, RAM D0, U7-18
-D1 ←→ ROM D1, RAM D1, U7-17
-D2 ←→ ROM D2, RAM D2, U7-16
-D3 ←→ ROM D3, RAM D3, U7-15
-D4 ←→ ROM D4, RAM D4, U7-14
-D5 ←→ ROM D5, RAM D5, U7-13
-D6 ←→ ROM D6, RAM D6, U7-12
-D7 ←→ ROM D7, RAM D7, U7-11
+DBUS0 ←→ ROM D0, RAM D0, U7-18, RV8_D0 (pin 17)
+DBUS1 ←→ ROM D1, RAM D1, U7-17, RV8_D1 (pin 18)
+DBUS2 ←→ ROM D2, RAM D2, U7-16, RV8_D2 (pin 19)
+DBUS3 ←→ ROM D3, RAM D3, U7-15, RV8_D3 (pin 20)
+DBUS4 ←→ ROM D4, RAM D4, U7-14, RV8_D4 (pin 21)
+DBUS5 ←→ ROM D5, RAM D5, U7-13, RV8_D5 (pin 22)
+DBUS6 ←→ ROM D6, RAM D6, U7-12, RV8_D6 (pin 23)
+DBUS7 ←→ ROM D7, RAM D7, U7-11, RV8_D7 (pin 24)
 ```
 
-### IBUS — Internal Bus (IB0-IB7)
+### IBUS0..IBUS7 — CPU Internal Data Bus
 
-Drivers (tristate, only ONE active at T2):
-- U7: ROM/RAM data (fetch or register read)
-- U6: IRL immediate (SRC=0, STR=0)
-- U14: AC value (STR=1)
-
-```
-IB0 ←→ U7-2, U6-19*, U14-18*, U12-1, U23-2, U5-2
-IB1 ←→ U7-3, U6-18*, U14-17*, U12-4, U23-3, U5-3
-IB2 ←→ U7-4, U6-17*, U14-16*, U12-9, U23-4, U5-4
-IB3 ←→ U7-5, U6-16*, U14-15*, U12-12, U23-5, U5-5
-IB4 ←→ U7-6, U6-15*, U14-14*, U13-1, U23-6, U5-6
-IB5 ←→ U7-7, U6-14*, U14-13*, U13-4, U23-7, U5-7
-IB6 ←→ U7-8, U6-13*, U14-12*, U13-9, U23-8, U5-8
-IB7 ←→ U7-9, U6-12*, U14-11*, U13-12, U23-9, U5-9
-```
-
-### ABUS — Address Bus (A0-A15)
+Drivers (tri-state, only one active in normal operation):
+- U7 drives `DBUS -> IBUS` during fetch/load/read paths.
+- U6 drives `IRL -> IBUS` for immediate/operand execution paths.
+- U14 drives `AC -> IBUS` only during store.
 
 ```
-A0  ← U15-4     A8  ← U29-4
-A1  ← U15-7     A9  ← U29-7
-A2  ← U15-9     A10 ← U29-9
-A3  ← U15-12    A11 ← U29-12
-A4  ← U16-4     A12 ← U30-4
-A5  ← U16-7     A13 ← U30-7
-A6  ← U16-9     A14 ← U30-9
-A7  ← U16-12    A15 ← U30-12
+IBUS0 ←→ U7-2, U6-19*, U14-18*, U12-1,  U23-2, U32-2, U5-2, U6-2
+IBUS1 ←→ U7-3, U6-18*, U14-17*, U12-4,  U23-3, U32-3, U5-3, U6-3
+IBUS2 ←→ U7-4, U6-17*, U14-16*, U12-9,  U23-4, U32-4, U5-4, U6-4
+IBUS3 ←→ U7-5, U6-16*, U14-15*, U12-12, U23-5, U32-5, U5-5, U6-5
+IBUS4 ←→ U7-6, U6-15*, U14-14*, U13-1,  U23-6, U32-6, U5-6, U6-6
+IBUS5 ←→ U7-7, U6-14*, U14-13*, U13-4,  U23-7, U32-7, U5-7, U6-7
+IBUS6 ←→ U7-8, U6-13*, U14-12*, U13-9,  U23-8, U32-8, U5-8, U6-8
+IBUS7 ←→ U7-9, U6-12*, U14-11*, U13-12, U23-9, U32-9, U5-9, U6-9
+```
+
+### ABUS0..ABUS15 — Address Mux Output Bus
+
+ABUS is the final address after the PC/IRL/DP muxes. It is also exported as
+RV8-Bus pins 1-16 and duplicated on pin 33 for `ABUS15`.
+
+```
+ABUS0  ← U15-4     ABUS8  ← U29-4
+ABUS1  ← U15-7     ABUS9  ← U29-7
+ABUS2  ← U15-9     ABUS10 ← U29-9
+ABUS3  ← U15-12    ABUS11 ← U29-12
+ABUS4  ← U16-4     ABUS12 ← U30-4
+ABUS5  ← U16-7     ABUS13 ← U30-7
+ABUS6  ← U16-9     ABUS14 ← U30-9
+ABUS7  ← U16-12    ABUS15 ← U30-12
+```
+
+### Register Output Nets
+
+```
+PC0..PC15   ← U1-U4 Q outputs
+IRL0..IRL7 ← U6 Q outputs
+PG0..PG7   ← U23 Q outputs
+DP0..DP7   ← U32 Q outputs
+AC0..AC7   ← U9 Q outputs
+SUM0..SUM7 ← U10-U11 sum outputs
+XOR_Y0..7  ← U12-U13 XOR outputs
 ```
 
 ---
@@ -348,18 +400,18 @@ Key control signals — source chip/pin and all destinations. Verify these first
 
 | Signal | Source | Destinations |
 |--------|--------|-------------|
-| PC_INC | U25-3 (T0 OR T1) | U1-7, U1-10, U2-7, U3-7, U4-7 (ENP/ENT) |
+| PC_INC | U25-6 (T0 OR T1) | U1-7, U1-10, U2-7, U3-7, U4-7 (ENP/ENT) |
 | /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 (/LD) |
 | ACC_CLK | U27-11 (NAND T2,AC_WR) | U9-11 (AC CLK), U21-3 (Z CLK) |
 | ADDR_MODE | U25-3 (SRC OR STR) | U15-1, U16-1, U29-1, U30-1 (mux SEL) |
-| BUF_OE_SAFE | U25-8 (BUF_OE_N OR STR) | U7-19 (/OE) |
-| WR_DIR | U28-8 (XOR gate) | U7-1 (DIR) |
+| BUF_OE_N | U24-12 (NOT /IRL_OE) | U7-19 (/OE) |
+| WR_DIR | U28-8 (XOR gate) | U7-1 (DIR), ROM /OE |
 | /AC_BUF | U26-8 (NAND T2,STR) | U14-1, U14-19 (/OE), RAM /WE |
-| /IRL_OE | U26-3 (NAND T2,/ADDR_MODE) | U6-1, U6-19 (/OE) |
+| /IRL_OE | U26-3 (NAND T2,/ADDR_MODE) | U6-1 (/OE), U24-13 |
 | DP_Load | U33-6 (AND gate 1) | U32-11 (CLK) |
-| PG_CLK | U25-6 (/T2 OR /PG_cond) | U23-11 (CLK) |
+| PG_CLK | U25-13 (/T2 OR /PG_cond) | U23-11 (CLK) |
 | /RST | Reset circuit (RC+Schmitt) | U1-1, U2-1, U3-1, U4-1, U8-9, U31-1, U31-13 |
-| CLK | Oscillator | U8-8, U9-11*, U5-11, U6-11 |
+| CLK | Oscillator | U1-2, U2-2, U3-2, U4-2, U8-8, RV8_CLK |
 
 > 📌 If a signal is wrong, check: (1) source chip output, (2) each destination pin, (3) solder/wire continuity.
 > These 12 nets account for >80% of debug issues on breadboard builds.
@@ -373,8 +425,8 @@ Key control signals — source chip/pin and all destinations. Verify these first
 ```
 U1: PC bits 0-3
 U1-1  (/CLR) ← /RST          U1-2  (CLK)  ← CLK
-U1-3  (D0)   ← IRL0 (U6-19)  U1-4  (D1)   ← IRL1 (U6-18)
-U1-5  (D2)   ← IRL2 (U6-17)  U1-6  (D3)   ← IRL3 (U6-16)
+U1-3  (D0)   ← IRL0          U1-4  (D1)   ← IRL1
+U1-5  (D2)   ← IRL2          U1-6  (D3)   ← IRL3
 U1-7  (ENP)  ← PC_INC (U25-6)
 U1-8  (GND)  → GND
 U1-9  (/LD)  ← /PC_LD (U26-11)
@@ -388,8 +440,8 @@ U1-16 (VCC)  → VCC
 
 U2: PC bits 4-7
 U2-1  (/CLR) ← /RST          U2-2  (CLK)  ← CLK
-U2-3  (D0)   ← IRL4 (U6-15)  U2-4  (D1)   ← IRL5 (U6-14)
-U2-5  (D2)   ← IRL6 (U6-13)  U2-6  (D3)   ← IRL7 (U6-12)
+U2-3  (D0)   ← IRL4          U2-4  (D1)   ← IRL5
+U2-5  (D2)   ← IRL6          U2-6  (D3)   ← IRL7
 U2-7  (ENP)  ← PC_INC (U25-6)
 U2-8  (GND)  → GND
 U2-9  (/LD)  ← /PC_LD (U26-11)
@@ -407,8 +459,8 @@ U2-16 (VCC)  → VCC
 ```
 U3: PC bits 8-11
 U3-1  (/CLR) ← /RST          U3-2  (CLK)  ← CLK
-U3-3  (D0)   ← PG0 (U23-19)  U3-4  (D1)   ← PG1 (U23-18)
-U3-5  (D2)   ← PG2 (U23-17)  U3-6  (D3)   ← PG3 (U23-16)
+U3-3  (D0)   ← PG0           U3-4  (D1)   ← PG1
+U3-5  (D2)   ← PG2           U3-6  (D3)   ← PG3
 U3-7  (ENP)  ← PC_INC (U25-6)
 U3-8  (GND)  → GND
 U3-9  (/LD)  ← /PC_LD (U26-11)
@@ -422,8 +474,8 @@ U3-16 (VCC)  → VCC
 
 U4: PC bits 12-15
 U4-1  (/CLR) ← /RST          U4-2  (CLK)  ← CLK
-U4-3  (D0)   ← PG4 (U23-15)  U4-4  (D1)   ← PG5 (U23-14)
-U4-5  (D2)   ← PG6 (U23-13)  U4-6  (D3)   ← PG7 (U23-12)
+U4-3  (D0)   ← PG4           U4-4  (D1)   ← PG5
+U4-5  (D2)   ← PG6           U4-6  (D3)   ← PG7
 U4-7  (ENP)  ← PC_INC (U25-6)
 U4-8  (GND)  → GND
 U4-9  (/LD)  ← /PC_LD (U26-11)
@@ -440,10 +492,10 @@ U4-16 (VCC)  → VCC
 
 ```
 U5-1  (/OE) → GND
-U5-2  (D1)  ← IB0             U5-3  (D2)  ← IB1
-U5-4  (D3)  ← IB2             U5-5  (D4)  ← IB3
-U5-6  (D5)  ← IB4             U5-7  (D6)  ← IB5
-U5-8  (D7)  ← IB6             U5-9  (D8)  ← IB7
+U5-2  (D1)  ← IBUS0           U5-3  (D2)  ← IBUS1
+U5-4  (D3)  ← IBUS2           U5-5  (D4)  ← IBUS3
+U5-6  (D5)  ← IBUS4           U5-7  (D6)  ← IBUS5
+U5-8  (D7)  ← IBUS6           U5-9  (D8)  ← IBUS7
 U5-10 (GND) → GND
 U5-11 (CLK) ← T0 (U8-3)
 U5-12 (Q8)  → ALU_SUB (bit7)
@@ -461,20 +513,20 @@ U5-20 (VCC) → VCC
 
 ```
 U6-1  (/OE) ← /IRL_OE (U26-3)
-U6-2  (D1)  ← IB0             U6-3  (D2)  ← IB1
-U6-4  (D3)  ← IB2             U6-5  (D4)  ← IB3
-U6-6  (D5)  ← IB4             U6-7  (D6)  ← IB5
-U6-8  (D7)  ← IB6             U6-9  (D8)  ← IB7
+U6-2  (D1)  ← IBUS0           U6-3  (D2)  ← IBUS1
+U6-4  (D3)  ← IBUS2           U6-5  (D4)  ← IBUS3
+U6-6  (D5)  ← IBUS4           U6-7  (D6)  ← IBUS5
+U6-8  (D7)  ← IBUS6           U6-9  (D8)  ← IBUS7
 U6-10 (GND) → GND
 U6-11 (CLK) ← T1 (U8-4)
-U6-12 (Q8)  → IRL7 → U16-13, U2-6, IB7*
-U6-13 (Q7)  → IRL6 → U16-10, U2-5, IB6*
-U6-14 (Q6)  → IRL5 → U16-6, U2-4, IB5*
-U6-15 (Q5)  → IRL4 → U16-3, U2-3, IB4*
-U6-16 (Q4)  → IRL3 → U15-13, U1-6, IB3*
-U6-17 (Q3)  → IRL2 → U15-10, U1-5, IB2*
-U6-18 (Q2)  → IRL1 → U15-6, U1-4, IB1*
-U6-19 (Q1)  → IRL0 → U15-3, U1-3, IB0*
+U6-12 (Q8)  → IRL7 → U16-13, U2-6, IBUS7*
+U6-13 (Q7)  → IRL6 → U16-10, U2-5, IBUS6*
+U6-14 (Q6)  → IRL5 → U16-6, U2-4, IBUS5*
+U6-15 (Q5)  → IRL4 → U16-3, U2-3, IBUS4*
+U6-16 (Q4)  → IRL3 → U15-13, U1-6, IBUS3*
+U6-17 (Q3)  → IRL2 → U15-10, U1-5, IBUS2*
+U6-18 (Q2)  → IRL1 → U15-6, U1-4, IBUS1*
+U6-19 (Q1)  → IRL0 → U15-3, U1-3, IBUS0*
 U6-20 (VCC) → VCC
 ```
 
@@ -482,16 +534,16 @@ U6-20 (VCC) → VCC
 
 ```
 U7-1  (DIR) ← WR_DIR (U28-8)
-U7-2  (A1)  ←→ IB0            U7-18 (B1)  ←→ D0
-U7-3  (A2)  ←→ IB1            U7-17 (B2)  ←→ D1
-U7-4  (A3)  ←→ IB2            U7-16 (B3)  ←→ D2
-U7-5  (A4)  ←→ IB3            U7-15 (B4)  ←→ D3
-U7-6  (A5)  ←→ IB4            U7-14 (B5)  ←→ D4
-U7-7  (A6)  ←→ IB5            U7-13 (B6)  ←→ D5
-U7-8  (A7)  ←→ IB6            U7-12 (B7)  ←→ D6
-U7-9  (A8)  ←→ IB7            U7-11 (B8)  ←→ D7
+U7-2  (A1)  ←→ IBUS0          U7-18 (B1)  ←→ DBUS0
+U7-3  (A2)  ←→ IBUS1          U7-17 (B2)  ←→ DBUS1
+U7-4  (A3)  ←→ IBUS2          U7-16 (B3)  ←→ DBUS2
+U7-5  (A4)  ←→ IBUS3          U7-15 (B4)  ←→ DBUS3
+U7-6  (A5)  ←→ IBUS4          U7-14 (B5)  ←→ DBUS4
+U7-7  (A6)  ←→ IBUS5          U7-13 (B6)  ←→ DBUS5
+U7-8  (A7)  ←→ IBUS6          U7-12 (B7)  ←→ DBUS6
+U7-9  (A8)  ←→ IBUS7          U7-11 (B8)  ←→ DBUS7
 U7-10 (GND) → GND
-U7-19 (/OE) ← BUF_OE_SAFE (U25-8)
+U7-19 (/OE) ← BUF_OE_N (U24-12)
 U7-20 (VCC) → VCC
 
 Direction (real 74HC245 datasheet):
@@ -566,17 +618,17 @@ U11-8 (GND) → GND   U11-16(VCC) → VCC
 
 ```
 U12: bits 0-3 (A=IBUS, B=mux output)
-U12-1 (A1) ← IB0    U12-2 (B1) ← U19-4    U12-3 (Y1) → XOR_Y0 → U10-6, U17-3
-U12-4 (A2) ← IB1    U12-5 (B2) ← U19-7    U12-6 (Y2) → XOR_Y1 → U10-2, U17-6
-U12-9 (A3) ← IB2    U12-10(B3) ← U19-9    U12-8 (Y3) → XOR_Y2 → U10-15, U17-10
-U12-12(A4) ← IB3    U12-13(B4) ← U19-12   U12-11(Y4) → XOR_Y3 → U10-11, U17-13
+U12-1 (A1) ← IBUS0  U12-2 (B1) ← U19-4    U12-3 (Y1) → XOR_Y0 → U10-6, U17-3
+U12-4 (A2) ← IBUS1  U12-5 (B2) ← U19-7    U12-6 (Y2) → XOR_Y1 → U10-2, U17-6
+U12-9 (A3) ← IBUS2  U12-10(B3) ← U19-9    U12-8 (Y3) → XOR_Y2 → U10-15, U17-10
+U12-12(A4) ← IBUS3  U12-13(B4) ← U19-12   U12-11(Y4) → XOR_Y3 → U10-11, U17-13
 U12-7 (GND) → GND   U12-14(VCC) → VCC
 
 U13: bits 4-7
-U13-1 (A1) ← IB4    U13-2 (B1) ← U20-4    U13-3 (Y1) → XOR_Y4 → U11-6, U18-3
-U13-4 (A2) ← IB5    U13-5 (B2) ← U20-7    U13-6 (Y2) → XOR_Y5 → U11-2, U18-6
-U13-9 (A3) ← IB6    U13-10(B3) ← U20-9    U13-8 (Y3) → XOR_Y6 → U11-15, U18-10
-U13-12(A4) ← IB7    U13-13(B4) ← U20-12   U13-11(Y4) → XOR_Y7 → U11-11, U18-13
+U13-1 (A1) ← IBUS4  U13-2 (B1) ← U20-4    U13-3 (Y1) → XOR_Y4 → U11-6, U18-3
+U13-4 (A2) ← IBUS5  U13-5 (B2) ← U20-7    U13-6 (Y2) → XOR_Y5 → U11-2, U18-6
+U13-9 (A3) ← IBUS6  U13-10(B3) ← U20-9    U13-8 (Y3) → XOR_Y6 → U11-15, U18-10
+U13-12(A4) ← IBUS7  U13-13(B4) ← U20-12   U13-11(Y4) → XOR_Y7 → U11-11, U18-13
 U13-7 (GND) → GND   U13-14(VCC) → VCC
 ```
 
@@ -584,14 +636,14 @@ U13-7 (GND) → GND   U13-14(VCC) → VCC
 
 ```
 U14-1 (/OE1) ← /AC_BUF (U26-8)
-U14-2  (A1) ← AC0    U14-18 (Y1) → IB0
-U14-3  (A2) ← AC1    U14-17 (Y2) → IB1
-U14-4  (A3) ← AC2    U14-16 (Y3) → IB2
-U14-5  (A4) ← AC3    U14-15 (Y4) → IB3
-U14-6  (A5) ← AC4    U14-14 (Y5) → IB4
-U14-7  (A6) ← AC5    U14-13 (Y6) → IB5
-U14-8  (A7) ← AC6    U14-12 (Y7) → IB6
-U14-9  (A8) ← AC7    U14-11 (Y8) → IB7
+U14-2  (A1) ← AC0    U14-18 (Y1) → IBUS0
+U14-3  (A2) ← AC1    U14-17 (Y2) → IBUS1
+U14-4  (A3) ← AC2    U14-16 (Y3) → IBUS2
+U14-5  (A4) ← AC3    U14-15 (Y4) → IBUS3
+U14-6  (A5) ← AC4    U14-14 (Y5) → IBUS4
+U14-7  (A6) ← AC5    U14-13 (Y6) → IBUS5
+U14-8  (A7) ← AC6    U14-12 (Y7) → IBUS6
+U14-9  (A8) ← AC7    U14-11 (Y8) → IBUS7
 U14-10 (GND) → GND
 U14-19 (/OE2) ← /AC_BUF (U26-8)
 U14-20 (VCC) → VCC
@@ -603,17 +655,17 @@ U14-20 (VCC) → VCC
 SEL=0: PC, SEL=1: IRL
 
 U15-1 (SEL) ← ADDR_MODE (U25-3)    U15-15(/E) → GND
-U15-2 (1A) ← PC0   U15-3 (1B) ← IRL0   U15-4 (1Y) → A0
-U15-5 (2A) ← PC1   U15-6 (2B) ← IRL1   U15-7 (2Y) → A1
-U15-11(3A) ← PC2   U15-10(3B) ← IRL2   U15-9 (3Y) → A2
-U15-14(4A) ← PC3   U15-13(4B) ← IRL3   U15-12(4Y) → A3
+U15-2 (1A) ← PC0   U15-3 (1B) ← IRL0   U15-4 (1Y) → ABUS0
+U15-5 (2A) ← PC1   U15-6 (2B) ← IRL1   U15-7 (2Y) → ABUS1
+U15-11(3A) ← PC2   U15-10(3B) ← IRL2   U15-9 (3Y) → ABUS2
+U15-14(4A) ← PC3   U15-13(4B) ← IRL3   U15-12(4Y) → ABUS3
 U15-8 (GND) → GND  U15-16(VCC) → VCC
 
 U16-1 (SEL) ← ADDR_MODE             U16-15(/E) → GND
-U16-2 (1A) ← PC4   U16-3 (1B) ← IRL4   U16-4 (1Y) → A4
-U16-5 (2A) ← PC5   U16-6 (2B) ← IRL5   U16-7 (2Y) → A5
-U16-11(3A) ← PC6   U16-10(3B) ← IRL6   U16-9 (3Y) → A6
-U16-14(4A) ← PC7   U16-13(4B) ← IRL7   U16-12(4Y) → A7
+U16-2 (1A) ← PC4   U16-3 (1B) ← IRL4   U16-4 (1Y) → ABUS4
+U16-5 (2A) ← PC5   U16-6 (2B) ← IRL5   U16-7 (2Y) → ABUS5
+U16-11(3A) ← PC6   U16-10(3B) ← IRL6   U16-9 (3Y) → ABUS6
+U16-14(4A) ← PC7   U16-13(4B) ← IRL7   U16-12(4Y) → ABUS7
 U16-8 (GND) → GND  U16-16(VCC) → VCC
 ```
 
@@ -667,7 +719,12 @@ U21-4 (/PR1)  ← U22-19 (/P=Q)
 U21-5 (Q1)    → Z_flag → U28-1
 U21-6 (/Q1)   → NC
 U21-7 (GND)   → GND
-U21-8..13     → FF2 unused (CLK2=GND, /PR2=VCC, /CLR2=VCC, D2=GND)
+U21-8 (/Q2)   → NC
+U21-9 (Q2)    → NC
+U21-10(/PR2)  → VCC
+U21-11(CLK2)  → GND
+U21-12(D2)    → GND
+U21-13(/CLR2) → VCC
 U21-14(VCC)   → VCC
 ```
 
@@ -722,10 +779,10 @@ PG_CLK truth table:
 
 ```
 U23-1 (/OE) → GND
-U23-2 (D1) ← IB0   U23-3 (D2) ← IB1
-U23-4 (D3) ← IB2   U23-5 (D4) ← IB3
-U23-6 (D5) ← IB4   U23-7 (D6) ← IB5
-U23-8 (D7) ← IB6   U23-9 (D8) ← IB7
+U23-2 (D1) ← IBUS0   U23-3 (D2) ← IBUS1
+U23-4 (D3) ← IBUS2   U23-5 (D4) ← IBUS3
+U23-6 (D5) ← IBUS4   U23-7 (D6) ← IBUS5
+U23-8 (D7) ← IBUS6   U23-9 (D8) ← IBUS7
 U23-10(GND) → GND
 U23-11(CLK) ← PG_CLK (U25-13)
 U23-12(Q8) → PG7 → U4-6     U23-13(Q7) → PG6 → U4-5
@@ -740,11 +797,11 @@ U23-20(VCC) → VCC
 ```
 U24-1 (1A) ← T0 (U8-3)         U24-2 (1Y) → NOT(Q0) → U8-1
 U24-3 (2A) ← T1 (U8-4)         U24-4 (2Y) → NOT(Q1) → U8-2
-U24-5 (3A) ← A15 (U30-12)      U24-6 (3Y) → /A15 → RAM /CE
+U24-5 (3A) ← ABUS15            U24-6 (3Y) → /A15 → RAM /CE
 U24-7 (GND) → GND
 U24-9 (4A) ← JUMP (U5-19)      U24-8 (4Y) → /JUMP → U27-4
 U24-11(5A) ← AC_WR (U5-15)     U24-10(5Y) → /AC_WR → U27-10
-U24-13(6A) ← /IRL_OE (U26-3)   U24-12(6Y) → BUF_OE_N → U25-9
+U24-13(6A) ← /IRL_OE (U26-3)   U24-12(6Y) → BUF_OE_N → U7-19
 U24-14(VCC) → VCC
 ```
 
@@ -754,7 +811,7 @@ U24-14(VCC) → VCC
 U25-1 (1A) ← SRC (U5-16)   U25-2 (1B) ← STR (U5-17)   U25-3 (1Y) → ADDR_MODE
 U25-4 (2A) ← T0 (U8-3)     U25-5 (2B) ← T1 (U8-4)     U25-6 (2Y) → PC_INC
 U25-7 (GND) → GND
-U25-9 (3A) ← BUF_OE_N (U24-12)  U25-10(3B) ← STR (U5-17)  U25-8 (3Y) → BUF_OE_SAFE → U7-19
+U25 gate 3 spare: tie U25-9 and U25-10 to GND; U25-8 → NC
 U25-11(4A) ← /T2 (U28-6)   U25-12(4B) ← /PG_cond(U27-8) U25-13(4Y) → PG_CLK → U23-11
 U25-14(VCC) → VCC
 ```
@@ -805,7 +862,7 @@ Gate B: /T2 = T2 XOR 1 = NOT(T2)
 U28-4 ← T2 (U8-5)   U28-5 → VCC   U28-6 → /T2 → U25-11
 
 Gate C: WR_DIR = /AC_BUF XOR 1 = NOT(/AC_BUF)
-U28-9 ← /AC_BUF (U26-8)   U28-10 → VCC   U28-8 → WR_DIR → U7-1
+U28-9 ← /AC_BUF (U26-8)   U28-10 → VCC   U28-8 → WR_DIR → U7-1, ROM /OE
 
 Gate D: /XOR_MODE = XOR_MODE XOR 1 = NOT(XOR_MODE)
 U28-12 ← XOR_MODE (U5-13)   U28-13 ← VCC   U28-11 → /XOR_MODE → U33-12
@@ -819,17 +876,17 @@ U28-7 (GND) → GND   U28-14(VCC) → VCC
 SEL=0: PC high, SEL=1: Data Page Register (U32 Q outputs)
 
 U29-1 (SEL) ← ADDR_MODE        U29-15(/E) → GND
-U29-2 (1A) ← PC8    U29-3 (1B) ← DP0 (U32-19)   U29-4 (1Y) → A8
-U29-5 (2A) ← PC9    U29-6 (2B) ← DP1 (U32-18)   U29-7 (2Y) → A9
-U29-11(3A) ← PC10   U29-10(3B) ← DP2 (U32-17)   U29-9 (3Y) → A10
-U29-14(4A) ← PC11   U29-13(4B) ← DP3 (U32-16)   U29-12(4Y) → A11
+U29-2 (1A) ← PC8    U29-3 (1B) ← DP0    U29-4 (1Y) → ABUS8
+U29-5 (2A) ← PC9    U29-6 (2B) ← DP1    U29-7 (2Y) → ABUS9
+U29-11(3A) ← PC10   U29-10(3B) ← DP2    U29-9 (3Y) → ABUS10
+U29-14(4A) ← PC11   U29-13(4B) ← DP3    U29-12(4Y) → ABUS11
 U29-8 (GND) → GND   U29-16(VCC) → VCC
 
 U30-1 (SEL) ← ADDR_MODE        U30-15(/E) → GND
-U30-2 (1A) ← PC12   U30-3 (1B) ← DP4 (U32-15)   U30-4 (1Y) → A12
-U30-5 (2A) ← PC13   U30-6 (2B) ← DP5 (U32-14)   U30-7 (2Y) → A13
-U30-11(3A) ← PC14   U30-10(3B) ← DP6 (U32-13)   U30-9 (3Y) → A14
-U30-14(4A) ← PC15   U30-13(4B) ← DP7 (U32-12)    U30-12(4Y) → A15 → ROM /CE, U24-5
+U30-2 (1A) ← PC12   U30-3 (1B) ← DP4    U30-4 (1Y) → ABUS12
+U30-5 (2A) ← PC13   U30-6 (2B) ← DP5    U30-7 (2Y) → ABUS13
+U30-11(3A) ← PC14   U30-10(3B) ← DP6    U30-9 (3Y) → ABUS14
+U30-14(4A) ← PC15   U30-13(4B) ← DP7    U30-12(4Y) → ABUS15 → ROM /CE, U24-5, RV8_A15
 U30-8 (GND) → GND   U30-16(VCC) → VCC
 ```
 
@@ -846,12 +903,12 @@ U31-6 (/Q1)   → NC
 
 FF-B: IRQ latch
 U31-7 (GND)   → GND
-U31-8 (/CLR2) ← /RST (clear on reset)
-U31-9 (D2)    → VCC (D=1 always)
-U31-10(CLK2)  ← /IRQ (external, active-low from peripheral)
-U31-11(/PR2)  → VCC
-U31-12(Q2)    → IRQ_FF → LED, readable via I/O slot
-U31-13(/Q2)   → NC
+U31-8 (/Q2)   → NC
+U31-9 (Q2)    → IRQ_FF → LED/test point; optional external /SLOT device may expose it to software
+U31-10(/PR2)  → VCC
+U31-11(CLK2)  ← /IRQ (external, active-low from peripheral)
+U31-12(D2)    → VCC (D=1 always)
+U31-13(/CLR2) ← /RST (clear on reset)
 U31-14(VCC)   → VCC
 ```
 
@@ -862,54 +919,58 @@ U31-14(VCC)   → VCC
 ### v1.0 IRQ Operation: Software Polling
 
 ```
-1. External device pulls /IRQ LOW → IRQ_FF = 1 (on release)
-2. Main loop reads IRQ_FF (mapped to I/O address via /SLOT1)
+1. External device pulls /IRQ LOW, then releases it HIGH → IRQ_FF = 1 on the rising edge
+2. Main loop reads IRQ_FF only if an external /SLOT status device exposes it
 3. If IRQ_FF=1 AND IE=1: branch to handler subroutine
 4. Handler processes event (IRQ_FF remains set until /RST in v1.0)
-5. DI to ignore further interrupts, return to main loop
+5. Software ignores further events unless it intentionally calls `EI` again
 
 No hardware vector. No PC forcing. No bus override.
 No IRQ_ack gate needed. No extra chips beyond U31+U33.
-v1.0: IRQ_FF cleared only by /RST. v1.1 adds auto-clear on ack.
+v1.0: IRQ_FF cleared only by /RST. Hardware vector/ack is not part of v1.0.
 ```
 
-### v1.1 Upgrade: Hardware Vector $FF00 (+2 chips, future)
+### Future Upgrade: Hardware Vector $FF00 (not frozen)
 
 ```
-Add: 74HC157 ×2 as mux on PC D-inputs (U1-U4)
-Add: IRQ_ack = T2 AND IE AND IRQ_FF AND NOT(PC_LOAD_COND)
-SEL ← IRQ_ack: 0={PG,IRL}, 1={$FF,$00}
-On ack: /PC_LD → PC=$FF00, clear IE+IRQ_FF
-Total v1.1: 34 logic + ROM + RAM = 36 packages
+Do not build this from the v1.0 wiring guide.
+
+Required functions:
+- PC input mux: normal {PG,IRL} vs vector constant $FF00
+- /PC_LD assertion during IRQ acknowledge
+- Safe IRQ_ack generation: T2 AND IE AND IRQ_FF AND NOT(PC_LOAD_COND)
+- Active-low clear generation for U31 if auto-clear is kept
+- Timing review for conflicts with branch/jump and reset
 ```
 
-> 📌 **$FF00 is in RAM** — v1.1 hardware vector jumps here.
+> 📌 **$FF00 is in RAM** — a future hardware vector may jump here.
 > Must load ISR code before enabling hardware interrupts:
 > `SETDP $FF` → write ISR via SB → `SETDP $80` → enable.
 > v1.0 (polling) does not jump to $FF00 automatically.
 
-### EI/DI Decode (v1.0)
+### EI Decode (v1.0)
 
 ```
-EI opcode = $08 = 00001000 (SRC=1, all others=0)
+EI opcode = $08 = 00001000 (SRC=1, XOR=0, AC_WR=0)
 
 EI_decode: U33 gate 2 (74HC21, 4-input AND)
   U33-9  ← T2 (U8-5)
   U33-10 ← SRC (U5-16)
-  U33-12 ← /XOR_MODE (U28-11, XOR gate D as inverter)
+  U33-12 ← /XOR_MODE (U28-11)
   U33-13 ← /AC_WR (U24-10)
-  U33-8  → EI_decode → U31-3 (CLK1, ↑edge sets IE=1)
+  U33-8  → EI_decode → U31-3 (CLK1, rising edge sets IE=1)
 
-Decode safety check (only $08 triggers EI):
+IE_D:
+  U31-2 (D1) ← VCC
+
+Decode safety check (only $08 clocks IE):
   $08: SRC=1, XOR=0, AC_WR=0 → T2 & 1 & 1 & 1 = 1 ✅
   $18: SRC=1, XOR=0, AC_WR=1 → /AC_WR=0 → blocked ✅
   $38: SRC=1, XOR=0, AC_WR=1 → /AC_WR=0 → blocked ✅
   $48: SRC=1, XOR=1, AC_WR=0 → /XOR=0 → blocked ✅
   $78: SRC=1, XOR=1, AC_WR=1 → both blocked ✅
 
-DI ($48): v1.0 = reset-only (IE cleared by /RST)
-  Software convention: don't call EI again = effectively DI
-  v1.1: add DI_decode → U31 /CLR1 for explicit disable
+DI ($48) has no v1.0 hardware effect. IE clears only via `/RST`.
 ```
 
 ---
@@ -918,20 +979,20 @@ DI ($48): v1.0 = reset-only (IE cleared by /RST)
 
 ```
 U32-1 (/OE) → GND
-U32-2 (D1) ← IB0   U32-3 (D2) ← IB1
-U32-4 (D3) ← IB2   U32-5 (D4) ← IB3
-U32-6 (D5) ← IB4   U32-7 (D6) ← IB5
-U32-8 (D7) ← IB6   U32-9 (D8) ← IB7
+U32-2 (D1) ← IBUS0   U32-3 (D2) ← IBUS1
+U32-4 (D3) ← IBUS2   U32-5 (D4) ← IBUS3
+U32-6 (D5) ← IBUS4   U32-7 (D6) ← IBUS5
+U32-8 (D7) ← IBUS6   U32-9 (D8) ← IBUS7
 U32-10(GND) → GND
 U32-11(CLK) ← DP_Load (decode: T2 AND SETDP)
-U32-12(Q8) → DP7 → U30-13 (A15 B-input: when DP7=1, A15=1 → selects RAM)
-U32-13(Q7) → DP6 → U30-10 (A14 B-input)
-U32-14(Q6) → DP5 → U30-6 (A13 B-input)
-U32-15(Q5) → DP4 → U30-3 (A12 B-input)
-U32-16(Q4) → DP3 → U29-13 (A11 B-input)
-U32-17(Q3) → DP2 → U29-10 (A10 B-input)
-U32-18(Q2) → DP1 → U29-6 (A9 B-input)
-U32-19(Q1) → DP0 → U29-3 (A8 B-input)
+U32-12(Q8) → DP7 → U30-13 (ABUS15 B-input: when DP7=1, ABUS15=1 → selects RAM)
+U32-13(Q7) → DP6 → U30-10 (ABUS14 B-input)
+U32-14(Q6) → DP5 → U30-6 (ABUS13 B-input)
+U32-15(Q5) → DP4 → U30-3 (ABUS12 B-input)
+U32-16(Q4) → DP3 → U29-13 (ABUS11 B-input)
+U32-17(Q3) → DP2 → U29-10 (ABUS10 B-input)
+U32-18(Q2) → DP1 → U29-6 (ABUS9 B-input)
+U32-19(Q1) → DP0 → U29-3 (ABUS8 B-input)
 U32-20(VCC) → VCC
 ```
 
@@ -971,11 +1032,11 @@ Note: $C0 triggers DP_Load but is equivalent to SETDP (SUB bit has no effect whe
 
 ```
 ROM (AT28C256 / SST39SF010A)
-  A[0:7]  ← ABUS A[0:7]
-  A[8:14] ← ABUS A[8:14]
-  D[0:7]  → DBUS
-  /CE     ← A15 (U30-12)
-  /OE     → GND
+  A[0:7]  ← ABUS0..ABUS7
+  A[8:14] ← ABUS8..ABUS14
+  D[0:7]  → DBUS0..DBUS7
+  /CE     ← ABUS15
+  /OE     ← WR_DIR (U28-8; disables ROM output during CPU store)
   /WE     ← /WR (RV8-Bus pin 27, from Programmer board only)
 
 Note: Bus pin 27 (/WR) is driven by /AC_BUF during CPU STORE operations.
@@ -985,16 +1046,16 @@ Programmer board unlocks SDP before flashing (while /RST=LOW, CPU stopped).
 SETDP <$80 + LB = read from ROM (lookup tables, safe).
 
 RAM (62256)
-  A[0:7]  ← ABUS A[0:7]
-  A[8:14] ← ABUS A[8:14]
-  D[0:7]  ←→ DBUS
+  A[0:7]  ← ABUS0..ABUS7
+  A[8:14] ← ABUS8..ABUS14
+  D[0:7]  ←→ DBUS0..DBUS7
   /CE     ← /A15 (U24-6)
   /OE     → GND (output always enabled when /CE active)
   /WE     ← /AC_BUF (U26-8)
 ```
 
 > 📌 **RAM output permanently enabled** — relies on mutually-exclusive chip selects.
-> A15=0 → ROM /CE=LOW (ROM drives DBUS). A15=1 → RAM /CE=LOW (RAM drives DBUS).
+> ABUS15=0 → ROM /CE=LOW (ROM drives DBUS). ABUS15=1 → RAM /CE=LOW (RAM drives DBUS).
 > No bus fight possible as long as A15 decode is correct.
 > During STORE: RAM /WE=LOW disables output drivers automatically (62256 datasheet).
 
@@ -1005,7 +1066,7 @@ RAM (62256)
 | Signal | Source | Destinations | Active |
 |--------|--------|-------------|:------:|
 | CLK | Oscillator | U1-2, U2-2, U3-2, U4-2, U8-8 | ↑edge |
-| /RST | RC+button | U1-1, U2-1, U3-1, U4-1, U8-9 | LOW |
+| /RST | RC+button | U1-1, U2-1, U3-1, U4-1, U8-9, U31-1, U31-13 | LOW |
 | T0 | U8-3 | U5-11, U25-4, U24-1 | HIGH |
 | T1 | U8-4 | U6-11, U25-5, U24-3 | HIGH |
 | T2 | U8-5 | U26-1, U26-9, U26-12, U27-12, U28-4, U33-1, U33-9 | HIGH |
@@ -1014,7 +1075,7 @@ RAM (62256)
 | MUX_SEL | U5-14 | U17-1, U18-1, U27-9 | HIGH |
 | AC_WR | U5-15 | U24-11, U27-13 | HIGH |
 | SRC | U5-16 | U25-1, U33-10 | HIGH |
-| STR | U5-17 | U25-2, U25-10, U26-10 | HIGH |
+| STR | U5-17 | U25-2, U26-10 | HIGH |
 | BR | U5-18 | U27-1 | HIGH |
 | JMP | U5-19 | U24-9 | HIGH |
 | ADDR_MODE | U25-3 | U15-1, U16-1, U29-1, U30-1, U26-4/5 | HIGH |
@@ -1022,9 +1083,8 @@ RAM (62256)
 | /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 | LOW |
 | /AC_BUF | U26-8 | U14-1/19, RAM /WE, U28-9 | LOW |
 | ACC_CLK | U27-11 | U9-11, U21-3 | ↑edge |
-| BUF_OE_N | U24-12 | U25-9 | LOW |
-| BUF_OE_SAFE | U25-8 | U7-19 | LOW |
-| WR_DIR | U28-8 | U7-1 | HIGH=write |
+| BUF_OE_N | U24-12 | U7-19 | LOW enables U7 |
+| WR_DIR | U28-8 | U7-1, ROM /OE | HIGH=write and ROM output disabled |
 | A15 | U30-12 | ROM /CE, U24-5 | — |
 | PG_CLK | U25-13 | U23-11 | ↑edge |
 | DP_Load | U33-6 | U32-11 | ↑edge |
@@ -1060,13 +1120,13 @@ The following states must NEVER occur — they cause electrical bus contention:
 | Bus | Conflict | Prevention |
 |-----|----------|-----------|
 | IBUS | U6 + U14 driving simultaneously | /IRL_OE and /AC_BUF mutually exclusive (NAND gates) |
-| IBUS | U7 + U14 driving simultaneously | BUF_OE_SAFE = BUF_OE_N OR STR (U25-8) |
+| IBUS | U7 + U14 driving simultaneously | Not a conflict in store: U14 drives IBUS, U7 is DIR=write and drives DBUS |
 | IBUS | U6 + U7 driving simultaneously | /IRL_OE=0 only when ADDR_MODE=0; U7 enabled when ADDR_MODE=1 |
-| DBUS | ROM + U7(write) simultaneously | ROM /CE=0 only when A15=0; STORE uses A15=1 (RAM) |
+| DBUS | ROM + U7(write) simultaneously | ROM /OE=WR_DIR disables ROM output during CPU store |
 | DBUS | RAM + U7(write) simultaneously | RAM /WE=0 disables RAM output automatically |
 | chip select | ROM + RAM both /CE=0 | Impossible: ROM /CE=A15, RAM /CE=/A15 (complementary) |
 
-If any of these occur during debug → check ADDR_MODE, BUF_OE_SAFE, or A15 decode.
+If any of these occur during debug → check ADDR_MODE, BUF_OE_N, WR_DIR, or ABUS15 decode.
 
 ---
 
@@ -1075,8 +1135,8 @@ If any of these occur during debug → check ADDR_MODE, BUF_OE_SAFE, or A15 deco
 | Version | Date | Changes |
 |:-------:|:----:|---------|
 | v1.0 | 2026-06-15 | Initial freeze. 33 logic + ROM + RAM. 18 instructions. 1 MHz target. Software polling IRQ. |
-| v1.1 | (reserved) | +2 chips: hardware IRQ vector $FF00, auto-clear IE |
-| v2.0 | (future) | Hardware save-PC, RTI instruction |
+| v1.1 | (reserved) | Optional software IRQ_FF clear via I/O, if wanted |
+| v2.0 | (future) | Hardware vector/save-PC/RTI after full logic design |
 
 ---
 
@@ -1133,5 +1193,5 @@ Not included in v1.0 BOM.
 
 **Alias**: $C0 = SETDP (SUB bit ignored by U33 decode)
 
-**Forbidden**: Any opcode with SRC+STR both set (bit3+bit2 = 11) → bus contention.
-Pattern: `(opcode & $0C) == $0C` → 64 forbidden opcodes.
+**Reserved**: Any opcode with SRC+STR both set (bit3+bit2 = 11) is store-dominant and electrically safe, but not part of the ISA.
+Pattern: `(opcode & $0C) == $0C` → 64 reserved mixed opcodes.
