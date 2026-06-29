@@ -47,6 +47,8 @@
 | 13 | BASIC interpreter | ⬜ |
 | 14 | Video game | ⬜ |
 
+Task details are tracked in `doc/03_fullhw_task_plan.md`.
+
 ---
 
 ## Architecture (Prototype)
