@@ -1,11 +1,11 @@
 # Team Log
 
-Maintained by: **Ploy (พลอย)**  
+Maintained by: **Pim (พิม)**  
 Updated: 2026-06-29
 
 ---
 
-## Ploy (พลอย) — Coordinator
+## Pim (พิม) — Coordinator
 | Date | What | Result |
 |------|------|--------|
 | 2026-06-29 | Created BACKLOG.md, SPRINT.md, TEAMLOG.md | ✅ Team tracking online |
@@ -44,7 +44,7 @@ Updated: 2026-06-29
 ---
 
 ## How to Use
-- Ploy adds entries when work is completed or significant progress made.
+- Pim adds entries when work is completed or significant progress made.
 - One row = one deliverable or decision. Keep it short.
 - Link to files if needed: `see rtl/rv8gr_cpu.v`
 - Failed attempts count too — mark with ❌ and note why.

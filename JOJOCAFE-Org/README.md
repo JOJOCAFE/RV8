@@ -8,7 +8,7 @@ A team of 7 brilliant people building minimal CPUs that kids can wire on breadbo
 
 | | Name | Age | They're the one who... |
 |---|------|-----|------------------------|
-| 🎯 | **Ploy** (พลอย) | 34 | ...makes sense of chaos and gets the right person on the right job |
+| 🎯 | **Pim** (พิม) | 34 | ...makes sense of chaos and gets the right person on the right job |
 | 🏛️ | **Bank** (แบงค์) | 38 | ...designs a CPU in 33 chips that others need 60 for |
 | 🔍 | **Fern** (เฟิร์น) | 31 | ...finds the one bug nobody else sees, and reports it like a friend |
 | ⚡ | **Mint** (มิ้นท์) | 27 | ...writes perfect Verilog at the speed of thought |
@@ -27,7 +27,7 @@ Everyone is a professional genius in their domain, deeply passionate about chang
 ### Talk to anyone directly
 
 ```
-Ctrl+Shift+0  Ploy    "I need something but not sure what"
+Ctrl+Shift+0  Pim     "I need something but not sure what"
 Ctrl+Shift+1  Bank    "Should we do X or Y?"
 Ctrl+Shift+2  Fern    "Check this / debug this"
 Ctrl+Shift+3  Mint    "Write Verilog for X"
@@ -36,9 +36,9 @@ Ctrl+Shift+5  Bam     "Write tool/program for X"
 Ctrl+Shift+6  Noon    "Write lab/docs for X"
 ```
 
-### Or just tell Ploy
+### Or just tell Pim
 
-Switch to Ploy (Ctrl+Shift+0) and describe what you want. She'll figure out who handles what and in what order.
+Switch to Pim (Ctrl+Shift+0) and describe what you want. She'll figure out who handles what and in what order.
 
 ### We'll be frank with you
 
@@ -51,7 +51,7 @@ You can ask anyone "what do you really think?" and get a real answer.
 ## How We Work Together
 
 ```
-You → Ploy (decomposes) → Specialists (build) → Fern (verifies) → Done
+You → Pim (decomposes) → Specialists (build) → Fern (verifies) → Done
 ```
 
 - **Nobody verifies their own work.** Mint/Ohm/Bam build, Fern checks.

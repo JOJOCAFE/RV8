@@ -39,7 +39,7 @@ Last updated: 2026-06-29
 | B-020 | PCB layout (4 MHz version) | Ohm | ⬜ TODO |
 | B-021 | RV8-Bus connector finalization | Bank + Ohm | ⬜ TODO |
 | B-022 | Video/photo documentation of physical build | Noon | ⬜ TODO |
-| B-023 | Student workshop dry run (labs 01-14) | Noon + Ploy | ⬜ TODO |
+| B-023 | Student workshop dry run (labs 01-14) | Noon + Pim | ⬜ TODO |
 | B-024 | Game ROM (simple Snake or Pong) | Bam | ⬜ TODO |
 
 ## 🟢 P3 — Future Projects

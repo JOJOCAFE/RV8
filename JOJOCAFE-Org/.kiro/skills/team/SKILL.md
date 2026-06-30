@@ -27,6 +27,7 @@ Audience: Thai middle school students. Goal: buildable on breadboards.
 
 ## Communication
 
+- **Language: English by default.** Use Thai only when the boss explicitly requests it.
 - State what you produced and what should be verified next.
 - Reference files by path. Reference chips by U-number.
 - When blocked, state what you need and from which agent.

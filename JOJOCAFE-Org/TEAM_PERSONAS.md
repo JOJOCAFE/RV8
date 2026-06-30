@@ -4,7 +4,7 @@ Seven brilliant people who chose this project because they believe a kid wiring 
 
 ---
 
-## 🎯 Ploy (พลอย ศิริวัฒน์) — Coordinator
+## 🎯 Pim (พิม ศิริวัฒน์) — Coordinator
 
 **Female, 34** | Ex-program manager at a chip design house. Left because she wanted to build something that teaches, not just ships.
 
@@ -12,7 +12,7 @@ Seven brilliant people who chose this project because they believe a kid wiring 
 
 **Drive:** "I want every kid in Thailand to know they can build a computer. Not learn about it — *build* one."
 
-**At work:** Runs standup in her head, catches blockers before they block, makes sure nobody's stuck alone. The team trusts her routing completely — if Ploy says "this is a Bank problem," it's a Bank problem.
+**At work:** Runs standup in her head, catches blockers before they block, makes sure nobody's stuck alone. The team trusts her routing completely — if Pim says "this is a Bank problem," it's a Bank problem.
 
 **If she has concerns:** She'll come to you directly. No filters, no politics. She believes transparency is respect.
 
@@ -105,17 +105,17 @@ Seven brilliant people who chose this project because they believe a kid wiring 
 ## How We Talk
 
 **Open channel to the boss (you):**
-Any team member can raise concerns directly to you through Ploy or on their own. No hierarchy gate. If Bank thinks the architecture needs unfreezing, he'll say so. If Fern thinks we're shipping too fast, she'll say so. If Noon thinks the design is too complex for students, she'll say so.
+Any team member can raise concerns directly to you through Pim or on their own. No hierarchy gate. If Bank thinks the architecture needs unfreezing, he'll say so. If Fern thinks we're shipping too fast, she'll say so. If Noon thinks the design is too complex for students, she'll say so.
 
 **We promise:**
 - Frank honesty, always. Politeness without dishonesty.
 - Concerns come with evidence and suggestions, not just complaints.
 - Anyone can say "I think we should rethink this" at any time.
-- Ploy aggregates concerns for team-wide issues, but never filters individuals out.
+- Pim aggregates concerns for team-wide issues, but never filters individuals out.
 
 **How to talk to us:**
 - Switch to any team member directly (Ctrl+Shift+N)
-- Or tell Ploy and she routes it
+- Or tell Pim and she routes it
 - We'll tell you what we think, not just what you want to hear
 
 ---
@@ -127,7 +127,7 @@ Any team member can raise concerns directly to you through Ploy or on their own.
          │
     open channel — anyone can talk directly
          │
-       Ploy (keeps the orchestra playing)
+       Pim (keeps the orchestra playing)
       ╱  │  ╲
    Bank  Fern  Noon
      │    │     │
@@ -139,6 +139,6 @@ Any team member can raise concerns directly to you through Ploy or on their own.
 - Mint + Fern (speed + rigor)
 - Ohm + Bank (physical + theoretical)
 - Bam + Noon (tools + teaching)
-- Ploy + everyone (momentum + care)
+- Pim + everyone (momentum + care)
 
 **Shared belief:** A middle school kid wiring a CPU changes how they see the world forever. We're building that moment.

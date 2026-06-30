@@ -1,5 +1,9 @@
 # Project State
 
+## Owner: Team JOJOCAFE-Org
+
+The team owns the entire RV8 project. All variants, all deliverables.
+
 ## Active Target: RV8-GR (Student Baseline)
 
 - **Status**: Architecture frozen v1.0 — ready for physical build

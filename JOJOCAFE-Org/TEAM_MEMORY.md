@@ -4,9 +4,20 @@ Shared knowledge for all agents. Update when significant facts change.
 
 ## Project: RV8 CPU Family
 
+- **Ownership**: Team JOJOCAFE owns the entire RV8 project
+- **Main focus**: RV8-GR (33 chips, architecture frozen v1.0)
 - Target: minimal 8-bit CPUs students can build on breadboards
 - Language: Thai docs, English code/comments
-- Active build: RV8-GR (33 chips, architecture frozen v1.0)
+- Repository: /home/jo/kiro/RV8
+
+## Variants (all under our care)
+
+| Variant | Status | Priority |
+|---------|--------|----------|
+| RV8-GR | **Active focus** — frozen, ready for physical build | 🔴 Now |
+| RV8-R | Queued — full ISA, microcode, 18 chips | 🟢 Future |
+| RV8-G | Queued — full ISA, no microcode, 38 chips | 🟢 Future |
+| RV8 | Reference/exploratory only | 🟢 Archive |
 
 ## Architecture Quick Reference
 

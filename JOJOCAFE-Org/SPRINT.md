@@ -8,7 +8,7 @@
 
 ## Team Task Lists
 
-### Ploy (พลอย) — Coordinator
+### Pim (พิม) — Coordinator
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
 | Maintain BACKLOG.md, SPRINT.md, TEAMLOG.md | — | 🔄 ONGOING | Update after every deliverable |
