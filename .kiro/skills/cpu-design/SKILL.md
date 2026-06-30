@@ -315,6 +315,12 @@ python3 tools/rv8gr_asm.py programs/testrom.asm -o programs/testrom.bin
 - Example Programs (.asm collection: blink, counter, game)
 - RV8-R architecture design (when ready)
 
+## AI Organization
+- Team repo: JOJOCAFE-Org (github.com/JOJOCAFE/JOJOCAFE-Org)
+- Local: /home/jo/kiro/RV8/JOJOCAFE-Org
+- 7 agents: Ploy (coord), Bank (arch), Fern (verify), Mint (rtl), Ohm (hw), Bam (sw), Noon (docs)
+- Push policy: GitHub only (Codeberg backup on explicit request)
+
 ## Design Status
 - RV8-GR: **Architecture Frozen v1.0** — all 11 docs consistent and signed off
 - Verilog: ALL 5 TESTBENCHES PASS (full 127 cycles, IRQ, SETDP, tasks, opcode sweep 512 cases)

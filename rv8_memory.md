@@ -90,4 +90,6 @@ pin 39: VCC, pin 40: GND
 - Use `RV8GR-V2/doc/06_debug_plan.md` probe map during bring-up
 - Create KiCad schematics from `RV8GR-V2/doc/10_kicad_modules.md` (6 sheets)
 - Order parts for physical build
-- RV8-R FullHW: write 15-bit direct-control microcode generator, migrate RTL/testbench, then convert `doc/02_wiring_guide.md` into KiCad sheets
+- RV8-R FullHW task list is now `RV8R/doc/03_fullhw_task_plan.md`
+- RV8-R FullHW immediate task: freeze the exact 16-bit direct-control word before writing the 15-bit microcode generator
+- RV8-R FullHW next sequence: control word -> microcode generator -> RTL/testbench -> KiCad/ERC -> Programmer/RV8-Bus audit
