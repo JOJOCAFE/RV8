@@ -42,9 +42,11 @@ The team owns the entire RV8 project. All variants, all deliverables.
 
 ## Known Issues
 
-No RV8-GR design blockers. Shared Components still has blocked future-use pinout placeholders for `74hc150` and `74hc260` until manufacturer-verified HC-family DIP datasheets are found.
+No RV8-GR design blockers. Shared Components removed `74hc150` and `74hc260`
+from the active catalog because manufacturer-verified HC-family DIP evidence
+was not available.
 
 Shared Components known follow-ups:
 
 - Add backend probe/test-logic channels next session.
-- Align SST39SF010A Python/Verilog write-trigger semantics if exact flash `/WE` edge behavior is needed.
+- SST39SF010A Python/Verilog write-trigger semantics are now aligned for the simplified flash model: write occurs on the falling edge of `/WE` while selected with `/OE` high.

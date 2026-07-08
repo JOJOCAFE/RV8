@@ -56,11 +56,11 @@ Shared knowledge for all agents. Update when significant facts change.
 - Contents: reusable 74HC Verilog models, memory models, DIP/PDIP pinout docs, smoke tests, and retained manufacturer datasheet evidence.
 - Python library: `/home/jo/kiro/Components/python`, pin-level DIP-style chip models, ROM/RAM image loader, 64 input stimulus channels (`IN0..IN63`), 8 clocks (`CLK0..CLK7`), propagation-delay simulation, and edge-aware clock dispatch.
 - Responsibility: Pim routes; Ohm owns physical pinout and DIP package evidence; Mint owns reusable Verilog models/tests; Bam owns Python backend/tool support; Fern verifies package evidence, source references, Python tests, and Verilog smoke tests; Bank approves chip-selection and simulator-abstraction decisions.
-- Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
+- `74HC150` and `74HC260` were removed from the active Components catalog because no manufacturer-verified HC-family DIP evidence was available.
 - Rule: pinout docs are physical wiring artifacts; do not create pin tables from memory. Require manufacturer datasheet evidence and explicit DIP/PDIP or equivalent through-hole package proof.
 - Rule: Python and Verilog component behavior must remain compatible for observable controls, output polarity, tri-state behavior, async controls, memory behavior, and rising/falling clock edges.
 - Deferred backend task: add probe/test-logic channels for pin/net sampling, transitions, pulse counts, timing windows, and serializable UI state.
-- Known follow-up: SST39SF010A Python/Verilog write-trigger semantics are not fully edge-aligned yet; fix if exact flash `/WE` behavior becomes required.
+- SST39SF010A Python/Verilog write-trigger semantics are aligned: the simplified flash model writes on the falling edge of `/WE` while selected with `/OE` high.
 
 ### Datasheet Access Notes
 

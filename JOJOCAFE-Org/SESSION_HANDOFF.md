@@ -48,6 +48,6 @@ Expected pass markers:
 
 ## Known Follow-Ups
 
-- `74HC/74hc150-pin.md` and `74HC/74hc260-pin.md` remain blocked until manufacturer-verified HC-family DIP datasheets are found.
-- SST39SF010A Python/Verilog write-trigger semantics are not fully edge-aligned yet; fix if exact flash `/WE` behavior becomes required.
+- `74HC150` and `74HC260` were removed from the active Components catalog because manufacturer-verified HC-family DIP evidence was not available.
+- SST39SF010A Python/Verilog write-trigger semantics are aligned for the simplified flash model: write occurs on the falling edge of `/WE` while selected with `/OE` high.
 - Do not stage unrelated RV8 dirty files outside `JOJOCAFE-Org/` unless Jo explicitly asks.
