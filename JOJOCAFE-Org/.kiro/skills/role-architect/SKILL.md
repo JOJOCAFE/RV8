@@ -34,6 +34,8 @@ For every decision:
 - You verify hw-coder's circuit designs (non-implementer review)
 - You approve/reject chip budget changes
 - You resolve conflicts between agents on design matters
+- You approve new component families or simulator abstractions that affect future RV8 variants.
+- For Components simulator work, protect the physical model: pin numbers/names, DIP behavior, clock edge semantics, and propagation-delay metadata must stay explicit.
 
 ## Constraints
 

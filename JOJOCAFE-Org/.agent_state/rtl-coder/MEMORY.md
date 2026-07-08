@@ -20,6 +20,7 @@
 | `/home/jo/kiro/Components/Memory/*.v` | Reusable EEPROM/SRAM behavioral models |
 | `/home/jo/kiro/Components/74HC/tests/tb_74hc_smoke.v` | Shared 74HC smoke test |
 | `/home/jo/kiro/Components/Memory/tests/tb_memory_smoke.v` | Shared memory smoke test |
+| `/home/jo/kiro/Components/python/chiplib` | Pin-level Python chip simulator that Verilog behavior must match |
 
 ## Conventions
 
@@ -52,3 +53,5 @@ wire [7:0] mem_read = pc[15] ? ram[pc[14:0]] : rom[pc[14:0]];
 - Use `ttl_74hcxx` module names for 74HC logic and `mem_<part>` for memory models.
 - Hand off any physical pinout/datasheet work to Ohm and any verification to Fern.
 - Test from `/home/jo/kiro` with the 74HC and Memory smoke commands in `component-library/SKILL.md`.
+- Sequential behavior now has edge-aware Python coverage. Preserve compatibility for 74HC73/112 falling-edge clocks, 74HC74 per-section clocks, 74HC595 SRCLK/RCLK separation, and 74HC593 RCK/CCK separation.
+- 74HC112 Verilog was corrected to datasheet-style asynchronous preset/clear and negative-edge clock.

@@ -13,7 +13,7 @@ The shared reusable component repository is:
 - GitHub: `git@github.com:JOJOCAFE/Components.git`
 - Branch: `main`
 
-Use this repository for reusable 74HC logic chips, memory parts, DIP pinout notes, smoke tests, and local datasheet evidence. Do not copy component models into an RV8 project unless a project intentionally needs a frozen local snapshot.
+Use this repository for reusable 74HC logic chips, memory parts, DIP pinout notes, Python chip models, smoke tests, and local datasheet evidence. Do not copy component models into an RV8 project unless a project intentionally needs a frozen local snapshot.
 
 ## Team Responsibility
 
@@ -22,11 +22,13 @@ Use this repository for reusable 74HC logic chips, memory parts, DIP pinout note
 - Mint owns Verilog component models and smoke-test benches.
 - Fern verifies package evidence, pin tables, local source references, and smoke-test results.
 - Bank resolves chip-selection questions and approves new component families.
+- Bam owns Python simulator-facing support code when it touches ROM/RAM image loading, UI/backend service contracts, or student tools.
 
 ## Folder Rules
 
 - `74HC/`: 74HC-family Verilog models plus `74hcxx-pin.md` files.
 - `Memory/`: EEPROM, flash, and SRAM models plus `<part>-pin.md` files.
+- `python/`: reusable pin-level Python chip simulator package.
 - `source/`: only local manufacturer PDFs that are cited by pinout docs or needed as durable evidence.
 
 Keep `source/` clean. Remove duplicate downloads, failed PDFs, HTML dumps, temporary files, and `Zone.Identifier` sidecars.
@@ -106,10 +108,29 @@ iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Componen
 vvp /tmp/tb_memory_smoke.vvp
 ```
 
+Run Python checks from `/home/jo/kiro/Components/python`:
+
+```sh
+python3 -B -m tests.test_chips
+python3 -m py_compile /home/jo/kiro/Components/python/chiplib/*.py /home/jo/kiro/Components/python/tests/*.py
+```
+
 Expected pass markers:
 
 - `74HC SMOKE TEST PASSED`
 - `MEMORY SMOKE TEST PASSED`
+- `Components Python chip tests passed`
+
+## Python Simulator Contract
+
+- Python models are physical DIP-style models: access pins by number or name.
+- `StimulusController` provides 64 external input channels (`IN0..IN63`) and 8 clock channels (`CLK0..CLK7`).
+- Clock stimulus must honor each chip's datasheet edge. Default is rising edge; falling-edge parts such as 74HC73 and 74HC112 override `clock_edge_for_pin()`.
+- Multi-clock packages must receive the physical pin in `clock_edge(pin)` so only that section/register changes. Examples: 74HC74 sections, 74HC595 `SRCLK` vs `RCLK`, 74HC593 `RCK` vs `CCK`.
+- Memory loader support lives in `python/chiplib/loader.py` and can preload `.bin`, Intel HEX, or text-hex images into ROM/RAM `.data` before simulation.
+- Python and Verilog behavior must stay compatible for observable controls, output polarity, tri-state behavior, reset/load/preset behavior, and clock edge behavior.
+- Known follow-up: align SST39SF010A Python/Verilog write-trigger semantics if exact flash `/WE` edge behavior becomes required.
+- Deferred next-session backend task: add probe/test-logic channels for pin/net sampling, serializable state, transition checks, pulse counts, and timing-window assertions.
 
 ## Final Review Checklist
 
@@ -118,4 +139,6 @@ Expected pass markers:
 - DIP/PDIP package evidence is explicit.
 - No duplicate temporary PDFs remain in `source/`.
 - Verilog smoke tests pass.
+- Python chip tests and compile check pass.
+- Python/Verilog edge behavior agrees for changed sequential chips.
 - If pushed, the Components repo status is clean and tracking `origin/main`.

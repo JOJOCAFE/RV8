@@ -48,3 +48,5 @@
 - Use AllDatasheet as helper only: search, open exact result, fetch PDF view page, parse PDF.js `file=` datasheet URL, download, confirm `%PDF`; or POST visible security code + `tmpinfo1aa` to the download endpoint.
 - Keep `/home/jo/kiro/Components/source` clean: only retained cited manufacturer PDFs, no duplicates or `Zone.Identifier`.
 - Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
+- When checking chip behavior for simulator work, record whether controls are level-sensitive, rising-edge, falling-edge, or asynchronous according to the manufacturer datasheet.
+- Memory note: SRAM/AT28C256 models are level-controlled in the simulator; SST39SF010A exact `/WE` edge alignment remains a known follow-up if flash programming accuracy is needed.

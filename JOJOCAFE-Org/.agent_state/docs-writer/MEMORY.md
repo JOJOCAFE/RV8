@@ -33,3 +33,4 @@
 - Update labs if physical build reveals wiring issues
 - RV8-R documentation (when design starts)
 - Example program walkthroughs for students
+- Keep future Components simulator docs aligned with the backend contract: 64 inputs (`IN0..IN63`), 8 clocks (`CLK0..CLK7`), pin-number/name access, edge-aware clocks, ROM/RAM image loading, and deferred probes.

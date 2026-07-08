@@ -9,6 +9,8 @@ description: Software coding patterns. Assembler tools, test ROMs, firmware. Use
 
 The software implementer. You write assemblers, test programs, ROM images, and firmware. You do NOT verify your own work.
 
+You also own Python support code in the shared Components simulator when the task is about backend API shape, ROM/RAM image loading, future UI service contracts, stimulus inputs/clocks, probes, or student-facing tools.
+
 ## Assembly Style (RV8-GR)
 
 ```asm
@@ -53,3 +55,6 @@ After writing code, state:
 - Python 3 standard library only (no pip deps)
 - Assembly must fit within 18-instruction ISA
 - ROM starts at $0000, max 32KB
+- Shared Components Python simulator lives in `/home/jo/kiro/Components/python`.
+- Keep the simulator frontend-agnostic: usable from a future JS/web service wrapper or directly from Python.
+- Current stimulus default is 64 inputs (`IN0..IN63`) and 8 clocks (`CLK0..CLK7`); clock channels must honor chip-specific rising/falling edge rules.

@@ -1,0 +1,53 @@
+# Session Handoff
+
+Updated: 2026-07-09
+
+## Current State
+
+- Components repo is pushed and clean at `f4ea985 Expand stimulus inputs to 64 channels`.
+- Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
+- RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`.
+- RV8 branch for team work: `team-setup`.
+
+## Components Library Facts
+
+- Shared library path: `/home/jo/kiro/Components`.
+- Python package path: `/home/jo/kiro/Components/python`.
+- Python simulator uses DIP-style pin number/name access and propagation-delay scheduling.
+- `StimulusController` default channels: 64 inputs (`IN0..IN63`) and 8 clocks (`CLK0..CLK7`).
+- Clock stimulus is physical-pin and edge aware:
+  - default rising edge
+  - 74HC73 and 74HC112 use falling-edge `CP`
+  - 74HC74 sections, 74HC595 `SRCLK`/`RCLK`, and 74HC593 `RCK`/`CCK` are pin-specific
+- `chiplib.loader` preloads `.bin`, Intel HEX, or text-hex data into ROM/RAM `.data`.
+- Python and Verilog component behavior must remain compatible.
+
+## Verification Evidence
+
+Last green checks:
+
+```sh
+cd /home/jo/kiro/Components/python && python3 -B -m tests.test_chips
+python3 -m py_compile /home/jo/kiro/Components/python/chiplib/*.py /home/jo/kiro/Components/python/tests/*.py
+cd /home/jo/kiro && iverilog -g2012 -Wall -o /tmp/tb_74hc_smoke.vvp Components/74HC/*.v Components/74HC/tests/tb_74hc_smoke.v && vvp /tmp/tb_74hc_smoke.vvp
+cd /home/jo/kiro && iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Components/Memory/tests/tb_memory_smoke.v && vvp /tmp/tb_memory_smoke.vvp
+```
+
+Expected pass markers:
+
+- `Components Python chip tests passed`
+- `74HC SMOKE TEST PASSED`
+- `MEMORY SMOKE TEST PASSED`
+
+## Next Session
+
+1. Implement backend probe/test-logic channels in `/home/jo/kiro/Components/python`.
+2. Probes should attach to chip pins or named nets, sample logic over simulated time, and expose serializable state for future JS/web or Python UI.
+3. Assertion helpers should cover `0`, `1`, `Z`, `X`, rising/falling transitions, pulse counts, and timing windows.
+4. Verify with Python tests first; run Verilog smoke only if chip behavior changes.
+
+## Known Follow-Ups
+
+- `74HC/74hc150-pin.md` and `74HC/74hc260-pin.md` remain blocked until manufacturer-verified HC-family DIP datasheets are found.
+- SST39SF010A Python/Verilog write-trigger semantics are not fully edge-aligned yet; fix if exact flash `/WE` behavior becomes required.
+- Do not stage unrelated RV8 dirty files outside `JOJOCAFE-Org/` unless Jo explicitly asks.

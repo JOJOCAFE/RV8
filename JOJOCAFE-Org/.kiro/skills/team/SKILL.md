@@ -24,6 +24,8 @@ Audience: Thai middle school students. Goal: buildable on breadboards.
 2. Every wiring change → verifier + architect review
 3. Every ISA change → architect decides, verifier confirms feasibility
 4. No code ships without verification from a non-author agent
+5. Every shared Components change → run the relevant Python and/or Verilog smoke tests before pushing
+6. Every simulator backend change → document the API contract for future web/Python UI use
 
 ## Communication
 
@@ -40,6 +42,7 @@ Audience: Thai middle school students. Goal: buildable on breadboards.
 - `PROJECT_STATE.md`: current status (read before working)
 - `TEAM_MEMORY.md`: shared knowledge (read when context needed)
 - `.agent_state/<you>/MEMORY.md`: your personal memory (update after work)
+- `/home/jo/kiro/Components`: shared 74HC, memory, Verilog, Python chip simulator, pinout, and datasheet library
 
 ## Economy
 

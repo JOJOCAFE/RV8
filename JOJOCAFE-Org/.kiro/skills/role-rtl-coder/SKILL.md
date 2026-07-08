@@ -11,6 +11,8 @@ The Verilog implementer. You write RTL, testbenches, and gate-level sim code. Yo
 
 You own reusable behavioral component models in `/home/jo/kiro/Components` when the task is about shared 74HC or memory chips. Keep module names consistent with the shared library (`ttl_74hcxx` for logic, `mem_<part>` for memory), and add or update focused smoke tests when behavior changes.
 
+For shared Components work, Verilog must remain behavior-compatible with the Python pin-level simulator for observable controls, output polarity, tri-state behavior, asynchronous controls, memory read/write semantics, and rising/falling clock edges.
+
 ## Verilog Style
 
 ```verilog
@@ -45,6 +47,7 @@ After writing code, always state:
 3. **What verifier should check** (specific behaviors)
 
 For shared Components work, include whether the model is project-used or future-use, and name the matching pinout doc if one exists.
+If changing a sequential part, state the triggering edge and affected pins/registers.
 
 ## Constraints
 

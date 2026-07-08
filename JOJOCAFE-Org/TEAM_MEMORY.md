@@ -52,10 +52,15 @@ Shared knowledge for all agents. Update when significant facts change.
 - GitHub: `git@github.com:JOJOCAFE/Components.git`
 - Branch: `main`
 - Initial pushed commit: `f674250 Initial shared component library`
+- Latest known pushed commit: `f4ea985 Expand stimulus inputs to 64 channels`
 - Contents: reusable 74HC Verilog models, memory models, DIP/PDIP pinout docs, smoke tests, and retained manufacturer datasheet evidence.
-- Responsibility: Pim routes; Ohm owns physical pinout and DIP package evidence; Mint owns reusable Verilog models/tests; Fern verifies package evidence, source references, and smoke tests; Bank approves chip-selection questions.
+- Python library: `/home/jo/kiro/Components/python`, pin-level DIP-style chip models, ROM/RAM image loader, 64 input stimulus channels (`IN0..IN63`), 8 clocks (`CLK0..CLK7`), propagation-delay simulation, and edge-aware clock dispatch.
+- Responsibility: Pim routes; Ohm owns physical pinout and DIP package evidence; Mint owns reusable Verilog models/tests; Bam owns Python backend/tool support; Fern verifies package evidence, source references, Python tests, and Verilog smoke tests; Bank approves chip-selection and simulator-abstraction decisions.
 - Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
 - Rule: pinout docs are physical wiring artifacts; do not create pin tables from memory. Require manufacturer datasheet evidence and explicit DIP/PDIP or equivalent through-hole package proof.
+- Rule: Python and Verilog component behavior must remain compatible for observable controls, output polarity, tri-state behavior, async controls, memory behavior, and rising/falling clock edges.
+- Deferred backend task: add probe/test-logic channels for pin/net sampling, transitions, pulse counts, timing windows, and serializable UI state.
+- Known follow-up: SST39SF010A Python/Verilog write-trigger semantics are not fully edge-aligned yet; fix if exact flash `/WE` behavior becomes required.
 
 ### Datasheet Access Notes
 
@@ -83,3 +88,4 @@ Shared knowledge for all agents. Update when significant facts change.
 - A15 chip select: ROM active when A15=0, RAM active when A15=1
 - Architecture frozen v1.0 — no design changes until physical build validates
 - Shared component pinouts must cite manufacturer sources and DIP/PDIP evidence before breadboard use.
+- Shared Components simulator backend must remain frontend-agnostic for future JS/web or Python UI use.

@@ -24,6 +24,9 @@ For shared Components changes, also verify:
 - Blocked placeholders remain blocked when no manufacturer source exists.
 - `source/` contains only useful evidence files, not temporary duplicates.
 - 74HC and Memory smoke tests pass after changes.
+- Python simulator tests pass after Python chip/stimulus/backend changes.
+- Python and Verilog agree on sequential edge behavior when a clocked chip is touched.
+- If memory write semantics are changed, check whether the part is level-controlled or edge-triggered and confirm Python/Verilog compatibility.
 
 ## Defect Report Format
 
@@ -50,6 +53,8 @@ python3 tools/rv8gr_asm.py <file>.asm -o /tmp/test.bin
 # Shared Components repo, run from /home/jo/kiro
 iverilog -g2012 -Wall -o /tmp/tb_74hc_smoke.vvp Components/74HC/*.v Components/74HC/tests/tb_74hc_smoke.v && vvp /tmp/tb_74hc_smoke.vvp
 iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Components/Memory/tests/tb_memory_smoke.v && vvp /tmp/tb_memory_smoke.vvp
+cd Components/python && python3 -B -m tests.test_chips
+python3 -m py_compile /home/jo/kiro/Components/python/chiplib/*.py /home/jo/kiro/Components/python/tests/*.py
 ```
 
 ## Pass Criteria

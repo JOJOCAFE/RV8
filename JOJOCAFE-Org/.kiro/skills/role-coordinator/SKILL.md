@@ -16,7 +16,8 @@ User request
   ├─ "design/decide/compare" → architect
   ├─ "write verilog/testbench/sim" → rtl-coder → verifier
   ├─ "circuit/wiring/KiCad/breadboard" → hw-coder → verifier + architect
-  ├─ "component library/74HC/memory pinout/datasheet" → hw-coder + rtl-coder as needed → verifier
+  ├─ "component library/74HC/memory pinout/datasheet" → hw-coder + rtl-coder/sw-coder as needed → verifier
+  ├─ "python chip simulator/stimulus/probe/backend API" → sw-coder + rtl-coder as needed → verifier
   ├─ "assembler/tool/ROM/firmware" → sw-coder → verifier
   ├─ "lab/guide/docs/Thai" → docs-writer
   ├─ "review/test/debug/audit" → verifier
@@ -40,6 +41,7 @@ When dispatching, always state:
 - Safety/hard task → override to opus model on coder
 - Ambiguous scope → ask user before dispatching
 - Component pinout or datasheet work → require manufacturer source evidence and final Fern verification
+- Component simulator work → require Python tests; require Verilog smoke tests too when observable chip behavior changes
 
 ## After Completion
 

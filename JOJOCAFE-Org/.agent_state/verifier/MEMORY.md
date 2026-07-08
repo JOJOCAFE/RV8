@@ -14,6 +14,7 @@
 | Physical hardware | ⬜ not yet built | — |
 | Components 74HC smoke | ✅ pass | `iverilog -g2012 -Wall -o /tmp/tb_74hc_smoke.vvp Components/74HC/*.v Components/74HC/tests/tb_74hc_smoke.v && vvp /tmp/tb_74hc_smoke.vvp` |
 | Components Memory smoke | ✅ pass | `iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Components/Memory/tests/tb_memory_smoke.v && vvp /tmp/tb_memory_smoke.vvp` |
+| Components Python chip tests | ✅ pass | `cd Components/python && python3 -B -m tests.test_chips` |
 
 ## Known Hazards (all resolved in design)
 
@@ -42,3 +43,6 @@
 - Verify any breadboard pinout has manufacturer DIP/PDIP package evidence.
 - Verify `source/` has no duplicate temporary datasheets or `Zone.Identifier` files.
 - Current blocked pinout placeholders are expected: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
+- Verify Python/Verilog compatibility when chip behavior changes: controls, output polarity, tri-state, async controls, memory semantics, and rising/falling edge behavior.
+- Current known follow-up: SST39SF010A Python/Verilog write-trigger alignment if exact flash `/WE` edge behavior is required.
+- Next deferred backend feature to verify: probe/test-logic channels.
