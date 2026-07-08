@@ -4,3 +4,11 @@
 __pycache__/
 *.pyc
 *:Zone.Identifier*
+
+# KiCad local/generated artifacts
+Kicad/*.kicad_prl
+Kicad/*-backups/
+Kicad/~*
+Kicad/__pycache__/
+Kicad/*.rpt
+Kicad/*.EDF
