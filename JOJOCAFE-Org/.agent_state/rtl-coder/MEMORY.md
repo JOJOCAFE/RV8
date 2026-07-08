@@ -12,6 +12,15 @@
 | `sim/chip_sim.py` | Gate-level simulation (35 chips) |
 | `sim/soft_debug.py` | High-level trace sim |
 
+## Shared Components Repo
+
+| Path | Purpose |
+|------|---------|
+| `/home/jo/kiro/Components/74HC/*.v` | Reusable 74HC behavioral chip models |
+| `/home/jo/kiro/Components/Memory/*.v` | Reusable EEPROM/SRAM behavioral models |
+| `/home/jo/kiro/Components/74HC/tests/tb_74hc_smoke.v` | Shared 74HC smoke test |
+| `/home/jo/kiro/Components/Memory/tests/tb_memory_smoke.v` | Shared memory smoke test |
+
 ## Conventions
 
 - Single-file CPU with FSM (T0/T1/T2)
@@ -36,3 +45,10 @@ wire [7:0] mem_read = pc[15] ? ram[pc[14:0]] : rom[pc[14:0]];
 
 - RV8-R CPU model (when architect specs it)
 - Example program .memh files for new tests
+
+## Component Library Responsibility
+
+- Own reusable Verilog component models and smoke tests in `/home/jo/kiro/Components`.
+- Use `ttl_74hcxx` module names for 74HC logic and `mem_<part>` for memory models.
+- Hand off any physical pinout/datasheet work to Ohm and any verification to Fern.
+- Test from `/home/jo/kiro` with the 74HC and Memory smoke commands in `component-library/SKILL.md`.

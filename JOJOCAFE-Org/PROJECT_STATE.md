@@ -34,10 +34,11 @@ The team owns the entire RV8 project. All variants, all deliverables.
 
 | Date | Decision | By |
 |------|----------|----|
+| 2026-07-09 | Shared Components repo created and pushed to `git@github.com:JOJOCAFE/Components.git`; component-library skill added for agent ownership and datasheet workflow | Pim |
 | 2026-06-15 | Memory map swapped: ROM $0000-$7FFF, RAM $8000-$FFFF | architect |
 | 2026-06-14 | Architecture frozen v1.0 — no more changes until physical build | architect |
 | 2026-06-14 | Programmer design finalized (ESP32 + TXS0108E + 74HC595) | hw-coder |
 
 ## Known Issues
 
-None blocking. All 11 hazards in risk analysis resolved.
+No RV8-GR design blockers. Shared Components still has blocked future-use pinout placeholders for `74hc150` and `74hc260` until manufacturer-verified HC-family DIP datasheets are found.

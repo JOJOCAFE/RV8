@@ -16,6 +16,7 @@ User request
   ├─ "design/decide/compare" → architect
   ├─ "write verilog/testbench/sim" → rtl-coder → verifier
   ├─ "circuit/wiring/KiCad/breadboard" → hw-coder → verifier + architect
+  ├─ "component library/74HC/memory pinout/datasheet" → hw-coder + rtl-coder as needed → verifier
   ├─ "assembler/tool/ROM/firmware" → sw-coder → verifier
   ├─ "lab/guide/docs/Thai" → docs-writer
   ├─ "review/test/debug/audit" → verifier
@@ -38,6 +39,7 @@ When dispatching, always state:
 - Verifier finds defect → route back to coder + defect report
 - Safety/hard task → override to opus model on coder
 - Ambiguous scope → ask user before dispatching
+- Component pinout or datasheet work → require manufacturer source evidence and final Fern verification
 
 ## After Completion
 

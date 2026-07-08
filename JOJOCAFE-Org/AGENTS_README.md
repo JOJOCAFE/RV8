@@ -27,7 +27,7 @@ Switch directly to a specialist when you know exactly who you need:
 | Ctrl+Shift+1 | architect | "Should we use X or Y?" / "Design the RV8-R ISA" |
 | Ctrl+Shift+2 | verifier | "Check this code" / "Why is test failing?" / "Debug X" |
 | Ctrl+Shift+3 | rtl-coder | "Write a testbench for X" / "Add instruction Y to Verilog" |
-| Ctrl+Shift+4 | hw-coder | "Design the ALU wiring" / "Create KiCad schematic" |
+| Ctrl+Shift+4 | hw-coder | "Design the ALU wiring" / "Create KiCad schematic" / "Verify a DIP pinout" |
 | Ctrl+Shift+5 | sw-coder | "Write a blink program" / "Add macro to assembler" |
 | Ctrl+Shift+6 | docs-writer | "Write lab 15" / "Translate module guide to Thai" |
 
@@ -47,6 +47,7 @@ Switch directly to a specialist when you know exactly who you need:
 ├─────────────────────────────────────────────────┤
 │  skill://cpu-design      (domain knowledge)     │  ← agents that need it
 │  skill://wiring-rules    (pin-level rules)      │
+│  skill://component-library (shared chips)        │
 │  skill://debug-mantra    (debugging method)     │
 │  skill://scrutinize      (review method)        │
 │  skill://thai-labs       (doc format)           │
@@ -133,9 +134,10 @@ JOJOCAFE-Org/
 │   ├── hw-coder.json           circuit implementer
 │   ├── sw-coder.json           tools/firmware implementer
 │   └── docs-writer.json        documentation specialist
-├── .kiro/skills/               13 skills (6 shared + 7 role-specific)
+├── .kiro/skills/               14 skills (7 shared + 7 role-specific)
 │   ├── team/                   org rules (all agents)
 │   ├── cpu-design/             architecture knowledge
+│   ├── component-library/      shared 74HC/memory model and datasheet workflow
 │   ├── debug-mantra/           debugging method
 │   ├── scrutinize/             review method
 │   ├── wiring-rules/           pin-level rules

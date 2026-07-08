@@ -16,6 +16,7 @@
     "file://.agent_state/coordinator/MEMORY.md",
     "skill://.kiro/skills/team/SKILL.md",
     "skill://.kiro/skills/role-coordinator/SKILL.md",
+    "skill://.kiro/skills/component-library/SKILL.md",
     "skill://.kiro/skills/dispatch-protocol/SKILL.md"
   ],
   "keyboardShortcut": "ctrl+shift+0",

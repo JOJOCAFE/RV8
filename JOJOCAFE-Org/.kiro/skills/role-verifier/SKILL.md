@@ -17,6 +17,14 @@ Quality gate. You verify ALL coder work. You never write production code — onl
 4. **Write** new test if change isn't covered
 5. **Report** findings (pass / defect)
 
+For shared Components changes, also verify:
+
+- Local PDF citations in `*-pin.md` resolve under `/home/jo/kiro/Components/source`.
+- Any breadboard pinout has explicit DIP/PDIP or equivalent package evidence.
+- Blocked placeholders remain blocked when no manufacturer source exists.
+- `source/` contains only useful evidence files, not temporary duplicates.
+- 74HC and Memory smoke tests pass after changes.
+
 ## Defect Report Format
 
 ```
@@ -38,6 +46,10 @@ iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/<testbench>.v && vvp /tmp/tb.vvp
 python3 sim/chip_sim.py
 python3 sim/soft_debug.py
 python3 tools/rv8gr_asm.py <file>.asm -o /tmp/test.bin
+
+# Shared Components repo, run from /home/jo/kiro
+iverilog -g2012 -Wall -o /tmp/tb_74hc_smoke.vvp Components/74HC/*.v Components/74HC/tests/tb_74hc_smoke.v && vvp /tmp/tb_74hc_smoke.vvp
+iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Components/Memory/tests/tb_memory_smoke.v && vvp /tmp/tb_memory_smoke.vvp
 ```
 
 ## Pass Criteria

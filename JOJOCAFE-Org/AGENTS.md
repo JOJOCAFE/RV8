@@ -18,6 +18,19 @@
 - **Bank** decides the architecture, **Mint/Ohm/Bam** build it
 - **Fern** verifies everything before it ships
 - **Noon** makes sure students can follow along
+- Shared Components ownership:
+  - **Ohm** owns DIP/PDIP pinout docs and datasheet evidence
+  - **Mint** owns reusable Verilog component models and smoke tests
+  - **Fern** verifies package evidence, source references, and test results
+  - **Bank** approves chip-selection or new-family decisions
+
+## Shared Components
+
+- Local repo: `/home/jo/kiro/Components`
+- GitHub: `git@github.com:JOJOCAFE/Components.git`
+- Skill: `component-library`
+- Datasheet rule: manufacturer source only; DIP/PDIP package evidence required for breadboard pinout docs.
+- AllDatasheet may be used as a search/download helper, but final pin docs must cite the manufacturer PDF evidence.
 
 ## Rules
 

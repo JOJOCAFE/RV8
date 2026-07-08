@@ -19,6 +19,7 @@
     "file://.agent_state/verifier/MEMORY.md",
     "skill://.kiro/skills/team/SKILL.md",
     "skill://.kiro/skills/role-verifier/SKILL.md",
+    "skill://.kiro/skills/component-library/SKILL.md",
     "skill://.kiro/skills/debug-mantra/SKILL.md",
     "skill://.kiro/skills/scrutinize/SKILL.md"
   ],

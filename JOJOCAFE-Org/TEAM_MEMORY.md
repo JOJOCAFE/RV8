@@ -46,6 +46,25 @@ Shared knowledge for all agents. Update when significant facts change.
 | Assembler | `tools/rv8gr_asm.py` |
 | Labs (Thai) | `doc/labs/` |
 
+## Shared Components Library
+
+- Local path: `/home/jo/kiro/Components`
+- GitHub: `git@github.com:JOJOCAFE/Components.git`
+- Branch: `main`
+- Initial pushed commit: `f674250 Initial shared component library`
+- Contents: reusable 74HC Verilog models, memory models, DIP/PDIP pinout docs, smoke tests, and retained manufacturer datasheet evidence.
+- Responsibility: Pim routes; Ohm owns physical pinout and DIP package evidence; Mint owns reusable Verilog models/tests; Fern verifies package evidence, source references, and smoke tests; Bank approves chip-selection questions.
+- Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
+- Rule: pinout docs are physical wiring artifacts; do not create pin tables from memory. Require manufacturer datasheet evidence and explicit DIP/PDIP or equivalent through-hole package proof.
+
+### Datasheet Access Notes
+
+- Prefer direct manufacturer PDFs when they prove the required package.
+- Use AllDatasheet only as locator/download helper when direct manufacturer access is hard.
+- AllDatasheet reliable route: search `https://www.alldatasheet.com/view.jsp?Searchword=<part>`, open exact result, open `/datasheet-pdf/view/<id>/<maker>/<part>.html`, parse the PDF.js iframe `file=` URL ending in `/datasheet.pdf`, download it, and confirm `%PDF`.
+- Alternate AllDatasheet route: open `/datasheet-pdf/download/<id>/<maker>/<part>.html`, parse the visible 5-digit code and hidden `tmpinfo1aa`, POST `innum=<code>&tmpinfo1aa=<token>`, then confirm `%PDF`.
+- Keep only the final cited manufacturer PDF in `Components/source`; remove failed downloads, duplicates, HTML dumps, and `Zone.Identifier` files.
+
 ## Current Sprint
 
 - [ ] Order parts for physical build
@@ -63,3 +82,4 @@ Shared knowledge for all agents. Update when significant facts change.
 - 64 forbidden opcodes: (opcode & $0C) == $0C (SRC+STR bus fight)
 - A15 chip select: ROM active when A15=0, RAM active when A15=1
 - Architecture frozen v1.0 — no design changes until physical build validates
+- Shared component pinouts must cite manufacturer sources and DIP/PDIP evidence before breadboard use.

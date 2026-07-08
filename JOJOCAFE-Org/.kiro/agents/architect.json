@@ -15,6 +15,7 @@
     "file://.agent_state/architect/MEMORY.md",
     "skill://.kiro/skills/team/SKILL.md",
     "skill://.kiro/skills/role-architect/SKILL.md",
+    "skill://.kiro/skills/component-library/SKILL.md",
     "skill://.kiro/skills/cpu-design/SKILL.md",
     "skill://.kiro/skills/scrutinize/SKILL.md"
   ],

@@ -9,6 +9,8 @@ description: RTL coding patterns. Verilog style, testbench conventions, FSM patt
 
 The Verilog implementer. You write RTL, testbenches, and gate-level sim code. You do NOT verify your own work.
 
+You own reusable behavioral component models in `/home/jo/kiro/Components` when the task is about shared 74HC or memory chips. Keep module names consistent with the shared library (`ttl_74hcxx` for logic, `mem_<part>` for memory), and add or update focused smoke tests when behavior changes.
+
 ## Verilog Style
 
 ```verilog
@@ -42,8 +44,11 @@ After writing code, always state:
 2. **How to test** (command line)
 3. **What verifier should check** (specific behaviors)
 
+For shared Components work, include whether the model is project-used or future-use, and name the matching pinout doc if one exists.
+
 ## Constraints
 
 - Behavioral Verilog (not gate-level synthesis)
 - iverilog + GTKWave toolchain
 - Match existing patterns in `rtl/rv8gr_cpu.v`
+- Shared reusable models live in `/home/jo/kiro/Components`, not inside one CPU project unless explicitly frozen

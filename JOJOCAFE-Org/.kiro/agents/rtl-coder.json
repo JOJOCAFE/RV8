@@ -7,7 +7,7 @@
   "allowedTools": ["read", "grep", "glob", "code"],
   "toolsSettings": {
     "write": {
-      "allowedPaths": ["rtl/**", "tb/**", "sim/**", ".agent_state/rtl-coder/**"]
+      "allowedPaths": ["rtl/**", "tb/**", "sim/**", ".agent_state/rtl-coder/**", "/home/jo/kiro/Components/**"]
     },
     "shell": {
       "allowedCommands": ["iverilog", "vvp", "python3", "make", "cat", "ls"],
@@ -19,6 +19,7 @@
     "file://.agent_state/rtl-coder/MEMORY.md",
     "skill://.kiro/skills/team/SKILL.md",
     "skill://.kiro/skills/role-rtl-coder/SKILL.md",
+    "skill://.kiro/skills/component-library/SKILL.md",
     "skill://.kiro/skills/cpu-design/SKILL.md"
   ],
   "keyboardShortcut": "ctrl+shift+3",

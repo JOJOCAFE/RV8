@@ -9,6 +9,13 @@ description: Pin-level wiring source of truth for RV8 CPU variants. Use when des
 
 The official pin-level wiring for each RV8 variant lives in its own `doc/03_wiring_guide.md` (or equivalent). This skill defines the RULES; the specific pin assignments are in the variant's wiring guide.
 
+Reusable chip pinouts and package evidence live in the shared Components repo:
+
+- Local path: `/home/jo/kiro/Components`
+- GitHub: `git@github.com:JOJOCAFE/Components.git`
+
+When a wiring guide needs a 74HC, EEPROM, flash, or SRAM pinout, use the matching `*-pin.md` file from the Components repo. If the part is not present or is marked blocked, do not infer pinout from memory; route to Ohm for datasheet-backed pinout work and Fern for verification.
+
 ## Universal Rules (all variants)
 
 ### Bus Discipline
@@ -43,6 +50,8 @@ When reviewing any wiring change:
 4. Decoupling caps on every IC?
 5. Fan-out within spec (≤10 for 74HC at 5V)?
 6. Propagation delay chain fits within clock period?
+7. Component pinouts come from Components `*-pin.md` files or a cited manufacturer datasheet?
+8. DIP/PDIP package evidence exists for any part that will be used on breadboard?
 
 ## RV8-GR Specific
 
