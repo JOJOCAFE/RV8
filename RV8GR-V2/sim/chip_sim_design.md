@@ -5,6 +5,12 @@
 Pin-accurate simulation of all 35 chips. Verify wiring from 02_wiring_guide.md.
 Probe any pin like attaching an LED. Step one clock at a time.
 
+The Python simulator is the preferred cross-check for RV8GR-V2 system behavior.
+Use it before the shared Verilog component models when checking chip behavior,
+pin wiring, bus ownership, instruction execution, and propagation-delay timing.
+Use Verilog as a secondary HDL-equivalence path or when the task is explicitly
+about RTL/FPGA-oriented verification.
+
 ---
 
 ## Architecture

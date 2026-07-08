@@ -163,6 +163,30 @@ Board 4: CONTROL         Board 5: BUS + DEBUG
 
 ## Simulation
 
+Run Python first for TTL/system behavior checks:
+
+```bash
+cd RV8GR-V2
+
+python3 -B sim/chip_sim.py
+# ALL 8 CPU TESTS PASSED
+
+python3 -B sim/verify_wiring.py
+# ALL WIRING VERIFIED
+
+python3 -B sim/soft_debug.py
+# ALL TESTS PASSED
+
+python3 -B tools/test_rv8gr_asm.py
+# 11 passed
+
+cd sim
+python3 -B chips/test_chips.py
+# ALL 14 CHIP TYPES VERIFIED
+```
+
+Use Verilog as the secondary HDL/RTL comparison path:
+
 ```bash
 cd RV8GR-V2
 iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
@@ -170,12 +194,6 @@ iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
 
 iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
 # ALL IRQ POLLING TESTS PASSED
-
-python3 sim/chip_sim.py
-# ALL 8 CPU TESTS PASSED ✅
-
-python3 sim/verify_wiring.py
-# ALL WIRING VERIFIED ✅
 ```
 
 ---
