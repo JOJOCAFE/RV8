@@ -29,7 +29,7 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 |----------|-------|
 | **Learn microcode / experimental reference** | **RV8** (28 chips target, not build-ready) |
 | **Full RV8-style ISA with real TTL paths** | **RV8-R FullHW** (49 logic chips, KiCad/RTL proof pending) |
-| **Full ISA + no microcode** | **RV8-G** (28 chips) |
+| **Full ISA + no microcode concept** | **RV8-G** (38 logic chips, no active folder) |
 | **Student-friendly no-microcode build** | **RV8GR** (34 logic chips) |
 
 ### RV8GR Student Baseline
@@ -66,7 +66,6 @@ RV8GR is the active physical-build target.
 RV8/
 ├── RV8/            ← 28-chip target, hardware regs, microcode, IRQ (exploratory)
 ├── RV8R/           ← 49-chip FullHW target, RAM regs, microcode, IRQ (full RV8-style hardware)
-├── RV8G/           ← 28 chips, full ISA, no microcode, fastest
 ├── RV8GR-V1/       ← previous RV8-GR baseline/reference
 ├── RV8GR/          ← active 34-logic-chip student baseline, labs, wiring, sim, RTL
 ├── Programmer/     ← ESP32 board; per-CPU bus/pin audit required
@@ -74,6 +73,9 @@ RV8/
 ├── Reference/      ← Gigatron, SAP-1, Nand2Tetris
 └── README.md
 ```
+
+`RV8-G` is retained as a documented concept/history item, not as an active
+folder in this checkout.
 
 ---
 
@@ -91,9 +93,8 @@ RV8/
 | | RV8 | RV8-R | RV8-G | RV8-GR |
 |--|:---:|:---:|:---:|:---:|
 | Instruction trace | ✅ | ✅ | ⬜ | ✅ |
-| Verilog | ⚠️ benches need cleanup | ⚠️ old-map RTL passed; FullHW RTL pending | ⬜ | ✅ (5 TBs, 512 opcode sweep) |
-| Wiring guide (pin-level) | ⚠️ stale assumptions | ✅ FullHW paths documented | ✅ | ✅ |
-| Wiring Guide | ⚠️ stale assumptions | ✅ FullHW paths documented | ⬜ | ✅ |
+| Verilog | ⚠️ benches need cleanup | ⚠️ old-map RTL passed; FullHW RTL pending | ⬜ | ✅ (behavioral + chip-level TBs, 512 opcode sweep) |
+| Wiring guide (pin-level) | ⚠️ stale assumptions | ✅ FullHW paths documented | ⬜ | ✅ |
 | Module guide (Thai) | ✅ | ⬜ | ⬜ | ✅ |
 | ISA reference | ⚠️ target ISA, not fully proven | ✅ FullHW encoding + hardware paths | ⬜ | ✅ |
 | Assembler | ⬜ | ⬜ | ⬜ | ✅ (page-safe) |
