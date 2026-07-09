@@ -1,5 +1,5 @@
 """
-Lab 03: Address Mux — U15-U16 (74HC157 ×2)
+Lab 04: Address Mux — U15-U16 (74HC157 ×2)
 
 Wiring:
   SEL (pin 1) ← ADDR_MODE (0=PC, 1=IRL)
@@ -43,7 +43,7 @@ TEST_VECTORS = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 03: Address Mux (U15-U16)")
+    print("Lab 04: Address Mux (U15-U16)")
     print("-" * 40)
 
     U15.set(15, 0); U16.set(15, 0)  # /E=GND
@@ -57,4 +57,4 @@ if __name__ == '__main__':
         print(f"  {i}: SEL={sel} PC=${pc:02X} IRL=${irl:02X} → ABUS=${abus:02X}  {status}")
         assert abus == exp
 
-    print("\n✅ Lab 03 PASS: Address mux selects PC or IRL correctly")
+    print("\n✅ Lab 04 PASS: Address mux selects PC or IRL correctly")

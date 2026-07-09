@@ -270,7 +270,7 @@ All 36 chips simulated pin-by-pin. 8 CPU tests + 11K wiring checks pass.
 
 ```
 sim/
-├── chips/__init__.py       — 36 chip models
+├── chips/__init__.py       — 34 logic chip models + ROM/RAM
 ├── chips/test_chips.py     — 141 test vectors (14 chip types)
 ├── chip_sim.py             — Full CPU simulation + timing analysis
 ├── soft_debug.py           — High-level trace (4 tests)

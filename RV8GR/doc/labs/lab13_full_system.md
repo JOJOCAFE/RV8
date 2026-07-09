@@ -110,7 +110,7 @@ $000F: $0E    ; jump to self ($000E)
 
 **Flash ด้วย programmer**:
 ```bash
-python3 /home/jo/Codex/Programmer/tools/rv8flash.py program test_full.bin --base 0x0000
+python3 ../Programmer/tools/rv8flash.py program test_full.bin --base 0x0000
 ```
 
 ---

@@ -1,5 +1,5 @@
 """
-Lab 02: PC Counter — U1-U4 (74HC161 ×4) cascaded
+Lab 03: PC Counter — U1-U4 (74HC161 ×4) cascaded
 
 Wiring:
   U1-U4: /CLR ← /RST, ENP ← PC_INC, /LD ← /PC_LD
@@ -76,7 +76,7 @@ TEST_SEQUENCE = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 02: PC Counter (U1-U4, 16-bit)")
+    print("Lab 03: PC Counter (U1-U4, 16-bit)")
     print("-" * 40)
 
     for i, (rst, inc, ld, load, exp) in enumerate(TEST_SEQUENCE):
@@ -89,4 +89,4 @@ if __name__ == '__main__':
         print(f"  CLK{i}: /RST={rst} INC={inc} /LD={ld} D=${load:04X} → PC=${pc:04X}  {status}")
         assert pc == exp, f"Expected ${exp:04X}, got ${pc:04X}"
 
-    print("\n✅ Lab 02 PASS: 16-bit counter with clear/count/load/overflow")
+    print("\n✅ Lab 03 PASS: 16-bit counter with clear/count/load/overflow")

@@ -58,7 +58,7 @@ U7 (74HC245) = สะพาน 2 ทิศทาง:
 
 Flash ROM ด้วย:
 ```bash
-python3 /home/jo/Codex/Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
+python3 ../Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
 ```
 
 ---
@@ -252,7 +252,7 @@ LED (ดู IBUS จากฝั่ง A):
 
 ```bash
 cd RV8GR/sim/sim_lab
-python3 lab05_rom_buffer.py
+python3 lab05_rom_fetch.py
 ```
 
 ---

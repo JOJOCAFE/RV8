@@ -1,5 +1,5 @@
 """
-Lab 04: ROM Fetch — ROM (AT28C256) + U7 (74HC245)
+Lab 05: ROM Fetch — ROM (AT28C256) + U7 (74HC245)
 
 Wiring:
   ROM A[14:0] ← ABUS
@@ -51,7 +51,7 @@ TEST_VECTORS = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 04: ROM Fetch (ROM + U7)")
+    print("Lab 05: ROM Fetch (ROM + U7)")
     print("-" * 40)
 
     for addr, exp in TEST_VECTORS:
@@ -60,4 +60,4 @@ if __name__ == '__main__':
         print(f"  ROM[${addr:04X}] → IBUS = ${data:02X}  {status}")
         assert data == exp
 
-    print("\n✅ Lab 04 PASS: ROM fetch through U7 to IBUS")
+    print("\n✅ Lab 05 PASS: ROM fetch through U7 to IBUS")

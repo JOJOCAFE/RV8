@@ -406,7 +406,7 @@ if __name__ == '__main__':
 
     if verbose:
         print("=" * 80)
-        print("VERBOSE TRACE: ADDI $05 (all 35 chip signals)")
+        print("VERBOSE TRACE: ADDI $05 (34 logic chips + ROM/RAM signals)")
         print("=" * 80)
         cpu = CPU()
         cpu.load_rom(bytes([0x10, 0x05, 0x01, 0x02]))  # ADDI $05, HLT

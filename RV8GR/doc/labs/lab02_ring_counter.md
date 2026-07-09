@@ -213,7 +213,7 @@ U8 pin 13 (Q7) → test point
 รัน sim_lab เปรียบเทียบ:
 ```bash
 cd RV8GR/sim/sim_lab
-python3 lab01_ring_counter.py
+python3 lab02_ring_counter.py
 ```
 
 ---

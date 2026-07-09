@@ -117,7 +117,7 @@ LED (ดู 8 บิตล่าง = U1 + U2):
 
 ```bash
 cd RV8GR/sim/sim_lab
-python3 lab02_pc_counter.py
+python3 lab03_pc_counter.py
 ```
 
 ---

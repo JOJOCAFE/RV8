@@ -372,7 +372,7 @@ sim/
 ├── verify_wiring.py        # Wiring correctness checker
 ├── wiring.py               # 247 pin connections from 02_wiring_guide
 ├── chips/
-│   ├── __init__.py         # All chip classes (35 chip models)
+│   ├── __init__.py         # 34 logic chip classes plus ROM/RAM models
 │   └── test_chips.py       # Unit tests for each chip type (141 vectors)
 ├── sim_lab/
 │   ├── __init__.py         # Lab index

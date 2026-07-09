@@ -11,7 +11,7 @@
 3. ใช้ single-step clock (กดปุ่ม) ทดสอบ ก่อนใส่ crystal
 4. ดู LED เพื่อเช็คว่าถูก
 
-## ข้อตกลงของรุ่น V2
+## ข้อตกลงของ baseline
 
 - สร้างเฉพาะ baseline: 34 logic chips + ROM + RAM.
 - ไม่มี microcode.

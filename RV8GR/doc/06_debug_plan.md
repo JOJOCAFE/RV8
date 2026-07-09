@@ -257,7 +257,7 @@ Clock 16: 00010000  ← U2 เริ่มนับ (cascade ทำงาน!)
 
 **เตรียม ROM**: Flash test pattern ด้วย Programmer board:
 ```bash
-python3 /home/jo/Codex/Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
+python3 ../Programmer/tools/rv8flash.py program test_bytes.bin --base 0x0000
 ```
 
 ```
@@ -594,9 +594,9 @@ handler:
 
 **LED**: 1 ดวงบน IE (U31-5), 1 ดวงบน IRQ_FF (U31-9)
 
-**FUTURE ONLY - DO NOT WIRE IN V2 BASELINE**: hardware vector is not part of
-v1.0/v2. It requires PC mux, /PC_LD control, IRQ_ack, and clear logic. If this
-is connected during the student build, the v2 tests and wiring guide no longer
+**FUTURE ONLY - DO NOT WIRE IN THE BASELINE**: hardware vector is not part of
+v1.0. It requires PC mux, /PC_LD control, IRQ_ack, and clear logic. If this
+is connected during the student build, the baseline tests and wiring guide no longer
 match the hardware.
 
 ---
@@ -625,8 +625,8 @@ Pin 40:    GND
 
 **ทดสอบ**:
 - [ ] ต่อ Programmer board ผ่าน ribbon cable
-- [ ] `python3 /home/jo/Codex/Programmer/tools/rv8flash.py -c` → "Connected"
-- [ ] Flash test ROM → verify ด้วย `python3 /home/jo/Codex/Programmer/tools/rv8flash.py verify test.bin --base 0x0000`
+- [ ] `python3 ../Programmer/tools/rv8flash.py -c` → "Connected"
+- [ ] Flash test ROM → verify ด้วย `python3 ../Programmer/tools/rv8flash.py verify test.bin --base 0x0000`
 - [ ] CLK บน bus pin 25 = oscillator (วัดด้วย probe)
 - [ ] /RST บน bus pin 26 = HIGH ตอนปกติ, LOW ตอนกด reset
 - [ ] /WR บน bus pin 27 = pulse LOW เฉพาะตอน STORE

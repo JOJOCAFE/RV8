@@ -11,7 +11,7 @@ Generated on 2026-07-01
 | CLK_RST.kicad_sch | Clock, Reset, Ring Counter (U8) |
 | PC.kicad_sch | Program Counter (U1-U4) |
 | ADDR_MEM.kicad_sch | Address Mux + ROM + RAM (U15-U16, U29-U30) |
-| IR_BUF.kicad_sch | Instruction Register + Bus Buffers (U5-U7, U14) |
+| IR_BUF.kicad_sch | Instruction Register + Bus Buffers (U5-U7, U14, U34) |
 | ALU_AC.kicad_sch | ALU + Accumulator + Z Flag (U9-U22) |
 | CTRL.kicad_sch | Control Logic (U23-U28, U31-U33) |
 

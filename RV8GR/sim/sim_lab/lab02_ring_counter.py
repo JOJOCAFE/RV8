@@ -1,5 +1,5 @@
 """
-Lab 01: Ring Counter — U8 (74HC164) + U24 gates 1,2 (inverters)
+Lab 02: Ring Counter — U8 (74HC164) + U24 gates 1,2 (inverters)
 
 Wiring:
   U24-1 (1A) ← U8-3 (Q0)    → U24-2 (1Y) → U8-1 (A)
@@ -42,7 +42,7 @@ TEST_SEQUENCE = [
 ]
 
 if __name__ == '__main__':
-    print("Lab 01: Ring Counter (U8 + U24)")
+    print("Lab 02: Ring Counter (U8 + U24)")
     print("-" * 40)
 
     for i, (rst, exp_t0, exp_t1, exp_t2) in enumerate(TEST_SEQUENCE):
@@ -57,4 +57,4 @@ if __name__ == '__main__':
         assert (t0, t1, t2) == (exp_t0, exp_t1, exp_t2), \
             f"Expected ({exp_t0},{exp_t1},{exp_t2})"
 
-    print("\n✅ Lab 01 PASS: Ring counter cycles T0→T1→T2→T0")
+    print("\n✅ Lab 02 PASS: Ring counter cycles T0→T1→T2→T0")
