@@ -1,31 +1,31 @@
 # RV8GR KiCad Netlist - Generated Files
 
-**Generated**: 2026-07-01
+**Generated**: 2026-07-09
 **Source**: `gen_kicad.py` based on `doc/12_netlist.md`
 
 ## Files Generated
 
 | File | Size | Description |
 |------|------|-------------|
-| `RV8GR.kicad_pro` | 432 bytes | KiCad project file |
-| `RV8GR.kicad_sch` | 13K | Top-level schematic with global labels |
-| `RV8GR.net` | 32K | **CRITICAL: KiCad netlist with all connections** |
+| `RV8GR.kicad_pro` | 429 bytes | KiCad project file |
+| `RV8GR.kicad_sch` | 12K | Top-level schematic with global labels |
+| `RV8GR.net` | 33K | **CRITICAL: KiCad netlist with all connections** |
 
 ## Netlist Summary
 
 - **Total nets**: 159
-- **Total chips**: 35 (34 logic + ROM + RAM)
-- **Total pin connections**: 578
+- **Total chips/packages**: 36 (34 logic + ROM + RAM)
+- **Total pin connections**: 598
 
 ### Largest Nets
 
 | Net | Pin Count | Description |
 |-----|-----------|-------------|
-| GND | 62 | Ground - all chips + control pins |
-| VCC | 45 | +5V power - all chips + pullups |
+| GND | 64 | Ground - all chips + control pins |
+| VCC | 46 | +5V power - all chips + pullups |
 | ALU_SUB | 11 | Adder carry-in, XOR B-mux selects |
-| T2 | 8 | Phase 2 timing - control decode |
-| /RST | 7 | Active-low reset - PC, ring counter, IRQ |
+| T2 | 9 | Phase 2 timing - control decode |
+| IBUS0-IBUS5 | 8 each | Internal data bus shared by U7, U34, U14, ALU/register inputs |
 
 ### Net Categories
 
@@ -96,6 +96,7 @@ kicad-cli sch erc RV8GR.kicad_sch
 | U31 | 74HC74 | DIP-14 | IRQ Flip-Flop |
 | U32 | 74HC574 | DIP-20 | Data Page Register |
 | U33 | 74HC21 | DIP-14 | 4-input AND Gates |
+| U34 | 74HC541 | DIP-20 | IRL-to-IBUS Immediate Buffer |
 | ROM1 | AT28C256 | DIP-28 | Program ROM (32KB) |
 | RAM1 | 62256 | DIP-28 | RAM (32KB) |
 

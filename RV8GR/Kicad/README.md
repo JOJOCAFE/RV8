@@ -1,6 +1,6 @@
 # RV8GR KiCad Project
 
-Generated on 2026-07-01
+Generated on 2026-07-09
 
 ## Files
 
@@ -22,14 +22,15 @@ Generated on 2026-07-01
 | CLK_RST | U8 (74HC164) | 1 |
 | PC | U1-U4 (74HC161) | 4 |
 | ADDR_MEM | U15, U16, U29, U30 (74HC157) + ROM + RAM | 6 |
-| IR_BUF | U5, U6 (74HC574), U7 (74HC245), U14 (74HC541) | 4 |
+| IR_BUF | U5, U6 (74HC574), U7 (74HC245), U14, U34 (74HC541) | 5 |
 | ALU_AC | U9 (574), U10-U11 (283), U12-U13 (86), U17-U20 (157), U21 (74), U22 (688) | 11 |
 | CTRL | U23 (574), U24 (04), U25 (32), U26-U27 (00), U28 (86), U31 (74), U32 (574), U33 (21) | 9 |
-| **Total** | | **35** |
+| **Total** | | **36** |
 
 ## ERC Status
 
-The schematic generates 42 ERC violations. These are expected for the initial generation:
+`kicad-cli sch erc RV8GR.kicad_sch` currently reports 57 errors. They are all
+expected dangling-label issues for this generated top-level scaffold:
 
 1. **Unconnected pins** - All symbol pins need explicit net labels or wire connections
 2. **Hierarchical label mismatch** - Top-level sheet symbols need to be created with matching pins
