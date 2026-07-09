@@ -27,8 +27,8 @@
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
 | Verify Programmer field test | B-012 | ⬜ TODO | After Bam preps test suite |
-| Verify each lab module on hardware | B-007 | ⬜ TODO | Test after Ohm builds each stage |
-| Run full ISA test on physical CPU | B-007 | ⬜ TODO | After all modules wired |
+| Verify each lab module on hardware | B-007 | ⛔ BLOCKED | Waiting for physical hardware build evidence; non-physical B-007 report is available |
+| Run full ISA test on physical CPU | B-007 | ⛔ BLOCKED | Requires wired CPU and hardware evidence |
 | Gate-sim coverage check (remaining .bin) | B-013 | ⬜ TODO | Pair with Mint |
 
 ### Mint (มิ้นท์) — RTL Coder
@@ -50,7 +50,7 @@
 ### Bam (แบม) — SW Coder
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
-| Write example .asm programs (blink, counter, echo) | B-010 | ⬜ TODO | For hardware testing |
+| Write example .asm programs (blink, counter, echo) | B-010 | ✅ DONE | Implemented and assembler-verified |
 | Prep Programmer field test suite | B-012 | ⬜ TODO | Before Fern verifies |
 | Flash test ROM onto physical hardware | B-006 | ⬜ TODO | After Ohm builds ROM module |
 | Start BASIC interpreter design | B-011 | ⬜ TODO | Background task |
@@ -69,11 +69,12 @@
 1. **Ohm builds sequentially** — one lab module at a time, verify before next
 2. **Fern tests each module** — no "move on and fix later"
 3. **Discrepancy → Mint + Bank** — if hardware ≠ sim, debug immediately
-4. **Bam delivers test programs** — Ohm needs .bin files to verify each stage
+4. **Bam delivers test programs** — example ASM programs are implemented and assembler-verified
 5. **Noon documents** — photos/notes as we go, not after
 
 ## Done This Sprint
 
 | Task | Completed | By |
 |------|-----------|-----|
-| (none yet) | | |
+| B-010 example ASM programs implemented | 2026-07-09 | Bam |
+| B-010 example ASM programs assembler-verified | 2026-07-09 | Bam + Fern |

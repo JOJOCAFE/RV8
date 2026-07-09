@@ -22,8 +22,8 @@ The team owns the entire RV8 project. All variants, all deliverables.
 - [ ] Order parts for physical build
 - [ ] Build Labs 01-14 on breadboard (sequential, verify each)
 - [ ] Flash test ROM via Programmer
-- [ ] Write example .asm programs
-- [ ] Full ISA test on physical hardware
+- [x] Write example .asm programs (B-010 implemented and assembler-verified)
+- [ ] Full ISA test on physical hardware (B-007 blocked until hardware evidence exists; non-physical report available)
 
 ## Next Projects (queued)
 
@@ -38,17 +38,21 @@ The team owns the entire RV8 project. All variants, all deliverables.
 | 2026-07-09 | Components Python simulator added/updated with DIP pin models, ROM/RAM image loading, 64 input stimulus channels, 8 clocks, and edge-aware clock dispatch; pushed through `f4ea985` | Pim |
 | 2026-07-09 | Components Python schematic backend, buses, pull defaults, probes/test logic, netlist, and Verilog export path added; pushed through `6bc7ee0` | Pim |
 | 2026-07-09 | RV8GR canonical rename/docs/labs cleanup and top-level README status fixes pushed through `1470963` | Pim |
+| 2026-07-09 | B-010 example ASM programs implemented and assembler-verified; B-007 non-physical verification report available while physical B-007 remains blocked for hardware evidence; Components netlist mappings verified and pushed through `a2ee62c` | Pim |
 | 2026-06-15 | Memory map swapped: ROM $0000-$7FFF, RAM $8000-$FFFF | architect |
 | 2026-06-14 | Architecture frozen v1.0 — no more changes until physical build | architect |
 | 2026-06-14 | Programmer design finalized (ESP32 + TXS0108E + 74HC595) | hw-coder |
 
 ## Known Issues
 
-No RV8-GR design blockers. Shared Components removed `74hc150` and `74hc260`
+No RV8-GR design blockers. Physical B-007 verification is blocked until
+hardware evidence exists; a non-physical B-007 verification report is available.
+Shared Components removed `74hc150` and `74hc260`
 from the active catalog because manufacturer-verified HC-family DIP evidence
 was not available.
 
 Shared Components known follow-ups:
 
 - Keep Components Python schematic backend compatible with future UI/block/JSON editing and RV8GR chip-level netlist/Verilog export.
+- Components netlist mapping expansion is verified and pushed through `a2ee62c`.
 - SST39SF010A Python/Verilog write-trigger semantics are now aligned for the simplified flash model: write occurs on the falling edge of `/WE` while selected with `/OE` high.

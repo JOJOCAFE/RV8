@@ -20,13 +20,13 @@ Last updated: 2026-07-09
 | B-004 | Build Lab 08-10 (branch, jump, Z-flag) | Ohm | ⬜ TODO |
 | B-005 | Build Lab 11-14 (SETDP, IRQ, full integration) | Ohm | ⬜ TODO |
 | B-006 | Flash test ROM via Programmer board | Bam + Ohm | ⬜ TODO |
-| B-007 | Run full ISA test on physical hardware | Fern | ⬜ TODO |
+| B-007 | Run full ISA test on physical hardware | Fern | ⛔ BLOCKED — non-physical report available; hardware evidence still required |
 
 ## 🟠 P1 — Sprint Support
 
 | # | Task | Owner | Status |
 |---|------|-------|--------|
-| B-010 | Write example .asm programs (blink, counter, echo) | Bam | ⬜ TODO |
+| B-010 | Write example .asm programs (blink, counter, echo) | Bam | ✅ DONE — assembler-verified |
 | B-011 | Write BASIC interpreter ROM (minimal) | Bam | ⬜ TODO |
 | B-012 | Programmer firmware final test (46 tests passing → field test) | Bam + Fern | ⬜ TODO |
 | B-013 | Gate-level sim: add remaining .bin coverage | Mint + Fern | ⬜ TODO |
@@ -65,3 +65,4 @@ Last updated: 2026-07-09
 | — | Gate-level sim 8/8 pass | 2026-06-14 | Mint |
 | — | Assembler (page-safe, 18 opcodes + macros) | 2026-06-14 | Bam |
 | — | Memory map swap (ROM $0000, RAM $8000) | 2026-06-15 | Bank |
+| B-010 | Example ASM programs: blink, counter, echo | 2026-07-09 | Bam + Fern |
