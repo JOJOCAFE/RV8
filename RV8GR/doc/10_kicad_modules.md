@@ -499,10 +499,10 @@ U18 (bits 4-7):
 
 === Zero Detect: U22 (74HC688) ===
   Pin 1 (/OE) → GND
-  P0(pin2)←AC0, P1(pin4)←AC1, P2(pin6)←AC2, P3(pin8)←AC3
-  P4(pin12)←AC4, P5(pin14)←AC5, P6(pin16)←AC6, P7(pin18)←AC7
-  Q0-Q7 (pins 3,5,7,9,11,13,15,17) → all GND
-  Pin 19 (/P=Q) → U21-4 (/PR1)
+  A0(pin2)←AC0, A1(pin4)←AC1, A2(pin6)←AC2, A3(pin8)←AC3
+  A4(pin11)←AC4, A5(pin13)←AC5, A6(pin15)←AC6, A7(pin17)←AC7
+  B0-B7 (pins 3,5,7,9,12,14,16,18) → all GND
+  Pin 19 (Y, active-low equal) → U21-4 (/PR1)
 
 === Z Flag: U21 (74HC74, FF1 only) ===
   Pin 1 (/CLR1) → VCC

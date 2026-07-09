@@ -1,0 +1,26 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "Resistor",
+  "part": "Resistor",
+  "group": "passive",
+  "kind": "physical",
+  "role": "passive",
+  "title": "Resistor",
+  "family": "Passive",
+  "package": {"kind": "two_terminal", "pins": 2},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "1", "direction": "passive"},
+    {"number": 2, "name": "2", "direction": "passive"}
+  ],
+  "simulation": {"service": "sim.resistor", "default_ohms": 10000},
+  "ui": {"widget": "resistor", "symbol": "resistor"}
+}

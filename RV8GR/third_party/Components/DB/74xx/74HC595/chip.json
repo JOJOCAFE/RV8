@@ -1,0 +1,201 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC595",
+  "title": "8-Bit Serial-In Shift Register With Output Register",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "QB",
+      "direction": "output"
+    },
+    {
+      "number": 2,
+      "name": "QC",
+      "direction": "output"
+    },
+    {
+      "number": 3,
+      "name": "QD",
+      "direction": "output"
+    },
+    {
+      "number": 4,
+      "name": "QE",
+      "direction": "output"
+    },
+    {
+      "number": 5,
+      "name": "QF",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "QG",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "QH",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "QH'",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "/SRCLR",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 11,
+      "name": "SRCLK",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "RCLK",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "/OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 14,
+      "name": "SER",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "QA",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc595.v",
+    "verilog": "Verilog/74xx/74hc595.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc595",
+    "file": "Verilog/74xx/74hc595.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "SER",
+          "pins": [
+            14
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "SRCLK",
+          "pins": [
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "RCLK",
+          "pins": [
+            12
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "SRCLR_bar",
+          "pins": [
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "OE_bar",
+          "pins": [
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            15,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "QH_prime",
+          "pins": [
+            9
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        15
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC595"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC595",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc595.pdf",
+      "package_evidence": "N, 16-pin PDIP"
+    }
+  ]
+}

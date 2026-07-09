@@ -1,0 +1,176 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC164",
+  "title": "8-Bit Serial-In Parallel-Out Shift Register",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 14
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "A",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "B",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "QA",
+      "direction": "output"
+    },
+    {
+      "number": 4,
+      "name": "QB",
+      "direction": "output"
+    },
+    {
+      "number": 5,
+      "name": "QC",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "QD",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 8,
+      "name": "CLK",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "/CLR",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 10,
+      "name": "QE",
+      "direction": "output"
+    },
+    {
+      "number": 11,
+      "name": "QF",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "QG",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "QH",
+      "direction": "output"
+    },
+    {
+      "number": 14,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc164.v",
+    "verilog": "Verilog/74xx/74hc164.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc164",
+    "file": "Verilog/74xx/74hc164.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Clear_bar",
+          "pins": [
+            9
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            8
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "B",
+          "pins": [
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            3,
+            4,
+            5,
+            6,
+            10,
+            11,
+            12,
+            13
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        3,
+        4,
+        5,
+        6,
+        10,
+        11,
+        12,
+        13
+      ],
+      "delay_ns": 4
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC164"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC164",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc164.pdf",
+      "package_evidence": "N, 14-pin PDIP"
+    }
+  ]
+}

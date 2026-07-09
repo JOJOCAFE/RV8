@@ -183,12 +183,22 @@ python3 -B tools/test_rv8gr_asm.py
 cd sim
 python3 -B chips/test_chips.py
 # ALL 14 CHIP TYPES VERIFIED
+
+cd ..
+python3 -B sim/verify_components.py
+# RV8GR Components verification passed: 16 part types, 36 packages
 ```
 
 Use Verilog as the secondary HDL/RTL comparison path:
 
 ```bash
 cd RV8GR
+tools/run_chip_level_verilog.sh
+# RV8GR chip-level bring-up PASS
+
+tools/run_chip_level_full_verilog.sh
+# RV8GR chip-level full PASS
+
 iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
 # === ALL TESTS PASSED === (127 cycles)
 

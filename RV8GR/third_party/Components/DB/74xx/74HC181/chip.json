@@ -1,0 +1,263 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC181",
+  "title": "4-bit arithmetic logic unit",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 24
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "B0",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "S3",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "S2",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "S1",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "S0",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "Cn",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "M",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "F0",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "F1",
+      "direction": "output"
+    },
+    {
+      "number": 11,
+      "name": "F2",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 13,
+      "name": "F3",
+      "direction": "output"
+    },
+    {
+      "number": 14,
+      "name": "A_eq_B",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "P",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "Cn+4",
+      "direction": "output"
+    },
+    {
+      "number": 17,
+      "name": "G",
+      "direction": "output"
+    },
+    {
+      "number": 18,
+      "name": "B3",
+      "direction": "input"
+    },
+    {
+      "number": 19,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 20,
+      "name": "B2",
+      "direction": "input"
+    },
+    {
+      "number": 21,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 22,
+      "name": "B1",
+      "direction": "input"
+    },
+    {
+      "number": 23,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 24,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc181.v",
+    "verilog": "Verilog/74xx/74hc181.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc181",
+    "file": "Verilog/74xx/74hc181.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Select",
+          "pins": [
+            6,
+            5,
+            4,
+            3
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Mode",
+          "pins": [
+            8
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "C_in",
+          "pins": [
+            7
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A_bar",
+          "pins": [
+            2,
+            23,
+            21,
+            19
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "B_bar",
+          "pins": [
+            1,
+            22,
+            20,
+            18
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "CP_bar",
+          "pins": [
+            15
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "CG_bar",
+          "pins": [
+            17
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Equal",
+          "pins": [
+            14
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "C_out",
+          "pins": [
+            16
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "F_bar",
+          "pins": [
+            9,
+            10,
+            11,
+            13
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC181"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC181_PHILIPS_15554.pdf"
+    }
+  ]
+}

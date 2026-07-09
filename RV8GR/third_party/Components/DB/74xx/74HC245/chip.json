@@ -1,0 +1,213 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC245",
+  "title": "Octal bus transceiver with 3-state outputs",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "DIR",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "A1",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 3,
+      "name": "A2",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 4,
+      "name": "A3",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 5,
+      "name": "A4",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 6,
+      "name": "A5",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 7,
+      "name": "A6",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 8,
+      "name": "A7",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 9,
+      "name": "A8",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "B8",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 12,
+      "name": "B7",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 13,
+      "name": "B6",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 14,
+      "name": "B5",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 15,
+      "name": "B4",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 16,
+      "name": "B3",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 17,
+      "name": "B2",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 18,
+      "name": "B1",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 19,
+      "name": "/OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc245.v",
+    "verilog": "Verilog/74xx/74hc245.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc245",
+    "file": "Verilog/74xx/74hc245.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "OE_bar",
+          "pins": [
+            19
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "DIR",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "B",
+          "pins": [
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC245"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC245",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc245.pdf",
+      "package_evidence": "N, 20-pin PDIP"
+    }
+  ]
+}

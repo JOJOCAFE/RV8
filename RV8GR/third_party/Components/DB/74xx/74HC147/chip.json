@@ -1,0 +1,184 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC147",
+  "title": "10-line to 4-line priority encoder with active-low inputs and outputs",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/I4",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "/I5",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 3,
+      "name": "/I6",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 4,
+      "name": "/I7",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 5,
+      "name": "/I8",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 6,
+      "name": "/Y2",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 7,
+      "name": "/Y1",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "/I0",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 10,
+      "name": "/I9",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 11,
+      "name": "/I1",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 12,
+      "name": "/I2",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 13,
+      "name": "/I3",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 14,
+      "name": "/Y3",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 15,
+      "name": "NC",
+      "direction": "nc"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc147.v",
+    "verilog": "Verilog/74xx/74hc147.v",
+    "python_behavior": "python/chiplib/catalog.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "python/tests/test_db.py"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc147",
+    "file": "Verilog/74xx/74hc147.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "I0_bar",
+          "pins": [
+            9
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A_bar",
+          "pins": [
+            11,
+            12,
+            13,
+            1,
+            2,
+            3,
+            4,
+            5,
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y_bar",
+          "pins": [
+            0,
+            7,
+            6,
+            14
+          ],
+          "direction": "output",
+          "note": "Pin 0 is an internal open placeholder for Y_bar[0], which is unbonded by the repository TI pin table."
+        }
+      ],
+      "output_pins": [
+        0,
+        6,
+        7,
+        14
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC147"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments CD74HC147/CD74HCT147",
+      "file": "Source/74HC147_TI2_2202533.pdf",
+      "package_evidence": "PDIP16 pinout in repository source PDF"
+    }
+  ]
+}

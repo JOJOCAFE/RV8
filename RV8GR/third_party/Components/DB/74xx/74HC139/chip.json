@@ -1,0 +1,196 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC139",
+  "title": "Dual 2-Line to 4-Line Decoder/Demultiplexer",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/1G",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "1A",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "1B",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "/1Y0",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 5,
+      "name": "/1Y1",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 6,
+      "name": "/1Y2",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 7,
+      "name": "/1Y3",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "/2Y3",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 10,
+      "name": "/2Y2",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 11,
+      "name": "/2Y1",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 12,
+      "name": "/2Y0",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 13,
+      "name": "2B",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "2A",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "/2G",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc139.v",
+    "verilog": "Verilog/74xx/74hc139.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc139",
+    "file": "Verilog/74xx/74hc139.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable_bar",
+          "pins": [
+            1,
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            2,
+            14
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "B",
+          "pins": [
+            3,
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y1_bar",
+          "pins": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Y2_bar",
+          "pins": [
+            12,
+            11,
+            10,
+            9
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC139"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC139",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc139.pdf",
+      "package_evidence": "N, 16-pin PDIP"
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC161",
+  "title": "4-bit binary counter with parallel load and asynchronous clear",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/CLR",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "CLK",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "A",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "B",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "C",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "D",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "ENP",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "/LOAD",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 10,
+      "name": "ENT",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "QD",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "QC",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "QB",
+      "direction": "output"
+    },
+    {
+      "number": 14,
+      "name": "QA",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "RCO",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc161.v",
+    "verilog": "Verilog/74xx/74hc161.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc161",
+    "file": "Verilog/74xx/74hc161.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Clear_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Load_bar",
+          "pins": [
+            9
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "ENT",
+          "pins": [
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "ENP",
+          "pins": [
+            7
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "D",
+          "pins": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "RCO",
+          "pins": [
+            15
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            14,
+            13,
+            12,
+            11
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC161"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC161",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc161.pdf",
+      "package_evidence": "N, 16-pin PDIP"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "db.index",
+  "version": 1,
+  "groups": [
+    {"id": "74xx", "title": "74xx and 74HC logic ICs", "path": "DB/74xx"},
+    {"id": "memory", "title": "Memory ICs", "path": "DB/Memory"},
+    {"id": "virtual", "title": "Simulation-only sources, rails, and probes", "path": "DB/Virtual"},
+    {"id": "passive", "title": "Passive physical parts", "path": "DB/Passive"},
+    {"id": "discrete", "title": "Discrete semiconductor parts", "path": "DB/Discrete"}
+  ]
+}

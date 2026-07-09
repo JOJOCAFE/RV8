@@ -2,6 +2,22 @@
 
 **Milestones from reset to full system. Matches Verilog testbenches.**
 
+## Shared Components Check
+
+RV8GR carries a small vendored Components runtime in
+`third_party/Components/`. Before chip-level export or HDL simulation, verify
+that the DB, Python models, and Verilog files cover every RV8GR package:
+
+```sh
+python3 -B sim/verify_components.py
+```
+
+Expected:
+
+```text
+RV8GR Components verification passed: 16 part types, 36 packages
+```
+
 ---
 
 ## Task 1: Reset

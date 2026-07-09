@@ -1,0 +1,7 @@
+{
+  "schema": "db.group",
+  "version": 1,
+  "id": "discrete",
+  "title": "Discrete semiconductor components",
+  "components": ["NPN", "PNP"]
+}

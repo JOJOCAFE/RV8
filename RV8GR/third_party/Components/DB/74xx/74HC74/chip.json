@@ -1,0 +1,185 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC74",
+  "title": "Dual D-type flip-flop with asynchronous preset and clear",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 14
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/1CLR",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "1D",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "1CLK",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "/1PRE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 5,
+      "name": "1Q",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "/1Q",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 7,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 8,
+      "name": "/2Q",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 9,
+      "name": "2Q",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "/2PRE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 11,
+      "name": "2CLK",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "2D",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "/2CLR",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 14,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc74.v",
+    "verilog": "Verilog/74xx/74hc74.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc74",
+    "file": "Verilog/74xx/74hc74.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Preset_bar",
+          "pins": [
+            4,
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clear_bar",
+          "pins": [
+            1,
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "D",
+          "pins": [
+            2,
+            12
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            3,
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            5,
+            9
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Q_bar",
+          "pins": [
+            6,
+            8
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        5,
+        6,
+        8,
+        9
+      ],
+      "sample_delay_ns": {
+        "U21": 20
+      }
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC74"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC74",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc74.pdf",
+      "package_evidence": "N, 14-pin PDIP"
+    }
+  ]
+}

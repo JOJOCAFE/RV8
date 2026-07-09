@@ -1,0 +1,25 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "Pulldown",
+  "part": "Pulldown",
+  "group": "virtual",
+  "kind": "virtual",
+  "role": "rail",
+  "title": "Weak logic low pull",
+  "family": "Virtual",
+  "package": {"kind": "virtual", "pins": 1},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "PULL", "direction": "passive"}
+  ],
+  "simulation": {"service": "sim.pull", "value": 0},
+  "ui": {"widget": "pulldown", "symbol": "pulldown"}
+}

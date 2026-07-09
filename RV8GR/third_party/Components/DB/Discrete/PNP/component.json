@@ -1,0 +1,27 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "PNP",
+  "part": "PNP",
+  "group": "discrete",
+  "kind": "physical",
+  "role": "discrete",
+  "title": "PNP bipolar transistor",
+  "family": "Discrete",
+  "package": {"kind": "generic_three_terminal", "pins": 3},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "C", "direction": "passive"},
+    {"number": 2, "name": "B", "direction": "passive"},
+    {"number": 3, "name": "E", "direction": "passive"}
+  ],
+  "simulation": {"service": "sim.transistor.pnp"},
+  "ui": {"widget": "transistor", "symbol": "pnp"}
+}

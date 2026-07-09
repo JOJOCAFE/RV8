@@ -6,7 +6,7 @@
   )
   (status
     (written
-      (timeStamp 2026 7 9 9 33 38)
+      (timeStamp 2026 7 9 23 41 3)
       (program "RV8GR gen_kicad.py"
         (version "1.0")
       )
@@ -1027,7 +1027,7 @@
               (portRef &5 (instanceRef U11))
               (portRef &3 (instanceRef U20))
               (portRef &6 (instanceRef U14))
-              (portRef &12 (instanceRef U22))
+              (portRef &11 (instanceRef U22))
             )
           )
           (net AC5
@@ -1036,7 +1036,7 @@
               (portRef &3 (instanceRef U11))
               (portRef &6 (instanceRef U20))
               (portRef &7 (instanceRef U14))
-              (portRef &14 (instanceRef U22))
+              (portRef &13 (instanceRef U22))
             )
           )
           (net AC6
@@ -1045,7 +1045,7 @@
               (portRef &14 (instanceRef U11))
               (portRef &10 (instanceRef U20))
               (portRef &8 (instanceRef U14))
-              (portRef &16 (instanceRef U22))
+              (portRef &15 (instanceRef U22))
             )
           )
           (net AC7
@@ -1054,7 +1054,7 @@
               (portRef &12 (instanceRef U11))
               (portRef &13 (instanceRef U20))
               (portRef &9 (instanceRef U14))
-              (portRef &18 (instanceRef U22))
+              (portRef &17 (instanceRef U22))
             )
           )
           (net ACC_CLK
@@ -1342,10 +1342,10 @@
               (portRef &5 (instanceRef U22))
               (portRef &7 (instanceRef U22))
               (portRef &9 (instanceRef U22))
-              (portRef &11 (instanceRef U22))
-              (portRef &13 (instanceRef U22))
-              (portRef &15 (instanceRef U22))
-              (portRef &17 (instanceRef U22))
+              (portRef &12 (instanceRef U22))
+              (portRef &14 (instanceRef U22))
+              (portRef &16 (instanceRef U22))
+              (portRef &18 (instanceRef U22))
               (portRef &9 (instanceRef U25))
               (portRef &10 (instanceRef U25))
               (portRef &22 (instanceRef RAM1))

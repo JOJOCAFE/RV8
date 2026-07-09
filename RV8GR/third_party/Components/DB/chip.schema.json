@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jojocafe.github.io/Components/DB/chip.schema.json",
+  "title": "Components DB chip manifest",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "version",
+    "part",
+    "title",
+    "family",
+    "package",
+    "status",
+    "pins"
+  ],
+  "properties": {
+    "schema": {
+      "const": "db.chip"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "part": {
+      "type": "string",
+      "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "group": {
+      "enum": ["74xx", "memory", "virtual", "passive", "discrete"]
+    },
+    "kind": {
+      "enum": ["physical", "virtual"]
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string"
+    },
+    "family": {
+      "type": "string"
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "pins"],
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "pins": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "required": [
+        "datasheet",
+        "pinout",
+        "python_behavior",
+        "verilog_model",
+        "verilog_export",
+        "tests"
+      ],
+      "properties": {
+        "datasheet": {"$ref": "#/$defs/statusValue"},
+        "pinout": {"$ref": "#/$defs/statusValue"},
+        "python_behavior": {"$ref": "#/$defs/statusValue"},
+        "verilog_model": {"$ref": "#/$defs/statusValue"},
+        "verilog_export": {"$ref": "#/$defs/statusValue"},
+        "tests": {"$ref": "#/$defs/statusValue"}
+      }
+    },
+    "pins": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["number", "name", "direction"],
+        "properties": {
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "direction": {
+            "enum": ["input", "output", "bidirectional", "passive", "power", "nc", "unknown"]
+          },
+          "active_low": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "legacy_paths": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {"type": "string"},
+          {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        ]
+      }
+    },
+    "verilog": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "module": {"type": "string"},
+        "file": {"type": "string"},
+        "export": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["kind", "ports", "output_pins"],
+          "properties": {
+            "kind": {"const": "structural_port_map"},
+            "ports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": ["name", "pins", "direction"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "pins": {
+                    "type": "array",
+                    "items": {"type": "integer"}
+                  },
+                  "direction": {"enum": ["input", "output"]},
+                  "fallback": {"type": "string"}
+                }
+              }
+            },
+            "output_pins": {
+              "type": "array",
+              "items": {"type": "integer"}
+            },
+            "delay_ns": {
+              "anyOf": [
+                {"type": "integer"},
+                {
+                  "type": "object",
+                  "additionalProperties": {"type": "integer"}
+                }
+              ]
+            },
+            "sample_delay_ns": {
+              "type": "object",
+              "additionalProperties": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "python": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "factory": {"type": "string"},
+        "part": {"type": "string"}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["label"],
+        "properties": {
+          "label": {"type": "string"},
+          "url": {"type": "string"},
+          "file": {"type": "string"},
+          "package_evidence": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "statusValue": {
+      "enum": [
+        "verified",
+        "modeled",
+        "tested",
+        "missing",
+        "blocked",
+        "unknown",
+        "not_applicable"
+      ]
+    }
+  }
+}

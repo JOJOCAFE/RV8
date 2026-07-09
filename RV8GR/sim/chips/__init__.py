@@ -143,14 +143,14 @@ def TTL_74hc283(name):
 def TTL_74hc688(name):
     pins = {1:('/OE','in'),2:('P0','in'),3:('Q0','in'),4:('P1','in'),5:('Q1','in'),
             6:('P2','in'),7:('Q2','in'),8:('P3','in'),9:('Q3','in'),10:('GND','power'),
-            11:('Q4','in'),12:('P4','in'),13:('Q5','in'),14:('P5','in'),
-            15:('Q6','in'),16:('P6','in'),17:('Q7','in'),18:('P7','in'),
+            11:('P4','in'),12:('Q4','in'),13:('P5','in'),14:('Q5','in'),
+            15:('P6','in'),16:('Q6','in'),17:('P7','in'),18:('Q7','in'),
             19:('/P=Q','out'),20:('VCC','power')}
     c = Chip(name, pins, prop_delay=30)
     def update():
         if c.get(1): c.set(19,1); return
-        p = c.get(2)|(c.get(4)<<1)|(c.get(6)<<2)|(c.get(8)<<3)|(c.get(12)<<4)|(c.get(14)<<5)|(c.get(16)<<6)|(c.get(18)<<7)
-        q = c.get(3)|(c.get(5)<<1)|(c.get(7)<<2)|(c.get(9)<<3)|(c.get(11)<<4)|(c.get(13)<<5)|(c.get(15)<<6)|(c.get(17)<<7)
+        p = c.get(2)|(c.get(4)<<1)|(c.get(6)<<2)|(c.get(8)<<3)|(c.get(11)<<4)|(c.get(13)<<5)|(c.get(15)<<6)|(c.get(17)<<7)
+        q = c.get(3)|(c.get(5)<<1)|(c.get(7)<<2)|(c.get(9)<<3)|(c.get(12)<<4)|(c.get(14)<<5)|(c.get(16)<<6)|(c.get(18)<<7)
         c.set(19, 0 if p==q else 1)
     c.update = update
     return c

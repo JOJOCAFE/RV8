@@ -1,0 +1,25 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "GND",
+  "part": "GND",
+  "group": "virtual",
+  "kind": "virtual",
+  "role": "rail",
+  "title": "Logic ground rail",
+  "family": "Virtual",
+  "package": {"kind": "virtual", "pins": 1},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "GND", "direction": "output"}
+  ],
+  "simulation": {"service": "sim.rail", "value": 0},
+  "ui": {"widget": "rail", "symbol": "gnd"}
+}

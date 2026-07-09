@@ -1,0 +1,206 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC240",
+  "title": "Octal Inverting Buffer/Line Driver",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/1OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "1A1",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "2Y4",
+      "direction": "output"
+    },
+    {
+      "number": 4,
+      "name": "1A2",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "2Y3",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "1A3",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "2Y2",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "1A4",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "2Y1",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "2A1",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "1Y4",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "2A2",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "1Y3",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "2A3",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "1Y2",
+      "direction": "output"
+    },
+    {
+      "number": 17,
+      "name": "2A4",
+      "direction": "input"
+    },
+    {
+      "number": 18,
+      "name": "1Y1",
+      "direction": "output"
+    },
+    {
+      "number": 19,
+      "name": "/2OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc240.v",
+    "verilog": "Verilog/74xx/74hc240.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc240",
+    "file": "Verilog/74xx/74hc240.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "OE1_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "OE2_bar",
+          "pins": [
+            19
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            2,
+            4,
+            6,
+            8,
+            11,
+            13,
+            15,
+            17
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y",
+          "pins": [
+            18,
+            16,
+            14,
+            12,
+            9,
+            7,
+            5,
+            3
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        3,
+        5,
+        7,
+        9,
+        12,
+        14,
+        16,
+        18
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC240"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC240",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc240.pdf",
+      "package_evidence": "N, 20-pin PDIP"
+    }
+  ]
+}

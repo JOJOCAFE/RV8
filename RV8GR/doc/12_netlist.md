@@ -116,7 +116,7 @@ Also tied to GND:
 - U5-1 (/OE), U9-1 (/OE), U23-1 (/OE), U32-1 (/OE) — always enabled
 - U15-15, U16-15, U17-15, U18-15, U19-15, U20-15, U29-15, U30-15 (/E) — mux always enabled
 - U21-2 (D1), U21-11 (CLK2), U21-12 (D2) — GND
-- U22-1 (/OE), U22-3, U22-5, U22-7, U22-9, U22-11, U22-13, U22-15, U22-17 (Q0-Q7) — GND
+- U22-1 (/OE), U22-3, U22-5, U22-7, U22-9, U22-12, U22-14, U22-16, U22-18 (B0-B7) — GND
 - U25-9, U25-10 (spare gate inputs) — GND
 - RAM /OE — GND (always output enabled)
 
@@ -353,10 +353,10 @@ Source: U9 Q outputs. Feeds: adder A-inputs, XOR B-mux B-inputs, store buffer (U
 | AC1 | U9-18 | U10-3 | U19-6 | U14-3 | U22-4 |
 | AC2 | U9-17 | U10-14 | U19-10 | U14-4 | U22-6 |
 | AC3 | U9-16 | U10-12 | U19-13 | U14-5 | U22-8 |
-| AC4 | U9-15 | U11-5 | U20-3 | U14-6 | U22-12 |
-| AC5 | U9-14 | U11-3 | U20-6 | U14-7 | U22-14 |
-| AC6 | U9-13 | U11-14 | U20-10 | U14-8 | U22-16 |
-| AC7 | U9-12 | U11-12 | U20-13 | U14-9 | U22-18 |
+| AC4 | U9-15 | U11-5 | U20-3 | U14-6 | U22-11 |
+| AC5 | U9-14 | U11-3 | U20-6 | U14-7 | U22-13 |
+| AC6 | U9-13 | U11-14 | U20-10 | U14-8 | U22-15 |
+| AC7 | U9-12 | U11-12 | U20-13 | U14-9 | U22-17 |
 
 ### SUM (Adder Outputs — 8-bit)
 

@@ -9,7 +9,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENTS_PYTHON = Path(os.environ.get("COMPONENTS_PYTHON", "/home/jo/kiro/Components/python"))
+COMPONENTS_ROOT = Path(os.environ.get("COMPONENTS_ROOT", ROOT / "third_party" / "Components"))
+COMPONENTS_PYTHON = Path(os.environ.get("COMPONENTS_PYTHON", COMPONENTS_ROOT / "python"))
 KICAD_NETLIST = ROOT / "Kicad" / "RV8GR.net"
 OUTPUT = ROOT / "rtl" / "rv8gr_chip_level.v"
 

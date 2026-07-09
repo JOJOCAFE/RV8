@@ -196,8 +196,8 @@ HC688_VECTORS = [
 
 def test_hc688():
     chips = create_cpu()
-    p_pins = [2, 4, 6, 8, 12, 14, 16, 18]
-    q_pins = [3, 5, 7, 9, 11, 13, 15, 17]
+    p_pins = [2, 4, 6, 8, 11, 13, 15, 17]
+    q_pins = [3, 5, 7, 9, 12, 14, 16, 18]
     for oe, p, q, exp in HC688_VECTORS:
         chips['U22'].set(1, oe)
         set_byte(chips['U22'], p_pins, p)
