@@ -14,7 +14,7 @@ description: RV8 CPU architecture patterns. 64K address, RAM-backed registers, n
 
 ## RV8-GR (Active Build Target)
 
-- 33 logic + ROM + RAM = 35 packages
+- 34 logic + ROM + RAM = 36 packages
 - No microcode — opcode byte IS the control word
 - 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 - ROM $0000-$7FFF, RAM $8000-$FFFF (A15 chip select)
@@ -101,7 +101,7 @@ wire [7:0] ac_mux  = mux_sel ? xor_out : adder[7:0];
 
 ## Design Rules
 
-- Chip budget: 33 logic (frozen). Adding a chip needs strong justification.
+- Chip budget: 34 logic (frozen). Adding a chip needs strong justification.
 - All 256 opcodes produce deterministic behavior (horizontal control).
 - Spare gates: U25 has free OR gates, U33 has spare AND inputs.
 - Memory: ROM (AT28C256-70), RAM (62256-70 or CY7C199-15PC).

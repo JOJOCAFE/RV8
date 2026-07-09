@@ -7,7 +7,7 @@ description: Pin-level wiring source of truth for RV8 CPU variants. Use when des
 
 ## Source of Truth
 
-The official pin-level wiring for each RV8 variant lives in its own `doc/03_wiring_guide.md` (or equivalent). This skill defines the RULES; the specific pin assignments are in the variant's wiring guide.
+The official pin-level wiring for RV8GR lives in `RV8GR/doc/02_wiring_guide.md`; other variants keep their own wiring guide equivalent. This skill defines the RULES; the specific pin assignments are in the variant's wiring guide.
 
 Reusable chip pinouts and package evidence live in the shared Components repo:
 
@@ -55,7 +55,7 @@ When reviewing any wiring change:
 
 ## RV8-GR Specific
 
-- 33 logic chips + ROM + RAM = 35 packages
+- 34 logic chips + ROM + RAM = 36 packages
 - 3-cycle: T0/T1/T2 (fetch ctrl, fetch operand, execute)
 - Horizontal control: opcode byte IS the control word
 - Encoding: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP

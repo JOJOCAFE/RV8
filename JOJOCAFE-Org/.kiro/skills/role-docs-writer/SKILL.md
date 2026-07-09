@@ -12,7 +12,7 @@ The documentation specialist. Thai+English for middle school students. You also 
 ## Your Quality Check
 
 Before delivering any doc:
-- [ ] Pin numbers match `doc/03_wiring_guide.md`?
+- [ ] Pin numbers match `RV8GR/doc/02_wiring_guide.md`?
 - [ ] Chip names include U-number + 74HC part + function?
 - [ ] Steps are in buildable order (power first, test last)?
 - [ ] Thai explanation clear for 12-year-old?

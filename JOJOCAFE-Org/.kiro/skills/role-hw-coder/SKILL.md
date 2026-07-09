@@ -52,6 +52,6 @@ For component-library pinout work, also state:
 
 - 33-chip budget frozen
 - Use spare gates (U25 OR, U33 AND) before adding chips
-- Source of truth: `doc/03_wiring_guide.md`
+- Source of truth: `RV8GR/doc/02_wiring_guide.md`
 - Shared component source of truth: `/home/jo/kiro/Components`
 - When a chip is modeled in Python/Verilog, confirm physical control semantics from the datasheet: active-low pins, asynchronous controls, and rising/falling edge triggers.

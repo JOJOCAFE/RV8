@@ -8,7 +8,7 @@
 
 ## Source of Truth
 
-- Pin-level wiring: `doc/03_wiring_guide.md`
+- Pin-level wiring: `doc/02_wiring_guide.md`
 - Circuit design: `doc/00_design_isa.md`
 - Module guide: `doc/05_understand_by_module.md`
 - Shared components: `/home/jo/kiro/Components`
@@ -24,7 +24,7 @@
 
 ## Key Constraints
 
-- 33 logic chips frozen (U1-U33)
+- 34 logic chips frozen (U1-U34) + ROM + RAM = 36 packages
 - 1 MHz for breadboard (generous timing margin)
 - Every IC needs 100nF decoupling cap
 - Wire colors: red=VCC, black=GND, yellow=data, blue=address, green=control
@@ -40,6 +40,7 @@
 - Physical build of all 14 labs
 - PCB layout for 4 MHz version
 - KiCad schematics (6 modules planned)
+- RV8GR KiCad/netlist files live under `RV8GR/Kicad/` and use canonical `RV8GR.*` names.
 
 ## Component Library Responsibility
 
@@ -49,4 +50,4 @@
 - Keep `/home/jo/kiro/Components/source` clean: only retained cited manufacturer PDFs, no duplicates or `Zone.Identifier`.
 - Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
 - When checking chip behavior for simulator work, record whether controls are level-sensitive, rising-edge, falling-edge, or asynchronous according to the manufacturer datasheet.
-- Memory note: SRAM/AT28C256 models are level-controlled in the simulator; SST39SF010A exact `/WE` edge alignment remains a known follow-up if flash programming accuracy is needed.
+- Memory note: SRAM/AT28C256 models are level-controlled in the simulator; SST39SF010A simplified Python/Verilog write semantics are aligned on falling `/WE` while selected with `/OE` high.

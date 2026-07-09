@@ -8,6 +8,7 @@
 | Verilog IRQ | ✅ pass | `tb_rv8gr_irq.v` |
 | Verilog SETDP | ✅ 160 cycles | `tb_rv8gr_setdp.v` |
 | Verilog opcode sweep | ✅ 512 cases | `tb_rv8gr_opcode_sweep.v` |
+| Verilog chip-level | ✅ pass | `tools/run_all_verilog_tb.sh` includes chip-level bring-up and full benches |
 | Gate-level sim | ✅ 8/8 | `python3 sim/chip_sim.py` |
 | Soft debug | ✅ 4/4 | `python3 sim/soft_debug.py` |
 | Assembler | ✅ | `python3 tools/rv8gr_asm.py` |
@@ -44,5 +45,5 @@
 - Verify `source/` has no duplicate temporary datasheets or `Zone.Identifier` files.
 - Current blocked pinout placeholders are expected: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
 - Verify Python/Verilog compatibility when chip behavior changes: controls, output polarity, tri-state, async controls, memory semantics, and rising/falling edge behavior.
-- Current known follow-up: SST39SF010A Python/Verilog write-trigger alignment if exact flash `/WE` edge behavior is required.
-- Next deferred backend feature to verify: probe/test-logic channels.
+- SST39SF010A Python/Verilog simplified write-trigger behavior is aligned on falling `/WE` while selected with `/OE` high.
+- Components schematic backend/probe/test-logic foundations exist; next verification should focus on JSON/block/Python round-trip and RV8GR netlist export compatibility.

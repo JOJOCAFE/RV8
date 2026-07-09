@@ -22,14 +22,14 @@
 - Shared reusable components live at `/home/jo/kiro/Components` and `git@github.com:JOJOCAFE/Components.git`.
 - Component-library routing: Ohm handles physical pinout/datasheet evidence, Mint handles Verilog models/tests, Fern verifies evidence/tests, Bank approves chip-selection decisions.
 - Components Python simulator routing: Bam handles backend/API/image-loader/stimulus/probe support, Mint aligns chip behavior with Verilog, Fern verifies Python and Verilog tests.
-- Latest pushed Components commit: `f4ea985 Expand stimulus inputs to 64 channels`.
+- Latest pushed Components commit: `6bc7ee0 Add Python schematic backend and netlist tooling`.
 
 ## Component Datasheet Routing
 
 - Datasheet lookup/update requests go through `skill://.kiro/skills/component-library/SKILL.md`.
 - AllDatasheet is a locator/download helper only; require manufacturer PDF evidence and DIP/PDIP package proof before marking a pinout usable.
 - Current blocked pinout placeholders: `74HC/74hc150-pin.md`, `74HC/74hc260-pin.md`.
-- Current deferred backend task for next session: add reusable probe/test-logic channels for pin/net sampling, transitions, pulse counts, timing windows, and serializable UI state.
+- Components backend now has reusable schematic/netlist/probe/test-logic foundations. Route future work toward UI/block/JSON round-trip and RV8GR chip-level export compatibility.
 
 ## Lessons Learned
 

@@ -21,6 +21,7 @@
 - Shared Components ownership:
   - **Ohm** owns DIP/PDIP pinout docs and datasheet evidence
   - **Mint** owns reusable Verilog component models and smoke tests
+  - **Bam** owns Python backend/tool APIs and JSON-friendly schematic workflows
   - **Fern** verifies package evidence, source references, and test results
   - **Bank** approves chip-selection or new-family decisions
 

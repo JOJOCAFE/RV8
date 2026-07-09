@@ -4,9 +4,9 @@ Updated: 2026-07-09
 
 ## Current State
 
-- Components repo is pushed and clean at `a55bec5 Remove unverified 74HC parts`.
+- Components repo is pushed and clean at `6bc7ee0 Add Python schematic backend and netlist tooling`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
-- RV8 repo is pushed and clean at `4e474b9 Add RV8GR KiCad project`.
+- RV8 repo is pushed through `1470963 Fix RV8 README project status`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
@@ -23,6 +23,7 @@ Updated: 2026-07-09
   - 74HC74 sections, 74HC595 `SRCLK`/`RCLK`, and 74HC593 `RCK`/`CCK` are pin-specific
 - `chiplib.loader` preloads `.bin`, Intel HEX, or text-hex data into ROM/RAM `.data`.
 - Python and Verilog component behavior must remain compatible.
+- Python schematic backend now supports buses, pull-up/pull-down style normal states, probes/test logic, simple JSON-friendly schematics, and netlist/Verilog export paths for RV8GR-style chip-level work.
 
 ## Verification Evidence
 
@@ -43,10 +44,10 @@ Expected pass markers:
 
 ## Next Session
 
-1. Implement backend probe/test-logic channels in `/home/jo/kiro/Components/python`.
-2. Probes should attach to chip pins or named nets, sample logic over simulated time, and expose serializable state for future JS/web or Python UI.
-3. Assertion helpers should cover `0`, `1`, `Z`, `X`, rising/falling transitions, pulse counts, and timing windows.
-4. Verify with Python tests first; run Verilog smoke only if chip behavior changes.
+1. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
+2. Use Components schematic backend as the reusable Python-first path for future UI/block/JSON/netlist work.
+3. When chip behavior changes, verify with Components Python tests first and run Verilog smoke tests.
+4. For RV8, do not stage unrelated dirty `RV8R/` or `rv8_memory.md` changes unless Jo explicitly asks.
 
 ## Known Follow-Ups
 
@@ -54,4 +55,6 @@ Expected pass markers:
 - SST39SF010A Python/Verilog write-trigger semantics are aligned for the simplified flash model: write occurs on the falling edge of `/WE` while selected with `/OE` high.
 - RV8GR KiCad project files were kept under `RV8GR/Kicad/`; accidental root report/output files and duplicate `XCPU (1).pdf` were removed.
 - `RV8GR/.gitignore` now ignores generated KiCad local artifacts such as `.kicad_prl`, backup folders, lock files, reports, EDF output, and Python cache.
+- RV8GR canonical folder is `RV8GR/`; `RV8GR-V2/` was renamed and docs/tool paths were cleaned.
+- Top-level `README.md` now treats `RV8-G` as a concept/history item, not an active folder in this checkout.
 - Do not stage unrelated RV8 dirty files unless Jo explicitly asks.

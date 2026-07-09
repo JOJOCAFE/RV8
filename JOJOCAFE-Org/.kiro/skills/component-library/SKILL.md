@@ -130,7 +130,8 @@ Expected pass markers:
 - Memory loader support lives in `python/chiplib/loader.py` and can preload `.bin`, Intel HEX, or text-hex images into ROM/RAM `.data` before simulation.
 - Python and Verilog behavior must stay compatible for observable controls, output polarity, tri-state behavior, reset/load/preset behavior, and clock edge behavior.
 - Known follow-up: align SST39SF010A Python/Verilog write-trigger semantics if exact flash `/WE` edge behavior becomes required.
-- Deferred next-session backend task: add probe/test-logic channels for pin/net sampling, serializable state, transition checks, pulse counts, and timing-window assertions.
+- Python schematic backend now includes bus modeling, pull-up/pull-down style default states, probes/test logic, JSON-friendly schematic mapping, netlist generation, and Verilog export foundations.
+- Next backend work should keep Python script, JSON/block UI, netlist, and Verilog paths round-trippable where practical.
 
 ## Final Review Checklist
 

@@ -85,5 +85,5 @@ Everything is files in git. Clone → copy `.kiro/` → done. Works on any machi
 | `TEAM_MEMORY.md` | Shared project knowledge |
 | `PROJECT_STATE.md` | Current status and todo |
 | `.kiro/agents/` | 7 agent configurations |
-| `.kiro/skills/` | 14 skills (shared + per-role) |
+| `.kiro/skills/` | 15 skills (shared + per-role) |
 | `.agent_state/` | Per-person memory |

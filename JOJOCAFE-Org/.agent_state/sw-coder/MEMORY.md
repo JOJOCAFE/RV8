@@ -5,7 +5,7 @@
 | Tool | Status | Purpose |
 |------|--------|---------|
 | `tools/rv8gr_asm.py` | ✅ done | Assembler (18 opcodes + macros) |
-| `sim/chip_sim.py` | ✅ done | Gate-level sim (35 chips) |
+| `sim/chip_sim.py` | ✅ done | Gate-level sim (34 logic chips + ROM/RAM) |
 | `sim/soft_debug.py` | ✅ done | High-level trace sim |
 | `rv8flash.py` | ✅ done | ROM programmer (flash/read/verify) |
 | `rv8term.py` | ✅ done | Terminal bridge via /SLOT1 |
@@ -35,7 +35,7 @@
 
 - Example programs (.asm): blink, counter, game, BASIC stub
 - RV8-R assembler (when ISA designed)
-- Components backend next session: implement probe/test-logic channels in `/home/jo/kiro/Components/python` for pin/net sampling, transitions, pulse counts, timing windows, and serializable UI state.
+- Components backend now has schematic/netlist/probe/test-logic foundations. Next work should keep JSON/block/Python APIs round-trippable and frontend-agnostic.
 
 ## Components Python Simulator
 

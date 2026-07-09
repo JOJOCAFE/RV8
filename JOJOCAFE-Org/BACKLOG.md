@@ -1,6 +1,6 @@
 # Project Backlog
 
-Last updated: 2026-06-29
+Last updated: 2026-07-09
 
 ## Priority Legend
 - 🔴 P0 — Must do now (blocks physical build)
@@ -46,7 +46,7 @@ Last updated: 2026-06-29
 
 | # | Task | Owner | Status |
 |---|------|-------|--------|
-| B-030 | RV8-R architecture design (18 chips, full ISA, microcode) | Bank | ⬜ TODO |
+| B-030 | RV8-R FullHW architecture continuation (49 logic / 53 total packages) | Bank | ⬜ TODO |
 | B-031 | RV8-R microcode generator (15-bit direct-control) | Mint + Bank | ⬜ TODO |
 | B-032 | RV8-R Verilog model + testbenches | Mint + Fern | ⬜ TODO |
 | B-033 | RV8-G architecture exploration (38 chips, no microcode) | Bank | ⬜ TODO |

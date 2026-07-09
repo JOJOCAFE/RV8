@@ -134,7 +134,7 @@ JOJOCAFE-Org/
 │   ├── hw-coder.json           circuit implementer
 │   ├── sw-coder.json           tools/firmware implementer
 │   └── docs-writer.json        documentation specialist
-├── .kiro/skills/               14 skills (7 shared + 7 role-specific)
+├── .kiro/skills/               15 skills (8 shared + 7 role-specific)
 │   ├── team/                   org rules (all agents)
 │   ├── cpu-design/             architecture knowledge
 │   ├── component-library/      shared 74HC/memory model and datasheet workflow
