@@ -7,6 +7,7 @@ Date: 2026-07-09
 Compared:
 
 - Reference PDF: `RV8GR-CPU-paul.pdf`
+- Updated EDIF/EDF file: `RV8GR-CPU-paul.EDF`
 - Current generated KiCad source: `RV8GR.kicad_pro`, `RV8GR.kicad_sch`, `RV8GR.net`, and module sheets
 - Current source-of-truth docs: `../doc/02_wiring_guide.md` and `../doc/12_netlist.md`
 
@@ -24,6 +25,9 @@ Limit: `RV8GR-CPU-paul.pdf` is a graphical schematic print, not a KiCad netlist.
 The current generated KiCad project does **not** fully match `RV8GR-CPU-paul.pdf`.
 
 The largest mismatch is design intent/version: Paul's PDF appears to be a one-page schematic using memory designators `U34` and `U35`, while the current RV8GR generated KiCad/netlist follows the newer 34-logic-chip baseline where `U34` is a 74HC541 IRL-to-IBUS immediate buffer and memory parts are named `ROM1` and `RAM1`.
+
+`RV8GR-CPU-paul.EDF` has been regenerated from `gen_kicad.py` so it now follows
+the current RV8GR baseline, not the older PDF designators.
 
 ## Confirmed Matches
 

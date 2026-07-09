@@ -12,3 +12,4 @@ Kicad/~*
 Kicad/__pycache__/
 Kicad/*.rpt
 Kicad/*.EDF
+!Kicad/RV8GR-CPU-paul.EDF

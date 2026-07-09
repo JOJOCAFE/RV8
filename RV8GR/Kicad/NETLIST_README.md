@@ -10,6 +10,7 @@
 | `RV8GR.kicad_pro` | 429 bytes | KiCad project file |
 | `RV8GR.kicad_sch` | 12K | Top-level schematic with global labels |
 | `RV8GR.net` | 33K | **CRITICAL: KiCad netlist with all connections** |
+| `RV8GR-CPU-paul.EDF` | 66K | EDIF/EDF export of the current RV8GR netlist |
 
 ## Netlist Summary
 
@@ -111,6 +112,8 @@ All nets have been verified against `doc/12_netlist.md`:
 ## Notes
 
 - The `.net` file is the machine-readable truth
+- The `.EDF` file is generated from the same `CHIPS` and `NETLIST` tables as
+  `RV8GR.net`; it is current-baseline data, not an import of the older Paul PDF
 - The `.kicad_sch` provides visual layout for humans
 - Import the netlist to create/verify actual wire connections
 - Run ERC to catch any electrical rule violations

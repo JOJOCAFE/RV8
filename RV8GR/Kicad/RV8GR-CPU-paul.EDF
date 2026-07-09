@@ -1,0 +1,2016 @@
+(edif RV8GR_CPU
+  (edifVersion 2 0 0)
+  (edifLevel 0)
+  (keywordMap
+    (keywordLevel 0)
+  )
+  (status
+    (written
+      (timeStamp 2026 7 9 9 33 38)
+      (program "RV8GR gen_kicad.py"
+        (version "1.0")
+      )
+      (author "RV8 Project")
+    )
+  )
+
+  (library RV8GR_COMPONENT_LIB
+    (edifLevel 0)
+    (technology
+      (numberDefinition
+        (scale 1 1 (unit distance))
+      )
+    )
+    (cell (rename N_62256 "62256")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+          (port (rename &21 "21") (direction INOUT))
+          (port (rename &22 "22") (direction INOUT))
+          (port (rename &23 "23") (direction INOUT))
+          (port (rename &24 "24") (direction INOUT))
+          (port (rename &25 "25") (direction INOUT))
+          (port (rename &26 "26") (direction INOUT))
+          (port (rename &27 "27") (direction INOUT))
+          (port (rename &28 "28") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC00 "74HC00")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC04 "74HC04")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC157 "74HC157")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC161 "74HC161")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC164 "74HC164")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC21 "74HC21")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC245 "74HC245")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC283 "74HC283")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC32 "74HC32")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC541 "74HC541")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC574 "74HC574")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC688 "74HC688")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC74 "74HC74")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell (rename N_74HC86 "74HC86")
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+        )
+      )
+    )
+    (cell AT28C256
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface
+          (port (rename &1 "1") (direction INOUT))
+          (port (rename &2 "2") (direction INOUT))
+          (port (rename &3 "3") (direction INOUT))
+          (port (rename &4 "4") (direction INOUT))
+          (port (rename &5 "5") (direction INOUT))
+          (port (rename &6 "6") (direction INOUT))
+          (port (rename &7 "7") (direction INOUT))
+          (port (rename &8 "8") (direction INOUT))
+          (port (rename &9 "9") (direction INOUT))
+          (port (rename &10 "10") (direction INOUT))
+          (port (rename &11 "11") (direction INOUT))
+          (port (rename &12 "12") (direction INOUT))
+          (port (rename &13 "13") (direction INOUT))
+          (port (rename &14 "14") (direction INOUT))
+          (port (rename &15 "15") (direction INOUT))
+          (port (rename &16 "16") (direction INOUT))
+          (port (rename &17 "17") (direction INOUT))
+          (port (rename &18 "18") (direction INOUT))
+          (port (rename &19 "19") (direction INOUT))
+          (port (rename &20 "20") (direction INOUT))
+          (port (rename &21 "21") (direction INOUT))
+          (port (rename &22 "22") (direction INOUT))
+          (port (rename &23 "23") (direction INOUT))
+          (port (rename &24 "24") (direction INOUT))
+          (port (rename &25 "25") (direction INOUT))
+          (port (rename &26 "26") (direction INOUT))
+          (port (rename &27 "27") (direction INOUT))
+          (port (rename &28 "28") (direction INOUT))
+        )
+      )
+    )
+  )
+
+  (library RV8GR_SHEET_LIB
+    (edifLevel 0)
+    (technology
+      (numberDefinition
+        (scale 1 1 (unit distance))
+      )
+    )
+    (cell RV8GR_CPU
+      (cellType GENERIC)
+      (view netListView
+        (viewType NETLIST)
+        (interface)
+        (contents
+          (instance U1
+            (viewRef netListView
+              (cellRef (rename N_74HC161 "74HC161")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC161"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U2
+            (viewRef netListView
+              (cellRef (rename N_74HC161 "74HC161")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC161"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U3
+            (viewRef netListView
+              (cellRef (rename N_74HC161 "74HC161")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC161"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U4
+            (viewRef netListView
+              (cellRef (rename N_74HC161 "74HC161")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC161"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U5
+            (viewRef netListView
+              (cellRef (rename N_74HC574 "74HC574")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC574"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U6
+            (viewRef netListView
+              (cellRef (rename N_74HC574 "74HC574")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC574"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U7
+            (viewRef netListView
+              (cellRef (rename N_74HC245 "74HC245")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC245"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U8
+            (viewRef netListView
+              (cellRef (rename N_74HC164 "74HC164")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC164"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U9
+            (viewRef netListView
+              (cellRef (rename N_74HC574 "74HC574")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC574"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U10
+            (viewRef netListView
+              (cellRef (rename N_74HC283 "74HC283")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC283"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U11
+            (viewRef netListView
+              (cellRef (rename N_74HC283 "74HC283")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC283"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U12
+            (viewRef netListView
+              (cellRef (rename N_74HC86 "74HC86")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC86"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U13
+            (viewRef netListView
+              (cellRef (rename N_74HC86 "74HC86")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC86"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U14
+            (viewRef netListView
+              (cellRef (rename N_74HC541 "74HC541")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC541"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U15
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U16
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U17
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U18
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U19
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U20
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U21
+            (viewRef netListView
+              (cellRef (rename N_74HC74 "74HC74")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC74"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U22
+            (viewRef netListView
+              (cellRef (rename N_74HC688 "74HC688")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC688"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U23
+            (viewRef netListView
+              (cellRef (rename N_74HC574 "74HC574")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC574"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U24
+            (viewRef netListView
+              (cellRef (rename N_74HC04 "74HC04")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC04"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U25
+            (viewRef netListView
+              (cellRef (rename N_74HC32 "74HC32")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC32"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U26
+            (viewRef netListView
+              (cellRef (rename N_74HC00 "74HC00")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC00"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U27
+            (viewRef netListView
+              (cellRef (rename N_74HC00 "74HC00")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC00"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U28
+            (viewRef netListView
+              (cellRef (rename N_74HC86 "74HC86")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC86"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U29
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U30
+            (viewRef netListView
+              (cellRef (rename N_74HC157 "74HC157")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC157"))
+            (property Footprint (string "Package_DIP:DIP-16_W7.62mm"))
+          )
+          (instance U31
+            (viewRef netListView
+              (cellRef (rename N_74HC74 "74HC74")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC74"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U32
+            (viewRef netListView
+              (cellRef (rename N_74HC574 "74HC574")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC574"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance U33
+            (viewRef netListView
+              (cellRef (rename N_74HC21 "74HC21")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC21"))
+            (property Footprint (string "Package_DIP:DIP-14_W7.62mm"))
+          )
+          (instance U34
+            (viewRef netListView
+              (cellRef (rename N_74HC541 "74HC541")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "74HC541"))
+            (property Footprint (string "Package_DIP:DIP-20_W7.62mm"))
+          )
+          (instance RAM1
+            (viewRef netListView
+              (cellRef (rename N_62256 "62256")
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "62256"))
+            (property Footprint (string "Package_DIP:DIP-28_W15.24mm"))
+          )
+          (instance ROM1
+            (viewRef netListView
+              (cellRef AT28C256
+                (libraryRef RV8GR_COMPONENT_LIB)
+              )
+            )
+            (property Comment (string "AT28C256"))
+            (property Footprint (string "Package_DIP:DIP-28_W15.24mm"))
+          )
+          (net (rename A15 "/A15")
+            (joined
+              (portRef &6 (instanceRef U24))
+              (portRef &20 (instanceRef RAM1))
+            )
+          )
+          (net (rename AC_BUF "/AC_BUF")
+            (joined
+              (portRef &8 (instanceRef U26))
+              (portRef &1 (instanceRef U14))
+              (portRef &19 (instanceRef U14))
+              (portRef &27 (instanceRef RAM1))
+              (portRef &9 (instanceRef U28))
+            )
+          )
+          (net (rename AC_WR "/AC_WR")
+            (joined
+              (portRef &10 (instanceRef U24))
+              (portRef &10 (instanceRef U27))
+              (portRef &5 (instanceRef U33))
+              (portRef &13 (instanceRef U33))
+            )
+          )
+          (net (rename ADDR_MODE "/ADDR_MODE")
+            (joined
+              (portRef &6 (instanceRef U26))
+              (portRef &1 (instanceRef U15))
+              (portRef &1 (instanceRef U16))
+              (portRef &1 (instanceRef U29))
+              (portRef &1 (instanceRef U30))
+              (portRef &2 (instanceRef U26))
+              (portRef &4 (instanceRef U33))
+            )
+          )
+          (net (rename BR_TAKEN "/BR_TAKEN")
+            (joined
+              (portRef &3 (instanceRef U27))
+              (portRef &5 (instanceRef U27))
+            )
+          )
+          (net (rename IRL_OE "/IRL_OE")
+            (joined
+              (portRef &3 (instanceRef U26))
+              (portRef &13 (instanceRef U24))
+              (portRef &1 (instanceRef U34))
+              (portRef &19 (instanceRef U34))
+            )
+          )
+          (net (rename IRQ "/IRQ")
+            (joined
+              (portRef &11 (instanceRef U31))
+            )
+          )
+          (net (rename JUMP "/JUMP")
+            (joined
+              (portRef &8 (instanceRef U24))
+              (portRef &4 (instanceRef U27))
+            )
+          )
+          (net (rename PC_LD "/PC_LD")
+            (joined
+              (portRef &11 (instanceRef U26))
+              (portRef &9 (instanceRef U1))
+              (portRef &9 (instanceRef U2))
+              (portRef &9 (instanceRef U3))
+              (portRef &9 (instanceRef U4))
+            )
+          )
+          (net (rename PG_cond "/PG_cond")
+            (joined
+              (portRef &8 (instanceRef U27))
+              (portRef &13 (instanceRef U25))
+            )
+          )
+          (net (rename P_EQ_Q "/P_EQ_Q")
+            (joined
+              (portRef &19 (instanceRef U22))
+              (portRef &4 (instanceRef U21))
+            )
+          )
+          (net (rename RST "/RST")
+            (joined
+              (portRef &1 (instanceRef U1))
+              (portRef &1 (instanceRef U2))
+              (portRef &1 (instanceRef U3))
+              (portRef &1 (instanceRef U4))
+              (portRef &9 (instanceRef U8))
+              (portRef &1 (instanceRef U31))
+              (portRef &13 (instanceRef U31))
+            )
+          )
+          (net (rename T2 "/T2")
+            (joined
+              (portRef &6 (instanceRef U28))
+              (portRef &12 (instanceRef U25))
+            )
+          )
+          (net (rename XOR_MODE "/XOR_MODE")
+            (joined
+              (portRef &11 (instanceRef U28))
+              (portRef &12 (instanceRef U33))
+            )
+          )
+          (net ABUS0
+            (joined
+              (portRef &4 (instanceRef U15))
+              (portRef &10 (instanceRef ROM1))
+              (portRef &10 (instanceRef RAM1))
+            )
+          )
+          (net ABUS1
+            (joined
+              (portRef &7 (instanceRef U15))
+              (portRef &9 (instanceRef ROM1))
+              (portRef &9 (instanceRef RAM1))
+            )
+          )
+          (net ABUS10
+            (joined
+              (portRef &9 (instanceRef U29))
+              (portRef &21 (instanceRef ROM1))
+              (portRef &21 (instanceRef RAM1))
+            )
+          )
+          (net ABUS11
+            (joined
+              (portRef &12 (instanceRef U29))
+              (portRef &23 (instanceRef ROM1))
+              (portRef &23 (instanceRef RAM1))
+            )
+          )
+          (net ABUS12
+            (joined
+              (portRef &4 (instanceRef U30))
+              (portRef &2 (instanceRef ROM1))
+              (portRef &2 (instanceRef RAM1))
+            )
+          )
+          (net ABUS13
+            (joined
+              (portRef &7 (instanceRef U30))
+              (portRef &26 (instanceRef ROM1))
+              (portRef &26 (instanceRef RAM1))
+            )
+          )
+          (net ABUS14
+            (joined
+              (portRef &9 (instanceRef U30))
+              (portRef &1 (instanceRef ROM1))
+              (portRef &1 (instanceRef RAM1))
+            )
+          )
+          (net ABUS15
+            (joined
+              (portRef &12 (instanceRef U30))
+              (portRef &20 (instanceRef ROM1))
+              (portRef &5 (instanceRef U24))
+            )
+          )
+          (net ABUS2
+            (joined
+              (portRef &9 (instanceRef U15))
+              (portRef &8 (instanceRef ROM1))
+              (portRef &8 (instanceRef RAM1))
+            )
+          )
+          (net ABUS3
+            (joined
+              (portRef &12 (instanceRef U15))
+              (portRef &7 (instanceRef ROM1))
+              (portRef &7 (instanceRef RAM1))
+            )
+          )
+          (net ABUS4
+            (joined
+              (portRef &4 (instanceRef U16))
+              (portRef &6 (instanceRef ROM1))
+              (portRef &6 (instanceRef RAM1))
+            )
+          )
+          (net ABUS5
+            (joined
+              (portRef &7 (instanceRef U16))
+              (portRef &5 (instanceRef ROM1))
+              (portRef &5 (instanceRef RAM1))
+            )
+          )
+          (net ABUS6
+            (joined
+              (portRef &9 (instanceRef U16))
+              (portRef &4 (instanceRef ROM1))
+              (portRef &4 (instanceRef RAM1))
+            )
+          )
+          (net ABUS7
+            (joined
+              (portRef &12 (instanceRef U16))
+              (portRef &3 (instanceRef ROM1))
+              (portRef &3 (instanceRef RAM1))
+            )
+          )
+          (net ABUS8
+            (joined
+              (portRef &4 (instanceRef U29))
+              (portRef &25 (instanceRef ROM1))
+              (portRef &25 (instanceRef RAM1))
+            )
+          )
+          (net ABUS9
+            (joined
+              (portRef &7 (instanceRef U29))
+              (portRef &24 (instanceRef ROM1))
+              (portRef &24 (instanceRef RAM1))
+            )
+          )
+          (net AC0
+            (joined
+              (portRef &19 (instanceRef U9))
+              (portRef &5 (instanceRef U10))
+              (portRef &3 (instanceRef U19))
+              (portRef &2 (instanceRef U14))
+              (portRef &2 (instanceRef U22))
+            )
+          )
+          (net AC1
+            (joined
+              (portRef &18 (instanceRef U9))
+              (portRef &3 (instanceRef U10))
+              (portRef &6 (instanceRef U19))
+              (portRef &3 (instanceRef U14))
+              (portRef &4 (instanceRef U22))
+            )
+          )
+          (net AC2
+            (joined
+              (portRef &17 (instanceRef U9))
+              (portRef &14 (instanceRef U10))
+              (portRef &10 (instanceRef U19))
+              (portRef &4 (instanceRef U14))
+              (portRef &6 (instanceRef U22))
+            )
+          )
+          (net AC3
+            (joined
+              (portRef &16 (instanceRef U9))
+              (portRef &12 (instanceRef U10))
+              (portRef &13 (instanceRef U19))
+              (portRef &5 (instanceRef U14))
+              (portRef &8 (instanceRef U22))
+            )
+          )
+          (net AC4
+            (joined
+              (portRef &15 (instanceRef U9))
+              (portRef &5 (instanceRef U11))
+              (portRef &3 (instanceRef U20))
+              (portRef &6 (instanceRef U14))
+              (portRef &12 (instanceRef U22))
+            )
+          )
+          (net AC5
+            (joined
+              (portRef &14 (instanceRef U9))
+              (portRef &3 (instanceRef U11))
+              (portRef &6 (instanceRef U20))
+              (portRef &7 (instanceRef U14))
+              (portRef &14 (instanceRef U22))
+            )
+          )
+          (net AC6
+            (joined
+              (portRef &13 (instanceRef U9))
+              (portRef &14 (instanceRef U11))
+              (portRef &10 (instanceRef U20))
+              (portRef &8 (instanceRef U14))
+              (portRef &16 (instanceRef U22))
+            )
+          )
+          (net AC7
+            (joined
+              (portRef &12 (instanceRef U9))
+              (portRef &12 (instanceRef U11))
+              (portRef &13 (instanceRef U20))
+              (portRef &9 (instanceRef U14))
+              (portRef &18 (instanceRef U22))
+            )
+          )
+          (net ACC_CLK
+            (joined
+              (portRef &11 (instanceRef U27))
+              (portRef &11 (instanceRef U9))
+              (portRef &3 (instanceRef U21))
+            )
+          )
+          (net AC_IN0
+            (joined
+              (portRef &4 (instanceRef U17))
+              (portRef &2 (instanceRef U9))
+            )
+          )
+          (net AC_IN1
+            (joined
+              (portRef &7 (instanceRef U17))
+              (portRef &3 (instanceRef U9))
+            )
+          )
+          (net AC_IN2
+            (joined
+              (portRef &9 (instanceRef U17))
+              (portRef &4 (instanceRef U9))
+            )
+          )
+          (net AC_IN3
+            (joined
+              (portRef &12 (instanceRef U17))
+              (portRef &5 (instanceRef U9))
+            )
+          )
+          (net AC_IN4
+            (joined
+              (portRef &4 (instanceRef U18))
+              (portRef &6 (instanceRef U9))
+            )
+          )
+          (net AC_IN5
+            (joined
+              (portRef &7 (instanceRef U18))
+              (portRef &7 (instanceRef U9))
+            )
+          )
+          (net AC_IN6
+            (joined
+              (portRef &9 (instanceRef U18))
+              (portRef &8 (instanceRef U9))
+            )
+          )
+          (net AC_IN7
+            (joined
+              (portRef &12 (instanceRef U18))
+              (portRef &9 (instanceRef U9))
+            )
+          )
+          (net AC_WR
+            (joined
+              (portRef &15 (instanceRef U5))
+              (portRef &11 (instanceRef U24))
+              (portRef &13 (instanceRef U27))
+            )
+          )
+          (net ADDER_CARRY
+            (joined
+              (portRef &9 (instanceRef U10))
+              (portRef &7 (instanceRef U11))
+            )
+          )
+          (net ADDR_REQ
+            (joined
+              (portRef &3 (instanceRef U25))
+              (portRef &4 (instanceRef U26))
+            )
+          )
+          (net ALU_SUB
+            (joined
+              (portRef &12 (instanceRef U5))
+              (portRef &7 (instanceRef U10))
+              (portRef &2 (instanceRef U19))
+              (portRef &5 (instanceRef U19))
+              (portRef &11 (instanceRef U19))
+              (portRef &14 (instanceRef U19))
+              (portRef &2 (instanceRef U20))
+              (portRef &5 (instanceRef U20))
+              (portRef &11 (instanceRef U20))
+              (portRef &14 (instanceRef U20))
+              (portRef &2 (instanceRef U28))
+            )
+          )
+          (net BR
+            (joined
+              (portRef &18 (instanceRef U5))
+              (portRef &1 (instanceRef U27))
+            )
+          )
+          (net BUF_OE_N
+            (joined
+              (portRef &12 (instanceRef U24))
+              (portRef &19 (instanceRef U7))
+            )
+          )
+          (net CLK
+            (joined
+              (portRef &2 (instanceRef U1))
+              (portRef &2 (instanceRef U2))
+              (portRef &2 (instanceRef U3))
+              (portRef &2 (instanceRef U4))
+              (portRef &8 (instanceRef U8))
+            )
+          )
+          (net DBUS0
+            (joined
+              (portRef &18 (instanceRef U7))
+              (portRef &11 (instanceRef ROM1))
+              (portRef &11 (instanceRef RAM1))
+            )
+          )
+          (net DBUS1
+            (joined
+              (portRef &17 (instanceRef U7))
+              (portRef &12 (instanceRef ROM1))
+              (portRef &12 (instanceRef RAM1))
+            )
+          )
+          (net DBUS2
+            (joined
+              (portRef &16 (instanceRef U7))
+              (portRef &13 (instanceRef ROM1))
+              (portRef &13 (instanceRef RAM1))
+            )
+          )
+          (net DBUS3
+            (joined
+              (portRef &15 (instanceRef U7))
+              (portRef &15 (instanceRef ROM1))
+              (portRef &15 (instanceRef RAM1))
+            )
+          )
+          (net DBUS4
+            (joined
+              (portRef &14 (instanceRef U7))
+              (portRef &16 (instanceRef ROM1))
+              (portRef &16 (instanceRef RAM1))
+            )
+          )
+          (net DBUS5
+            (joined
+              (portRef &13 (instanceRef U7))
+              (portRef &17 (instanceRef ROM1))
+              (portRef &17 (instanceRef RAM1))
+            )
+          )
+          (net DBUS6
+            (joined
+              (portRef &12 (instanceRef U7))
+              (portRef &18 (instanceRef ROM1))
+              (portRef &18 (instanceRef RAM1))
+            )
+          )
+          (net DBUS7
+            (joined
+              (portRef &11 (instanceRef U7))
+              (portRef &19 (instanceRef ROM1))
+              (portRef &19 (instanceRef RAM1))
+            )
+          )
+          (net DP0
+            (joined
+              (portRef &19 (instanceRef U32))
+              (portRef &2 (instanceRef U29))
+            )
+          )
+          (net DP1
+            (joined
+              (portRef &18 (instanceRef U32))
+              (portRef &5 (instanceRef U29))
+            )
+          )
+          (net DP2
+            (joined
+              (portRef &17 (instanceRef U32))
+              (portRef &11 (instanceRef U29))
+            )
+          )
+          (net DP3
+            (joined
+              (portRef &16 (instanceRef U32))
+              (portRef &14 (instanceRef U29))
+            )
+          )
+          (net DP4
+            (joined
+              (portRef &15 (instanceRef U32))
+              (portRef &2 (instanceRef U30))
+            )
+          )
+          (net DP5
+            (joined
+              (portRef &14 (instanceRef U32))
+              (portRef &5 (instanceRef U30))
+            )
+          )
+          (net DP6
+            (joined
+              (portRef &13 (instanceRef U32))
+              (portRef &11 (instanceRef U30))
+            )
+          )
+          (net DP7
+            (joined
+              (portRef &12 (instanceRef U32))
+              (portRef &14 (instanceRef U30))
+            )
+          )
+          (net DP_Load
+            (joined
+              (portRef &6 (instanceRef U33))
+              (portRef &11 (instanceRef U32))
+            )
+          )
+          (net EI_decode
+            (joined
+              (portRef &8 (instanceRef U33))
+              (portRef &3 (instanceRef U31))
+            )
+          )
+          (net GND
+            (joined
+              (portRef &8 (instanceRef U1))
+              (portRef &8 (instanceRef U2))
+              (portRef &8 (instanceRef U3))
+              (portRef &8 (instanceRef U4))
+              (portRef &10 (instanceRef U5))
+              (portRef &10 (instanceRef U6))
+              (portRef &10 (instanceRef U7))
+              (portRef &7 (instanceRef U8))
+              (portRef &10 (instanceRef U9))
+              (portRef &8 (instanceRef U10))
+              (portRef &8 (instanceRef U11))
+              (portRef &7 (instanceRef U12))
+              (portRef &7 (instanceRef U13))
+              (portRef &10 (instanceRef U14))
+              (portRef &8 (instanceRef U15))
+              (portRef &8 (instanceRef U16))
+              (portRef &8 (instanceRef U17))
+              (portRef &8 (instanceRef U18))
+              (portRef &8 (instanceRef U19))
+              (portRef &8 (instanceRef U20))
+              (portRef &7 (instanceRef U21))
+              (portRef &10 (instanceRef U22))
+              (portRef &10 (instanceRef U23))
+              (portRef &7 (instanceRef U24))
+              (portRef &7 (instanceRef U25))
+              (portRef &7 (instanceRef U26))
+              (portRef &7 (instanceRef U27))
+              (portRef &7 (instanceRef U28))
+              (portRef &8 (instanceRef U29))
+              (portRef &8 (instanceRef U30))
+              (portRef &7 (instanceRef U31))
+              (portRef &10 (instanceRef U32))
+              (portRef &7 (instanceRef U33))
+              (portRef &10 (instanceRef U34))
+              (portRef &14 (instanceRef ROM1))
+              (portRef &14 (instanceRef RAM1))
+              (portRef &1 (instanceRef U5))
+              (portRef &1 (instanceRef U6))
+              (portRef &1 (instanceRef U9))
+              (portRef &1 (instanceRef U23))
+              (portRef &1 (instanceRef U32))
+              (portRef &15 (instanceRef U15))
+              (portRef &15 (instanceRef U16))
+              (portRef &15 (instanceRef U17))
+              (portRef &15 (instanceRef U18))
+              (portRef &15 (instanceRef U19))
+              (portRef &15 (instanceRef U20))
+              (portRef &15 (instanceRef U29))
+              (portRef &15 (instanceRef U30))
+              (portRef &2 (instanceRef U21))
+              (portRef &11 (instanceRef U21))
+              (portRef &12 (instanceRef U21))
+              (portRef &1 (instanceRef U22))
+              (portRef &3 (instanceRef U22))
+              (portRef &5 (instanceRef U22))
+              (portRef &7 (instanceRef U22))
+              (portRef &9 (instanceRef U22))
+              (portRef &11 (instanceRef U22))
+              (portRef &13 (instanceRef U22))
+              (portRef &15 (instanceRef U22))
+              (portRef &17 (instanceRef U22))
+              (portRef &9 (instanceRef U25))
+              (portRef &10 (instanceRef U25))
+              (portRef &22 (instanceRef RAM1))
+            )
+          )
+          (net IBUS0
+            (joined
+              (portRef &2 (instanceRef U7))
+              (portRef &18 (instanceRef U14))
+              (portRef &18 (instanceRef U34))
+              (portRef &1 (instanceRef U12))
+              (portRef &2 (instanceRef U5))
+              (portRef &2 (instanceRef U6))
+              (portRef &2 (instanceRef U23))
+              (portRef &2 (instanceRef U32))
+            )
+          )
+          (net IBUS1
+            (joined
+              (portRef &3 (instanceRef U7))
+              (portRef &17 (instanceRef U14))
+              (portRef &17 (instanceRef U34))
+              (portRef &4 (instanceRef U12))
+              (portRef &3 (instanceRef U5))
+              (portRef &3 (instanceRef U6))
+              (portRef &3 (instanceRef U23))
+              (portRef &3 (instanceRef U32))
+            )
+          )
+          (net IBUS2
+            (joined
+              (portRef &4 (instanceRef U7))
+              (portRef &16 (instanceRef U14))
+              (portRef &16 (instanceRef U34))
+              (portRef &9 (instanceRef U12))
+              (portRef &4 (instanceRef U5))
+              (portRef &4 (instanceRef U6))
+              (portRef &4 (instanceRef U23))
+              (portRef &4 (instanceRef U32))
+            )
+          )
+          (net IBUS3
+            (joined
+              (portRef &5 (instanceRef U7))
+              (portRef &15 (instanceRef U14))
+              (portRef &15 (instanceRef U34))
+              (portRef &12 (instanceRef U12))
+              (portRef &5 (instanceRef U5))
+              (portRef &5 (instanceRef U6))
+              (portRef &5 (instanceRef U23))
+              (portRef &5 (instanceRef U32))
+            )
+          )
+          (net IBUS4
+            (joined
+              (portRef &6 (instanceRef U7))
+              (portRef &14 (instanceRef U14))
+              (portRef &14 (instanceRef U34))
+              (portRef &1 (instanceRef U13))
+              (portRef &6 (instanceRef U5))
+              (portRef &6 (instanceRef U6))
+              (portRef &6 (instanceRef U23))
+              (portRef &6 (instanceRef U32))
+            )
+          )
+          (net IBUS5
+            (joined
+              (portRef &7 (instanceRef U7))
+              (portRef &13 (instanceRef U14))
+              (portRef &13 (instanceRef U34))
+              (portRef &4 (instanceRef U13))
+              (portRef &7 (instanceRef U5))
+              (portRef &7 (instanceRef U6))
+              (portRef &7 (instanceRef U23))
+              (portRef &7 (instanceRef U32))
+            )
+          )
+          (net IBUS6
+            (joined
+              (portRef &8 (instanceRef U7))
+              (portRef &12 (instanceRef U14))
+              (portRef &12 (instanceRef U34))
+              (portRef &9 (instanceRef U13))
+              (portRef &8 (instanceRef U5))
+              (portRef &8 (instanceRef U6))
+              (portRef &8 (instanceRef U23))
+              (portRef &8 (instanceRef U32))
+            )
+          )
+          (net IBUS7
+            (joined
+              (portRef &9 (instanceRef U7))
+              (portRef &11 (instanceRef U14))
+              (portRef &11 (instanceRef U34))
+              (portRef &12 (instanceRef U13))
+              (portRef &9 (instanceRef U5))
+              (portRef &9 (instanceRef U6))
+              (portRef &9 (instanceRef U23))
+              (portRef &9 (instanceRef U32))
+            )
+          )
+          (net IE
+            (joined
+              (portRef &5 (instanceRef U31))
+            )
+          )
+          (net IRL0
+            (joined
+              (portRef &19 (instanceRef U6))
+              (portRef &2 (instanceRef U15))
+              (portRef &3 (instanceRef U1))
+              (portRef &2 (instanceRef U34))
+            )
+          )
+          (net IRL1
+            (joined
+              (portRef &18 (instanceRef U6))
+              (portRef &5 (instanceRef U15))
+              (portRef &4 (instanceRef U1))
+              (portRef &3 (instanceRef U34))
+            )
+          )
+          (net IRL2
+            (joined
+              (portRef &17 (instanceRef U6))
+              (portRef &11 (instanceRef U15))
+              (portRef &5 (instanceRef U1))
+              (portRef &4 (instanceRef U34))
+            )
+          )
+          (net IRL3
+            (joined
+              (portRef &16 (instanceRef U6))
+              (portRef &14 (instanceRef U15))
+              (portRef &6 (instanceRef U1))
+              (portRef &5 (instanceRef U34))
+            )
+          )
+          (net IRL4
+            (joined
+              (portRef &15 (instanceRef U6))
+              (portRef &2 (instanceRef U16))
+              (portRef &3 (instanceRef U2))
+              (portRef &6 (instanceRef U34))
+            )
+          )
+          (net IRL5
+            (joined
+              (portRef &14 (instanceRef U6))
+              (portRef &5 (instanceRef U16))
+              (portRef &4 (instanceRef U2))
+              (portRef &7 (instanceRef U34))
+            )
+          )
+          (net IRL6
+            (joined
+              (portRef &13 (instanceRef U6))
+              (portRef &11 (instanceRef U16))
+              (portRef &5 (instanceRef U2))
+              (portRef &8 (instanceRef U34))
+            )
+          )
+          (net IRL7
+            (joined
+              (portRef &12 (instanceRef U6))
+              (portRef &14 (instanceRef U16))
+              (portRef &6 (instanceRef U2))
+              (portRef &9 (instanceRef U34))
+            )
+          )
+          (net IRQ_FF
+            (joined
+              (portRef &9 (instanceRef U31))
+            )
+          )
+          (net JMP
+            (joined
+              (portRef &19 (instanceRef U5))
+              (portRef &9 (instanceRef U24))
+            )
+          )
+          (net MUX_SEL
+            (joined
+              (portRef &14 (instanceRef U5))
+              (portRef &1 (instanceRef U17))
+              (portRef &1 (instanceRef U18))
+              (portRef &9 (instanceRef U27))
+            )
+          )
+          (net NOT_T0
+            (joined
+              (portRef &2 (instanceRef U24))
+              (portRef &1 (instanceRef U8))
+            )
+          )
+          (net NOT_T1
+            (joined
+              (portRef &4 (instanceRef U24))
+              (portRef &2 (instanceRef U8))
+            )
+          )
+          (net PC0
+            (joined
+              (portRef &14 (instanceRef U1))
+              (portRef &3 (instanceRef U15))
+            )
+          )
+          (net PC1
+            (joined
+              (portRef &13 (instanceRef U1))
+              (portRef &6 (instanceRef U15))
+            )
+          )
+          (net PC10
+            (joined
+              (portRef &12 (instanceRef U3))
+              (portRef &10 (instanceRef U29))
+            )
+          )
+          (net PC11
+            (joined
+              (portRef &11 (instanceRef U3))
+              (portRef &13 (instanceRef U29))
+            )
+          )
+          (net PC12
+            (joined
+              (portRef &14 (instanceRef U4))
+              (portRef &3 (instanceRef U30))
+            )
+          )
+          (net PC13
+            (joined
+              (portRef &13 (instanceRef U4))
+              (portRef &6 (instanceRef U30))
+            )
+          )
+          (net PC14
+            (joined
+              (portRef &12 (instanceRef U4))
+              (portRef &10 (instanceRef U30))
+            )
+          )
+          (net PC15
+            (joined
+              (portRef &11 (instanceRef U4))
+              (portRef &13 (instanceRef U30))
+            )
+          )
+          (net PC2
+            (joined
+              (portRef &12 (instanceRef U1))
+              (portRef &10 (instanceRef U15))
+            )
+          )
+          (net PC3
+            (joined
+              (portRef &11 (instanceRef U1))
+              (portRef &13 (instanceRef U15))
+            )
+          )
+          (net PC4
+            (joined
+              (portRef &14 (instanceRef U2))
+              (portRef &3 (instanceRef U16))
+            )
+          )
+          (net PC5
+            (joined
+              (portRef &13 (instanceRef U2))
+              (portRef &6 (instanceRef U16))
+            )
+          )
+          (net PC6
+            (joined
+              (portRef &12 (instanceRef U2))
+              (portRef &10 (instanceRef U16))
+            )
+          )
+          (net PC7
+            (joined
+              (portRef &11 (instanceRef U2))
+              (portRef &13 (instanceRef U16))
+            )
+          )
+          (net PC8
+            (joined
+              (portRef &14 (instanceRef U3))
+              (portRef &3 (instanceRef U29))
+            )
+          )
+          (net PC9
+            (joined
+              (portRef &13 (instanceRef U3))
+              (portRef &6 (instanceRef U29))
+            )
+          )
+          (net PC_INC
+            (joined
+              (portRef &6 (instanceRef U25))
+              (portRef &7 (instanceRef U1))
+              (portRef &10 (instanceRef U1))
+              (portRef &7 (instanceRef U2))
+              (portRef &7 (instanceRef U3))
+              (portRef &7 (instanceRef U4))
+            )
+          )
+          (net PC_LOAD_COND
+            (joined
+              (portRef &6 (instanceRef U27))
+              (portRef &13 (instanceRef U26))
+            )
+          )
+          (net PG0
+            (joined
+              (portRef &19 (instanceRef U23))
+              (portRef &3 (instanceRef U3))
+            )
+          )
+          (net PG1
+            (joined
+              (portRef &18 (instanceRef U23))
+              (portRef &4 (instanceRef U3))
+            )
+          )
+          (net PG2
+            (joined
+              (portRef &17 (instanceRef U23))
+              (portRef &5 (instanceRef U3))
+            )
+          )
+          (net PG3
+            (joined
+              (portRef &16 (instanceRef U23))
+              (portRef &6 (instanceRef U3))
+            )
+          )
+          (net PG4
+            (joined
+              (portRef &15 (instanceRef U23))
+              (portRef &3 (instanceRef U4))
+            )
+          )
+          (net PG5
+            (joined
+              (portRef &14 (instanceRef U23))
+              (portRef &4 (instanceRef U4))
+            )
+          )
+          (net PG6
+            (joined
+              (portRef &13 (instanceRef U23))
+              (portRef &5 (instanceRef U4))
+            )
+          )
+          (net PG7
+            (joined
+              (portRef &12 (instanceRef U23))
+              (portRef &6 (instanceRef U4))
+            )
+          )
+          (net PG_CLK
+            (joined
+              (portRef &11 (instanceRef U25))
+              (portRef &11 (instanceRef U23))
+            )
+          )
+          (net RCO_0
+            (joined
+              (portRef &15 (instanceRef U1))
+              (portRef &10 (instanceRef U2))
+            )
+          )
+          (net RCO_1
+            (joined
+              (portRef &15 (instanceRef U2))
+              (portRef &10 (instanceRef U3))
+            )
+          )
+          (net RCO_2
+            (joined
+              (portRef &15 (instanceRef U3))
+              (portRef &10 (instanceRef U4))
+            )
+          )
+          (net SRC
+            (joined
+              (portRef &16 (instanceRef U5))
+              (portRef &1 (instanceRef U25))
+              (portRef &10 (instanceRef U33))
+            )
+          )
+          (net STR
+            (joined
+              (portRef &17 (instanceRef U5))
+              (portRef &2 (instanceRef U25))
+              (portRef &10 (instanceRef U26))
+            )
+          )
+          (net SUM0
+            (joined
+              (portRef &4 (instanceRef U10))
+              (portRef &2 (instanceRef U17))
+            )
+          )
+          (net SUM1
+            (joined
+              (portRef &1 (instanceRef U10))
+              (portRef &5 (instanceRef U17))
+            )
+          )
+          (net SUM2
+            (joined
+              (portRef &13 (instanceRef U10))
+              (portRef &11 (instanceRef U17))
+            )
+          )
+          (net SUM3
+            (joined
+              (portRef &10 (instanceRef U10))
+              (portRef &14 (instanceRef U17))
+            )
+          )
+          (net SUM4
+            (joined
+              (portRef &4 (instanceRef U11))
+              (portRef &2 (instanceRef U18))
+            )
+          )
+          (net SUM5
+            (joined
+              (portRef &1 (instanceRef U11))
+              (portRef &5 (instanceRef U18))
+            )
+          )
+          (net SUM6
+            (joined
+              (portRef &13 (instanceRef U11))
+              (portRef &11 (instanceRef U18))
+            )
+          )
+          (net SUM7
+            (joined
+              (portRef &10 (instanceRef U11))
+              (portRef &14 (instanceRef U18))
+            )
+          )
+          (net T0
+            (joined
+              (portRef &3 (instanceRef U8))
+              (portRef &11 (instanceRef U5))
+              (portRef &4 (instanceRef U25))
+              (portRef &1 (instanceRef U24))
+            )
+          )
+          (net T1
+            (joined
+              (portRef &4 (instanceRef U8))
+              (portRef &11 (instanceRef U6))
+              (portRef &5 (instanceRef U25))
+              (portRef &3 (instanceRef U24))
+            )
+          )
+          (net T2
+            (joined
+              (portRef &5 (instanceRef U8))
+              (portRef &1 (instanceRef U26))
+              (portRef &5 (instanceRef U26))
+              (portRef &9 (instanceRef U26))
+              (portRef &12 (instanceRef U26))
+              (portRef &12 (instanceRef U27))
+              (portRef &4 (instanceRef U28))
+              (portRef &1 (instanceRef U33))
+              (portRef &9 (instanceRef U33))
+            )
+          )
+          (net VCC
+            (joined
+              (portRef &16 (instanceRef U1))
+              (portRef &16 (instanceRef U2))
+              (portRef &16 (instanceRef U3))
+              (portRef &16 (instanceRef U4))
+              (portRef &20 (instanceRef U5))
+              (portRef &20 (instanceRef U6))
+              (portRef &20 (instanceRef U7))
+              (portRef &14 (instanceRef U8))
+              (portRef &20 (instanceRef U9))
+              (portRef &16 (instanceRef U10))
+              (portRef &16 (instanceRef U11))
+              (portRef &14 (instanceRef U12))
+              (portRef &14 (instanceRef U13))
+              (portRef &20 (instanceRef U14))
+              (portRef &16 (instanceRef U15))
+              (portRef &16 (instanceRef U16))
+              (portRef &16 (instanceRef U17))
+              (portRef &16 (instanceRef U18))
+              (portRef &16 (instanceRef U19))
+              (portRef &16 (instanceRef U20))
+              (portRef &14 (instanceRef U21))
+              (portRef &20 (instanceRef U22))
+              (portRef &20 (instanceRef U23))
+              (portRef &14 (instanceRef U24))
+              (portRef &14 (instanceRef U25))
+              (portRef &14 (instanceRef U26))
+              (portRef &14 (instanceRef U27))
+              (portRef &14 (instanceRef U28))
+              (portRef &16 (instanceRef U29))
+              (portRef &16 (instanceRef U30))
+              (portRef &14 (instanceRef U31))
+              (portRef &20 (instanceRef U32))
+              (portRef &14 (instanceRef U33))
+              (portRef &20 (instanceRef U34))
+              (portRef &28 (instanceRef ROM1))
+              (portRef &28 (instanceRef RAM1))
+              (portRef &1 (instanceRef U21))
+              (portRef &10 (instanceRef U21))
+              (portRef &13 (instanceRef U21))
+              (portRef &5 (instanceRef U28))
+              (portRef &10 (instanceRef U28))
+              (portRef &13 (instanceRef U28))
+              (portRef &2 (instanceRef U31))
+              (portRef &4 (instanceRef U31))
+              (portRef &10 (instanceRef U31))
+              (portRef &12 (instanceRef U31))
+            )
+          )
+          (net WR_DIR
+            (joined
+              (portRef &8 (instanceRef U28))
+              (portRef &1 (instanceRef U7))
+              (portRef &22 (instanceRef ROM1))
+            )
+          )
+          (net XOR_B0
+            (joined
+              (portRef &4 (instanceRef U19))
+              (portRef &2 (instanceRef U12))
+            )
+          )
+          (net XOR_B1
+            (joined
+              (portRef &7 (instanceRef U19))
+              (portRef &5 (instanceRef U12))
+            )
+          )
+          (net XOR_B2
+            (joined
+              (portRef &9 (instanceRef U19))
+              (portRef &10 (instanceRef U12))
+            )
+          )
+          (net XOR_B3
+            (joined
+              (portRef &12 (instanceRef U19))
+              (portRef &13 (instanceRef U12))
+            )
+          )
+          (net XOR_B4
+            (joined
+              (portRef &4 (instanceRef U20))
+              (portRef &2 (instanceRef U13))
+            )
+          )
+          (net XOR_B5
+            (joined
+              (portRef &7 (instanceRef U20))
+              (portRef &5 (instanceRef U13))
+            )
+          )
+          (net XOR_B6
+            (joined
+              (portRef &9 (instanceRef U20))
+              (portRef &10 (instanceRef U13))
+            )
+          )
+          (net XOR_B7
+            (joined
+              (portRef &12 (instanceRef U20))
+              (portRef &13 (instanceRef U13))
+            )
+          )
+          (net XOR_MODE
+            (joined
+              (portRef &13 (instanceRef U5))
+              (portRef &1 (instanceRef U19))
+              (portRef &1 (instanceRef U20))
+              (portRef &2 (instanceRef U33))
+              (portRef &12 (instanceRef U28))
+            )
+          )
+          (net XOR_Y0
+            (joined
+              (portRef &3 (instanceRef U12))
+              (portRef &6 (instanceRef U10))
+              (portRef &3 (instanceRef U17))
+            )
+          )
+          (net XOR_Y1
+            (joined
+              (portRef &6 (instanceRef U12))
+              (portRef &2 (instanceRef U10))
+              (portRef &6 (instanceRef U17))
+            )
+          )
+          (net XOR_Y2
+            (joined
+              (portRef &8 (instanceRef U12))
+              (portRef &15 (instanceRef U10))
+              (portRef &10 (instanceRef U17))
+            )
+          )
+          (net XOR_Y3
+            (joined
+              (portRef &11 (instanceRef U12))
+              (portRef &11 (instanceRef U10))
+              (portRef &13 (instanceRef U17))
+            )
+          )
+          (net XOR_Y4
+            (joined
+              (portRef &3 (instanceRef U13))
+              (portRef &6 (instanceRef U11))
+              (portRef &3 (instanceRef U18))
+            )
+          )
+          (net XOR_Y5
+            (joined
+              (portRef &6 (instanceRef U13))
+              (portRef &2 (instanceRef U11))
+              (portRef &6 (instanceRef U18))
+            )
+          )
+          (net XOR_Y6
+            (joined
+              (portRef &8 (instanceRef U13))
+              (portRef &15 (instanceRef U11))
+              (portRef &10 (instanceRef U18))
+            )
+          )
+          (net XOR_Y7
+            (joined
+              (portRef &11 (instanceRef U13))
+              (portRef &11 (instanceRef U11))
+              (portRef &13 (instanceRef U18))
+            )
+          )
+          (net Z_flag
+            (joined
+              (portRef &5 (instanceRef U21))
+              (portRef &1 (instanceRef U28))
+            )
+          )
+          (net Z_match
+            (joined
+              (portRef &3 (instanceRef U28))
+              (portRef &2 (instanceRef U27))
+            )
+          )
+        )
+      )
+    )
+  )
+  (design RV8GR_CPU
+    (cellRef RV8GR_CPU
+      (libraryRef RV8GR_SHEET_LIB)
+    )
+  )
+)

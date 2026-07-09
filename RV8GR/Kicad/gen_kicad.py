@@ -7,6 +7,7 @@ Generates KiCad netlist file (.net) with pin connections.
 This is the COMPLETE netlist - the machine-readable truth for the CPU.
 """
 import os
+import sys
 import uuid
 from datetime import datetime
 
@@ -365,6 +366,126 @@ def generate_netlist():
 
     return '\n'.join(lines)
 
+
+# ============================================================================
+# EDIF / EDF NETLIST GENERATOR
+# ============================================================================
+def edif_identifier(name):
+    """Return an EDIF-safe identifier token for a display name."""
+    safe = []
+    for ch in name:
+        if ch.isalnum() or ch == "_":
+            safe.append(ch)
+        else:
+            safe.append("_")
+    ident = ''.join(safe).strip("_") or "NET"
+    if ident[0].isdigit():
+        ident = f"N_{ident}"
+    return ident
+
+
+def edif_name(name):
+    """Return an EDIF name, using rename when the display name is not token-safe."""
+    ident = edif_identifier(name)
+    if ident == name:
+        return ident
+    escaped = name.replace("\\", "\\\\").replace('"', '\\"')
+    return f'(rename {ident} "{escaped}")'
+
+
+def chip_pin_count(ref):
+    pins = {pin for pins in NETLIST.values() for chip, pin in pins if chip == ref}
+    return max(pins)
+
+
+def generate_edif():
+    """Generate a vendor-neutral EDIF netlist from the RV8GR source nets."""
+    cell_defs = {}
+    for ref, chip in CHIPS.items():
+        value = chip["value"]
+        cell_defs[value] = max(cell_defs.get(value, 0), chip_pin_count(ref))
+
+    lines = []
+    lines.append("(edif RV8GR_CPU")
+    lines.append("  (edifVersion 2 0 0)")
+    lines.append("  (edifLevel 0)")
+    lines.append("  (keywordMap")
+    lines.append("    (keywordLevel 0)")
+    lines.append("  )")
+    lines.append("  (status")
+    lines.append("    (written")
+    now = datetime.now()
+    lines.append(f"      (timeStamp {now.year} {now.month} {now.day} {now.hour} {now.minute} {now.second})")
+    lines.append("      (program \"RV8GR gen_kicad.py\"")
+    lines.append("        (version \"1.0\")")
+    lines.append("      )")
+    lines.append("      (author \"RV8 Project\")")
+    lines.append("    )")
+    lines.append("  )")
+    lines.append("")
+    lines.append("  (library RV8GR_COMPONENT_LIB")
+    lines.append("    (edifLevel 0)")
+    lines.append("    (technology")
+    lines.append("      (numberDefinition")
+    lines.append("        (scale 1 1 (unit distance))")
+    lines.append("      )")
+    lines.append("    )")
+    for value in sorted(cell_defs):
+        lines.append(f"    (cell {edif_name(value)}")
+        lines.append("      (cellType GENERIC)")
+        lines.append("      (view netListView")
+        lines.append("        (viewType NETLIST)")
+        lines.append("        (interface")
+        for pin in range(1, cell_defs[value] + 1):
+            lines.append(f"          (port (rename &{pin} \"{pin}\") (direction INOUT))")
+        lines.append("        )")
+        lines.append("      )")
+        lines.append("    )")
+    lines.append("  )")
+    lines.append("")
+    lines.append("  (library RV8GR_SHEET_LIB")
+    lines.append("    (edifLevel 0)")
+    lines.append("    (technology")
+    lines.append("      (numberDefinition")
+    lines.append("        (scale 1 1 (unit distance))")
+    lines.append("      )")
+    lines.append("    )")
+    lines.append("    (cell RV8GR_CPU")
+    lines.append("      (cellType GENERIC)")
+    lines.append("      (view netListView")
+    lines.append("        (viewType NETLIST)")
+    lines.append("        (interface)")
+    lines.append("        (contents")
+    for ref in sorted(CHIPS.keys(), key=lambda x: (len(x), x)):
+        chip = CHIPS[ref]
+        lines.append(f"          (instance {ref}")
+        lines.append("            (viewRef netListView")
+        lines.append(f"              (cellRef {edif_name(chip['value'])}")
+        lines.append("                (libraryRef RV8GR_COMPONENT_LIB)")
+        lines.append("              )")
+        lines.append("            )")
+        lines.append(f"            (property Comment (string \"{chip['value']}\"))")
+        lines.append(f"            (property Footprint (string \"{chip['footprint']}\"))")
+        lines.append("          )")
+    for net_name in sorted(NETLIST.keys()):
+        lines.append(f"          (net {edif_name(net_name)}")
+        lines.append("            (joined")
+        for ref, pin in NETLIST[net_name]:
+            lines.append(f"              (portRef &{pin} (instanceRef {ref}))")
+        lines.append("            )")
+        lines.append("          )")
+    lines.append("        )")
+    lines.append("      )")
+    lines.append("    )")
+    lines.append("  )")
+    lines.append("  (design RV8GR_CPU")
+    lines.append("    (cellRef RV8GR_CPU")
+    lines.append("      (libraryRef RV8GR_SHEET_LIB)")
+    lines.append("    )")
+    lines.append("  )")
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
 # ============================================================================
 # KICAD SCHEMATIC GENERATORS
 # ============================================================================
@@ -556,6 +677,14 @@ if __name__ == "__main__":
     print("RV8GR KiCad Generator")
     print("=" * 60)
 
+    if "--edf-only" in sys.argv:
+        edif_path = os.path.join(OUTDIR, "RV8GR-CPU-paul.EDF")
+        with open(edif_path, "w") as f:
+            f.write(generate_edif())
+        print(f"✓ Created RV8GR-CPU-paul.EDF")
+        print(f"Files generated in: {OUTDIR}")
+        sys.exit(0)
+
     # Create project file
     pro_path = os.path.join(OUTDIR, "RV8GR.kicad_pro")
     with open(pro_path, "w") as f:
@@ -573,6 +702,12 @@ if __name__ == "__main__":
     with open(net_path, "w") as f:
         f.write(generate_netlist())
     print(f"✓ Created RV8GR.net")
+
+    # Generate EDIF/EDF file for tools that consume EDIF netlists.
+    edif_path = os.path.join(OUTDIR, "RV8GR-CPU-paul.EDF")
+    with open(edif_path, "w") as f:
+        f.write(generate_edif())
+    print(f"✓ Created RV8GR-CPU-paul.EDF")
 
     # Count and verify nets
     net_count = len(NETLIST)
@@ -617,6 +752,7 @@ if __name__ == "__main__":
     print(f"  - RV8GR.kicad_pro   (project file)")
     print(f"  - RV8GR.kicad_sch   (top-level schematic)")
     print(f"  - RV8GR.net         (CRITICAL: KiCad netlist)")
+    print(f"  - RV8GR-CPU-paul.EDF (EDIF netlist)")
     print(f"\nNext steps:")
     print(f"  1. Open RV8GR.kicad_pro in KiCad 10.0+")
     print(f"  2. Import netlist: Tools → Generate Netlist → Import")

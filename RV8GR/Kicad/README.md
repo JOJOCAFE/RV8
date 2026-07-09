@@ -14,6 +14,9 @@ Generated on 2026-07-09
 | IR_BUF.kicad_sch | Instruction Register + Bus Buffers (U5-U7, U14, U34) |
 | ALU_AC.kicad_sch | ALU + Accumulator + Z Flag (U9-U22) |
 | CTRL.kicad_sch | Control Logic (U23-U28, U31-U33) |
+| RV8GR.net | Current KiCad netlist generated from `gen_kicad.py` |
+| RV8GR-CPU-paul.EDF | Current-baseline EDIF/EDF netlist generated from `gen_kicad.py` |
+| RV8GR-CPU-paul.pdf | Older Paul one-page schematic reference; not designator-compatible with the current baseline |
 
 ## Chip Summary
 
@@ -73,3 +76,10 @@ To complete the schematic:
 ## Reference
 
 See `doc/10_kicad_modules.md` and `doc/02_wiring_guide.md` for complete pin-level wiring details.
+
+## Paul Reference Files
+
+`RV8GR-CPU-paul.pdf` is kept as a visual reference only. The generated
+`RV8GR-CPU-paul.EDF` now follows the current RV8GR source-of-truth netlist:
+`U34` is the 74HC541 IRL-to-IBUS immediate buffer, and memory is named `ROM1`
+and `RAM1`.
