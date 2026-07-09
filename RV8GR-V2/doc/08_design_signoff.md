@@ -1,6 +1,6 @@
 # RV8-GR — Design Sign-off v1.0
 
-**33 chips. 18 instructions. 64KB. No microcode. Hardware Design Frozen.**
+**36 packages. 18 instructions. 64KB. No microcode. Hardware Design Frozen.**
 
 ---
 
@@ -40,8 +40,8 @@ Opcode = Control Word (no decoder, no microcode ROM)
 
 | Metric | Value |
 |--------|-------|
-| Logic chips | 33 |
-| Total packages | 35 (+ ROM + RAM) |
+| Logic chips | 34 |
+| Total packages | 36 (34 logic + ROM + RAM) |
 | Instructions | 18 (+NOT free, +$C0 alias) |
 | Gate count | ~1,260 |
 | Opcode space | 7% used, 68% expansion |
@@ -85,7 +85,7 @@ Step 3: 5 MHz   — experimental (PCB only), verify if achievable
 ```
 
 Critical sequence to test: **two consecutive data-access instructions**
-(e.g., `LB $03` followed by `ADD $04`) where ADDR_MODE switches back
+(e.g., `LB $03` followed by `ADD $04`) where /ADDR_MODE switches back
 to PC late. If this works at 5 MHz with 70ns ROM → design is proven.
 
 ---
@@ -104,7 +104,7 @@ to PC late. If this works at 5 MHz with 70ns ROM → design is proven.
 ## Sign-off
 
 ```
-RV8-GR v1.0: 33-chip horizontal-control CPU
+RV8-GR v1.0: 36-package horizontal-control CPU
 - Full 64KB code + data
 - All 256 opcodes deterministic
 - Electrical hazard eliminated
@@ -139,7 +139,7 @@ Hardware Design Frozen.
 ```
 
 *Date: 2026-06-09*
-*Chips: U1-U33 (33 logic) + ROM + RAM = 35 packages*
+*Chips: U1-U34 (34 logic) + ROM + RAM = 36 packages*
 *Store safety: U7 /OE=BUF_OE_N, ROM /OE=WR_DIR*
 *Bus: RV8-Bus v2 (40-pin, Slot1=$FF10, Slot2=$FF20)*
 *IRQ: v1.0 polling (IRQ_FF latch, cleared by /RST only). Hardware vector is future/unfrozen.*

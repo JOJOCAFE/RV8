@@ -218,12 +218,12 @@ Look at:
 - `ABUS0..ABUS7`.
 
 Expected:
-- `SEL=0`: ABUS follows PC low byte.
-- `SEL=1`: ABUS follows DIP switch.
+- `/ADDR_MODE=1`: ABUS follows PC low byte.
+- `/ADDR_MODE=0`: ABUS follows DIP switch.
 
 Pass:
-- [ ] SEL=0 works.
-- [ ] SEL=1 works.
+- [ ] /ADDR_MODE=1 works.
+- [ ] /ADDR_MODE=0 works.
 - [ ] All 8 bits match.
 
 Stop if:
@@ -254,9 +254,9 @@ Look at:
 - Especially `ABUS15`.
 
 Expected:
-- `SEL=0`: high address follows PC high.
-- `SEL=1`, DP=`$80`: `ABUS15=1`.
-- `SEL=1`, DP=`$00`: `ABUS15=0`.
+- `/ADDR_MODE=1`: high address follows PC high.
+- `/ADDR_MODE=0`, DP=`$80`: `ABUS15=1`.
+- `/ADDR_MODE=0`, DP=`$00`: `ABUS15=0`.
 
 Pass:
 - [ ] High mux selects correctly.
@@ -394,7 +394,7 @@ Pass:
 
 Stop if:
 - U5 and U6 latch at the wrong time.
-- U6 output fights IBUS during fetch.
+- U34 output fights IBUS during fetch.
 
 Notes:
 
@@ -444,22 +444,22 @@ Notes:
 Goal: Select immediate operand or data address correctly.
 
 Build:
-- U25 gate 1 for `ADDR_MODE`.
+- U25 gate 1 for `ADDR_REQ`.
 - U26 gate 2 for `/ADDR_MODE`.
 - U26 gate 1 for `/IRL_OE`.
 - U24 gate 6 for `BUF_OE_N`.
 
 Look at:
-- `ADDR_MODE`.
+- `/ADDR_MODE`.
 - `/IRL_OE`.
 - `BUF_OE_N`.
-- U6-1.
+- U34-1/19.
 - U7-19.
 
 Expected:
-- Immediate instruction: U6 drives IBUS during T2.
+- Immediate instruction: U34 drives IBUS during T2.
 - Load/store instruction: address mux uses `{DP, IRL}`.
-- U6 and U7 do not drive IBUS at the same time.
+- U34 and U7 do not drive IBUS at the same time.
 
 Pass:
 - [ ] Immediate path works.
@@ -467,7 +467,7 @@ Pass:
 - [ ] No two IBUS drivers fight.
 
 Stop if:
-- U6 and U7 are both enabled in T2 immediate.
+- U34 and U7 are both enabled in T2 immediate.
 - IBUS flickers randomly.
 
 Notes:
@@ -811,7 +811,7 @@ Goal: Set the high byte for data access.
 Build:
 - U32 data page register.
 - U33 gate 1 for `DP_Load`.
-- U32 outputs to U29/U30 B inputs.
+- U32 outputs to U29/U30 A inputs.
 
 Look at:
 - `DP0..DP7`.
@@ -1180,4 +1180,3 @@ Do not skip these checks:
 | J goes wrong page | PG register wiring |
 | RAM fails | DP, RAM `/CE`, RAM `/WE`, U7 direction |
 | IRQ LED never lights after release | `/IRQ` pull-up, U31-11, U31 pinout |
-

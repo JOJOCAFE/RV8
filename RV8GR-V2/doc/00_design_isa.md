@@ -1,6 +1,6 @@
 # RV8-GR — Design & ISA Reference (Stable)
 
-**33 logic chips + ROM + RAM. No microcode. 64K. Polling IRQ. Verilog verified.**
+**34 logic chips + ROM + RAM. No microcode. 64K. Polling IRQ. Verilog verified.**
 
 ---
 
@@ -140,7 +140,7 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 
 ---
 
-## Chip List (33 logic + ROM + RAM = 35 packages)
+## Chip List (34 logic + ROM + RAM = 36 packages)
 
 > 📌 **Master Reference**: All U# designators are frozen. Use this table for schematic, PCB, and wiring cross-reference.
 
@@ -169,15 +169,17 @@ DBUS ←→ [U7 Bus Buffer] ←→ IBUS
 | U31 | 74HC74 | IRQ latch + IE flag |
 | U32 | 74HC574 | Data Page Register |
 | U33 | 74HC21 | SETDP decode (gate1) + EI decode (gate2) |
+| U34 | 74HC541 | IRL-to-IBUS immediate buffer |
 
 ---
 
 ## Derived Signals
 
 ```
-ADDR_MODE    = SRC | STR
+ADDR_REQ     = SRC | STR
 PC_INC       = T0 | T1
 ACC_CLK   = NAND(T2, AC_WR)          ← U27 gate D → U9 CLK, U21 CLK
+/ADDR_MODE   = NAND(ADDR_REQ, T2)    ← LOW selects {DP,IRL}; HIGH selects PC
 /IRL_OE      = NAND(T2, /ADDR_MODE)
 /AC_BUF      = NAND(T2, STR)            ← also RAM /WE
 BUF_OE_N     = NOT(/IRL_OE)             ← U7 /OE
@@ -198,8 +200,8 @@ EI_decode    = T2 & SRC & /XOR_MODE & /AC_WR        ← U33 gate 2
 
 | Type | Signals | Convention |
 |------|---------|------------|
-| **Active High** | AC_WR, SRC, STR, BR, JMP, PC_INC, ADDR_MODE, PC_LOAD_COND, DP_Load, EI_decode, Z_match, WR_DIR | Name = assert function. HIGH = active. |
-| **Active Low** | /PC_LD, /IRL_OE, /AC_BUF, /BR_TAKEN, /RST, /IRQ | Prefix `/` = active LOW. LOW = assert. |
+| **Active High** | AC_WR, SRC, STR, BR, JMP, PC_INC, ADDR_REQ, PC_LOAD_COND, DP_Load, EI_decode, Z_match, WR_DIR | Name = assert function. HIGH = active. |
+| **Active Low** | /ADDR_MODE, /PC_LD, /IRL_OE, /AC_BUF, /BR_TAKEN, /RST, /IRQ | Prefix `/` = active LOW. LOW = assert. |
 | **Clock-edge** | ACC_CLK (active LOW→latch on rise), PG_CLK (latch on rising edge), CLK | Edge-triggered. Action on specified edge. |
 
 ### Suffix Rules (cross-tool)
@@ -429,7 +431,7 @@ the bus direction; source/read semantics are ignored by the physical store path.
 | PC_INC | PC increment | =1 during T0,T1 only |
 | /PC_LD | PC load | =0 → loads {PG,IRL} into PC |
 | ACC_CLK | AC latch | Rising edge → AC captures mux output |
-| ADDR_MODE | Address select | =1 → ABUS={DP,IRL} |
+| /ADDR_MODE | Address select | =0 → ABUS={DP,IRL}; =1 → ABUS=PC |
 | BUF_OE_N | U7 output enable | =0 → U7 enabled |
 | WR_DIR | U7 direction | =1 → IBUS-to-DBUS (store path) |
 | /AC_BUF | AC buffer + RAM /WE | =0 → U14 active + RAM write |
@@ -448,19 +450,19 @@ follow their contracts above.
 |:-----:|:----:|:-----------:|:-----------:|
 | T0 (fetch) | PC | ROM or RAM | U7 (DBUS→IBUS) |
 | T1 (fetch) | PC | ROM or RAM | U7 (DBUS→IBUS) |
-| T2 immediate | PC | (stale) | **U6** (IRL) |
+| T2 immediate | PC | (stale) | **U34** (IRL) |
 | T2 load (SRC=1) | {DP,IRL} | RAM or ROM | **U7** (DBUS→IBUS) |
 | T2 store (STR=1) | {DP,IRL} | **U7** (IBUS→DBUS) | **U14** (AC) |
 
 **Rule: At no time may two drivers be active on the same bus.**
-- IBUS: U6, U7, U14 — safe by direction and /OE timing
+- IBUS: U34, U7, U14 — safe by direction and /OE timing
 - DBUS: ROM, RAM, U7 — safe via /CE, /WE, ROM /OE=WR_DIR
 
 ### Forbidden Bus States
 
 | # | Condition | Conflict | Hardware Safety |
 |:-:|-----------|----------|----------------|
-| 1 | U6 enabled AND U7 enabled (IBUS) | Two IBUS drivers | /IRL_OE requires /ADDR_MODE=1 → SRC=0,STR=0 → U7 disabled |
+| 1 | U34 enabled AND U7 enabled (IBUS) | Two IBUS drivers | /IRL_OE requires /ADDR_MODE=1 → ADDR_REQ=0 → U7 disabled |
 | 2 | U14 enabled AND U7 enabled | No conflict | U14 drives IBUS; U7 DIR=write treats IBUS as input and drives DBUS |
 | 3 | ROM enabled AND U7 writing DBUS | ROM vs U7 on DBUS | ROM /OE=WR_DIR disables ROM output during store |
 | 4 | RAM output AND U7 writing DBUS | RAM vs U7 on DBUS | RAM /WE=0 during store → RAM in write mode, not driving DBUS |
@@ -475,8 +477,8 @@ follow their contracts above.
 ```
 Design Goal: keep v1.0 at the smallest easy-to-build baseline
 
-RV8-GR v1.0:  35 packages (33 logic + ROM + RAM)
-Hardware vector: future/unfrozen; not part of the 33-chip wiring guide
+RV8-GR v1.0:  36 packages (34 logic + ROM + RAM)
+Hardware vector: future/unfrozen; not part of the 36-package wiring guide
 ```
 
 Any feature proposal must justify chip cost against this budget.
@@ -531,7 +533,7 @@ Cycle  Phase  PC    ABUS  IRH  IRL  Mnemonic  AC  Z  PG  DP  IE  IRQ  Notes
 | Cycle | dec | Global clock count (1-based) |
 | Phase | T0/T1/T2 | Ring counter state |
 | PC | 4 hex | PC value at **start** of phase (before increment) |
-| ABUS | 4 hex | Address bus output (=PC during T0/T1, ={DP,IRL} during T2 if ADDR_MODE) |
+| ABUS | 4 hex | Address bus output (=PC when /ADDR_MODE=1, ={DP,IRL} when /ADDR_MODE=0) |
 | IRH | 2 hex | IR control byte (-- if not yet latched) |
 | IRL | 2 hex | IR operand (-- if not yet latched) |
 | Mnemonic | text | Decoded instruction name (-- until T2) |
@@ -547,7 +549,7 @@ Cycle  Phase  PC    ABUS  IRH  IRL  Mnemonic  AC  Z  PG  DP  IE  IRQ  Notes
 
 **PC convention**: PC is sampled at the **rising edge** of each phase (before PC_INC takes effect). Thus T0 shows the address being fetched, not the next address.
 
-**ABUS convention**: Shows the actual address on the bus during that phase. For T2+ADDR_MODE (LB/SB/ADD/SUB/XOR with SRC=1), ABUS={DP,IRL}. Otherwise ABUS=PC.
+**ABUS convention**: Shows the actual address on the bus during that phase. For T2 data access (LB/SB/ADD/SUB/XOR with SRC=1 or STR=1), /ADDR_MODE=0 and ABUS={DP,IRL}. Otherwise /ADDR_MODE=1 and ABUS=PC.
 
 **Minimal mode**: For quick checks, tools MAY omit ABUS/PG/DP/IE/IRQ columns and show only `Cycle Phase PC IRH IRL AC Z Notes`. The full format is required for regression tests and bug reports.
 

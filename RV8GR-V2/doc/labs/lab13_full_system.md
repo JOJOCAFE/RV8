@@ -273,7 +273,7 @@ python3 lab13_full_system.py
 
 ---
 
-## Chip Count (33 logic + ROM + RAM = 35):
+## Chip Count (34 logic + ROM + RAM = 35):
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|
@@ -289,7 +289,7 @@ python3 lab13_full_system.py
 | 10 | U25-U28 | Branch/Jump logic |
 | 11 | U23 | Page register |
 | 12 | RAM, U32, U33 | RAM + data page |
-| **รวม** | **33 logic + ROM + RAM** | **= 35 packages** |
+| **รวม** | **34 logic + ROM + RAM** | **= 36 packages** |
 
 ---
 

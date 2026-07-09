@@ -108,7 +108,7 @@ For valid opcodes: no conflict. MUX and XOR bits naturally separate SETPG/SETDP.
 
 ## IRQ Save-PC Status
 
-| Approach | v1.0 Build (33 chips) | Future vector | v2.0 Future |
+| Approach | v1.0 Build (36 packages) | Future vector | v2.0 Future |
 |----------|:---------------------:|:----------------:|:-----------:|
 | Detect /IRQ edge | ✅ Hardware (U31) | ✅ Hardware | ✅ Hardware |
 | Jump to $FF00 | ❌ Software poll+branch | TBD hardware | ✅ Hardware |

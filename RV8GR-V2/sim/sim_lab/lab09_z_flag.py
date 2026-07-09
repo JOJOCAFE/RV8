@@ -2,7 +2,7 @@
 Lab 09: Z Flag + Control Logic — U21-U22, U24-U28, U33
 
 Tests derived signals from IR_HIGH control bits:
-  ADDR_MODE, PC_INC, /IRL_OE, /AC_BUF, /PC_LD, Z_match, WR_DIR, DP_Load, PG_Load
+  ADDR_REQ, /ADDR_MODE, PC_INC, /IRL_OE, /AC_BUF, /PC_LD, Z_match, WR_DIR, DP_Load, PG_Load
 """
 import sys; sys.path.insert(0, '..')
 from chips import TTL_74hc04, TTL_74hc32, TTL_74hc00, TTL_74hc86, TTL_74hc21
@@ -16,17 +16,17 @@ U33 = TTL_74hc21('U33')
 
 def compute_signals(t2, sub, xor_mode, mux, ac_wr, src, stt, br, jmp, z_flag):
     """Compute all derived signals. Returns dict."""
-    # U25 gate 1: ADDR_MODE = SRC | STR
+    # U25 gate 1: ADDR_REQ = SRC | STR
     U25.set(1, src); U25.set(2, stt); U25.update()
-    addr_mode = U25.get(3)
+    addr_req = U25.get(3)
 
     # U25 gate 2: PC_INC = T0 | T1 (we pass t0/t1 as !t2 for simplicity)
     t0 = 1 if not t2 else 0
     U25.set(4, t0); U25.set(5, 0); U25.update()  # simplified
     pc_inc = U25.get(6)
 
-    # U26 gate 2: /ADDR_MODE = NAND(ADDR_MODE, ADDR_MODE) = NOT
-    U26.set(4, addr_mode); U26.set(5, addr_mode); U26.update()
+    # U26 gate 2: /ADDR_MODE = NAND(ADDR_REQ, T2)
+    U26.set(4, addr_req); U26.set(5, t2); U26.update()
     not_addr_mode = U26.get(6)
 
     # U26 gate 1: /IRL_OE = NAND(T2, /ADDR_MODE)
@@ -76,7 +76,8 @@ def compute_signals(t2, sub, xor_mode, mux, ac_wr, src, stt, br, jmp, z_flag):
     pg_load = int(bool(t2 and mux and not ac_wr))
 
     return {
-        'ADDR_MODE': addr_mode, '/IRL_OE': irl_oe_n, '/AC_BUF': ac_buf_n,
+        'ADDR_REQ': addr_req, '/ADDR_MODE': not_addr_mode,
+        '/IRL_OE': irl_oe_n, '/AC_BUF': ac_buf_n,
         'U7_OE_N': u7_oe_n, '/PC_LD': pc_ld_n, 'Z_match': z_match,
         'WR_DIR': wr_dir, 'DP_Load': dp_load, 'PG_Load': pg_load,
         'PC_LOAD_COND': pc_load_cond,
@@ -85,9 +86,9 @@ def compute_signals(t2, sub, xor_mode, mux, ac_wr, src, stt, br, jmp, z_flag):
 # Test: (T2, SUB,XOR,MUX,AC_WR,SRC,STR,BR,JMP, Z, expected_signals)
 TEST_VECTORS = [
     # LI $42 at T2: $30 = 0011_0000
-    (1, 0,0,1,1,0,0,0,0, 0, {'ADDR_MODE':0, '/IRL_OE':0, '/AC_BUF':1, 'WR_DIR':0, '/PC_LD':1, 'DP_Load':0}),
+    (1, 0,0,1,1,0,0,0,0, 0, {'ADDR_REQ':0, '/ADDR_MODE':1, '/IRL_OE':0, '/AC_BUF':1, 'WR_DIR':0, '/PC_LD':1, 'DP_Load':0}),
     # SB $03 at T2: $04 = 0000_0100
-    (1, 0,0,0,0,0,1,0,0, 0, {'ADDR_MODE':1, '/IRL_OE':1, '/AC_BUF':0, 'WR_DIR':1, '/PC_LD':1, 'DP_Load':0}),
+    (1, 0,0,0,0,0,1,0,0, 0, {'ADDR_REQ':1, '/ADDR_MODE':0, '/IRL_OE':1, '/AC_BUF':0, 'WR_DIR':1, '/PC_LD':1, 'DP_Load':0}),
     # J $20 at T2: $01 = 0000_0001
     (1, 0,0,0,0,0,0,0,1, 0, {'/PC_LD':0, 'PC_LOAD_COND':1, 'DP_Load':0}),
     # BEQ at T2 with Z=1: $02
@@ -95,7 +96,7 @@ TEST_VECTORS = [
     # BNE at T2 with Z=0: $82 (SUB=1)
     (1, 1,0,0,0,0,0,1,0, 0, {'Z_match':1, '/PC_LD':0}),
     # SETDP at T2: $40 = 0100_0000
-    (1, 0,1,0,0,0,0,0,0, 0, {'DP_Load':1, 'ADDR_MODE':0}),
+    (1, 0,1,0,0,0,0,0,0, 0, {'DP_Load':1, 'ADDR_REQ':0, '/ADDR_MODE':1}),
     # Reserved physical side effect: $60 loads both PG and DP.
     # U23 ignores XOR; U33 ignores MUX.
     (1, 0,1,1,0,0,0,0,0, 0, {'PG_Load':1, 'DP_Load':1}),

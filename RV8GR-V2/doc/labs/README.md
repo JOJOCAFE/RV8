@@ -13,7 +13,7 @@
 
 ## ข้อตกลงของรุ่น V2
 
-- สร้างเฉพาะ baseline: 33 logic chips + ROM + RAM.
+- สร้างเฉพาะ baseline: 34 logic chips + ROM + RAM.
 - ไม่มี microcode.
 - ไม่มี hardware IRQ vector.
 - IRQ เป็น polling latch เท่านั้น.
@@ -45,7 +45,7 @@
 
 ---
 
-## Chip Checklist (33 logic + ROM + RAM = 35)
+## Chip Checklist (34 logic + ROM + RAM = 35)
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|

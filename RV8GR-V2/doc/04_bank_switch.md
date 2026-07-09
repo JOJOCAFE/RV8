@@ -1,9 +1,9 @@
 # RV8-GR — Bank Switch & Memory Expansion (Stable)
 
-**CPU has 33 chips with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
+**CPU has 36 packages with SETDP (full 64KB data access). Expansion only needed for ROM banking.**
 
 > FUTURE ONLY: ROM banking is not part of the RV8GR-V2 student baseline.
-> Build and verify the 33-logic-chip CPU first. Do not add bank-switch wiring
+> Build and verify the 34-logic-chip CPU first. Do not add bank-switch wiring
 > until the baseline passes the full instruction smoke test.
 
 ---

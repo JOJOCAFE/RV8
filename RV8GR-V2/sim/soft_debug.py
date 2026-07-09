@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 RV8-GR Soft Debug: Pin-level logic simulation
-Traces signals through all 33 chips clock-by-clock.
+Traces signals through all 36 packages clock-by-clock.
 Simulates with slow clock to verify wiring correctness.
 
-NOTE: This sim models the 33-chip v1.0 CPU:
+NOTE: This sim models the 36-package v1.0 CPU:
   - EI ($08) sets IE; DI ($48) is an inert software marker
   - DP/PG/AC/Z initialized to known values (hardware = indeterminate at power-on)
   - IRQ is polling-only: /IRQ latches IRQ_FF, no hardware vector
@@ -125,7 +125,7 @@ class CPU:
                 # U14 drives IBUS = AC
                 self.ibus = self.ac
             elif s['/IRL_OE'] == 0:
-                # U6 drives IBUS = IRL (immediate)
+                # U34 drives IBUS = IRL (immediate)
                 self.ibus = self.ir_low
             else:
                 # U7 drives IBUS = DBUS (RAM read)

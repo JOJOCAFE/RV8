@@ -2,7 +2,7 @@
 RV8-GR Full CPU Simulation — runs programs through all 35 chips.
 Uses soft_debug logic (proven correct) but with chip-level probe interface.
 
-Models 33-chip v1.0 CPU behavior (Verilog-equivalent):
+Models 36-package v1.0 CPU behavior (Verilog-equivalent):
   - DP=$80, PG=$00, AC=$00, Z=1 at init (hardware = indeterminate)
   - EI sets IE; DI is inert; IRQ is polling-only with no hardware vector
   Physical v1.0 boot must start with: SETDP $80, SETPG $00, LI $00

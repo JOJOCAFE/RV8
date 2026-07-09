@@ -1,6 +1,6 @@
 # RV8-GR — No Microcode, Full 64K, IRQ (Stable)
 
-**33 logic chips + ROM + RAM = 35 packages. Verilog verified.**
+**34 logic chips + ROM + RAM = 36 packages. Verilog verified.**
 
 ---
 
@@ -9,7 +9,7 @@
 This is the build target for RV8GR-V2. Do not add future features while
 building the baseline CPU.
 
-- **33 logic chips + ROM + RAM = 35 packages**
+- **34 logic chips + ROM + RAM = 36 packages**
 - **No microcode ROM**
 - **No hardware IRQ vector**: IRQ is a polling latch only
 - **Every instruction is 3 phases**: T0 fetch opcode, T1 fetch operand, T2 execute
@@ -66,7 +66,7 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
 ## BOM — Complete Order List
 
-### Logic (33 chips)
+### Logic (36 packages)
 
 | Part | Qty | Package | Notes |    |count|
 |------|:---:|:-------:|-------|-----|-----|
@@ -266,11 +266,11 @@ RV8GR-V2/
 
 ### Task 6: Gate-Level Simulator ✅
 
-All 35 chips simulated pin-by-pin. 8 CPU tests + 11K wiring checks pass.
+All 36 chips simulated pin-by-pin. 8 CPU tests + 11K wiring checks pass.
 
 ```
 sim/
-├── chips/__init__.py       — 35 chip models
+├── chips/__init__.py       — 36 chip models
 ├── chips/test_chips.py     — 141 test vectors (14 chip types)
 ├── chip_sim.py             — Full CPU simulation + timing analysis
 ├── soft_debug.py           — High-level trace (4 tests)

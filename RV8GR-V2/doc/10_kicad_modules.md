@@ -1,6 +1,6 @@
 # RV8-GR — KiCad Module Definitions
 
-**Split the 35-chip CPU into 6 sub-schematics for easier wiring and debugging.**
+**Split the 36-chip CPU into 6 sub-schematics for easier wiring and debugging.**
 
 Each module = 1 KiCad hierarchical sheet. Matches `06_debug_plan.md` build order.
 Wire one module at a time on breadboard, test before connecting the next.
@@ -14,10 +14,10 @@ Wire one module at a time on breadboard, test before connecting the next.
 | 1 | **CLK_RST** | U8, U24 (gates 1-2) | 1.5* | Steps 1-2 |
 | 2 | **PC** | U1-U4 | 4 | Step 3 |
 | 3 | **ADDR_MEM** | U15-U16, U29-U30, ROM, RAM | 6 | Steps 4-5, 11 |
-| 4 | **IR_BUF** | U5, U6, U7, U14 | 4 | Step 6 |
+| 4 | **IR_BUF** | U5, U6, U7, U14, U34 | 5 | Step 6 |
 | 5 | **ALU_AC** | U9, U10-U13, U17-U20, U21, U22 | 11 | Steps 7-8-9 (AC+Z) |
 | 6 | **CTRL** | U23, U24 (gates 3-6), U25-U28, U31, U32, U33 | 9.5* | Steps 9-14 |
-| | **Total** | | **35** | |
+| | **Total** | | **36** | |
 
 \* U24 is shared: gates 1-2 in CLK_RST (ring counter feedback), gates 3-6 in CTRL.
 In KiCad, place U24 on the CTRL sheet with hierarchical pins for NOT_T0/NOT_T1 back to CLK_RST.
@@ -87,13 +87,14 @@ IRL[7:0]      U6 Q1-Q8 outputs
 ```
 PC_INC        U25-6    → PC
 /PC_LD        U26-11   → PC
-ADDR_MODE     U25-3    → ADDR_MEM
+ADDR_REQ      U25-3    → CTRL internal (U26)
+/ADDR_MODE    U26-6    → ADDR_MEM
 ACC_CLK       U27-11   → ALU_AC (U9, U21)
-/IRL_OE       U26-3    → IR_BUF (U6 /OE)
+/IRL_OE       U26-3    → IR_BUF (U34 /OE)
 /AC_BUF       U26-8    → IR_BUF (U14 /OE), ADDR_MEM (RAM /WE)
 BUF_OE_N      U24-12   → IR_BUF (U7 /OE)
 WR_DIR        U28-8    → IR_BUF (U7 DIR)
-PG_CLK        U25-13   → CTRL internal (U23)
+PG_CLK        U25-11   → CTRL internal (U23)
 DP_Load       U33-6    → CTRL internal (U32)
 ```
 
@@ -102,7 +103,7 @@ DP_Load       U33-6    → CTRL internal (U32)
 PC[15:0]      U1-U4 Q outputs → ADDR_MEM
 AC[7:0]       U9 Q outputs → ALU_AC internal, IR_BUF (U14)
 PG[7:0]       U23 Q outputs → PC (jump D-inputs)
-DP[7:0]       U32 Q outputs → ADDR_MEM (mux high B-inputs)
+DP[7:0]       U32 Q outputs → ADDR_MEM (mux high A-inputs)
 Z_flag        U21-5 → CTRL (U28-1)
 ```
 
@@ -173,7 +174,7 @@ Reset Circuit:
 | /PC_LD | in | /PC_LD | From CTRL (U26-11) |
 | IRL[7:0] | in | IRL0..IRL7 | From IR_BUF (U6 Q outputs) |
 | PG[7:0] | in | PG0..PG7 | From CTRL (U23 Q outputs) |
-| PC[15:0] | out | PC0..PC15 | To ADDR_MEM (mux A-inputs) |
+| PC[15:0] | out | PC0..PC15 | To ADDR_MEM (mux B-inputs) |
 
 ### Wiring
 ```
@@ -243,7 +244,7 @@ U4 (PC bits 12-15):
 | PC[15:0] | in | PC0..PC15 | From PC module |
 | IRL[7:0] | in | IRL0..IRL7 | From IR_BUF (U6) |
 | DP[7:0] | in | DP0..DP7 | From CTRL (U32 Q outputs) |
-| ADDR_MODE | in | ADDR_MODE | From CTRL (U25-3) |
+| /ADDR_MODE | in | /ADDR_MODE | From CTRL (U26-6) |
 | /A15 | in | /A15 | From CTRL (U24-6) — RAM /CE |
 | /AC_BUF | in | /AC_BUF | From CTRL (U26-8) — RAM /WE |
 | DBUS[7:0] | bidir | DBUS0..DBUS7 | ↔ IR_BUF (U7 B-side), RV8_D0..RV8_D7 |
@@ -253,38 +254,38 @@ U4 (PC bits 12-15):
 ### Wiring
 ```
 === Address Mux Low: U15-U16 (ABUS0-ABUS7) ===
-SEL=0: PC, SEL=1: IRL (for data access)
+SEL=0: IRL (for data access), SEL=1: PC
 
 U15 (A0-A3):
-  Pin 1 (SEL) ← ADDR_MODE    Pin 15 (/E) → GND
-  Pin 2 (1A) ← PC0    Pin 3 (1B) ← IRL0    Pin 4 (1Y) → ABUS0
-  Pin 5 (2A) ← PC1    Pin 6 (2B) ← IRL1    Pin 7 (2Y) → ABUS1
-  Pin 11(3A) ← PC2    Pin 10(3B) ← IRL2    Pin 9 (3Y) → ABUS2
-  Pin 14(4A) ← PC3    Pin 13(4B) ← IRL3    Pin 12(4Y) → ABUS3
+  Pin 1 (SEL) ← /ADDR_MODE    Pin 15 (/E) → GND
+  Pin 2 (1A) ← IRL0   Pin 3 (1B) ← PC0    Pin 4 (1Y) → ABUS0
+  Pin 5 (2A) ← IRL1   Pin 6 (2B) ← PC1    Pin 7 (2Y) → ABUS1
+  Pin 11(3A) ← IRL2   Pin 10(3B) ← PC2    Pin 9 (3Y) → ABUS2
+  Pin 14(4A) ← IRL3   Pin 13(4B) ← PC3    Pin 12(4Y) → ABUS3
 
 U16 (A4-A7):
-  Pin 1 (SEL) ← ADDR_MODE    Pin 15 (/E) → GND
-  Pin 2 (1A) ← PC4    Pin 3 (1B) ← IRL4    Pin 4 (1Y) → ABUS4
-  Pin 5 (2A) ← PC5    Pin 6 (2B) ← IRL5    Pin 7 (2Y) → ABUS5
-  Pin 11(3A) ← PC6    Pin 10(3B) ← IRL6    Pin 9 (3Y) → ABUS6
-  Pin 14(4A) ← PC7    Pin 13(4B) ← IRL7    Pin 12(4Y) → ABUS7
+  Pin 1 (SEL) ← /ADDR_MODE    Pin 15 (/E) → GND
+  Pin 2 (1A) ← IRL4   Pin 3 (1B) ← PC4    Pin 4 (1Y) → ABUS4
+  Pin 5 (2A) ← IRL5   Pin 6 (2B) ← PC5    Pin 7 (2Y) → ABUS5
+  Pin 11(3A) ← IRL6   Pin 10(3B) ← PC6    Pin 9 (3Y) → ABUS6
+  Pin 14(4A) ← IRL7   Pin 13(4B) ← PC7    Pin 12(4Y) → ABUS7
 
 === Address Mux High: U29-U30 (ABUS8-ABUS15) ===
-SEL=0: PC high, SEL=1: Data Page
+SEL=0: Data Page, SEL=1: PC high
 
 U29 (A8-A11):
-  Pin 1 (SEL) ← ADDR_MODE    Pin 15 (/E) → GND
-  Pin 2 (1A) ← PC8    Pin 3 (1B) ← DP0    Pin 4 (1Y) → ABUS8
-  Pin 5 (2A) ← PC9    Pin 6 (2B) ← DP1    Pin 7 (2Y) → ABUS9
-  Pin 11(3A) ← PC10   Pin 10(3B) ← DP2    Pin 9 (3Y) → ABUS10
-  Pin 14(4A) ← PC11   Pin 13(4B) ← DP3    Pin 12(4Y) → ABUS11
+  Pin 1 (SEL) ← /ADDR_MODE    Pin 15 (/E) → GND
+  Pin 2 (1A) ← DP0    Pin 3 (1B) ← PC8    Pin 4 (1Y) → ABUS8
+  Pin 5 (2A) ← DP1    Pin 6 (2B) ← PC9    Pin 7 (2Y) → ABUS9
+  Pin 11(3A) ← DP2    Pin 10(3B) ← PC10   Pin 9 (3Y) → ABUS10
+  Pin 14(4A) ← DP3    Pin 13(4B) ← PC11   Pin 12(4Y) → ABUS11
 
 U30 (A12-A15):
-  Pin 1 (SEL) ← ADDR_MODE    Pin 15 (/E) → GND
-  Pin 2 (1A) ← PC12   Pin 3 (1B) ← DP4    Pin 4 (1Y) → ABUS12
-  Pin 5 (2A) ← PC13   Pin 6 (2B) ← DP5    Pin 7 (2Y) → ABUS13
-  Pin 11(3A) ← PC14   Pin 10(3B) ← DP6    Pin 9 (3Y) → ABUS14
-  Pin 14(4A) ← PC15   Pin 13(4B) ← DP7    Pin 12(4Y) → ABUS15
+  Pin 1 (SEL) ← /ADDR_MODE    Pin 15 (/E) → GND
+  Pin 2 (1A) ← DP4    Pin 3 (1B) ← PC12   Pin 4 (1Y) → ABUS12
+  Pin 5 (2A) ← DP5    Pin 6 (2B) ← PC13   Pin 7 (2Y) → ABUS13
+  Pin 11(3A) ← DP6    Pin 10(3B) ← PC14   Pin 9 (3Y) → ABUS14
+  Pin 14(4A) ← DP7    Pin 13(4B) ← PC15   Pin 12(4Y) → ABUS15
 
 === ROM (AT28C256) ===
   A0-A14 ← ABUS0-ABUS14
@@ -358,13 +359,19 @@ U5 (IR_HIGH — control byte, 74HC574):
   Pin 12 (Q8) → ALU_SUB (bit7)
 
 U6 (IR_LOW — operand, 74HC574):
-  Pin 1 (/OE) ← /IRL_OE
+  Pin 1 (/OE) → GND
   Pin 2-9 (D1-D8) ← IBUS0-IBUS7 (IBUS)
   Pin 11 (CLK) ← T1
   Pin 19 (Q1) → IRL0    Pin 18 (Q2) → IRL1
   Pin 17 (Q3) → IRL2    Pin 16 (Q4) → IRL3
   Pin 15 (Q5) → IRL4    Pin 14 (Q6) → IRL5
   Pin 13 (Q7) → IRL6    Pin 12 (Q8) → IRL7
+
+U34 (IRL Immediate Buffer, 74HC541):
+  Pin 1 (/OE1) ← /IRL_OE
+  Pin 19 (/OE2) ← /IRL_OE
+  Pin 2-9 (A1-A8) ← IRL0-IRL7
+  Pin 18-11 (Y1-Y8) → IBUS0-IBUS7
 
 U7 (Bus Buffer, 74HC245):
   Pin 1 (DIR) ← WR_DIR (0=DBUS→IBUS read, 1=IBUS→DBUS write)
@@ -382,7 +389,7 @@ U14 (AC Output Buffer, 74HC541):
 ### Bus Contention Rules (from wiring guide)
 ```
 Only ONE IBUS driver active at T2:
-  SRC=0, STR=0 → U6 drives IBUS (immediate from IRL)
+  SRC=0, STR=0 → U34 drives IBUS (immediate from IRL)
   SRC=1, STR=0 → U7 drives IBUS (RAM/ROM data)
   SRC=0, STR=1 → U14 drives IBUS (AC value for store)
   SRC=1, STR=1 → FORBIDDEN (64 illegal opcodes)
@@ -545,16 +552,16 @@ U18 (bits 4-7):
 | NOT_T0 | out | NOT_T0 | To CLK_RST (U8-1) |
 | NOT_T1 | out | NOT_T1 | To CLK_RST (U8-2) |
 | /A15 | out | /A15 | To ADDR_MEM (RAM /CE) |
-| ADDR_MODE | out | ADDR_MODE | To ADDR_MEM |
+| /ADDR_MODE | out | /ADDR_MODE | To ADDR_MEM |
 | PC_INC | out | PC_INC | To PC |
 | /PC_LD | out | /PC_LD | To PC |
 | ACC_CLK | out | ACC_CLK | To ALU_AC (U9, U21) |
-| /IRL_OE | out | /IRL_OE | To IR_BUF (U6) |
+| /IRL_OE | out | /IRL_OE | To IR_BUF (U34) |
 | /AC_BUF | out | /AC_BUF | To IR_BUF (U14), ADDR_MEM (RAM /WE) |
 | BUF_OE_N | out | BUF_OE_N | To IR_BUF (U7 /OE) |
 | WR_DIR | out | WR_DIR | To IR_BUF (U7 DIR) |
 | PG[7:0] | out | PG0..PG7 | To PC (U3/U4 D-inputs) |
-| DP[7:0] | out | DP0..DP7 | To ADDR_MEM (U29/U30 B-inputs) |
+| DP[7:0] | out | DP0..DP7 | To ADDR_MEM (U29/U30 A-inputs) |
 
 ### Wiring
 ```
@@ -567,14 +574,14 @@ Gate 5: Pin 11←AC_WR,   Pin 10→/AC_WR (internal)
 Gate 6: Pin 13←/IRL_OE, Pin 12→BUF_OE_N (internal)
 
 === U25 (74HC32 — 4 OR Gates) ===
-Gate 1: Pin 1←SRC,       Pin 2←STR,       Pin 3→ADDR_MODE
+Gate 1: Pin 1←SRC,       Pin 2←STR,       Pin 3→ADDR_REQ
 Gate 2: Pin 4←T0,        Pin 5←T1,        Pin 6→PC_INC
 Gate 3: Pin 9←GND,       Pin 10←GND,      Pin 8→NC (spare)
-Gate 4: Pin 11←/T2,      Pin 12←/PG_cond, Pin 13→PG_CLK (→U23-11)
+Gate 4: Pin 12←/T2,      Pin 13←/PG_cond, Pin 11→PG_CLK (→U23-11)
 
 === U26 (74HC00 — 4 NAND Gates) ===
 Gate A: Pin 1←T2,        Pin 2←/ADDR_MODE, Pin 3→/IRL_OE
-Gate B: Pin 4←ADDR_MODE, Pin 5←ADDR_MODE,  Pin 6→/ADDR_MODE (internal)
+Gate B: Pin 4←ADDR_REQ,  Pin 5←T2,         Pin 6→/ADDR_MODE
 Gate C: Pin 9←T2,        Pin 10←STR,       Pin 8→/AC_BUF
 Gate D: Pin 12←T2,       Pin 13←PC_LOAD_COND, Pin 11→/PC_LD
 
@@ -604,7 +611,7 @@ Pin 3, Pin 11 → NC (74HC21 no-connect pins)
 === U23 (Page Register, 74HC574) ===
   Pin 1 (/OE) → GND
   Pin 2-9 (D1-D8) ← IBUS0-IBUS7
-  Pin 11 (CLK) ← PG_CLK (U25-13)
+  Pin 11 (CLK) ← PG_CLK (U25-11)
   Pin 19→PG0, Pin 18→PG1, Pin 17→PG2, Pin 16→PG3
   Pin 15→PG4, Pin 14→PG5, Pin 13→PG6, Pin 12→PG7
 
@@ -725,6 +732,7 @@ PC_LOAD_COND  U27-6
 | U31 | 74HC74 | CTRL | 13 |
 | U32 | 74HC574 | CTRL | 12 |
 | U33 | 74HC21 | CTRL | 12 |
+| U34 | 74HC541 | IR_BUF | 10 |
 | ROM | AT28C256 | ADDR_MEM | 5 |
 | RAM | 62256 | ADDR_MEM | 11 |
 

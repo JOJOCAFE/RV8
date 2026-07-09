@@ -1,5 +1,5 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// Matches 02_wiring_guide.md: 33 logic chips (U1-U33 incl. U31 IRQ, U32 DP, U33 decode)
+// Matches 02_wiring_guide.md: 34 logic chips (U1-U34 incl. U31 IRQ, U32 DP, U33 decode, U34 IRL buffer)
 // Memory: ROM $0000-$7FFF, RAM $8000-$FFFF, PC starts $0000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 // 18 instructions (17 + SETDP)
@@ -37,7 +37,7 @@ module rv8gr_cpu (
 
     // U33 decode equations. These intentionally model the physical gates,
     // so some reserved horizontal encodings can share side effects.
-    // DI is an inert software marker in the 33-chip v1.0 build.
+    // DI is an inert software marker in the 36-package v1.0 build.
     wire is_ei = source_type & ~xor_mode & ~ac_wr;              // U33 gate 2
     wire is_setdp = xor_mode & ~(source_type | store) & ~ac_wr; // U33 gate 1
 
@@ -120,7 +120,7 @@ module rv8gr_cpu (
                         pc <= {page_reg, ir_low};
 
                     // EI sets the software-visible IE flag. Reset clears it.
-                    // DI has no hardware decode in the 33-chip build.
+                    // DI has no hardware decode in the 36-package build.
                     if (is_ei) ie <= 1'b1;
 
                     if (is_halt)

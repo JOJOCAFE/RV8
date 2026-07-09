@@ -14,7 +14,7 @@
 ## Netlist Summary
 
 - **Total nets**: 159
-- **Total chips**: 35 (33 logic + ROM + RAM)
+- **Total chips**: 35 (34 logic + ROM + RAM)
 - **Total pin connections**: 578
 
 ### Largest Nets
@@ -102,7 +102,7 @@ kicad-cli sch erc RV8GR-V2.kicad_sch
 ## Verification
 
 All nets have been verified against `doc/12_netlist.md`:
-- ✓ All 35 chips have connections
+- ✓ All 36 chips have connections
 - ✓ VCC/GND pins match datasheets
 - ✓ Signal routing matches wiring guide
 - ✓ No orphaned nets

@@ -20,7 +20,7 @@
 
 Debug only the RV8GR-V2 baseline first:
 
-- 33 logic chips + ROM + RAM.
+- 34 logic chips + ROM + RAM.
 - IRQ is polling-only.
 - DI has no hardware effect.
 - No hardware vector to `$FF00`.
@@ -43,13 +43,13 @@ matches the expected behavior.
 | `T1` | U8-4 | Operand fetch phase |
 | `T2` | U8-5 | Execute phase |
 | `PC0..PC7` | U1/U2 Q outputs | Counts during T0/T1, loads on jump |
-| `ABUS0..ABUS7` | U15/U16 outputs | PC or IRL selected by `ADDR_MODE` |
-| `ABUS8..ABUS15` | U29/U30 outputs | PC high or DP selected by `ADDR_MODE` |
+| `ABUS0..ABUS7` | U15/U16 outputs | PC or IRL selected by `/ADDR_MODE` |
+| `ABUS8..ABUS15` | U29/U30 outputs | PC high or DP selected by `/ADDR_MODE` |
 | `DBUS0..DBUS7` | ROM/RAM data pins, U7 B side | External memory data bus |
-| `IBUS0..IBUS7` | U7 A side, U6 output, U14 output | Internal CPU data bus |
+| `IBUS0..IBUS7` | U7 A side, U34 output, U14 output | Internal CPU data bus |
 | `BUF_OE_N` | U24-12, U7-19 | LOW when U7 is enabled |
 | `WR_DIR` | U28-8, U7-1, ROM `/OE` | 0 read, 1 store/write direction |
-| `/IRL_OE` | U26-3, U6-1 | LOW when operand drives IBUS |
+| `/IRL_OE` | U26-3, U34-1/19 | LOW when operand drives IBUS |
 | `/AC_BUF` | U26-8, U14 enables, RAM `/WE` | LOW when AC stores to memory |
 | `ACC_CLK` | U27-11, U9-11, U21-3 | AC/Z update pulse |
 | `AC0..AC7` | U9 Q outputs | Accumulator value |
@@ -236,11 +236,11 @@ Clock 16: 00010000  ← U2 เริ่มนับ (cascade ทำงาน!)
 
 ## ขั้นที่ 4: Address Mux (U15-U16, U29-U30)
 
-**ต่ออะไร**: Mux 4 ตัว, ต่อ PC outputs เข้า A-inputs
+**ต่ออะไร**: Mux 4 ตัว, ต่อ IRL/DP เข้า A-inputs และ PC เข้า B-inputs
 
 **ทดสอบ**:
-- [ ] SEL=0 (GND) → ABUS = PC (ดู LED ตรงกับ PC)
-- [ ] SEL=1 (VCC) → ABUS = B-inputs (ต่อ DIP switch เข้า B)
+- [ ] /ADDR_MODE=1 (VCC) → ABUS = PC (ดู LED ตรงกับ PC)
+- [ ] /ADDR_MODE=0 (GND) → ABUS = A-inputs (ต่อ DIP switch เข้า A)
 - [ ] A15 output ถูกต้อง (U30-12)
 
 **LED**: 8 ดวงบน ABUS A[7:0]
@@ -302,16 +302,16 @@ $0003: $00  (jump to $00 → loop)
 
 | Phase | IBUS driver ที่ถูกต้อง | ตรวจ |
 |:-----:|:----------------------:|------|
-| T0 | U7 (DBUS→IBUS) | U7-19=LOW, U6-1=HIGH, U14-1=HIGH |
+| T0 | U7 (DBUS→IBUS) | U7-19=LOW, U34-1/19=HIGH, U14-1=HIGH |
 | T1 | U7 (DBUS→IBUS) | (เหมือน T0) |
-| T2 immediate | U6 (IRL→IBUS) | U6-1=LOW, U7-19=HIGH |
+| T2 immediate | U34 (IRL→IBUS) | U34-1/19=LOW, U7-19=HIGH |
 | T2 store | U14 (AC→IBUS), U7 writes IBUS→DBUS | U14-1=LOW, U7-19=LOW, U7-1=HIGH |
 
 - [ ] Single-step ตรวจว่า IBUS driver ไม่ทับกัน (ทีละตัวเท่านั้น)
 
 ### Bus Float Test (ตรวจ IBUS ไม่ลอย)
 
-- [ ] Force: U7 /OE=HIGH, U6 /OE=HIGH, U14 /OE=HIGH (ปิด driver ทั้ง 3)
+- [ ] Force: U7 /OE=HIGH, U34 /OE=HIGH, U14 /OE=HIGH (ปิด driver ทั้ง 3)
 - [ ] วัด IBUS ด้วย LED → ค่าต้องคงที่ (ไม่สุ่มเปลี่ยน)
 - [ ] ถ้า LED กระพริบสุ่ม → IBUS ลอย → เพิ่ม 10kΩ pull-down/pull-up
 
@@ -434,8 +434,8 @@ After T2:  AC = $42 ← LI $42 ทำงานแล้ว!
 
 **U32 wiring**:
 - D[7:0] ← IBUS
-- Q[6:0] → U29/U30 B-inputs (A[14:8])
-- Q[7] → U30-13 (A15 B-input)
+- Q[6:0] → U29/U30 A-inputs (A[14:8])
+- Q[7] → U30-14 (A15 A-input)
 - CLK ← DP_Load (U33-6)
 
 **U33 wiring (SETDP decode — 74HC21 gate 1)**:
@@ -586,7 +586,7 @@ handler:
 > DI has no v1.0 hardware effect — IRQ_FF stays latched until next reset.
 >
 > **Practical impact**: IRQ is a one-shot "event detected" flag in v1.0.
-> Software can use EI to set IE, but only reset clears IE and IRQ_FF in the 33-chip build.
+> Software can use EI to set IE, but only reset clears IE and IRQ_FF in the 36-package build.
 > For games/BASIC: poll input directly via I/O slot instead of relying on IRQ_FF re-arm.
 >
 > **Future small fix**: Route /SLOT2 write to U31 /CLR2 → software clear via `SB $20`.

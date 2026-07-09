@@ -100,7 +100,7 @@ U6 (IR Low — operand byte):
 > ⚠️ **หมายเหตุ: /OE ใน Lab vs CPU จริง**
 >
 > Lab นี้ต่อ /OE = GND (เปิด output ตลอด) เพื่อให้เห็น LED ได้ง่าย
-> แต่ใน CPU จริง (ดู 02_wiring_guide) U6 /OE จะถูกควบคุมด้วย control logic
+> แต่ใน CPU จริง (ดู 02_wiring_guide) U6 /OE ต่อ GND และ U34 /OE ถูกควบคุมด้วย control logic
 > เพื่อป้องกัน **Bus Contention** — หลาย chip ขับ IBUS พร้อมกัน
 > เรื่องนี้จะได้เรียนเมื่อต่อ datapath ครบใน Lab ถัด ๆ ไป
 
@@ -183,13 +183,13 @@ Single-step ตรวจว่า IBUS driver active ทีละตัวเท
 
 | Phase | IBUS driver | ตรวจ |
 |:-----:|:-----------:|------|
-| T0 | U7 (DBUS→IBUS) | U7-19=LOW, U6-1=HIGH, U14-1=HIGH |
+| T0 | U7 (DBUS→IBUS) | U7-19=LOW, U34-1/19=HIGH, U14-1=HIGH |
 | T1 | U7 (DBUS→IBUS) | (เหมือน T0) |
-| T2 immediate | U6 (IRL→IBUS) | U6-1=LOW, U7-19=HIGH |
+| T2 immediate | U34 (IRL→IBUS) | U34-1/19=LOW, U7-19=HIGH |
 | T2 store | U14 (AC→IBUS), U7 writes IBUS→DBUS | U14-1=LOW, U7-19=LOW, U7-1=HIGH |
 
 ### Bus Float Test
-- [ ] ปิด U7, U6, U14 ทั้งหมด (/OE=HIGH) → วัด IBUS ต้องไม่สุ่มค่า
+- [ ] ปิด U7, U34, U14 ทั้งหมด (/OE=HIGH) → วัด IBUS ต้องไม่สุ่มค่า
 
 ---
 

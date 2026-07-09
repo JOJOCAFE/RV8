@@ -292,7 +292,7 @@ WIRING = [
     # U23: Page Register (74HC574)
     # =========================================================================
     ('U23', 1,  'GND'),           # /OE → GND
-    ('U23', 11, 'U25', 13),       # CLK ← PG_CLK (U25-13)
+    ('U23', 11, 'U25', 11),       # CLK ← PG_CLK (U25-11)
     # D1-D8 (pins 2-9) ← IBUS
     # Q outputs → U3/U4 D inputs (already wired above)
 

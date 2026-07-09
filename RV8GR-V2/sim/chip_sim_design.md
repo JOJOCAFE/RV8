@@ -138,13 +138,13 @@ class SharedWire:
 # Each IBUS0-IBUS7 is a SharedWire
 # Connected pins (from 02_wiring_guide):
 #
-# IBUS0 wire connects to: U7-2, U6-19, U14-18, U12-1, U23-2, U5-2, U32-2
+# IBUS0 wire connects to: U7-2, U34-18, U14-18, U12-1, U23-2, U5-2, U6-2, U32-2
 #   Drivers (tristate):
 #     U7-2   enabled when BUF_OE_N=0 (U24-12=0) — reads from DBUS
-#     U6-19  enabled when /IRL_OE=0 (U26-3=0) — immediate operand
+#     U34-18 enabled when /IRL_OE=0 (U26-3=0) — immediate operand
 #     U14-18 enabled when /AC_BUF=0 (U26-8=0) — AC value for store
 #   Readers (always connected, high-impedance input):
-#     U12-1, U23-2, U5-2, U32-2
+#     U12-1, U23-2, U5-2, U6-2, U32-2
 ```
 
 ### DBUS — 8 shared wires
@@ -274,10 +274,10 @@ def wire_cpu(sim):
         ('U5', 11), ('U25', 4), ('U24', 1)
     ])
 
-    # IBUS0: U7-18, U6-19*, U14-18*, U12-1, U23-2, U5-2, U32-2
+    # IBUS0: U7-2, U34-18*, U14-18*, U12-1, U23-2, U5-2, U6-2, U32-2
     sim.wire('IBUS0', source=None, sinks=[  # tristate - multiple potential drivers
-        ('U7', 18), ('U6', 19), ('U14', 18),
-        ('U12', 1), ('U23', 2), ('U5', 2), ('U32', 2)
+        ('U7', 2), ('U34', 18), ('U14', 18),
+        ('U12', 1), ('U23', 2), ('U5', 2), ('U6', 2), ('U32', 2)
     ])
     # ... (all connections from 02_wiring_guide.md)
 ```

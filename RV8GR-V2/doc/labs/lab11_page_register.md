@@ -77,7 +77,7 @@ PC_new = { PG[7:0], IRL[7:0] }
 U23 (Page Register):
   pin 20 (VCC) → 5V,  pin 10 (GND) → GND,  100nF คร่อม VCC-GND
   pin 1 (/OE) → GND (output ตลอด)
-  pin 11 (CLK) ← PG_CLK (U25-13)
+  pin 11 (CLK) ← PG_CLK (U25-11)
 
     74HC574 loads on RISING edge.
     PG_CLK goes LOW during T2 (when SETPG active),
@@ -170,7 +170,7 @@ $1003: $00  ; target = $00
 
 | อาการ | สาเหตุ | แก้ |
 |-------|--------|-----|
-| PG ไม่เปลี่ยนหลัง SETPG | CLK ไม่ pulse | เช็ค U25-13 → U23-11 |
+| PG ไม่เปลี่ยนหลัง SETPG | CLK ไม่ pulse | เช็ค U25-11 → U23-11 |
 | PG เปลี่ยนทุก instruction | PG_CLK ค้าง LOW | เช็ค U27-8 (/PG_cond) + U28-6 (/T2) |
 | PC high ไม่เปลี่ยนหลัง J | U23-Q ไม่ต่อ U3/U4 D | เช็คสาย PG → PC high D-inputs |
 | Jump ไปผิด page | PG สลับ bit order | เช็ค PG0→U3-3, PG4→U4-3 |

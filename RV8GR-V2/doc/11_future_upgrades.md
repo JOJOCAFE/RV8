@@ -1,7 +1,7 @@
 # 11. Future Upgrades (v1.1 / v2.0)
 
 Ideas extracted from the RV8GR-Codex experimental branch (June 2026).
-These require additional chips and are **not** part of the v1.0 frozen design (33 chips).
+These require additional chips and are **not** part of the v1.0 frozen design (36 packages).
 
 ---
 
@@ -25,13 +25,13 @@ These require additional chips and are **not** part of the v1.0 frozen design (3
 
 ### Background
 - Current v1.0: DI ($48) is a NOP — IE can only be cleared by /RST.
-- This keeps the 33-chip build simple, but limits flexibility.
+- This keeps the 36-package build simple, but limits flexibility.
 
 ### Proposal
 - Add DI decode: `DI_decode = T2 & SUB & /XOR & /AC_WR & SRC` → fires on $48.
 - Wire DI_decode to U31 IE_FF /CLR (active-low clear).
 - **Cost**: Requires extra decode resources because U33 gate 2 is already used by EI.
-- **Constraint**: Do not fold this into the 33-chip baseline without re-checking the wiring guide and BOM.
+- **Constraint**: Do not fold this into the 36-package baseline without re-checking the wiring guide and BOM.
 
 ---
 
@@ -86,15 +86,14 @@ v1.0 requires ISR to save PC via software (read $0E/$0F). This wastes cycles and
 
 ## v2.0: IBUS Buffer Separation (+1 chip)
 
-### Problem
-U6 (IR_LOW latch) drives IBUS directly. During T2, if SRC=0, the operand value comes from U6's output. This means U6 must remain driving during T2 even though it's a latch loaded during T1.
+### Current v1.0 Solution
+U6 is only the IR_LOW latch. Its outputs remain enabled to feed PC load,
+address mux inputs, and U34 inputs. U34 (74HC541) is the controlled
+IRL-to-IBUS buffer; `/IRL_OE` enables U34 only for immediate-style T2 cycles.
 
-### Solution
-- Add U39 (74HC541): buffer between U6 output and IBUS.
-- U6 output → U39 input, U39 /OE = /T2 OR SRC (only enable when needed).
-- **Benefit**: Cleaner bus timing, prevents any back-drive from ALU into U6.
-- **Cost**: +1 chip.
-- **Risk**: Low — the current design works because U6 holds its value, but explicit buffering is safer at higher speeds.
+- **Benefit**: Cleaner bus ownership; U6 never directly drives IBUS.
+- **Cost**: +1 chip already included in the 36-package baseline.
+- **Risk**: Low — U34 makes the immediate path explicit and easier to probe.
 
 ---
 
@@ -110,4 +109,4 @@ U6 (IR_LOW latch) drives IBUS directly. During T2, if SRC=0, the operand value c
 | Hardware save-PC | +2 | LOW | v2.0 |
 | IBUS buffer | +1 | LOW | v2.0 / 5MHz only |
 
-**None of these are required for the v1.0 breadboard build.** The current 33-chip design is verified and sufficient at 1 MHz.
+**None of these are required for the v1.0 breadboard build.** The current 36-package design is verified and sufficient at 1 MHz.

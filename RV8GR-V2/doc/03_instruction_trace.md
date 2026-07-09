@@ -1,6 +1,6 @@
 # RV8-GR — Instruction Trace (Stable)
 
-**Pin-level traces for key instructions. Based on 02_wiring_guide.md (33 chips).**
+**Pin-level traces for key instructions. Based on 02_wiring_guide.md (36 packages).**
 
 ---
 
@@ -23,7 +23,7 @@ PC → $0002
 
 ### T2: Execute
 ```
-/IRL_OE = NAND(1,1)=0 → U6 drives IBUS=$05
+/IRL_OE = NAND(1,1)=0 → U34 drives IBUS=$05
 XOR_MODE=0 → XOR B-mux=SUB=0 → XOR out = $05 XOR $00 = $05
 Adder: AC($10) + XOR($05) + Cin(0) = $15
 MUX_SEL=0 → AC mux = adder = $15
@@ -37,7 +37,7 @@ ACC_CLK = NAND(T2=1, AC_WR=1) = 0 → AC latches $15
 
 ### T2: Execute (AC=$AA)
 ```
-IR=$04: STR=1, ADDR_MODE=1
+IR=$04: STR=1, /ADDR_MODE=0
 Addr mux = IRL=$03, A[15:8]=DP=$80 → addr=$8003
 A15=1 → /A15=0 → RAM selected
 /AC_BUF = NAND(T2=1, STR=1) = 0 → U14 drives IBUS=AC=$AA
@@ -111,7 +111,7 @@ PC = {PG=$90, IRL=$00} = $9000
 ### T2: Execute (RAM[$8003]=$AA)
 ```
 IR=$38: MUX_SEL=1, AC_WR=1, SRC=1
-ADDR_MODE=1 → addr mux=IRL=$03, A[15:8]=DP=$80
+/ADDR_MODE=0 → addr mux=IRL=$03, A[15:8]=DP=$80
 A15=1 → /A15=0 → RAM selected
 BUF_OE_N=0 → U7 enabled (DBUS→IBUS)
 U7 reads RAM → IBUS=$AA
@@ -128,12 +128,12 @@ AC latches $AA
 ### T2: Execute
 ```
 IR=$40: XOR_MODE=1, MUX_SEL=0, AC_WR=0, SRC=0, STR=0
-ADDR_MODE = SRC|STR = 0
-/IRL_OE = NAND(T2=1, /ADDR_MODE=1) = 0 → U6 drives IBUS=$80
+ADDR_REQ = SRC|STR = 0
+/IRL_OE = NAND(T2=1, /ADDR_MODE=1) = 0 → U34 drives IBUS=$80
 DP_Load = T2(1) AND XOR_MODE(1) AND /ADDR_MODE(1) AND /AC_WR(1) = 1
 DP_Load: 0→1 at T2 end → U32 latches $80 on rising edge
 
-Bus: ABUS=PC, IBUS=U6($80), DBUS=ROM(stale)
+Bus: ABUS=PC, IBUS=U34($80), DBUS=ROM(stale)
 Check: ✓ PG_CLK stays HIGH (MUX=0) ✓ AC unchanged (AC_WR=0)
 ```
 **Result: DP = $80 ✓**
@@ -151,7 +151,7 @@ PC_LOAD_COND = NAND(/JUMP=1, /BR_TAKEN=0) = 1
 /PC_LD = NAND(T2=1, 1) = 0 → PC loads
 PC = {PG=$00, IRL=$20} = $0020
 
-Bus: ABUS=PC, IBUS=U6($20), DBUS=ROM(stale)
+Bus: ABUS=PC, IBUS=U34($20), DBUS=ROM(stale)
 Check: ✓ Same hardware as BEQ — SUB bit flips Z_match polarity
 ```
 **Result: PC = $0020 ✓ (BNE reuses BEQ hardware via Z XOR SUB)**
@@ -162,7 +162,7 @@ Check: ✓ Same hardware as BEQ — SUB bit flips Z_match polarity
 
 ### T2: Execute (hypothetical — opcode $0C has SRC=1, STR=1)
 ```
-IR=$0C: SRC=1, STR=1, ADDR_MODE=1
+IR=$0C: SRC=1, STR=1, /ADDR_MODE=0
 Addr mux = {DP,IRL} → ABUS = data address
 /AC_BUF = NAND(T2=1, STR=1) = 0 → U14 drives IBUS = AC
 
@@ -189,8 +189,8 @@ Power-on state: PC=$0000, PG=??, DP=??, AC=??, Z=??
 T0: PC=$0000, ABUS=$0000, A15=0 → ROM selected
     DBUS=$40, U7→IBUS=$40, U5 latches $40. PC→$0001
 T1: PC=$0001, DBUS=$80, U6 latches $80. PC→$0002
-T2: IR=$40: XOR_MODE=1, ADDR_MODE=0, AC_WR=0
-    /IRL_OE=0 → U6 drives IBUS=$80
+T2: IR=$40: XOR_MODE=1, /ADDR_MODE=1, AC_WR=0
+    /IRL_OE=0 → U34 drives IBUS=$80
     DP_Load: 0→1 at T2 end → U32 latches $80
     ✓ ABUS=PC (no data access) — DP=?? is harmless
 ```
@@ -200,7 +200,7 @@ T2: IR=$40: XOR_MODE=1, ADDR_MODE=0, AC_WR=0
 ```
 T0: PC=$0002, DBUS=$20, U5 latches $20. PC→$0003
 T1: PC=$0003, DBUS=$00, U6 latches $00. PC→$0004
-T2: IR=$20: MUX_SEL=1, AC_WR=0, ADDR_MODE=0
+T2: IR=$20: MUX_SEL=1, AC_WR=0, /ADDR_MODE=1
     /IRL_OE=0 → IBUS=$00
     PG_CLK: 0→1 at T2→T0 edge → U23 latches $00
     ✓ ABUS=PC — PG=?? is harmless (no jump yet)
@@ -234,7 +234,7 @@ T2: IR=$30: MUX_SEL=1, AC_WR=1, XOR_MODE=0
 | 4 | BEQ | $02 | BR, Z_match, /PC_LD | PC loads if Z=1 |
 | 5 | SETPG | $20 | MUX_SEL, PG_CLK | PG ← IBUS |
 | 6 | J | $01 | JMP, /PC_LD | PC = {PG, addr} |
-| 7 | LB | $38 | SRC, ADDR_MODE, BUF_OE_N | AC = RAM[{DP,rs}] |
+| 7 | LB | $38 | SRC, /ADDR_MODE, BUF_OE_N | AC = RAM[{DP,rs}] |
 | 8 | SETDP | $40 | XOR_MODE, DP_Load | DP ← operand |
 | 9 | BNE | $82 | SUB, BR, Z_match | PC loads if Z=0 |
 | 10 | Mixed SRC+STR | $0C | WR_DIR=1, ROM /OE=1 | Store wins, no conflict |
@@ -248,19 +248,19 @@ All 11 traces verified pin-by-pin against 02_wiring_guide.md. ✓
 
 | Trace | ABUS | IBUS driver | DBUS driver |
 |:-----:|:----:|:-----------:|:-----------:|
-| ADDI (T2) | PC | U6 (immediate) | ROM (stale) |
+| ADDI (T2) | PC | U34 (immediate) | ROM (stale) |
 | SB (T2) | {DP,IRL} | U14 (AC) | U7 (write) |
-| XORI (T2) | PC | U6 (immediate) | ROM (stale) |
-| BEQ (T2) | PC | U6 (immediate) | ROM (stale) |
-| SETPG (T2) | PC | U6 (immediate) | ROM (stale) |
-| J (T2) | PC | U6 (immediate) | ROM (stale) |
+| XORI (T2) | PC | U34 (immediate) | ROM (stale) |
+| BEQ (T2) | PC | U34 (immediate) | ROM (stale) |
+| SETPG (T2) | PC | U34 (immediate) | ROM (stale) |
+| J (T2) | PC | U34 (immediate) | ROM (stale) |
 | LB (T2) | {DP,IRL} | U7 (RAM read) | RAM |
-| SETDP (T2) | PC | U6 (immediate) | ROM (stale) |
-| BNE (T2) | PC | U6 (immediate) | ROM (stale) |
+| SETDP (T2) | PC | U34 (immediate) | ROM (stale) |
+| BNE (T2) | PC | U34 (immediate) | ROM (stale) |
 | Mixed SRC+STR (T2) | {DP,IRL} | U14 (AC) | U7 (write), ROM disabled |
-| Boot: SETDP (T2) | PC | U6 (immediate) | ROM (stale) |
-| Boot: SETPG (T2) | PC | U6 (immediate) | ROM (stale) |
-| Boot: LI (T2) | PC | U6 (immediate) | ROM (stale) |
+| Boot: SETDP (T2) | PC | U34 (immediate) | ROM (stale) |
+| Boot: SETPG (T2) | PC | U34 (immediate) | ROM (stale) |
+| Boot: LI (T2) | PC | U34 (immediate) | ROM (stale) |
 
 ---
 

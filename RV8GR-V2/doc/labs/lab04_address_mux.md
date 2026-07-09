@@ -29,8 +29,8 @@ CPU ต้องเข้าถึง 2 ที่อยู่:
 ```
 
 74HC157 = Quad 2-to-1 Multiplexer (มี 4 ช่อง แต่ละช่องเลือก A หรือ B)
-- S=0 → เอา input "A" (จาก PC)
-- S=1 → เอา input "B" (จาก IRL)
+- S=0 → เอา input "A" (จาก IRL/DP data address)
+- S=1 → เอา input "B" (จาก PC fetch address)
 
 ต้องใช้ 4 ตัว = 16 บิต = A[15:0] ครบ!
 
@@ -73,75 +73,75 @@ CPU ต้องเข้าถึง 2 ที่อยู่:
   pin 16 (VCC) → 5V
   pin 8 (GND) → GND
   pin 15 (/E) → GND (enable ตลอด)
-  pin 1 (SEL) → ADDR_MODE (switch: GND=PC, 5V=IRL)
+  pin 1 (SEL) → /ADDR_MODE (switch: 5V=PC, GND=IRL)
   100nF คร่อม VCC-GND ทุกตัว
 
 U15 — Address bits 0-3:
-  pin 2 (1A) ← PC0 (U1-14 จาก Lab 03)
-  pin 3 (1B) ← IRL0 (DIP switch bit 0 หรือ U6-19)
+  pin 2 (1A) ← IRL0 (DIP switch bit 0 หรือ U6-19)
+  pin 3 (1B) ← PC0 (U1-14 จาก Lab 03)
   pin 4 (1Y) → A0 (ออก address bus)
 
-  pin 5 (2A) ← PC1 (U1-13)
-  pin 6 (2B) ← IRL1 (DIP switch bit 1 หรือ U6-18)
+  pin 5 (2A) ← IRL1 (DIP switch bit 1 หรือ U6-18)
+  pin 6 (2B) ← PC1 (U1-13)
   pin 7 (2Y) → A1
 
-  pin 11 (3A) ← PC2 (U1-12)
-  pin 10 (3B) ← IRL2 (DIP switch bit 2 หรือ U6-17)
+  pin 11 (3A) ← IRL2 (DIP switch bit 2 หรือ U6-17)
+  pin 10 (3B) ← PC2 (U1-12)
   pin 9  (3Y) → A2
 
-  pin 14 (4A) ← PC3 (U1-11)
-  pin 13 (4B) ← IRL3 (DIP switch bit 3 หรือ U6-16)
+  pin 14 (4A) ← IRL3 (DIP switch bit 3 หรือ U6-16)
+  pin 13 (4B) ← PC3 (U1-11)
   pin 12 (4Y) → A3
 
 U16 — Address bits 4-7:
-  pin 2 (1A) ← PC4 (U2-14)
-  pin 3 (1B) ← IRL4 (DIP switch bit 4 หรือ U6-15)
+  pin 2 (1A) ← IRL4 (DIP switch bit 4 หรือ U6-15)
+  pin 3 (1B) ← PC4 (U2-14)
   pin 4 (1Y) → A4
 
-  pin 5 (2A) ← PC5 (U2-13)
-  pin 6 (2B) ← IRL5 (DIP switch bit 5 หรือ U6-14)
+  pin 5 (2A) ← IRL5 (DIP switch bit 5 หรือ U6-14)
+  pin 6 (2B) ← PC5 (U2-13)
   pin 7 (2Y) → A5
 
-  pin 11 (3A) ← PC6 (U2-12)
-  pin 10 (3B) ← IRL6 (DIP switch bit 6 หรือ U6-13)
+  pin 11 (3A) ← IRL6 (DIP switch bit 6 หรือ U6-13)
+  pin 10 (3B) ← PC6 (U2-12)
   pin 9  (3Y) → A6
 
-  pin 14 (4A) ← PC7 (U2-11)
-  pin 13 (4B) ← IRL7 (DIP switch bit 7 หรือ U6-12)
+  pin 14 (4A) ← IRL7 (DIP switch bit 7 หรือ U6-12)
+  pin 13 (4B) ← PC7 (U2-11)
   pin 12 (4Y) → A7
 
 U29 — Address bits 8-11 (high):
-  pin 2 (1A) ← PC8 (U3-14)
-  pin 3 (1B) ← DP0 (GND สำหรับ lab นี้, ภายหลังต่อ U32-19)
+  pin 2 (1A) ← DP0 (GND สำหรับ lab นี้, ภายหลังต่อ U32-19)
+  pin 3 (1B) ← PC8 (U3-14)
   pin 4 (1Y) → A8
 
-  pin 5 (2A) ← PC9 (U3-13)
-  pin 6 (2B) ← DP1 (GND)
+  pin 5 (2A) ← DP1 (GND)
+  pin 6 (2B) ← PC9 (U3-13)
   pin 7 (2Y) → A9
 
-  pin 11 (3A) ← PC10 (U3-12)
-  pin 10 (3B) ← DP2 (GND)
+  pin 11 (3A) ← DP2 (GND)
+  pin 10 (3B) ← PC10 (U3-12)
   pin 9  (3Y) → A10
 
-  pin 14 (4A) ← PC11 (U3-11)
-  pin 13 (4B) ← DP3 (GND)
+  pin 14 (4A) ← DP3 (GND)
+  pin 13 (4B) ← PC11 (U3-11)
   pin 12 (4Y) → A11
 
 U30 — Address bits 12-15:
-  pin 2 (1A) ← PC12 (U4-14)
-  pin 3 (1B) ← DP4 (GND)
+  pin 2 (1A) ← DP4 (GND)
+  pin 3 (1B) ← PC12 (U4-14)
   pin 4 (1Y) → A12
 
-  pin 5 (2A) ← PC13 (U4-13)
-  pin 6 (2B) ← DP5 (GND)
+  pin 5 (2A) ← DP5 (GND)
+  pin 6 (2B) ← PC13 (U4-13)
   pin 7 (2Y) → A13
 
-  pin 11 (3A) ← PC14 (U4-12)
-  pin 10 (3B) ← DP6 (GND)
+  pin 11 (3A) ← DP6 (GND)
+  pin 10 (3B) ← PC14 (U4-12)
   pin 9  (3Y) → A14
 
-  pin 14 (4A) ← PC15 (U4-11)
-  pin 13 (4B) ← DP7 (GND)
+  pin 14 (4A) ← DP7 (GND)
+  pin 13 (4B) ← PC15 (U4-11)
   pin 12 (4Y) → A15
 
 LED (ดู A0-A7 output):
@@ -163,27 +163,27 @@ LED (ดู A0-A7 output):
 
 1. Reset PC → $00 (Lab 03)
 2. ตั้ง DIP switch = $A5 (10100101)
-3. สลับ ADDR_MODE switch ดูผลลัพธ์
+3. สลับ /ADDR_MODE switch ดูผลลัพธ์
 
 ### ตาราง LED (A7...A0)
 
-| ADDR_MODE | แหล่ง | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
+| /ADDR_MODE | แหล่ง | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
 |:---------:|:-----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:----:|
-| 0 (GND) | PC=$00 | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | $00 | ☐ |
-| 1 (5V) | IRL=$A5 | ● | ○ | ● | ○ | ○ | ● | ○ | ● | $A5 | ☐ |
+| 1 (5V) | PC=$00 | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | $00 | ☐ |
+| 0 (GND) | IRL=$A5 | ● | ○ | ● | ○ | ○ | ● | ○ | ● | $A5 | ☐ |
 
 4. กด Clock 3 ครั้ง (PC=$03) แล้วสลับ:
 
-| ADDR_MODE | แหล่ง | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
+| /ADDR_MODE | แหล่ง | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
 |:---------:|:-----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:----:|
-| 0 (GND) | PC=$03 | ○ | ○ | ○ | ○ | ○ | ○ | ● | ● | $03 | ☐ |
-| 1 (5V) | IRL=$A5 | ● | ○ | ● | ○ | ○ | ● | ○ | ● | $A5 | ☐ |
+| 1 (5V) | PC=$03 | ○ | ○ | ○ | ○ | ○ | ○ | ● | ● | $03 | ☐ |
+| 0 (GND) | IRL=$A5 | ● | ○ | ● | ○ | ○ | ● | ○ | ● | $A5 | ☐ |
 
 5. เปลี่ยน DIP switch = $FF (11111111):
 
-| ADDR_MODE | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
+| /ADDR_MODE | A7 | A6 | A5 | A4 | A3 | A2 | A1 | A0 | ค่า | ถูก? |
 |:---------:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:----:|
-| 1 (5V) | ● | ● | ● | ● | ● | ● | ● | ● | $FF | ☐ |
+| 0 (GND) | ● | ● | ● | ● | ● | ● | ● | ● | $FF | ☐ |
 
 ---
 
@@ -210,9 +210,9 @@ python3 lab04_address_mux.py
 ## สิ่งที่ได้
 
 - ✅ Address mux เลือกระหว่าง PC กับ IRL ได้
-- ✅ SEL=0 → A[15:0] มาจาก PC (สำหรับ fetch)
-- ✅ SEL=1 → A[7:0] มาจาก IRL, A[15:8] มาจาก Data Page (สำหรับ data access)
-- ✅ ในวงจรจริง ADDR_MODE = SRC OR STR (จาก IR bits)
+- ✅ /ADDR_MODE=1 → A[15:0] มาจาก PC (สำหรับ fetch)
+- ✅ /ADDR_MODE=0 → A[7:0] มาจาก IRL, A[15:8] มาจาก Data Page (สำหรับ data access)
+- ✅ ในวงจรจริง ADDR_REQ = SRC OR STR (จาก IR bits)
 
 > 📝 **หมายเหตุ: Data Page**
 >
@@ -232,7 +232,7 @@ python3 lab04_address_mux.py
 
 ลองต่อ:
 ```
-SEL (pin 1 ทุกตัว) ← T2 (U8 pin 5 จาก Lab 02)
+SEL (pin 1 ทุกตัว) ← NOT T2
 ```
 
 สังเกต:
@@ -241,9 +241,9 @@ SEL (pin 1 ทุกตัว) ← T2 (U8 pin 5 จาก Lab 02)
 
 → **Control Unit ควบคุม Address Mux โดยอัตโนมัติ!**
 
-> ⚠️ **หมายเหตุ: CPU จริงใช้ ADDR_MODE ไม่ใช่ T2 ตรงๆ**
+> ⚠️ **หมายเหตุ: CPU จริงใช้ /ADDR_MODE ไม่ใช่ T2 ตรงๆ**
 >
-> RV8-GR จริง: `ADDR_MODE = SRC OR STR` (จาก U25)
+> RV8-GR จริง: `ADDR_REQ = SRC OR STR` (จาก U25)
 > ไม่ใช่ทุก T2 จะเปลี่ยน address — เฉพาะคำสั่ง LB/SB/ADD/SUB/XOR เท่านั้น
 > คำสั่ง LI, ADDI, SETPG ไม่มี SRC/STR → ABUS ยังเป็น PC แม้ใน T2
 >

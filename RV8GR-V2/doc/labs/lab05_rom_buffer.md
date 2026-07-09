@@ -195,7 +195,7 @@ LED (ดู IBUS จากฝั่ง A):
 ### ขั้นตอน
 
 1. Reset PC → $0000 (counter จาก Lab 03 reset เป็น $0000)
-2. ตั้ง ADDR_MODE = 0 (ให้ PC ขับ address)
+2. ตั้ง /ADDR_MODE = 1 (ให้ PC ขับ address)
 3. กด Clock ดู LED:
 
 ### ตาราง LED (IBUS7...IBUS0 = data จาก ROM)

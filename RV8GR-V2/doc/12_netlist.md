@@ -2,7 +2,7 @@
 
 **Source of truth**: `02_wiring_guide.md`  
 **Generated**: 2026-06-30  
-**Chips**: 33 logic (U1–U33) + ROM + RAM = 35 packages
+**Chips**: 34 logic (U1-U34) + ROM + RAM = 36 packages
 
 This document lists every net (named signal) in the RV8-GR CPU with all
 connected chip pins. Use for schematic capture, KiCad import, or breadboard
@@ -17,7 +17,7 @@ cross-checking.
 | `/NAME` | Active-low signal | `/RST`, `/PC_LD` |
 | `NAME_N` | Active-low (alternate) | `BUF_OE_N` |
 | `NAMEn` | Bit n of a bus | `ABUS0`, `IBUS7` |
-| `*` after pin | Tri-state driver (only active when enabled) | `U6-19*` |
+| `*` after pin | Tri-state driver (only active when enabled) | `U34-18*` |
 | `←` | Input | |
 | `→` | Output | |
 | `←→` | Bidirectional | |
@@ -274,22 +274,22 @@ Drivers (tri-state — only one active at a time):
 
 | Net | Source | Destinations |
 |-----|--------|-------------|
-| PC0 | U1-14 (QA) | U15-2 (mux A low 1A) |
-| PC1 | U1-13 (QB) | U15-5 (mux A low 2A) |
-| PC2 | U1-12 (QC) | U15-11 (mux A low 3A) |
-| PC3 | U1-11 (QD) | U15-14 (mux A low 4A) |
-| PC4 | U2-14 (QA) | U16-2 (mux A low 1A) |
-| PC5 | U2-13 (QB) | U16-5 (mux A low 2A) |
-| PC6 | U2-12 (QC) | U16-11 (mux A low 3A) |
-| PC7 | U2-11 (QD) | U16-14 (mux A low 4A) |
-| PC8 | U3-14 (QA) | U29-2 (mux A high 1A) |
-| PC9 | U3-13 (QB) | U29-5 (mux A high 2A) |
-| PC10 | U3-12 (QC) | U29-11 (mux A high 3A) |
-| PC11 | U3-11 (QD) | U29-14 (mux A high 4A) |
-| PC12 | U4-14 (QA) | U30-2 (mux A high 1A) |
-| PC13 | U4-13 (QB) | U30-5 (mux A high 2A) |
-| PC14 | U4-12 (QC) | U30-11 (mux A high 3A) |
-| PC15 | U4-11 (QD) | U30-14 (mux A high 4A) |
+| PC0 | U1-14 (QA) | U15-3 (mux B low 1B) |
+| PC1 | U1-13 (QB) | U15-6 (mux B low 2B) |
+| PC2 | U1-12 (QC) | U15-10 (mux B low 3B) |
+| PC3 | U1-11 (QD) | U15-13 (mux B low 4B) |
+| PC4 | U2-14 (QA) | U16-3 (mux B low 1B) |
+| PC5 | U2-13 (QB) | U16-6 (mux B low 2B) |
+| PC6 | U2-12 (QC) | U16-10 (mux B low 3B) |
+| PC7 | U2-11 (QD) | U16-13 (mux B low 4B) |
+| PC8 | U3-14 (QA) | U29-3 (mux B high 1B) |
+| PC9 | U3-13 (QB) | U29-6 (mux B high 2B) |
+| PC10 | U3-12 (QC) | U29-10 (mux B high 3B) |
+| PC11 | U3-11 (QD) | U29-13 (mux B high 4B) |
+| PC12 | U4-14 (QA) | U30-3 (mux B high 1B) |
+| PC13 | U4-13 (QB) | U30-6 (mux B high 2B) |
+| PC14 | U4-12 (QC) | U30-10 (mux B high 3B) |
+| PC15 | U4-11 (QD) | U30-13 (mux B high 4B) |
 
 Carry chain:
 | Net | Source | Destination |
@@ -300,18 +300,18 @@ Carry chain:
 
 ### IRL (Operand Register — 8-bit)
 
-Source: U6 Q outputs. IRL feeds: PC load D-inputs (U1-U2), address mux B-inputs (U15-U16), and IBUS (when /OE=LOW).
+Source: U6 Q outputs. IRL feeds PC load D-inputs (U1-U2), address mux A-inputs (U15-U16), and the U34 immediate buffer.
 
 | Net | Source | Destinations |
 |-----|--------|-------------|
-| IRL0 | U6-19 | U15-3 (mux 1B), U1-3 (PC D0), IBUS0* |
-| IRL1 | U6-18 | U15-6 (mux 2B), U1-4 (PC D1), IBUS1* |
-| IRL2 | U6-17 | U15-10 (mux 3B), U1-5 (PC D2), IBUS2* |
-| IRL3 | U6-16 | U15-13 (mux 4B), U1-6 (PC D3), IBUS3* |
-| IRL4 | U6-15 | U16-3 (mux 1B), U2-3 (PC D0), IBUS4* |
-| IRL5 | U6-14 | U16-6 (mux 2B), U2-4 (PC D1), IBUS5* |
-| IRL6 | U6-13 | U16-10 (mux 3B), U2-5 (PC D2), IBUS6* |
-| IRL7 | U6-12 | U16-13 (mux 4B), U2-6 (PC D3), IBUS7* |
+| IRL0 | U6-19 | U15-2 (mux 1A), U1-3 (PC D0), U34-2 |
+| IRL1 | U6-18 | U15-5 (mux 2A), U1-4 (PC D1), U34-3 |
+| IRL2 | U6-17 | U15-11 (mux 3A), U1-5 (PC D2), U34-4 |
+| IRL3 | U6-16 | U15-14 (mux 4A), U1-6 (PC D3), U34-5 |
+| IRL4 | U6-15 | U16-2 (mux 1A), U2-3 (PC D0), U34-6 |
+| IRL5 | U6-14 | U16-5 (mux 2A), U2-4 (PC D1), U34-7 |
+| IRL6 | U6-13 | U16-11 (mux 3A), U2-5 (PC D2), U34-8 |
+| IRL7 | U6-12 | U16-14 (mux 4A), U2-6 (PC D3), U34-9 |
 
 ### PG (Page Register — 8-bit)
 
@@ -330,18 +330,18 @@ Source: U23 Q outputs. Feeds PC high load D-inputs (U3-U4).
 
 ### DP (Data Page Register — 8-bit)
 
-Source: U32 Q outputs. Feeds address mux high B-inputs (U29-U30).
+Source: U32 Q outputs. Feeds address mux high A-inputs (U29-U30).
 
 | Net | Source | Destination |
 |-----|--------|-------------|
-| DP0 | U32-19 | U29-3 (1B) |
-| DP1 | U32-18 | U29-6 (2B) |
-| DP2 | U32-17 | U29-10 (3B) |
-| DP3 | U32-16 | U29-13 (4B) |
-| DP4 | U32-15 | U30-3 (1B) |
-| DP5 | U32-14 | U30-6 (2B) |
-| DP6 | U32-13 | U30-10 (3B) |
-| DP7 | U32-12 | U30-13 (4B) |
+| DP0 | U32-19 | U29-2 (1A) |
+| DP1 | U32-18 | U29-5 (2A) |
+| DP2 | U32-17 | U29-11 (3A) |
+| DP3 | U32-16 | U29-14 (4A) |
+| DP4 | U32-15 | U30-2 (1A) |
+| DP5 | U32-14 | U30-5 (2A) |
+| DP6 | U32-13 | U30-11 (3A) |
+| DP7 | U32-12 | U30-14 (4A) |
 
 ### AC (Accumulator — 8-bit)
 
@@ -428,8 +428,8 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | XOR_MODE | U5-13 (Q7) | U19-1 (SEL), U20-1 (SEL), U33-2 (1B), U28-12 | 6 |
 | MUX_SEL | U5-14 (Q6) | U17-1 (SEL), U18-1 (SEL), U27-9 | 5 |
 | AC_WR | U5-15 (Q5) | U24-11 (→/AC_WR), U27-13 | 4 |
-| SRC | U5-16 (Q4) | U25-1 (→ADDR_MODE), U33-10 (2B) | 3 |
-| STR | U5-17 (Q3) | U25-2 (→ADDR_MODE), U26-10 | 2 |
+| SRC | U5-16 (Q4) | U25-1 (→ADDR_REQ), U33-10 (2B) | 3 |
+| STR | U5-17 (Q3) | U25-2 (→ADDR_REQ), U26-10 | 2 |
 | BR | U5-18 (Q2) | U27-1 | 1 |
 | JMP | U5-19 (Q1) | U24-9 (→/JUMP) | 0 |
 
@@ -437,16 +437,16 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 
 | Net | Source | Destinations | Function |
 |-----|--------|-------------|----------|
-| ADDR_MODE | U25-3 | U15-1, U16-1, U29-1, U30-1, U26-4, U26-5 | SRC OR STR |
-| /ADDR_MODE | U26-6 | U26-2, U33-4 | NAND(ADDR_MODE, ADDR_MODE) |
+| ADDR_REQ | U25-3 | U26-4 | SRC OR STR |
+| /ADDR_MODE | U26-6 | U15-1, U16-1, U29-1, U30-1, U26-2, U33-4 | NAND(ADDR_REQ, T2) |
 | PC_INC | U25-6 | U1-7, U1-10, U2-7, U3-7, U4-7 | T0 OR T1 |
 | /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 | NAND(T2, PC_LOAD_COND) |
-| /IRL_OE | U26-3 | U6-1, U24-13 | NAND(T2, /ADDR_MODE) |
+| /IRL_OE | U26-3 | U34-1, U34-19, U24-13 | NAND(T2, /ADDR_MODE) |
 | /AC_BUF | U26-8 | U14-1, U14-19, RAM /WE, U28-9 | NAND(T2, STR) |
 | BUF_OE_N | U24-12 | U7-19 | NOT(/IRL_OE) |
 | WR_DIR | U28-8 | U7-1, ROM /OE | NOT(/AC_BUF) |
 | ACC_CLK | U27-11 | U9-11, U21-3 | NAND(T2, AC_WR) — active LOW edge |
-| PG_CLK | U25-13 | U23-11 | /T2 OR /PG_cond |
+| PG_CLK | U25-11 | U23-11 | /T2 OR /PG_cond |
 | DP_Load | U33-6 | U32-11 | T2 AND XOR_MODE AND /ADDR_MODE AND /AC_WR |
 | EI_decode | U33-8 | U31-3 | T2 AND SRC AND /XOR_MODE AND /AC_WR |
 | /AC_WR | U24-10 | U27-10, U33-5, U33-13 | NOT(AC_WR) |
@@ -568,7 +568,7 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | U3 | 74HC161 | CLK, /RST, PG0-3, PC_INC, /PC_LD, RCO_1, PC8-11, RCO_2 |
 | U4 | 74HC161 | CLK, /RST, PG4-7, PC_INC, /PC_LD, RCO_2, PC12-15 |
 | U5 | 74HC574 | T0, IBUS0-7, ALU_SUB, XOR_MODE, MUX_SEL, AC_WR, SRC, STR, BR, JMP |
-| U6 | 74HC574 | T1, /IRL_OE, IBUS0-7, IRL0-7 |
+| U6 | 74HC574 | T1, IBUS0-7, IRL0-7 |
 | U7 | 74HC245 | WR_DIR, BUF_OE_N, IBUS0-7, DBUS0-7 |
 | U8 | 74HC164 | CLK, /RST, NOT(Q0), NOT(Q1), T0, T1, T2 |
 | U9 | 74HC574 | ACC_CLK, AC_IN0-7, AC0-7 |
@@ -577,8 +577,8 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | U12 | 74HC86 | IBUS0-3, XOR_B0-3, XOR_Y0-3 |
 | U13 | 74HC86 | IBUS4-7, XOR_B4-7, XOR_Y4-7 |
 | U14 | 74HC541 | /AC_BUF, AC0-7, IBUS0-7 |
-| U15 | 74HC157 | ADDR_MODE, PC0-3, IRL0-3, ABUS0-3 |
-| U16 | 74HC157 | ADDR_MODE, PC4-7, IRL4-7, ABUS4-7 |
+| U15 | 74HC157 | /ADDR_MODE, IRL0-3, PC0-3, ABUS0-3 |
+| U16 | 74HC157 | /ADDR_MODE, IRL4-7, PC4-7, ABUS4-7 |
 | U17 | 74HC157 | MUX_SEL, SUM0-3, XOR_Y0-3, AC_IN0-3 |
 | U18 | 74HC157 | MUX_SEL, SUM4-7, XOR_Y4-7, AC_IN4-7 |
 | U19 | 74HC157 | XOR_MODE, ALU_SUB(×4), AC0-3, XOR_B0-3 |
@@ -587,15 +587,16 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | U22 | 74HC688 | AC0-7, /P=Q |
 | U23 | 74HC574 | PG_CLK, IBUS0-7, PG0-7 |
 | U24 | 74HC04 | T0, T1, ABUS15, JMP, AC_WR, /IRL_OE → NOT(Q0), NOT(Q1), /A15, /JUMP, /AC_WR, BUF_OE_N |
-| U25 | 74HC32 | SRC, STR, T0, T1, /T2, /PG_cond → ADDR_MODE, PC_INC, (spare), PG_CLK |
-| U26 | 74HC00 | T2, /ADDR_MODE, ADDR_MODE, STR, PC_LOAD_COND → /IRL_OE, /ADDR_MODE, /AC_BUF, /PC_LD |
+| U25 | 74HC32 | SRC, STR, T0, T1, /T2, /PG_cond → ADDR_REQ, PC_INC, (spare), PG_CLK |
+| U26 | 74HC00 | T2, /ADDR_MODE, ADDR_REQ, STR, PC_LOAD_COND → /IRL_OE, /ADDR_MODE, /AC_BUF, /PC_LD |
 | U27 | 74HC00 | BR, Z_match, /JUMP, /BR_TAKEN, MUX_SEL, /AC_WR, T2, AC_WR → /BR_TAKEN, PC_LOAD_COND, /PG_cond, ACC_CLK |
 | U28 | 74HC86 | Z_flag, ALU_SUB, T2, /AC_BUF, XOR_MODE → Z_match, /T2, WR_DIR, /XOR_MODE |
-| U29 | 74HC157 | ADDR_MODE, PC8-11, DP0-3, ABUS8-11 |
-| U30 | 74HC157 | ADDR_MODE, PC12-15, DP4-7, ABUS12-15 |
+| U29 | 74HC157 | /ADDR_MODE, DP0-3, PC8-11, ABUS8-11 |
+| U30 | 74HC157 | /ADDR_MODE, DP4-7, PC12-15, ABUS12-15 |
 | U31 | 74HC74 | /RST, EI_decode, /IRQ, IE, IRQ_FF |
 | U32 | 74HC574 | DP_Load, IBUS0-7, DP0-7 |
 | U33 | 74HC21 | T2, XOR_MODE, /ADDR_MODE, /AC_WR, SRC, /XOR_MODE → DP_Load, EI_decode |
+| U34 | 74HC541 | /IRL_OE, IRL0-7, IBUS0-7 |
 | ROM | AT28C256 | ABUS0-14, ABUS15(/CE), WR_DIR(/OE), DBUS0-7 |
 | RAM | 62256 | ABUS0-14, /A15(/CE), /AC_BUF(/WE), DBUS0-7 |
 

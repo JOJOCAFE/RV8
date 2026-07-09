@@ -57,7 +57,7 @@ To complete the schematic:
 - CLK, /RST - System clock and reset
 - T0, T1, T2 - Phase timing
 - PC_INC, /PC_LD - Program counter control
-- ADDR_MODE - Address multiplexer select
+- /ADDR_MODE - Address multiplexer select (LOW=data address, HIGH=PC)
 - ACC_CLK - Accumulator clock
 - /IRL_OE, /AC_BUF, BUF_OE_N, WR_DIR - Bus control
 

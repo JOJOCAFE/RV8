@@ -111,7 +111,7 @@
 | IRQ does not change PC when IE=1 | ✅ |
 | PC is not saved to RAM[$800E:$800F] | ✅ |
 
-**v1.0 Hardware and Verilog model** (33 chips): polling only. `/IRQ` release/rising edge sets
+**v1.0 Hardware and Verilog model** (36 packages): polling only. `/IRQ` release/rising edge sets
 `IRQ_FF`; firmware decides what to do. There is no hardware vector, no PC
 forcing, no automatic PC save, and no DI clear path.
 

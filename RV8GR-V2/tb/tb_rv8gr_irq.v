@@ -101,7 +101,7 @@ module tb_rv8gr_irq;
             errors = errors + 1;
         end else $display("PASS: no automatic PC save to RAM");
 
-        $display("\nTest 3: DI is inert in the 33-chip v1.0 build");
+        $display("\nTest 3: DI is inert in the 36-package v1.0 build");
         clear_mem;
         cpu.rom[0] = 8'h08; cpu.rom[1] = 8'h00;  // EI
         cpu.rom[2] = 8'h48; cpu.rom[3] = 8'h00;  // DI

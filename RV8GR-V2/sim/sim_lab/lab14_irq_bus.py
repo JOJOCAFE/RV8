@@ -1,6 +1,6 @@
 """Lab 14: IRQ + RV8-Bus — tests v1.0 polling IRQ latch.
 
-33-chip v1.0 behavior:
+36-package v1.0 behavior:
   - EI sets IE.
   - DI is an inert software marker.
   - /IRQ is active-low; U31 latches IRQ_FF on release/rising edge.

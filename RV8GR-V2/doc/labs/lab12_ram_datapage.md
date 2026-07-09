@@ -122,11 +122,11 @@ U32 (Data Page Register):
     pin 2 ← IBUS0    pin 3 ← IBUS1    pin 4 ← IBUS2    pin 5 ← IBUS3
     pin 6 ← IBUS4    pin 7 ← IBUS5    pin 8 ← IBUS6    pin 9 ← IBUS7
 
-  Q outputs → Address Mux B-inputs (high byte for LB/SB):
-    pin 19 (Q1) → DP0 → U29-3     pin 18 (Q2) → DP1 → U29-6
-    pin 17 (Q3) → DP2 → U29-10    pin 16 (Q4) → DP3 → U29-13
-    pin 15 (Q5) → DP4 → U30-3     pin 14 (Q6) → DP5 → U30-6
-    pin 13 (Q7) → DP6 → U30-10    pin 12 (Q8) → DP7 → U30-13
+  Q outputs → Address Mux A-inputs (high byte for LB/SB):
+    pin 19 (Q1) → DP0 → U29-2     pin 18 (Q2) → DP1 → U29-5
+    pin 17 (Q3) → DP2 → U29-11    pin 16 (Q4) → DP3 → U29-14
+    pin 15 (Q5) → DP4 → U30-2     pin 14 (Q6) → DP5 → U30-5
+    pin 13 (Q7) → DP6 → U30-11    pin 12 (Q8) → DP7 → U30-14
 
   LED (ดู Data Page value):
     DP0-DP7 → 330Ω → LED → GND (8 ดวง)
@@ -240,7 +240,7 @@ $0009: $00  ; addr = $00 → AC ← RAM[$9000]
 | อาการ | สาเหตุ | แก้ |
 |-------|--------|-----|
 | RAM ไม่เขียน (LB ได้ $FF) | /WE ไม่ pulse LOW | เช็ค U26-8 → RAM pin 27 |
-| เขียนผิด address | DP ไม่ต่อ mux B-input | เช็ค U32-Q → U29/U30 pin B |
+| เขียนผิด address | DP ไม่ต่อ mux A-input | เช็ค U32-Q → U29/U30 pin A |
 | ROM+RAM ชนกัน (IC ร้อน!) | chip select ผิด | ROM /CE ← A15, RAM /CE ← /A15 |
 | DP ไม่เปลี่ยน | U33 output ไม่ pulse | เช็ค U33 inputs: T2, XOR_MODE, /ADDR_MODE, /AC_WR |
 | LB ได้ $00 แทน $AA | IBUS/DBUS path fault | เช็ค BUF_OE_N: U7 ต้อง enabled ตอน LB |

@@ -148,12 +148,12 @@ U26 (NAND #1):
   Gate A: /IRL_OE = NAND(T2, /ADDR_MODE)
     pin 1 ← T2 (U8-5)
     pin 2 ← /ADDR_MODE (U26-6)
-    pin 3 → /IRL_OE → U6-1, U24-13
+    pin 3 → /IRL_OE → U34-1/19, U24-13
 
-  Gate B: /ADDR_MODE = NAND(ADDR_MODE, ADDR_MODE) [= NOT]
-    pin 4 ← ADDR_MODE (U25-3)
-    pin 5 ← ADDR_MODE (U25-3)
-    pin 6 → /ADDR_MODE → U26-2
+  Gate B: /ADDR_MODE = NAND(ADDR_REQ, T2)
+    pin 4 ← ADDR_REQ (U25-3)
+    pin 5 ← T2 (U8-5)
+    pin 6 → /ADDR_MODE → U15/U16/U29/U30 pin 1, U26-2, U33-4
 
   Gate C: /AC_BUF = NAND(T2, STR)
     pin 9 ← T2 (U8-5)
@@ -168,10 +168,10 @@ U26 (NAND #1):
 U25 (OR gates):
   pin 14 (VCC) → 5V,  pin 7 (GND) → GND,  100nF คร่อม VCC-GND
 
-  Gate 1: ADDR_MODE = SRC OR STR
+  Gate 1: ADDR_REQ = SRC OR STR
     pin 1 ← SRC (U5-16)
     pin 2 ← STR (U5-17)
-    pin 3 → ADDR_MODE → U15/U16/U29/U30 pin 1, U26-4/5
+    pin 3 → ADDR_REQ → U26-4; U26-6 /ADDR_MODE → U15/U16/U29/U30 pin 1
 
   Gate 2: PC_INC = T0 OR T1
     pin 4 ← T0 (U8-3)
@@ -313,7 +313,7 @@ python3 lab10_branch_jump.py
 - ✅ BEQ กระโดดเมื่อ Z=1 (AC=0)
 - ✅ BNE กระโดดเมื่อ Z=0 (AC≠0)
 - ✅ Branch not taken → PC นับปกติ (+2 per instruction)
-- ✅ Control logic ครบ: PC_INC, /PC_LD, ADDR_MODE, ACC_CLK, /IRL_OE, /AC_BUF
+- ✅ Control logic ครบ: PC_INC, /PC_LD, /ADDR_MODE, ACC_CLK, /IRL_OE, /AC_BUF
 
 ### CPU Milestone: สิ่งที่ทำได้แล้ว!
 
