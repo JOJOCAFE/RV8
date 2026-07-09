@@ -7,7 +7,7 @@ The team owns the entire RV8 project. All variants, all deliverables.
 ## Active Target: RV8-GR (Student Baseline)
 
 - **Status**: Architecture frozen v1.0 — ready for physical build
-- **Chips**: 33 logic + ROM + RAM = 35 packages
+- **Chips**: 34 logic + ROM + RAM = 36 packages
 - **ISA**: 18 instructions (17 + SETDP), all verified
 - **Verification**: 5 Verilog TBs pass, gate-level sim 8/8, soft_debug 4/4
 - **Labs**: 14 hardware labs written (Thai, middle school level)

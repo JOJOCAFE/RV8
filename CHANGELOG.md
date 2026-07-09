@@ -1,5 +1,16 @@
 # RV8 Project — Changelog
 
+## 2026-07-09 — v4.3: RV8GR Canonical Rename and Chip-Level Source
+
+### RV8GR
+- Renamed the active student baseline folder from `RV8GR-V2/` to `RV8GR/`
+- Updated top-level routing docs so `RV8GR/` is the canonical 34-logic-chip, 36-package student build
+- Kept `RV8GR-V1/` as the previous baseline/reference folder
+
+### Chip-Level Verification
+- Updated chip-level Verilog, testbench, KiCad, and netlist filenames to use the canonical `rv8gr` / `RV8GR` name
+- Preserved Verilog/netlist compatibility as the secondary HDL comparison path for the Python-first simulator workflow
+
 ## 2026-06-26 — v4.2: RV8-R FullHW Real Hardware Path
 
 ### RV8-R FullHW
@@ -17,26 +28,26 @@
 
 ### Project Status
 - Top-level README now presents RV8-R FullHW as the real full RV8-style TTL path, not the fewest-chip option
-- RV8GR-V2 remains the active student-friendly physical build target
+- RV8GR remains the active student-friendly physical build target
 - Existing RV8-R microcode generator is explicitly marked as legacy 14-bit prototype; FullHW needs a new 15-bit direct-control generator
 
 ### Verification
 - Documentation consistency scan completed for stale zero-page, 19-chip, and old blocked-path claims
 - RTL, KiCad/ERC, and FullHW microcode generator migration remain pending
 
-## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
+## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR Compatibility
 
 ### Programmer
 - **Programmer/firmware/firmware.ino**: RUN mode now releases both `/WR` and `/RD`; PROG mode reclaims `/WR` before ROM write cycles
 - **Programmer/tools/rv8term.py**: Normal terminal mode now starts directly in RUN mode without sending the PROG-only `?` handshake; `-c` remains the explicit connection check
-- **Programmer/tools/rv8flash.py**: Added RV8GR-V2 documented command aliases: `program FILE --base 0x0000` and `verify FILE --base 0x0000`; nonzero `--base` fails loudly
-- **Programmer/tools/test_rv8flash.py** and **test_rv8term.py**: Added regression coverage for RV8GR-V2 CLI aliases and PROG/RUN handshake boundary
+- **Programmer/tools/rv8flash.py**: Added RV8GR documented command aliases: `program FILE --base 0x0000` and `verify FILE --base 0x0000`; nonzero `--base` fails loudly
+- **Programmer/tools/test_rv8flash.py** and **test_rv8term.py**: Added regression coverage for RV8GR CLI aliases and PROG/RUN handshake boundary
 - **Programmer/README.md**, **schematic.md**, and requirement docs: Documented ZIF-direct vs RV8-Bus in-system use, never-both safety rule, and AT28C256 SDP limitation
 
-### RV8GR-V2 Integration
-- **RV8GR-V2/doc/02_wiring_guide.md**: Clarified that ROM `/WE` connects to RV8-Bus `/WR` pin 27 for Programmer support, and that current firmware does normal byte writes unless SDP unlock is added
-- **RV8GR-V2/doc/labs/lab05_rom_buffer.md**: Separated early standalone ROM `/WE -> 5V` lab wiring from final Programmer/RV8-Bus `/WE -> /WR` wiring
-- **RV8GR-V2/doc/labs/lab13_full_system.md**, **lab14_irq_bus.md**, and **doc/06_debug_plan.md**: Updated Programmer command examples to the actual `Programmer/tools/rv8flash.py` path and RV8GR-V2-compatible command form
+### RV8GR Integration
+- **RV8GR/doc/02_wiring_guide.md**: Clarified that ROM `/WE` connects to RV8-Bus `/WR` pin 27 for Programmer support, and that current firmware does normal byte writes unless SDP unlock is added
+- **RV8GR/doc/labs/lab05_rom_buffer.md**: Separated early standalone ROM `/WE -> 5V` lab wiring from final Programmer/RV8-Bus `/WE -> /WR` wiring
+- **RV8GR/doc/labs/lab13_full_system.md**, **lab14_irq_bus.md**, and **doc/06_debug_plan.md**: Updated Programmer command examples to the actual `Programmer/tools/rv8flash.py` path and RV8GR-compatible command form
 
 ### KiCad Exports
 - Regenerated `Programmer/KICAD/RV8Programmer.pdf`
@@ -44,42 +55,42 @@
 
 ### Verification
 - `python3 -m unittest discover -s Programmer/tools -p 'test_*.py'` — 36 tests pass
-- `python3 RV8GR-V2/sim/verify_wiring.py` — all wiring verified
-- `python3 RV8GR-V2/tools/test_rv8gr_asm.py` — 11 tests pass
+- `python3 RV8GR/sim/verify_wiring.py` — all wiring verified
+- `python3 RV8GR/tools/test_rv8gr_asm.py` — 11 tests pass
 - Cleaned Python caches and Zone.Identifier artifacts after validation
 
-## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
+## 2026-06-26 — v4.0: RV8GR Student Build Guardrails
 
 ### Documentation
-- **RV8GR-V2/README.md**: Added Student Baseline Contract and recommended reading order for student, teacher, debug, wiring, and KiCad paths
-- **RV8GR-V2/doc/build_plan/01_student_incremental_build_plan.md**: Added baseline contract, explicit temporary-wire removal checks, "do not add" warnings for vector/IRQ upgrade wiring, and stage checklist field for temporary wires
-- **RV8GR-V2/doc/06_debug_plan.md**: Added Baseline Boundary and Probe Point Map for clock/reset, buses, control signals, PC, PG, DP, IRQ, and latch debug
-- **RV8GR-V2/doc/labs/README.md**: Added Thai V2 baseline rules for students
-- **RV8GR-V2/doc/04_bank_switch.md**: Marked ROM banking as future-only, not part of the student baseline
-- **Top-level README.md**: Updated project routing to make RV8GR-V2 the active 33-chip student baseline
+- **RV8GR/README.md**: Added Student Baseline Contract and recommended reading order for student, teacher, debug, wiring, and KiCad paths
+- **RV8GR/doc/build_plan/01_student_incremental_build_plan.md**: Added baseline contract, explicit temporary-wire removal checks, "do not add" warnings for vector/IRQ upgrade wiring, and stage checklist field for temporary wires
+- **RV8GR/doc/06_debug_plan.md**: Added Baseline Boundary and Probe Point Map for clock/reset, buses, control signals, PC, PG, DP, IRQ, and latch debug
+- **RV8GR/doc/labs/README.md**: Added Thai baseline rules for students
+- **RV8GR/doc/04_bank_switch.md**: Marked ROM banking as future-only, not part of the student baseline
+- **Top-level README.md**: Updated project routing to make RV8GR the active 34-logic-chip student baseline
 
 ### Cleanup
-- **RV8GR-V2/.gitignore**: Added rules for `*.pyc` and `*:Zone.Identifier*`
-- Removed generated VCD/VVP traces, Python caches, and Windows Zone.Identifier metadata from RV8GR-V2
+- **RV8GR/.gitignore**: Added rules for `*.pyc` and `*:Zone.Identifier*`
+- Removed generated VCD/VVP traces, Python caches, and Windows Zone.Identifier metadata from RV8GR
 
 ### Verification
-- `python3 RV8GR-V2/tools/test_rv8gr_asm.py` — 11 tests pass
-- `python3 RV8GR-V2/sim/chip_sim.py` — 8 CPU tests pass
-- `python3 RV8GR-V2/sim/verify_wiring.py` — all wiring verified
+- `python3 RV8GR/tools/test_rv8gr_asm.py` — 11 tests pass
+- `python3 RV8GR/sim/chip_sim.py` — 8 CPU tests pass
+- `python3 RV8GR/sim/verify_wiring.py` — all wiring verified
 - Icarus Verilog benches pass: full, IRQ polling, SETDP, tasks, assembler ROM, opcode sweep
 - Opcode sweep: 512 cases pass
 
 ## 2026-06-21 — v3.9: KiCad Module Definitions
 
 ### Documentation
-- **doc/10_kicad_modules.md**: Split 35-chip CPU into 6 hierarchical KiCad sheets
+- **doc/10_kicad_modules.md**: Split 36-package CPU into 6 hierarchical KiCad sheets
   - CLK_RST (U8), PC (U1-U4), ADDR_MEM (U15/U16/U29/U30+ROM+RAM), IR_BUF (U5-U7,U14), ALU_AC (U9-U13,U17-U22), CTRL (U23-U28,U31-U33)
   - Full sheet port tables, pin-level wiring, inter-module signal names
   - Aligned with debug plan (14 steps) and hardware labs (14 labs)
   - Build/test order matches existing bring-up sequence
 
 ### Verification
-- All 35 chips accounted for (no duplicates, no gaps)
+- All 34 logic chips plus ROM/RAM accounted for (no duplicates, no gaps)
 - Cross-referenced with 02_wiring_guide.md (source of truth) — all pin assignments match
 - Module boundaries consistent with 05_understand_by_module.md groupings
 
@@ -103,7 +114,7 @@
 
 ### Skills (new)
 - **debug-mantra**: 4-step hardware debugging discipline adapted from 9arm-skills (reproduce → trace → falsify → breadcrumbs), with RV8-specific hazard checklist and sim layers
-- **scrutinize**: Outsider design review adapted from 9arm-skills, with chip:pin signal tracing, ISA encoding safety, 33-chip budget awareness
+- **scrutinize**: Outsider design review adapted from 9arm-skills, with chip:pin signal tracing, ISA encoding safety, 34-logic-chip budget awareness
 
 ### Cleanup
 - Evaluated RV8GR-Codex (40-chip AI redesign): rejected as unauthorized/unnecessary at 1 MHz; extracted useful assembler safety and opcode sweep TB
@@ -214,9 +225,9 @@ SR_LATCH:     GPIO 19
 ## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
 
 ### Gate-Level Simulator (Task 6 Complete)
-- **chip_sim.py**: Full CPU simulation through all 35 chips
+- **chip_sim.py**: Full CPU simulation through all 34 logic chips plus ROM/RAM
 - **sim_lab/**: 10 step-by-step labs (module-by-module testing)
-- **chips/__init__.py**: 35 chip objects with pin layout + behavior
+- **chips/__init__.py**: 34 logic chip objects plus ROM/RAM with pin layout + behavior
 - **wiring.py**: 247 pin connections matching 03_wiring_guide.md
 - **Timing analysis**: max safe clock 9.7 MHz, 97ns margin @ 5 MHz
 - All 3 .bin programs pass through gate-level sim

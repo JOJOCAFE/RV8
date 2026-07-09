@@ -347,7 +347,7 @@ class TestIntegration(unittest.TestCase):
 
 
 class TestRv8grCliCompatibility(unittest.TestCase):
-    """Regression tests for RV8GR-V2 documented rv8flash command form."""
+    """Regression tests for RV8GR documented rv8flash command form."""
 
     @classmethod
     def setUpClass(cls):

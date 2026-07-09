@@ -6,7 +6,7 @@ Updated: 2026-07-09
 
 - Components repo is pushed and clean at `a55bec5 Remove unverified 74HC parts`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
-- RV8 repo is pushed and clean at `4e474b9 Add RV8GR-V2 KiCad project`.
+- RV8 repo is pushed and clean at `4e474b9 Add RV8GR KiCad project`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
@@ -52,6 +52,6 @@ Expected pass markers:
 
 - `74HC150` and `74HC260` were removed from the active Components catalog because manufacturer-verified HC-family DIP evidence was not available.
 - SST39SF010A Python/Verilog write-trigger semantics are aligned for the simplified flash model: write occurs on the falling edge of `/WE` while selected with `/OE` high.
-- RV8GR-V2 KiCad project files were kept under `RV8GR-V2/Kicad/`; accidental root report/output files and duplicate `XCPU (1).pdf` were removed.
-- `RV8GR-V2/.gitignore` now ignores generated KiCad local artifacts such as `.kicad_prl`, backup folders, lock files, reports, EDF output, and Python cache.
+- RV8GR KiCad project files were kept under `RV8GR/Kicad/`; accidental root report/output files and duplicate `XCPU (1).pdf` were removed.
+- `RV8GR/.gitignore` now ignores generated KiCad local artifacts such as `.kicad_prl`, backup folders, lock files, reports, EDF output, and Python cache.
 - Do not stage unrelated RV8 dirty files unless Jo explicitly asks.

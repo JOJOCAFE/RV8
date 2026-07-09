@@ -22,7 +22,7 @@ Seven brilliant people who chose this project because they believe a kid wiring 
 
 **Male, 38** | PhD dropout (he solved the problem and lost interest in the paper). Self-taught hardware architect who's designed 3 production chips at his previous company.
 
-**Why he's genius:** Sees the entire system at once — chip count, timing margins, student confusion points, future extensibility — and optimizes for all of them simultaneously. His 33-chip design is what other architects achieve in 60.
+**Why he's genius:** Sees the entire system at once — chip count, timing margins, student confusion points, future extensibility — and optimizes for all of them simultaneously. His 34-logic-chip design is what other architects achieve in 60.
 
 **Drive:** "Elegance isn't luxury. Elegance is the difference between a student finishing the build or giving up at step 47."
 

@@ -1,5 +1,12 @@
 # RV8 Project — Development History
 
+## 2026-07-09 — v4.3: RV8GR Canonical Rename and Chip-Level Source
+
+- Renamed the active student baseline from `RV8GR-V2/` to `RV8GR/`
+- Updated top-level docs to route students, teachers, tooling, KiCad, netlist, and Verilog work through `RV8GR/`
+- Normalized RV8GR count language to **34 logic chips + ROM + RAM = 36 packages**
+- Kept chip-level Verilog/netlist export compatible with the Python-first simulation path
+
 ## 2026-06-26 — v4.2: RV8-R FullHW Real Hardware Path
 
 - Reframed RV8-R as **FullHW**, a larger but real full-ISA TTL hardware path instead of the old 19-chip reduced concept
@@ -8,29 +15,29 @@
 - Changed RV8-R control model to **16-bit direct-control microcode** with a **15-bit microcode address**: `{IRQ_ACTIVE, C, Z, step[3:0], opcode[7:0]}`
 - Marked the old 19-chip instruction trace as legacy design history
 - Marked the existing Python microcode generator as a legacy 14-bit prototype; FullHW needs a new generator, RTL migration, and KiCad/ERC proof
-- Updated the top-level README so RV8GR-V2 remains the physical student baseline and RV8-R FullHW becomes the full RV8-style TTL investigation path
+- Updated the top-level README so RV8GR remains the physical student baseline and RV8-R FullHW becomes the full RV8-style TTL investigation path
 
-## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR-V2 Compatibility
+## 2026-06-26 — v4.1: Programmer Dual-Mode RV8GR Compatibility
 
-- Rechecked `Programmer/` against the current `RV8GR-V2` RV8-Bus pinout and ROM wiring contract
+- Rechecked `Programmer/` against the current `RV8GR` RV8-Bus pinout and ROM wiring contract
 - Confirmed the board supports two mutually exclusive programming paths: ZIF direct ROM programming, or in-system RV8-Bus programming with the ZIF empty
 - Fixed RUN-mode bus release in firmware: `/WR` and `/RD` are both released when switching to RUN, then reclaimed in PROG
 - Fixed `rv8term.py` so normal RUN terminal mode no longer requires the PROG-only `? -> Connected` handshake; `-c` remains the explicit PROG-mode health check
-- Added RV8GR-V2-compatible `rv8flash.py program FILE --base 0x0000` and `verify FILE --base 0x0000` aliases; nonzero base is rejected explicitly
+- Added RV8GR-compatible `rv8flash.py program FILE --base 0x0000` and `verify FILE --base 0x0000` aliases; nonzero base is rejected explicitly
 - Documented the AT28C256 software data protection boundary: current firmware performs normal byte write cycles, so use SDP-disabled ROM chips or add an unlock sequence before protected parts
-- Updated RV8GR-V2 docs and labs so Programmer command examples use the actual `Programmer/tools/rv8flash.py` path and final ROM `/WE -> RV8-Bus /WR` wiring is clear
+- Updated RV8GR docs and labs so Programmer command examples use the actual `Programmer/tools/rv8flash.py` path and final ROM `/WE -> RV8-Bus /WR` wiring is clear
 - Regenerated `Programmer/KICAD/RV8Programmer.pdf` and SVG exports with KiCad 10.0.4
-- Verification passed: Programmer Python tests (36), RV8GR-V2 wiring verifier, and RV8GR-V2 assembler tests
+- Verification passed: Programmer Python tests (36), RV8GR wiring verifier, and RV8GR assembler tests
 
-## 2026-06-26 — v4.0: RV8GR-V2 Student Build Guardrails
+## 2026-06-26 — v4.0: RV8GR Student Build Guardrails
 
-- Made `RV8GR-V2/` the active 33-chip student baseline in the top-level project docs
-- Added Student Baseline Contract: 33 logic chips + ROM + RAM, no microcode, no hardware IRQ vector, fixed T0/T1/T2 execution, one active IBUS/DBUS driver
+- Made `RV8GR/` the active 34-logic-chip student baseline in the top-level project docs
+- Added Student Baseline Contract: 34 logic chips + ROM + RAM = 36 packages, no microcode, no hardware IRQ vector, fixed T0/T1/T2 execution, one active IBUS/DBUS driver
 - Added recommended reading order: labs for students, build plan for teachers, debug plan for probing, wiring guide as source of truth, KiCad module split for schematic work
 - Added temporary-wire removal checkpoints to the incremental build plan to prevent test jumpers from becoming hidden wiring bugs
 - Added probe-point map to the physical debug plan for clock/reset, buses, enables, PC, PG, DP, AC, Z, and IRQ latch signals
-- Marked ROM banking and hardware IRQ vectoring as future-only, not part of the V2 baseline
-- Cleaned generated VCD/VVP traces, Python caches, and Zone.Identifier metadata from RV8GR-V2
+- Marked ROM banking and hardware IRQ vectoring as future-only, not part of the baseline
+- Cleaned generated VCD/VVP traces, Python caches, and Zone.Identifier metadata from RV8GR
 - Verification passed: assembler tests, Python chip sim, wiring verifier, all RTL benches, and 512-case opcode sweep
 
 ## 2026-06-21 — v3.9: KiCad Module Definitions
@@ -90,7 +97,7 @@
 
 ## 2026-06-09 — v3.4: Gate-Level Simulator + Build Plan
 
-- Gate-level chip simulator: 35 chips, 14 types, 141 test vectors
+- Gate-level chip simulator: 34 logic chips plus ROM/RAM, 14 types, 141 test vectors
 - 10 sim labs (ring counter → full execute LI $42)
 - 3 .bin programs verified through gate-level sim
 - Propagation delay model (70ns ROM/RAM, max 9.7 MHz)

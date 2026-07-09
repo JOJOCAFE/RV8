@@ -5,7 +5,7 @@ Shared knowledge for all agents. Update when significant facts change.
 ## Project: RV8 CPU Family
 
 - **Ownership**: Team JOJOCAFE owns the entire RV8 project
-- **Main focus**: RV8-GR (33 chips, architecture frozen v1.0)
+- **Main focus**: RV8-GR (34 logic chips, architecture frozen v1.0)
 - Target: minimal 8-bit CPUs students can build on breadboards
 - Language: Thai docs, English code/comments
 - Repository: /home/jo/kiro/RV8
@@ -25,7 +25,7 @@ Shared knowledge for all agents. Update when significant facts change.
 - Accumulator-based, 18 instructions, 3-cycle (T0/T1/T2)
 - Horizontal control: opcode byte = control word, no decoder
 - Encoding: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP
-- Chips: 33 logic (U1-U33) + AT28C256 ROM + 62256 RAM
+- Chips: 34 logic (U1-U34) + AT28C256 ROM + 62256 RAM
 - Clock: 1 MHz breadboard, 4-5 MHz PCB
 
 ## Verification Status

@@ -44,8 +44,8 @@ class VirtualESP32:
 | `-w FILE` | Write FILE to ROM |
 | `-r FILE` | Read ROM to FILE |
 | `-v FILE` | Verify ROM against FILE |
-| `program FILE --base 0x0000` | RV8GR-V2 documented alias for write |
-| `verify FILE --base 0x0000` | RV8GR-V2 documented alias for verify |
+| `program FILE --base 0x0000` | RV8GR documented alias for write |
+| `verify FILE --base 0x0000` | RV8GR documented alias for verify |
 | `--base ADDR` | Base address compatibility option; current firmware supports only `0x0000` |
 | `-d` | Debug (show serial traffic) |
 | `-q` | Quiet (minimal output) |
@@ -135,4 +135,4 @@ tools/
 - [x] Read (`V` → 32768 bytes)
 - [x] Verify (read + compare)
 - [x] Port + baud display before operations
-- [x] RV8GR-V2 `program/verify --base 0x0000` compatibility aliases
+- [x] RV8GR `program/verify --base 0x0000` compatibility aliases

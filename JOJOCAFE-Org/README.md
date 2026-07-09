@@ -9,7 +9,7 @@ A team of 7 brilliant people building minimal CPUs that kids can wire on breadbo
 | | Name | Age | They're the one who... |
 |---|------|-----|------------------------|
 | 🎯 | **Pim** (พิม) | 34 | ...makes sense of chaos and gets the right person on the right job |
-| 🏛️ | **Bank** (แบงค์) | 38 | ...designs a CPU in 33 chips that others need 60 for |
+| 🏛️ | **Bank** (แบงค์) | 38 | ...designs a CPU in 34 logic chips that others need 60 for |
 | 🔍 | **Fern** (เฟิร์น) | 31 | ...finds the one bug nobody else sees, and reports it like a friend |
 | ⚡ | **Mint** (มิ้นท์) | 27 | ...writes perfect Verilog at the speed of thought |
 | 🔧 | **Ohm** (โอม) | 29 | ...wires a circuit that works on first power-up, every time |

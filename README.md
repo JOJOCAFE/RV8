@@ -8,8 +8,8 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 
 | | **RV8** | **RV8-R** | **RV8-G** | **RV8-GR** |
 |--|:---:|:---:|:---:|:---:|
-| **Logic chips** | 28 | **49 FullHW** | **38** | **33** |
-| **Total** | 31 | 53 | 40 | 35 |
+| **Logic chips** | 28 | **49 FullHW** | **38** | **34** |
+| **Total** | 31 | 53 | 40 | 36 |
 | **MIPS @5MHz** | 1.25 | 1.0 | **2.5** | **0.33*** |
 | **ISA** | Full target, not frozen | FullHW RV8-style surface | Full (35) | 18 instr |
 | **Microcode** | Yes | Yes | **No** | **No** |
@@ -30,19 +30,19 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 | **Learn microcode / experimental reference** | **RV8** (28 chips target, not build-ready) |
 | **Full RV8-style ISA with real TTL paths** | **RV8-R FullHW** (49 logic chips, KiCad/RTL proof pending) |
 | **Full ISA + no microcode** | **RV8-G** (28 chips) |
-| **Student-friendly no-microcode build** | **RV8GR-V2** (33 chips) |
+| **Student-friendly no-microcode build** | **RV8GR** (34 logic chips) |
 
-### RV8GR-V2 Student Baseline
+### RV8GR Student Baseline
 
-RV8GR-V2 is the active physical-build target.
+RV8GR is the active physical-build target.
 
-- 33 logic chips + ROM + RAM = 35 packages.
+- 34 logic chips + ROM + RAM = 36 packages.
 - No microcode ROM.
 - No hardware IRQ vector; IRQ is a polling latch only.
 - Every instruction uses T0, T1, T2.
 - Build one module, test it, then continue.
-- Start with `RV8GR-V2/doc/labs/README.md` for student labs.
-- Use `RV8GR-V2/doc/02_wiring_guide.md` as the official pin-level source.
+- Start with `RV8GR/doc/labs/README.md` for student labs.
+- Use `RV8GR/doc/02_wiring_guide.md` as the official pin-level source.
 
 ### RV8 vs RV8-R Analysis
 
@@ -56,7 +56,7 @@ RV8GR-V2 is the active physical-build target.
 | Wiring | ⚠️ Pin-level guide exists but is tied to stale chip-count/control assumptions | ✅ FullHW wiring paths documented; Programmer/RV8-Bus pin audit still required |
 | Build readiness | Not ready for student physical build | Not ready for physical build until KiCad/ERC and sim proof |
 
-**Decision:** keep RV8 as a learning/reference branch, but do not present it as proven. Use RV8-R FullHW when the goal is to make the full RV8-style ISA real in TTL, and use RV8GR-V2 when the goal is a student-buildable physical CPU today.
+**Decision:** keep RV8 as a learning/reference branch, but do not present it as proven. Use RV8-R FullHW when the goal is to make the full RV8-style ISA real in TTL, and use RV8GR when the goal is a student-buildable physical CPU today.
 
 ---
 
@@ -68,7 +68,7 @@ RV8/
 ├── RV8R/           ← 49-chip FullHW target, RAM regs, microcode, IRQ (full RV8-style hardware)
 ├── RV8G/           ← 28 chips, full ISA, no microcode, fastest
 ├── RV8GR-V1/       ← previous RV8-GR baseline/reference
-├── RV8GR-V2/       ← active 33-chip student baseline, labs, wiring, sim, RTL
+├── RV8GR/          ← active 34-logic-chip student baseline, labs, wiring, sim, RTL
 ├── Programmer/     ← ESP32 board; per-CPU bus/pin audit required
 ├── Old_Design/     ← Archived
 ├── Reference/      ← Gigatron, SAP-1, Nand2Tetris
