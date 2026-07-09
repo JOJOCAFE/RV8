@@ -24,6 +24,7 @@ Updated: 2026-07-09
 |------|------|--------|
 | 2026-06-14 | 5 Verilog TBs pass + 512-opcode sweep verified | ✅ All pass |
 | 2026-07-09 | Verified Components Python, 74HC Verilog, and Memory Verilog smoke checks | ✅ All pass |
+| 2026-07-09 | Published B-007 non-physical verification report; physical B-007 remains blocked until hardware evidence exists | ⛔ Physical blocked |
 
 ## Mint (มิ้นท์) — RTL Coder
 | Date | What | Result |
@@ -42,12 +43,14 @@ Updated: 2026-07-09
 |------|------|--------|
 | 2026-06-14 | Assembler complete (18 opcodes + macros, page-safe) | ✅ Working |
 | 2026-07-09 | Captured Components Python backend contract: loader, 64 inputs, 8 clocks, future probes | ✅ Skill updated |
+| 2026-07-09 | Implemented and assembler-verified B-010 example ASM programs for blink, counter, and echo workflows | ✅ Verified |
 
 ## Noon (นุ่น) — Docs Writer
 | Date | What | Result |
 |------|------|--------|
 | 2026-06-15 | 14 hardware labs written (Thai, middle school) | ✅ Complete |
 | 2026-07-09 | Captured simulator documentation requirements for future UI/backend docs | ✅ Skill updated |
+| 2026-07-09 | Updated team docs for B-010 verification, B-007 verification split, and Components mapping push `a2ee62c` | ✅ Current |
 
 ---
 

@@ -4,7 +4,10 @@ Updated: 2026-07-09
 
 ## Current State
 
-- Components repo is pushed and clean at `6bc7ee0 Add Python schematic backend and netlist tooling`.
+- B-010 example ASM programs are implemented and assembler-verified.
+- B-007 non-physical verification report is available; physical B-007 remains blocked until hardware evidence exists.
+- Components netlist mapping expansion is verified and pushed at `a2ee62c Expand component netlist mappings`.
+- Components repo is pushed and clean at `a2ee62c Expand component netlist mappings`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
 - RV8 repo is pushed through `1470963 Fix RV8 README project status`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
@@ -44,10 +47,13 @@ Expected pass markers:
 
 ## Next Session
 
-1. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
-2. Use Components schematic backend as the reusable Python-first path for future UI/block/JSON/netlist work.
-3. When chip behavior changes, verify with Components Python tests first and run Verilog smoke tests.
-4. For RV8, do not stage unrelated dirty `RV8R/` or `rv8_memory.md` changes unless Jo explicitly asks.
+1. Keep physical B-007 blocked until hardware photos/logs/test output exist; cite the non-physical report separately.
+2. Use B-010 example ASM programs for ROM/programmer prep once the physical ROM workflow is ready.
+3. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
+4. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
+5. Use Components schematic backend as the reusable Python-first path for future UI/block/JSON/netlist work.
+6. When chip behavior changes, verify with Components Python tests first and run Verilog smoke tests.
+7. For RV8, do not stage unrelated dirty `RV8R/` or `rv8_memory.md` changes unless Jo explicitly asks.
 
 ## Known Follow-Ups
 
