@@ -11,6 +11,7 @@
 | `RV8GR.kicad_sch` | 12K | Top-level schematic with global labels |
 | `RV8GR.net` | 33K | **CRITICAL: KiCad netlist with all connections** |
 | `RV8GR-CPU-paul.EDF` | 66K | EDIF/EDF export of the current RV8GR netlist |
+| `RV8GR-CPU-paul.pdf` | 295K | Merged PDF export of the current RV8GR schematic sheets |
 
 ## Netlist Summary
 
@@ -68,6 +69,9 @@ kicad-cli sch import netlist RV8GR.net
 
 # Run ERC
 kicad-cli sch erc RV8GR.kicad_sch
+
+# Export current top-level PDF page
+kicad-cli sch export pdf --black-and-white --output RV8GR-CPU-paul.pdf RV8GR.kicad_sch
 ```
 
 ## Chip Reference

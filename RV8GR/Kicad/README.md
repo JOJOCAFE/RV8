@@ -16,7 +16,7 @@ Generated on 2026-07-09
 | CTRL.kicad_sch | Control Logic (U23-U28, U31-U33) |
 | RV8GR.net | Current KiCad netlist generated from `gen_kicad.py` |
 | RV8GR-CPU-paul.EDF | Current-baseline EDIF/EDF netlist generated from `gen_kicad.py` |
-| RV8GR-CPU-paul.pdf | Older Paul one-page schematic reference; not designator-compatible with the current baseline |
+| RV8GR-CPU-paul.pdf | Current-baseline merged KiCad PDF export |
 
 ## Chip Summary
 
@@ -77,9 +77,17 @@ To complete the schematic:
 
 See `doc/10_kicad_modules.md` and `doc/02_wiring_guide.md` for complete pin-level wiring details.
 
-## Paul Reference Files
+## Current PDF/EDF Files
 
-`RV8GR-CPU-paul.pdf` is kept as a visual reference only. The generated
-`RV8GR-CPU-paul.EDF` now follows the current RV8GR source-of-truth netlist:
-`U34` is the 74HC541 IRL-to-IBUS immediate buffer, and memory is named `ROM1`
-and `RAM1`.
+`RV8GR-CPU-paul.pdf` and `RV8GR-CPU-paul.EDF` now follow the current RV8GR
+source-of-truth netlist: `U34` is the 74HC541 IRL-to-IBUS immediate buffer,
+and memory is named `ROM1` and `RAM1`.
+
+Regenerate the single-page top-level PDF from this directory with:
+
+```bash
+kicad-cli sch export pdf --black-and-white --output RV8GR-CPU-paul.pdf RV8GR.kicad_sch
+```
+
+The committed PDF is a merged export of the top-level page plus generated
+module sheets.
