@@ -1,0 +1,191 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC155",
+  "title": "dual 2-to-4 line decoder / 3-to-8 line decoder",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "1C",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "1G",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "B",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "1Y3",
+      "direction": "output"
+    },
+    {
+      "number": 5,
+      "name": "1Y2",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "1Y1",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "1Y0",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "2Y0",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "2Y1",
+      "direction": "output"
+    },
+    {
+      "number": 11,
+      "name": "2Y2",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "2Y3",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "A",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "2G",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "2C",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc155.v",
+    "verilog": "Verilog/74xx/74hc155.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc155",
+    "file": "Verilog/74xx/74hc155.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable1C",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Enable1G_bar",
+          "pins": [
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Enable2C_bar",
+          "pins": [
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Enable2G_bar",
+          "pins": [
+            14
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            13,
+            3
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y_2D",
+          "pins": [
+            7,
+            6,
+            5,
+            4,
+            9,
+            10,
+            11,
+            12
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC155"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC155_STMICROELECTRONICS_23044.pdf"
+    }
+  ]
+}

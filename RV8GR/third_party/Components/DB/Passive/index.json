@@ -1,0 +1,7 @@
+{
+  "schema": "db.group",
+  "version": 1,
+  "id": "passive",
+  "title": "Passive physical components",
+  "components": ["LED", "Resistor", "Capacitor"]
+}

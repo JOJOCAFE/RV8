@@ -1,0 +1,25 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "InputSource",
+  "part": "InputSource",
+  "group": "virtual",
+  "kind": "virtual",
+  "role": "stimulus",
+  "title": "Manual logic input source",
+  "family": "Virtual",
+  "package": {"kind": "virtual", "pins": 1},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "OUT", "direction": "output"}
+  ],
+  "simulation": {"service": "sim.input_source", "default_value": 0},
+  "ui": {"widget": "switch", "symbol": "input"}
+}

@@ -1,0 +1,249 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC593",
+  "title": "8-Bit Binary Counter With Input Register",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "A/QA",
+      "direction": "output"
+    },
+    {
+      "number": 2,
+      "name": "B/QB",
+      "direction": "output"
+    },
+    {
+      "number": 3,
+      "name": "C/QC",
+      "direction": "output"
+    },
+    {
+      "number": 4,
+      "name": "D/QD",
+      "direction": "output"
+    },
+    {
+      "number": 5,
+      "name": "E/QE",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "F/QF",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "G/QG",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "H/QH",
+      "direction": "output"
+    },
+    {
+      "number": 9,
+      "name": "CLOAD",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "RCO",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "CCLR",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "CCK",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "CCKEN",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "/CCKEN",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 16,
+      "name": "RCK",
+      "direction": "input"
+    },
+    {
+      "number": 17,
+      "name": "RCKEN",
+      "direction": "input"
+    },
+    {
+      "number": 18,
+      "name": "G",
+      "direction": "input"
+    },
+    {
+      "number": 19,
+      "name": "/G",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc593.v",
+    "verilog": "Verilog/74xx/74hc593.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc593",
+    "file": "Verilog/74xx/74hc593.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "A_Q",
+          "pins": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "CLOAD",
+          "pins": [
+            9
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "RCO",
+          "pins": [
+            11
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "CCLR",
+          "pins": [
+            12
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "CCK",
+          "pins": [
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "CCKEN",
+          "pins": [
+            14
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "CCKEN_bar",
+          "pins": [
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "RCK",
+          "pins": [
+            16
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "RCKEN",
+          "pins": [
+            17
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "G",
+          "pins": [
+            18
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "G_bar",
+          "pins": [
+            19
+          ],
+          "direction": "input"
+        }
+      ],
+      "output_pins": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC593"
+  },
+  "sources": [
+    {
+      "label": "STMicroelectronics M54HC593/M74HC593",
+      "url": "`Components/Source/M54HC593.PDF`",
+      "package_evidence": "B1R plastic package, 20-pin DIP"
+    }
+  ]
+}

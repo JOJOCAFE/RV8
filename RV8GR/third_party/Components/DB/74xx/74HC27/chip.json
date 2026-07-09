@@ -1,0 +1,150 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC27",
+  "title": "triple 3-input NOR gate",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 14
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "1A",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "1B",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "2A",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "2B",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "2C",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "2Y",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 8,
+      "name": "3Y",
+      "direction": "output"
+    },
+    {
+      "number": 9,
+      "name": "3A",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "3B",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "3C",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "1Y",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "1C",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc27.v",
+    "verilog": "Verilog/74xx/74hc27.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc27",
+    "file": "Verilog/74xx/74hc27.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "A_2D",
+          "pins": [
+            1,
+            2,
+            13,
+            3,
+            4,
+            5,
+            9,
+            10,
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y",
+          "pins": [
+            12,
+            6,
+            8
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        6,
+        8,
+        12
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC27"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC27_NXP_344450_DIPCHECK.pdf"
+    }
+  ]
+}

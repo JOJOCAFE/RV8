@@ -1,0 +1,198 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC85",
+  "title": "4-bit magnitude comparator",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "B3",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "IA_LT_B",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "IA_EQ_B",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "IA_GT_B",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "QA_GT_B",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "QA_EQ_B",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "QA_LT_B",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "B0",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "B1",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "B2",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc85.v",
+    "verilog": "Verilog/74xx/74hc85.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc85",
+    "file": "Verilog/74xx/74hc85.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "A",
+          "pins": [
+            10,
+            12,
+            13,
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "B",
+          "pins": [
+            9,
+            11,
+            14,
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "ALess_in",
+          "pins": [
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Equal_in",
+          "pins": [
+            3
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "AGreater_in",
+          "pins": [
+            4
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "ALess_out",
+          "pins": [
+            7
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Equal_out",
+          "pins": [
+            6
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "AGreater_out",
+          "pins": [
+            5
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC85"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC85_MOTOROLA_4353_MC74HC85N_DIPVERIFY.pdf"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC112",
+  "title": "dual JK flip-flop with set and reset, negative-edge trigger",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "1CP",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "1K",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "1J",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "1SD",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "1Q",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "1Q_bar",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "2Q_bar",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "2Q",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "2SD",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "2J",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "2K",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "2CP",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "2RD",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "1RD",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc112.v",
+    "verilog": "Verilog/74xx/74hc112.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc112",
+    "file": "Verilog/74xx/74hc112.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Preset_bar",
+          "pins": [
+            4,
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clear_bar",
+          "pins": [
+            15,
+            14
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "J",
+          "pins": [
+            3,
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "K",
+          "pins": [
+            2,
+            12
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            1,
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            5,
+            9
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Q_bar",
+          "pins": [
+            6,
+            7
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        5,
+        6,
+        7,
+        9
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC112"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC112_PHILIPS_15529_DIPCHECK.pdf"
+    }
+  ]
+}

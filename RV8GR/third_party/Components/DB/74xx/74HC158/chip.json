@@ -1,0 +1,175 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC158",
+  "title": "quad 2-input multiplexer, inverting outputs",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "S",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "1I0",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "1I1",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "1Y",
+      "direction": "output"
+    },
+    {
+      "number": 5,
+      "name": "2I0",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "2I1",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "2Y",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "3Y",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "3I1",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "3I0",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "4Y",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "4I1",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "4I0",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "E",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc158.v",
+    "verilog": "Verilog/74xx/74hc158.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc158",
+    "file": "Verilog/74xx/74hc158.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable_bar",
+          "pins": [
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Select",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A_2D",
+          "pins": [
+            2,
+            3,
+            5,
+            6,
+            11,
+            10,
+            14,
+            13
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y_bar",
+          "pins": [
+            4,
+            7,
+            9,
+            12
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        4,
+        7,
+        9,
+        12
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC158"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC158_TI_27895_SN74HC158N_DIPVERIFY.pdf"
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "SST39SF010A",
+  "title": "128K x 8 flash EEPROM",
+  "family": "Memory",
+  "package": {
+    "kind": "DIP",
+    "pins": 32
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "NC",
+      "direction": "nc"
+    },
+    {
+      "number": 2,
+      "name": "A16",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "A15",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "A12",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "A7",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "A6",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "A5",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "A4",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "DQ0",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 14,
+      "name": "DQ1",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 15,
+      "name": "DQ2",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 16,
+      "name": "VSS",
+      "direction": "power"
+    },
+    {
+      "number": 17,
+      "name": "DQ3",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 18,
+      "name": "DQ4",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 19,
+      "name": "DQ5",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 20,
+      "name": "DQ6",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 21,
+      "name": "DQ7",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 22,
+      "name": "/CE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 23,
+      "name": "A10",
+      "direction": "input"
+    },
+    {
+      "number": 24,
+      "name": "/OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 25,
+      "name": "A11",
+      "direction": "input"
+    },
+    {
+      "number": 26,
+      "name": "A9",
+      "direction": "input"
+    },
+    {
+      "number": 27,
+      "name": "A8",
+      "direction": "input"
+    },
+    {
+      "number": 28,
+      "name": "A13",
+      "direction": "input"
+    },
+    {
+      "number": 29,
+      "name": "A14",
+      "direction": "input"
+    },
+    {
+      "number": 30,
+      "name": "NC",
+      "direction": "nc"
+    },
+    {
+      "number": 31,
+      "name": "/WE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 32,
+      "name": "VDD",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/Memory/sst39sf010a.v",
+    "verilog": "Verilog/Memory/sst39sf010a.v",
+    "python_behavior": "python/chiplib/catalog.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/Memory/tests/tb_memory_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "mem_sst39sf010a",
+    "file": "Verilog/Memory/sst39sf010a.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "A",
+          "pins": [
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            27,
+            26,
+            23,
+            25,
+            4,
+            28,
+            29,
+            3,
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "DQ",
+          "pins": [
+            13,
+            14,
+            15,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "CE_bar",
+          "pins": [
+            22
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "OE_bar",
+          "pins": [
+            24
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "WE_bar",
+          "pins": [
+            31
+          ],
+          "direction": "input",
+          "fallback": "1'b1"
+        }
+      ],
+      "output_pins": [
+        13,
+        14,
+        15,
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "SST39SF010A"
+  },
+  "sources": [
+    {
+      "label": "Microchip SST39SF010A/SST39SF020A/SST39SF040",
+      "url": "https://ww1.microchip.com/downloads/en/DeviceDoc/SST39SF010A-SST39SF020A-SST39SF040-Data-Sheet-DS20005022.pdf",
+      "package_evidence": "32-pin PDIP flash package"
+    }
+  ]
+}

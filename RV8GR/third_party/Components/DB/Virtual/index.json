@@ -1,0 +1,7 @@
+{
+  "schema": "db.group",
+  "version": 1,
+  "id": "virtual",
+  "title": "Virtual simulation components",
+  "components": ["InputSource", "ClockSource", "Probe", "BusProbe", "VCC", "GND", "Pullup", "Pulldown"]
+}

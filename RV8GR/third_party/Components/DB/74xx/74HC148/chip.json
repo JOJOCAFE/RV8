@@ -1,0 +1,182 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC148",
+  "title": "8-to-3 line priority encoder",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "I3",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "I4",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "I5",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "I6",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "EI",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "A2",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "A1",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "A0",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "I7",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "I0",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "I1",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "I2",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "GS",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "EO",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc148.v",
+    "verilog": "Verilog/74xx/74hc148.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc148",
+    "file": "Verilog/74xx/74hc148.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "EI_bar",
+          "pins": [
+            5
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A_bar",
+          "pins": [
+            11,
+            12,
+            13,
+            1,
+            2,
+            3,
+            4,
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "EO_bar",
+          "pins": [
+            15
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "GS_bar",
+          "pins": [
+            14
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "Y_bar",
+          "pins": [
+            9,
+            7,
+            6
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        6,
+        7,
+        9,
+        14,
+        15
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC148"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC148_STMICROELECTRONICS_23041.pdf"
+    }
+  ]
+}

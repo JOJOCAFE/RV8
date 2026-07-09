@@ -1,0 +1,206 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC541",
+  "title": "Octal Buffer/Line Driver",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/OE1",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "A4",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "A5",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "A6",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "A7",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "A8",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "Y8",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "Y7",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "Y6",
+      "direction": "output"
+    },
+    {
+      "number": 14,
+      "name": "Y5",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "Y4",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "Y3",
+      "direction": "output"
+    },
+    {
+      "number": 17,
+      "name": "Y2",
+      "direction": "output"
+    },
+    {
+      "number": 18,
+      "name": "Y1",
+      "direction": "output"
+    },
+    {
+      "number": 19,
+      "name": "/OE2",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc541.v",
+    "verilog": "Verilog/74xx/74hc541.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc541",
+    "file": "Verilog/74xx/74hc541.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "OE1_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "OE2_bar",
+          "pins": [
+            19
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y",
+          "pins": [
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC541"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC541",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc541.pdf",
+      "package_evidence": "N, 20-pin PDIP"
+    }
+  ]
+}

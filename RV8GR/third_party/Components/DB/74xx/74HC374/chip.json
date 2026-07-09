@@ -1,0 +1,205 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC374",
+  "title": "Octal D-Type Flip-Flop With 3-State Outputs",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "1Q",
+      "direction": "output"
+    },
+    {
+      "number": 3,
+      "name": "1D",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "2D",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "2Q",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "3Q",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "3D",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "4D",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "4Q",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "CLK",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "5Q",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "5D",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "6D",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "6Q",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "7Q",
+      "direction": "output"
+    },
+    {
+      "number": 17,
+      "name": "7D",
+      "direction": "input"
+    },
+    {
+      "number": 18,
+      "name": "8D",
+      "direction": "input"
+    },
+    {
+      "number": 19,
+      "name": "8Q",
+      "direction": "output"
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc374.v",
+    "verilog": "Verilog/74xx/74hc374.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc374",
+    "file": "Verilog/74xx/74hc374.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "OE_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "D",
+          "pins": [
+            3,
+            4,
+            7,
+            8,
+            13,
+            14,
+            17,
+            18
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            2,
+            5,
+            6,
+            9,
+            12,
+            15,
+            16,
+            19
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        2,
+        5,
+        6,
+        9,
+        12,
+        15,
+        16,
+        19
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC374"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC374",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc374.pdf",
+      "package_evidence": "N, 20-pin PDIP"
+    }
+  ]
+}

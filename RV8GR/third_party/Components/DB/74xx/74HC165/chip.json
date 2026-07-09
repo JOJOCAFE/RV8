@@ -1,0 +1,194 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC165",
+  "title": "8-Bit Parallel-Load Shift Register",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/SH/LD",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "CLK",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "E",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "F",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "G",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "H",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "/QH",
+      "direction": "output",
+      "active_low": true
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "QH",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "SER",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "A",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "B",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "C",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "D",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "CLK INH",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc165.v",
+    "verilog": "Verilog/74xx/74hc165.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc165",
+    "file": "Verilog/74xx/74hc165.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "ShiftLoad_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            2
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "ClkInhibit",
+          "pins": [
+            15
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Serial",
+          "pins": [
+            10
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "D",
+          "pins": [
+            11,
+            12,
+            13,
+            14,
+            3,
+            4,
+            5,
+            6
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "QH",
+          "pins": [
+            9
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "QH_bar",
+          "pins": [
+            7
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        7,
+        9
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC165"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments SN74HC165",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc165.pdf",
+      "package_evidence": "N, 16-pin PDIP"
+    }
+  ]
+}

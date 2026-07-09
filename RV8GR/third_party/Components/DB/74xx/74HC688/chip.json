@@ -1,0 +1,198 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC688",
+  "title": "8-Bit Identity Comparator",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "/E",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 2,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "B0",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "B1",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "B2",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "B3",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "Y",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "B7",
+      "direction": "input"
+    },
+    {
+      "number": 13,
+      "name": "A7",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "B6",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "A6",
+      "direction": "input"
+    },
+    {
+      "number": 16,
+      "name": "B5",
+      "direction": "input"
+    },
+    {
+      "number": 17,
+      "name": "A5",
+      "direction": "input"
+    },
+    {
+      "number": 18,
+      "name": "B4",
+      "direction": "input"
+    },
+    {
+      "number": 19,
+      "name": "A4",
+      "direction": "output"
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc688.v",
+    "verilog": "Verilog/74xx/74hc688.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc688",
+    "file": "Verilog/74xx/74hc688.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            2,
+            4,
+            6,
+            8,
+            12,
+            14,
+            16,
+            18
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "B",
+          "pins": [
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Equal_bar",
+          "pins": [
+            19
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        19
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC688"
+  },
+  "sources": [
+    {
+      "label": "Texas Instruments CD74HC688",
+      "url": "https://www.ti.com/lit/gpn/cd74hc688",
+      "package_evidence": "E, 20-pin PDIP"
+    }
+  ]
+}

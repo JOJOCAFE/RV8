@@ -1,0 +1,185 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC238",
+  "title": "3-to-8 line decoder/demultiplexer, active-high outputs",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 16
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "E1",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "E2",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "E3",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "Y7",
+      "direction": "output"
+    },
+    {
+      "number": 8,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 9,
+      "name": "Y6",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "Y5",
+      "direction": "output"
+    },
+    {
+      "number": 11,
+      "name": "Y4",
+      "direction": "output"
+    },
+    {
+      "number": 12,
+      "name": "Y3",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "Y2",
+      "direction": "output"
+    },
+    {
+      "number": 14,
+      "name": "Y1",
+      "direction": "output"
+    },
+    {
+      "number": 15,
+      "name": "Y0",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc238.v",
+    "verilog": "Verilog/74xx/74hc238.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc238",
+    "file": "Verilog/74xx/74hc238.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable1_bar",
+          "pins": [
+            4
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Enable2_bar",
+          "pins": [
+            5
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Enable3",
+          "pins": [
+            6
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "A",
+          "pins": [
+            1,
+            2,
+            3
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Y",
+          "pins": [
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            7
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC238"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC238_NXP_344486_DIPCHECK.pdf"
+    }
+  ]
+}

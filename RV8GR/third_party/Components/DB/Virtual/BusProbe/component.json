@@ -1,0 +1,25 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "id": "BusProbe",
+  "part": "BusProbe",
+  "group": "virtual",
+  "kind": "virtual",
+  "role": "probe",
+  "title": "Bus logic probe",
+  "family": "Virtual",
+  "package": {"kind": "virtual", "pins": 1},
+  "status": {
+    "datasheet": "not_applicable",
+    "pinout": "modeled",
+    "python_behavior": "modeled",
+    "verilog_model": "not_applicable",
+    "verilog_export": "not_applicable",
+    "tests": "modeled"
+  },
+  "pins": [
+    {"number": 1, "name": "BUS", "direction": "input"}
+  ],
+  "simulation": {"service": "sim.bus_probe"},
+  "ui": {"widget": "bus_probe", "symbol": "bus_probe"}
+}

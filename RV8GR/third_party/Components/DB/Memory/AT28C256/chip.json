@@ -1,0 +1,262 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "AT28C256",
+  "title": "32K x 8 parallel EEPROM",
+  "family": "Memory",
+  "package": {
+    "kind": "DIP",
+    "pins": 28
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "modeled",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "A14",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "A12",
+      "direction": "input"
+    },
+    {
+      "number": 3,
+      "name": "A7",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "A6",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "A5",
+      "direction": "input"
+    },
+    {
+      "number": 6,
+      "name": "A4",
+      "direction": "input"
+    },
+    {
+      "number": 7,
+      "name": "A3",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "A2",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "A1",
+      "direction": "input"
+    },
+    {
+      "number": 10,
+      "name": "A0",
+      "direction": "input"
+    },
+    {
+      "number": 11,
+      "name": "I/O0",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 12,
+      "name": "I/O1",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 13,
+      "name": "I/O2",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 14,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 15,
+      "name": "I/O3",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 16,
+      "name": "I/O4",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 17,
+      "name": "I/O5",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 18,
+      "name": "I/O6",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 19,
+      "name": "I/O7",
+      "direction": "bidirectional"
+    },
+    {
+      "number": 20,
+      "name": "/CE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 21,
+      "name": "A10",
+      "direction": "input"
+    },
+    {
+      "number": 22,
+      "name": "/OE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 23,
+      "name": "A11",
+      "direction": "input"
+    },
+    {
+      "number": 24,
+      "name": "A9",
+      "direction": "input"
+    },
+    {
+      "number": 25,
+      "name": "A8",
+      "direction": "input"
+    },
+    {
+      "number": 26,
+      "name": "A13",
+      "direction": "input"
+    },
+    {
+      "number": 27,
+      "name": "/WE",
+      "direction": "input",
+      "active_low": true
+    },
+    {
+      "number": 28,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/Memory/at28c256.v",
+    "verilog": "Verilog/Memory/at28c256.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/Memory/tests/tb_memory_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "mem_at28c256",
+    "file": "Verilog/Memory/at28c256.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "A",
+          "pins": [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            25,
+            24,
+            21,
+            23,
+            2,
+            26,
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "DQ",
+          "pins": [
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "direction": "output"
+        },
+        {
+          "name": "CE_bar",
+          "pins": [
+            20
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "OE_bar",
+          "pins": [
+            22
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "WE_bar",
+          "pins": [
+            27
+          ],
+          "direction": "input",
+          "fallback": "1'b1"
+        }
+      ],
+      "output_pins": [
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "AT28C256"
+  },
+  "sources": [
+    {
+      "label": "Microchip AT28C256",
+      "url": "https://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf",
+      "package_evidence": "28-lead Cerdip/PDIP/Flatpack/SOIC"
+    }
+  ]
+}

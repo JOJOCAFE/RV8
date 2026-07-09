@@ -1,0 +1,203 @@
+{
+  "schema": "db.chip",
+  "version": 1,
+  "part": "74HC377",
+  "title": "octal D-type flip-flop with data enable, positive-edge trigger",
+  "family": "74HC",
+  "package": {
+    "kind": "DIP",
+    "pins": 20
+  },
+  "status": {
+    "datasheet": "verified",
+    "pinout": "verified",
+    "python_behavior": "not_applicable",
+    "verilog_model": "modeled",
+    "verilog_export": "tested",
+    "tests": "tested"
+  },
+  "pins": [
+    {
+      "number": 1,
+      "name": "E",
+      "direction": "input"
+    },
+    {
+      "number": 2,
+      "name": "Q0",
+      "direction": "output"
+    },
+    {
+      "number": 3,
+      "name": "D0",
+      "direction": "input"
+    },
+    {
+      "number": 4,
+      "name": "D1",
+      "direction": "input"
+    },
+    {
+      "number": 5,
+      "name": "Q1",
+      "direction": "output"
+    },
+    {
+      "number": 6,
+      "name": "Q2",
+      "direction": "output"
+    },
+    {
+      "number": 7,
+      "name": "D2",
+      "direction": "input"
+    },
+    {
+      "number": 8,
+      "name": "D3",
+      "direction": "input"
+    },
+    {
+      "number": 9,
+      "name": "Q3",
+      "direction": "output"
+    },
+    {
+      "number": 10,
+      "name": "GND",
+      "direction": "power"
+    },
+    {
+      "number": 11,
+      "name": "CP",
+      "direction": "input"
+    },
+    {
+      "number": 12,
+      "name": "Q4",
+      "direction": "output"
+    },
+    {
+      "number": 13,
+      "name": "D4",
+      "direction": "input"
+    },
+    {
+      "number": 14,
+      "name": "D5",
+      "direction": "input"
+    },
+    {
+      "number": 15,
+      "name": "Q5",
+      "direction": "output"
+    },
+    {
+      "number": 16,
+      "name": "Q6",
+      "direction": "output"
+    },
+    {
+      "number": 17,
+      "name": "D6",
+      "direction": "input"
+    },
+    {
+      "number": 18,
+      "name": "D7",
+      "direction": "input"
+    },
+    {
+      "number": 19,
+      "name": "Q7",
+      "direction": "output"
+    },
+    {
+      "number": 20,
+      "name": "VCC",
+      "direction": "power"
+    }
+  ],
+  "legacy_paths": {
+    "pinout": "Verilog/74xx/74hc377.v",
+    "verilog": "Verilog/74xx/74hc377.v",
+    "python_behavior": "python/chiplib/chips.py",
+    "verilog_export": "python/chiplib/netlist.py",
+    "tests": [
+      "python/tests/test_chips.py",
+      "python/tests/test_netlist.py",
+      "Verilog/74xx/tests/tb_74xx_smoke.v"
+    ]
+  },
+  "verilog": {
+    "module": "ttl_74hc377",
+    "file": "Verilog/74xx/74hc377.v",
+    "export": {
+      "kind": "structural_port_map",
+      "ports": [
+        {
+          "name": "Enable_bar",
+          "pins": [
+            1
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "D",
+          "pins": [
+            3,
+            4,
+            7,
+            8,
+            13,
+            14,
+            17,
+            18
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Clk",
+          "pins": [
+            11
+          ],
+          "direction": "input"
+        },
+        {
+          "name": "Q",
+          "pins": [
+            2,
+            5,
+            6,
+            9,
+            12,
+            15,
+            16,
+            19
+          ],
+          "direction": "output"
+        }
+      ],
+      "output_pins": [
+        2,
+        5,
+        6,
+        9,
+        12,
+        15,
+        16,
+        19
+      ]
+    }
+  },
+  "python": {
+    "factory": "chiplib.create_chip",
+    "part": "74HC377"
+  },
+  "sources": [
+    {
+      "label": "Legacy pinout datasheet source",
+      "file": "Source/74HC377_TI_27924_SN74HC377N_DIPVERIFY.pdf"
+    }
+  ]
+}
