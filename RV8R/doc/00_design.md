@@ -42,28 +42,113 @@ it hid too many real enable signals behind decode prose. FullHW uses direct
 control lines so every bus driver, address source, ALU operation, PC load, RAM
 write, IRQ action, and halt action can be pinned and probed.
 
-### Direct Control Lines
+### Frozen Direct Control Word
 
-| Bits | Signal group | Purpose |
-|------|--------------|---------|
-| ROM0[0] | `BUF_OE_n` | Enable U12 memory data bridge |
-| ROM0[1] | `BUF_DIR` | Select memory read/write direction |
-| ROM0[2] | `OPR_OE_n` | Let operand register drive IBUS |
-| ROM0[3] | `ALUR_OE_n` | Let ALU result latch drive IBUS |
-| ROM0[4] | `ALUB_CLK` | Load ALU_B latch |
-| ROM0[5] | `ALUR_CLK` | Load ALU result latch |
-| ROM0[6] | `FLAGS_CLK` | Load Z/C flags |
-| ROM0[7] | `RAM_WE_n` | Write RAM when address selects RAM |
-| ROM1[0] | `PC_INC` | Count PC during fetch |
-| ROM1[1] | `PC_LOAD_n` | Load PC from address register |
-| ROM1[2] | `AR_LO_CLK` | Load address low register |
-| ROM1[3] | `AR_HI_CLK` | Load address high register |
-| ROM1[5:4] | `ADDR_SRC[1:0]` | Select normal, register, fast/IRQ, or vector/PC address source |
-| ROM1[7:6] | `ALU_SEL[1:0]` | Select ADD/SUB, AND, OR, XOR result |
+The two microcode ROM bytes are now frozen as this 16-bit physical control
+contract. Bit names ending in `_n` are active low. All other latched controls
+are asserted high for one CPU clock edge.
 
-Extra decoded controls from opcode/operand and small gates are `ALU_SUB`,
-`ALU_CIN`, `CONST_OE`, `SEXT_OE`, `PC_LO_OE`, `PC_HI_OE`, `REG_SEL[1:0]`,
-`SYS_EI`, `SYS_DI`, `SYS_IRET`, `IRQ_ACK`, `HALT_SET`, and `STEP_RST`.
+| Bit | Signal | Active | Purpose |
+|-----|--------|--------|---------|
+| 0 | `BUF_OE_n` | Low | Enable U12 DBUS/IBUS bridge |
+| 1 | `BUF_DIR` | High=IBUS to DBUS | Direction for U12 (`0` = memory read to IBUS, `1` = IBUS write to DBUS) |
+| 2 | `OPR_OE_n` | Low | Let operand register U2 drive IBUS |
+| 3 | `ALUR_OE_n` | Low | Let ALU result latch U15 drive IBUS |
+| 4 | `ALUB_CLK` | High edge | Load ALU_B latch U3 from IBUS |
+| 5 | `ALUR_CLK` | High edge | Load ALU result latch U15 from selected ALU output |
+| 6 | `FLAGS_CLK` | High edge | Load Z/C flags from current ALU result |
+| 7 | `RAM_WE_n` | Low | Write RAM when RAM is selected and write guards allow it |
+| 8 | `PC_INC` | High edge | Increment the 16-bit PC counter |
+| 9 | `PC_LOAD_n` | Low edge | Load the 16-bit PC counter from ARQ |
+| 10 | `AR_LO_CLK` | High edge | Load address-register low byte from address-source mux |
+| 11 | `AR_HI_CLK` | High edge | Load address-register high byte from address-source mux |
+| 12-13 | `ADDR_SRC[1:0]` | Encoded | Select address-source mux input |
+| 14-15 | `ALU_SEL[1:0]` | Encoded | Select ALU result mux input |
+
+Default safe word is `0x028D`: all active-low output enables and writes are
+inactive, no clocks assert, `ADDR_SRC=00`, and `ALU_SEL=00`.
+
+### Encoded Fields
+
+`ADDR_SRC[1:0]` selects the source feeding the address registers when
+`AR_LO_CLK` or `AR_HI_CLK` is asserted.
+
+| Value | Name | AR low byte | AR high byte | Use |
+|-------|------|-------------|--------------|-----|
+| `00` | `ADDR_NORMAL` | IBUS or ALU result path selected by the micro-step | IBUS or zero/PC-high helper selected by the micro-step | Absolute and computed data addresses |
+| `01` | `ADDR_REG` | `$F8 + REG_SEL` | `$FF` | RAM register window `$FFF8-$FFFF` |
+| `10` | `ADDR_FAST_IRQ` | Operand byte, `$F6`, or `$F7` from helper decode | `$FF` | Fast page and IRQ save slots |
+| `11` | `ADDR_VECTOR_PC` | `$00` or branch target low byte | `$7F` or `PC_HI` | IRQ vector `$7F00` and same-page branch/jump targets |
+
+`ALU_SEL[1:0]` selects the result latched by `ALUR_CLK`.
+
+| Value | Name | Result |
+|-------|------|--------|
+| `00` | `ALU_ADD_SUB` | Adder result; `ALU_SUB` and `ALU_CIN` choose add/sub/compare |
+| `01` | `ALU_AND` | `IBUS & ALU_B` |
+| `10` | `ALU_OR` | `IBUS | ALU_B` |
+| `11` | `ALU_XOR` | `IBUS ^ ALU_B` |
+
+### Derived And Decoded Controls
+
+These helper signals are not extra microcode ROM bits. They are deterministic
+decode from opcode, operand, flags, step, and the 16-bit control word.
+
+| Signal | Source rule |
+|--------|-------------|
+| `IR_CLK` | `step=0` during normal fetch |
+| `OPR_CLK` | `step=1` during normal fetch |
+| `/RD` | Assert low when `BUF_OE_n=0`, `BUF_DIR=0`, and no write is active |
+| `/WR` | Assert low when `BUF_OE_n=0`, `BUF_DIR=1`, and `RAM_WE_n=0` |
+| `STEP_RST` | Assert on the final micro-step for the selected opcode/flag path, on `HLT`, and after IRQ entry step 3 |
+| `ALU_SUB` | Assert for `SUB`, `SUBI`, compare, `SLT/SLTI`, `BLT/BGE`, stack decrement, and address subtract forms |
+| `ALU_CIN` | Assert with `ALU_SUB` so subtraction is `A + ~B + 1`; deassert for addition and logic |
+| `CONST_OE` | Assert only on micro-steps that drive helper constants `$00` or `$01` to IBUS |
+| `SEXT_OE` | Assert only when signed offset `sext(OPR[4:0])` drives IBUS |
+| `PC_LO_OE` | Assert only when PC low byte drives IBUS for `JAL` or IRQ save |
+| `PC_HI_OE` | Assert only when PC high byte drives IBUS for IRQ save or same-page target high byte |
+| `REG_SEL[1:0]` | `rd=IR[2:0]`, `rs=OPR[7:5]`, or `sp=r7` selected by opcode class and micro-step |
+| `SYS_EI` | `opcode=$F8`, `OPR[2:0]=2`, final SYS step |
+| `SYS_DI` | `opcode=$F8`, `OPR[2:0]=3`, final SYS step |
+| `SYS_IRET` | `opcode=$F8`, `OPR[2:0]=4`, IRET micro-sequence active |
+| `IRQ_ACK` | IRQ entry final step; clears `IE` and `IRQ_PENDING` |
+| `HALT_SET` | `opcode=$F8`, `OPR[2:0]=1`, final SYS step |
+
+### Legal Bus Ownership
+
+The microcode generator must reject any word/decode combination that enables
+more than one IBUS driver. Reset, halt, and the default safe word leave all
+IBUS drivers disabled.
+
+| IBUS owner | Enable condition | Typical use |
+|------------|------------------|-------------|
+| Memory via U12 | `BUF_OE_n=0`, `BUF_DIR=0` | Fetch, register read, RAM load |
+| Operand U2 | `OPR_OE_n=0` | Immediate and offset source |
+| ALU result U15 | `ALUR_OE_n=0` | Register/RAM writeback |
+| Constant U60 | `CONST_OE=1` | Zero, one, `SLT/SLTI` result |
+| Sign extend U61 | `SEXT_OE=1` | Branch and `off(rs)` address math |
+| PC low U44 | `PC_LO_OE=1` | `JAL`, IRQ save low |
+| PC high U45 | `PC_HI_OE=1` | IRQ save high, same-page high byte |
+
+DBUS has one legal writer: U12 in write direction. ROM and RAM drive DBUS only
+during reads, selected by A15 and `/RD`. ROM `/WE` remains tied inactive.
+
+### Standard Micro-Step Patterns
+
+These patterns are the canonical source for the FullHW generator and RTL.
+
+| Pattern | Required control/decode |
+|---------|-------------------------|
+| Fetch opcode | `BUF_OE_n=0`, `BUF_DIR=0`, `PC_INC=1`, `IR_CLK=1` |
+| Fetch operand | `BUF_OE_n=0`, `BUF_DIR=0`, `PC_INC=1`, `OPR_CLK=1` |
+| Read register | `ADDR_SRC=ADDR_REG`, select `REG_SEL`, clock AR as needed, then `BUF_OE_n=0`, `BUF_DIR=0` |
+| Write register | `ADDR_SRC=ADDR_REG`, select `REG_SEL`, `ALUR_OE_n=0`, `BUF_OE_n=0`, `BUF_DIR=1`, `RAM_WE_n=0` |
+| Load ALU_B immediate | `OPR_OE_n=0`, `ALUB_CLK=1` |
+| Latch ALU result | choose `ALU_SEL`, set `ALU_SUB/ALU_CIN` as needed, assert `ALUR_CLK=1`, optional `FLAGS_CLK=1` |
+| RAM read | target address in ARQ, `BUF_OE_n=0`, `BUF_DIR=0` |
+| RAM write | target address in ARQ, one IBUS data owner, `BUF_OE_n=0`, `BUF_DIR=1`, `RAM_WE_n=0` |
+| Branch/jump load | compute/load ARQ target, then `PC_LOAD_n=0` |
+| End instruction | assert `STEP_RST` with all bus drivers disabled unless the final step also performs a documented write |
 
 ### Legacy 8-bit Group Sketch (superseded by FullHW)
 

@@ -12,6 +12,7 @@ RAM package, for 53 total packages.
 | Architecture docs | Done | FullHW paths are defined in `00_design.md` and `02_wiring_guide.md` |
 | ISA encoding docs | Done | Fast page is `$FF00+imm8`; registers are `$FFF8-$FFFF` |
 | Legacy trace | Done | `01_instruction_trace.md` is marked as legacy 19-chip history |
+| Control word | Done | Frozen 16-bit direct-control contract is in `00_design.md` and mirrored in `02_wiring_guide.md` |
 | Microcode generator | Pending | Existing generator is legacy 14-bit prototype |
 | RTL | Pending | Existing RTL is old-map behavioral proof, not FullHW |
 | Tests | Pending | Need FullHW ISA and bus-path tests |
@@ -20,7 +21,7 @@ RAM package, for 53 total packages.
 
 ## Task Order
 
-### 1. Freeze FullHW Control Word
+### 1. Freeze FullHW Control Word - Done
 
 **Goal:** Turn the FullHW direct-control description into one exact 16-bit
 control word contract.
@@ -40,6 +41,14 @@ control word contract.
 **Pass condition:**
 - Every FullHW control signal in the wiring guide has a control-word source.
 - No signal is still described as conceptual or implied.
+
+**Result:** Done. The frozen ROM output bits are:
+`BUF_OE_n`, `BUF_DIR`, `OPR_OE_n`, `ALUR_OE_n`, `ALUB_CLK`,
+`ALUR_CLK`, `FLAGS_CLK`, `RAM_WE_n`, `PC_INC`, `PC_LOAD_n`,
+`AR_LO_CLK`, `AR_HI_CLK`, `ADDR_SRC[1:0]`, and `ALU_SEL[1:0]`.
+The default safe word is `0x028D`. Fetch clocks, memory strobes,
+`STEP_RST`, SYS controls, helper IBUS drivers, and `REG_SEL` are defined as
+deterministic decode rather than extra ROM bits.
 
 ### 2. Write FullHW Microcode Generator
 
@@ -148,5 +157,7 @@ control word contract.
 
 ## Immediate Next Task
 
-Start with **Task 1: Freeze FullHW Control Word**. The microcode generator, RTL,
-and KiCad all depend on that exact signal contract.
+Start with **Task 2: Write FullHW Microcode Generator**. Replace the legacy
+14-bit group-encoded prototype with a 15-bit address, 16-bit output generator
+that emits `0x028D` as the safe default and rejects illegal bus-owner
+combinations before writing ROM output.

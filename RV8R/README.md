@@ -34,7 +34,7 @@
 |:-:|------|:------:|
 | 1 | Architecture design | ✅ |
 | 2 | ISA encoding (2-byte) | ✅ |
-| 3 | Microcode format + control word | ✅ FullHW 15-bit direct-control target |
+| 3 | Microcode format + control word | ✅ Frozen 15-bit address / 16-bit direct-control contract |
 | 4 | Chip list + pin wiring | ✅ real FullHW paths documented; KiCad proof pending |
 | 5 | Verilog model | ⚠️ needs migration to frozen ROM-low/RAM-high map |
 | 6 | Testbench | ⚠️ old `$8000` reset map passed; frozen map test pending |
@@ -146,6 +146,7 @@ Data[15:0] = direct control word from two microcode ROMs
 - ✅ Architecture concept and ISA encoding drafted
 - ⚠️ Behavioral Verilog core + IRQ test passed on the previous `$8000` reset map; RTL/testbench migration to this frozen map is pending
 - ⚠️ Legacy microcode generator still uses 14-bit prototype output; FullHW needs a 15-bit direct-control generator
+- ✅ FullHW control word is frozen in `doc/00_design.md`; safe default is `0x028D`
 - ✅ FullHW chip/pin paths are now concrete in `doc/02_wiring_guide.md`
 - ⚠️ Chip count is now 49 logic / 53 packages for the full-ISA hardware path
 - ✅ `SLT`, `SLTI`, `PUSH`, `POP`, IRQ, and IRET have real hardware paths in FullHW; RTL/KiCad proof is pending
