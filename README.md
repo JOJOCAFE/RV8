@@ -66,7 +66,6 @@ RV8GR is the active physical-build target.
 RV8/
 ├── RV8/            ← 28-chip target, hardware regs, microcode, IRQ (exploratory)
 ├── RV8R/           ← 49-chip FullHW target, RAM regs, microcode, IRQ (full RV8-style hardware)
-├── RV8GR-V1/       ← previous RV8-GR baseline/reference
 ├── RV8GR/          ← active 34-logic-chip student baseline, labs, wiring, sim, RTL
 ├── Programmer/     ← ESP32 board; per-CPU bus/pin audit required
 ├── Old_Design/     ← Archived

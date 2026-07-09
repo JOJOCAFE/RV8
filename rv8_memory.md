@@ -6,7 +6,6 @@
 
 ### Active folders:
 - `RV8GR/` — active CPU design (33 logic + ROM + RAM = 36 packages, student baseline contract, labs, Verilog benches, gate-level sim passing)
-- `RV8GR-V1/` — previous RV8-GR reference snapshot
 - `Programmer/` — ESP32 board (dual ZIF/RV8-Bus mode, firmware+tools verified, 36 current tests)
 - `RV8/` — microcode variant (28 chips, Verilog 8/8, reference)
 - `RV8R/` — FullHW RAM-register variant (49 logic + 4 ROM/RAM = 53 packages, full RV8-style TTL hardware path, RTL/KiCad/generator migration pending)
@@ -95,6 +94,7 @@ pin 39: VCC, pin 40: GND
 - RV8-R FullHW next sequence: control word -> microcode generator -> RTL/testbench -> KiCad/ERC -> Programmer/RV8-Bus audit
 
 ### Resume update (2026-07-09):
+- Obsolete `RV8GR-V1/` reference snapshot was removed; use `RV8GR/` as the only RV8GR folder.
 - RV8-R FullHW Task 1 is done: the 16-bit direct-control word is frozen in `RV8R/doc/00_design.md` and mirrored in `RV8R/doc/02_wiring_guide.md`.
 - Frozen safe default word is `0x028D`.
 - Next immediate task is now Task 2: replace `RV8R/tools/microcode_gen.py` with the 15-bit address / 16-bit output FullHW generator.

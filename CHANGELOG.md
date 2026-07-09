@@ -5,7 +5,7 @@
 ### RV8GR
 - Renamed the active student baseline folder from `RV8GR-V2/` to `RV8GR/`
 - Updated top-level routing docs so `RV8GR/` is the canonical 34-logic-chip, 36-package student build
-- Kept `RV8GR-V1/` as the previous baseline/reference folder
+- Removed the obsolete `RV8GR-V1/` reference snapshot so `RV8GR/` is the only RV8GR checkout folder
 
 ### Chip-Level Verification
 - Updated chip-level Verilog, testbench, KiCad, and netlist filenames to use the canonical `rv8gr` / `RV8GR` name

@@ -1,4 +1,0 @@
-# Build artifacts
-*.vvp
-*.vcd
-__pycache__/
