@@ -123,8 +123,8 @@ def test_hc283():
 
 def test_hc688():
     chip = create_chip("74HC688", "U")
-    set_byte(chip, [2, 4, 6, 8, 12, 14, 16, 18], 0x42)
-    set_byte(chip, [3, 5, 7, 9, 11, 13, 15, 17], 0x42)
+    set_byte(chip, [2, 4, 6, 8, 11, 13, 15, 17], 0x42)
+    set_byte(chip, [3, 5, 7, 9, 12, 14, 16, 18], 0x42)
     chip.set_input(1, 0)
     eval_chip(chip)
     assert chip.read(19) == 0

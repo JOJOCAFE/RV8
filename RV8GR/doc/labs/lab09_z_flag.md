@@ -76,15 +76,15 @@ Timeline:
 ```
         ┌───U───┐
  /OE  1 │       │ 20 VCC
-  P0  2 │       │ 19 /P=Q  ← OUTPUT!
-  Q0  3 │ 688   │ 18 P7
-  P1  4 │       │ 17 Q7
-  Q1  5 │       │ 16 P6
-  P2  6 │       │ 15 Q6
-  Q2  7 │       │ 14 P5
-  P3  8 │       │ 13 Q5
-  Q3  9 │       │ 12 P4
- GND 10 │       │ 11 Q4
+  A0  2 │       │ 19 Y  ← OUTPUT!
+  B0  3 │ 688   │ 18 B7
+  A1  4 │       │ 17 A7
+  B1  5 │       │ 16 B6
+  A2  6 │       │ 15 A6
+  B2  7 │       │ 14 B5
+  A3  8 │       │ 13 A5
+  B3  9 │       │ 12 B4
+ GND 10 │       │ 11 A4
         └───────┘
 ```
 
@@ -109,28 +109,28 @@ U22 (Zero Comparator):
   pin 20 (VCC) → 5V,  pin 10 (GND) → GND,  100nF คร่อม VCC-GND
   pin 1 (/OE) → GND (enable ตลอด)
 
-  P inputs ← AC (U9 Q outputs):
-    pin 2 (P0) ← U9-19 (AC0)
-    pin 4 (P1) ← U9-18 (AC1)
-    pin 6 (P2) ← U9-17 (AC2)
-    pin 8 (P3) ← U9-16 (AC3)
-    pin 12(P4) ← U9-15 (AC4)
-    pin 14(P5) ← U9-14 (AC5)
-    pin 16(P6) ← U9-13 (AC6)
-    pin 18(P7) ← U9-12 (AC7)
+  A inputs ← AC (U9 Q outputs):
+    pin 2 (A0) ← U9-19 (AC0)
+    pin 4 (A1) ← U9-18 (AC1)
+    pin 6 (A2) ← U9-17 (AC2)
+    pin 8 (A3) ← U9-16 (AC3)
+    pin 11(A4) ← U9-15 (AC4)
+    pin 13(A5) ← U9-14 (AC5)
+    pin 15(A6) ← U9-13 (AC6)
+    pin 17(A7) ← U9-12 (AC7)
 
-  Q inputs ← GND (เปรียบเทียบกับ 0):
-    pin 3 (Q0) → GND
-    pin 5 (Q1) → GND
-    pin 7 (Q2) → GND
-    pin 9 (Q3) → GND
-    pin 11(Q4) → GND
-    pin 13(Q5) → GND
-    pin 15(Q6) → GND
-    pin 17(Q7) → GND
+  B inputs ← GND (เปรียบเทียบกับ 0):
+    pin 3 (B0) → GND
+    pin 5 (B1) → GND
+    pin 7 (B2) → GND
+    pin 9 (B3) → GND
+    pin 12(B4) → GND
+    pin 14(B5) → GND
+    pin 16(B6) → GND
+    pin 18(B7) → GND
 
-  pin 19 (/P=Q) → U21 pin 4 (/PR1)
-    [เมื่อ AC=0: /P=Q goes LOW → preset Z=1]
+  pin 19 (Y, active-low equal) → U21 pin 4 (/PR1)
+    [เมื่อ AC=0: Y goes LOW → preset Z=1]
 
 U21 (Z flag flip-flop):
   pin 14 (VCC) → 5V,  pin 7 (GND) → GND,  100nF คร่อม VCC-GND

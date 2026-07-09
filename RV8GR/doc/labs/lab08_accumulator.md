@@ -158,10 +158,10 @@ U9 (Accumulator):
     pin 18 (Q2) → AC1 → LED1, U10-3, U19-6, U14-3, U22-4
     pin 17 (Q3) → AC2 → LED2, U10-14, U19-10, U14-4, U22-6
     pin 16 (Q4) → AC3 → LED3, U10-12, U19-13, U14-5, U22-8
-    pin 15 (Q5) → AC4 → LED4, U11-5, U20-3, U14-6, U22-12
-    pin 14 (Q6) → AC5 → LED5, U11-3, U20-6, U14-7, U22-14
-    pin 13 (Q7) → AC6 → LED6, U11-14, U20-10, U14-8, U22-16
-    pin 12 (Q8) → AC7 → LED7, U11-12, U20-13, U14-9, U22-18
+    pin 15 (Q5) → AC4 → LED4, U11-5, U20-3, U14-6, U22-11
+    pin 14 (Q6) → AC5 → LED5, U11-3, U20-6, U14-7, U22-13
+    pin 13 (Q7) → AC6 → LED6, U11-14, U20-10, U14-8, U22-15
+    pin 12 (Q8) → AC7 → LED7, U11-12, U20-13, U14-9, U22-17
   100nF คร่อม VCC-GND
 
   LED (ดู AC):

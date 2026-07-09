@@ -125,17 +125,17 @@ class HC688(Chip):
     def __init__(self, name: str):
         pins = {1: ("/OE", "in"), 2: ("P0", "in"), 3: ("Q0", "in"), 4: ("P1", "in"),
                 5: ("Q1", "in"), 6: ("P2", "in"), 7: ("Q2", "in"), 8: ("P3", "in"),
-                9: ("Q3", "in"), 10: ("GND", "power"), 11: ("Q4", "in"), 12: ("P4", "in"),
-                13: ("Q5", "in"), 14: ("P5", "in"), 15: ("Q6", "in"), 16: ("P6", "in"),
-                17: ("Q7", "in"), 18: ("P7", "in"), 19: ("/P=Q", "out"), 20: ("VCC", "power")}
+                9: ("Q3", "in"), 10: ("GND", "power"), 11: ("P4", "in"), 12: ("Q4", "in"),
+                13: ("P5", "in"), 14: ("Q5", "in"), 15: ("P6", "in"), 16: ("Q6", "in"),
+                17: ("P7", "in"), 18: ("Q7", "in"), 19: ("/P=Q", "out"), 20: ("VCC", "power")}
         super().__init__(name, pins_from(pins), Delay(30))
 
     def update(self) -> None:
         if bit(self.read(1)):
             self.output(19, 1)
             return
-        p = byte_from_pins(self, [2, 4, 6, 8, 12, 14, 16, 18])
-        q = byte_from_pins(self, [3, 5, 7, 9, 11, 13, 15, 17])
+        p = byte_from_pins(self, [2, 4, 6, 8, 11, 13, 15, 17])
+        q = byte_from_pins(self, [3, 5, 7, 9, 12, 14, 16, 18])
         self.output(19, 0 if p == q else 1)
 
 
