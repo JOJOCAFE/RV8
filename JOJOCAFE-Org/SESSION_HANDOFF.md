@@ -8,7 +8,7 @@ Updated: 2026-07-10
 - B-007 non-physical verification report is available; physical B-007 remains blocked until hardware evidence exists.
 - Components repo is pushed and clean at `87bcfdc Save Components student guide handoff`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
-- RV8 repo is pushed through `1470963 Fix RV8 README project status`.
+- RV8 repo is pushed through `622e41a Add RV8GR dual Verilog ISA scoreboard`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`; current work merges the latest Components skill/status into the RV8 team operating docs.
 - RV8GR verification tooling now writes Verilog `.vvp/.vcd` artifacts to `RV8GR_BUILD_DIR` or `/tmp/rv8gr-verilog`, so source folders stay clean while testbenches still support manual local VCD names.
@@ -17,6 +17,7 @@ Updated: 2026-07-10
 - `RV8GR/sim/components_chip_sim.py` is the standalone Components-backed Python CPU runner using vendored `chiplib` chip definitions.
 - `RV8GR/sim/test_cpu_logical_protocol.py` is the executable protocol test suite. It assembles directed CPU programs and scoreboards both `CPUSim` and `ComponentsCPUSim`.
 - RV8GR Verilog signoff rule: behavioral `rtl/rv8gr_cpu.v` benches are comparison only. Shipping confidence must include `rtl/rv8gr_chip_level.v` compiled with Components TTL-chip Verilog models (`ttl_74hc*`, `62256`, `at28c256`) through the chip-level runner scripts.
+- `RV8GR/tools/run_dual_verilog_compare.sh` is now part of signoff. It runs behavioral and chip-level Verilog together on the same ROM program and scoreboards `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM writes. The current dual run covers every frozen ISA command at least once.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
 - Existing untracked file `RV8GR/doc/10_real_build_timing_log.md` was left untouched; do not stage it unless Jo explicitly asks.
 
@@ -55,6 +56,7 @@ python3 -B RV8GR/tools/test_rv8gr_asm.py
 python3 -B RV8GR/sim/chips/test_chips.py
 python3 -B RV8GR/sim/verify_components.py
 cd /home/jo/kiro/RV8/RV8GR
+tools/run_dual_verilog_compare.sh
 tools/run_all_verilog_tb.sh
 
 cd /home/jo/kiro/Components
@@ -70,7 +72,7 @@ git diff --check
 
 Expected pass markers:
 
-- RV8GR Python, chip behavior, Components package coverage, behavioral Verilog benches, and TTL-chip Components Verilog system benches pass.
+- RV8GR Python, chip behavior, Components package coverage, behavioral Verilog benches, TTL-chip Components Verilog system benches, and all-ISA dual Verilog scoreboard pass.
 - CLI/API tests pass.
 - `circuit-faults` accepts the RV8GR whole-system virtual circuit with zero pin, bus-contention, edge-polarity, or propagation-delay/deadband findings.
 - `git diff --check` reports no whitespace errors.
@@ -82,7 +84,7 @@ Expected pass markers:
 3. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
 4. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
 5. Use Components schematic backend and `circuit-faults` as the reusable Python-first path for future UI/block/JSON/netlist work.
-6. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
+6. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests and `tools/run_dual_verilog_compare.sh` when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
 7. Later Components task: review chip JSON/component definition output for student readability and document system wiring commands.
 8. For RV8, do not stage unrelated dirty files unless Jo explicitly asks.
 

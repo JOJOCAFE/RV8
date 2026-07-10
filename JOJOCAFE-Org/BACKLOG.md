@@ -1,6 +1,6 @@
 # Project Backlog
 
-Last updated: 2026-07-09
+Last updated: 2026-07-10
 
 ## Priority Legend
 - 🔴 P0 — Must do now (blocks physical build)
@@ -29,7 +29,7 @@ Last updated: 2026-07-09
 | B-010 | Write example .asm programs (blink, counter, echo) | Bam | ✅ DONE — assembler-verified |
 | B-011 | Write BASIC interpreter ROM (minimal) | Bam | ⬜ TODO |
 | B-012 | Programmer firmware final test (46 tests passing → field test) | Bam + Fern | ⬜ TODO |
-| B-013 | Gate-level sim: add remaining .bin coverage | Mint + Fern | ⬜ TODO |
+| B-013 | Gate-level sim: add remaining .bin coverage | Mint + Fern | ✅ DONE — replaced by all-ISA dual Verilog scoreboard plus existing opcode sweep |
 | B-014 | Update wiring guide if physical build reveals discrepancies | Ohm + Noon | ⬜ TODO |
 
 ## 🟡 P2 — Post-Build / Polish
@@ -66,3 +66,4 @@ Last updated: 2026-07-09
 | — | Assembler (page-safe, 18 opcodes + macros) | 2026-06-14 | Bam |
 | — | Memory map swap (ROM $0000, RAM $8000) | 2026-06-15 | Bank |
 | B-010 | Example ASM programs: blink, counter, echo | 2026-07-09 | Bam + Fern |
+| B-013 | All-ISA dual Verilog scoreboard: behavioral vs TTL chip-level | 2026-07-10 | Mint + Fern |
