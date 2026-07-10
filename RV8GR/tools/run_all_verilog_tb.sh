@@ -31,3 +31,6 @@ RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_chip_level_verilog.sh"
 
 echo "=== tb_rv8gr_chip_full ==="
 RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_chip_level_full_verilog.sh"
+
+echo "=== tb_rv8gr_dual_compare ==="
+RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_dual_verilog_compare.sh"

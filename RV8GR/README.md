@@ -211,7 +211,7 @@ Use Verilog as the secondary HDL/RTL comparison path:
 ```bash
 cd RV8GR
 tools/run_all_verilog_tb.sh
-# behavioral, opcode sweep, SETDP, task, IRQ, and chip-level benches pass
+# behavioral, opcode sweep, SETDP, task, IRQ, chip-level, and dual-compare benches pass
 ```
 
 The behavioral `rtl/rv8gr_cpu.v` benches are only a comparison path. RV8GR
@@ -221,6 +221,11 @@ Verilog signoff must include the TTL-chip system:
 - `tools/run_chip_level_verilog.sh` and
   `tools/run_chip_level_full_verilog.sh` compile it with the Components
   `ttl_74hc*`, `62256`, and `at28c256` Verilog models.
+- `tools/run_dual_verilog_compare.sh` runs `rv8gr_cpu.v` and
+  `rv8gr_chip_level.v` on the same ROM program and compares architectural
+  checkpoints: `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM
+  writes. This dual bench covers every frozen ISA command at least once,
+  including jump/branch, ALU, memory, page/data-page control, and IRQ polling.
 - Do not replace this signoff with an optimized gate/behavioral model.
 
 Generated Verilog artifacts default to `/tmp/rv8gr-verilog`. Set

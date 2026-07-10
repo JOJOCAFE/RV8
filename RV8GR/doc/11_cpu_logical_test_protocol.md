@@ -41,6 +41,7 @@ clear pass/fail signals.
 | Components-backed CPU behavior | RV8GR + Components | Prove the same CPU tests run while using Components chip definitions | `sim/components_chip_sim.py` |
 | RTL behavioral comparison | RV8GR | Compare optimized/behavioral HDL against CPU expectations | `tools/run_all_verilog_tb.sh` behavioral benches |
 | TTL-chip HDL system | RV8GR + Components | Prove chip-level Verilog netlist runs using Components TTL models | `tools/run_chip_level_*.sh` |
+| Behavioral vs chip-level HDL scoreboard | RV8GR + Components | Prove both Verilog levels agree at architectural checkpoints on the same ROM image | `tools/run_dual_verilog_compare.sh` |
 | Virtual physical screen | Components | Check pin truth, bus contention, edge polarity, and delay/noise assumptions | `chiplib.cli circuit-faults` |
 | Physical signoff | RV8GR physical build | Prove the real breadboard works | Lab/debug plan evidence |
 
@@ -125,6 +126,39 @@ AC=$00 Z=1 PG=$00
 
 A `$readmemh` missing-file warning invalidates that run even if the bench later
 prints a pass banner.
+
+### Dual Verilog Comparison
+
+Run:
+
+```bash
+cd RV8GR
+tools/run_dual_verilog_compare.sh
+```
+
+This bench runs both Verilog versions together:
+
+- `rtl/rv8gr_cpu.v` is the behavioral/logical CPU model.
+- `rtl/rv8gr_chip_level.v` is the KiCad/Components TTL-chip netlist.
+
+The behavioral model records architectural checkpoints. The chip-level model
+must later reach the same checkpoints with matching `PC`, `AC`, `Z`, `PG`, `DP`,
+`IE`, `IRQ_FF`, and selected RAM bytes.
+
+The dual comparison program must cover every frozen ISA command at least once:
+
+| Group | Commands |
+|---|---|
+| Baseline/control | `NOP`, `EI`, `DI` |
+| Jump/branch | `J`, `BEQ`, `BNE` |
+| ALU immediate | `LI`, `ADDI`, `SUBI`, `XORI` |
+| ALU memory/register | `ADD`, `SUB`, `XOR`, `LB`, `SB` |
+| Page/data control | `SETPG`, `SETPG_R`, `SETDP` |
+| IRQ protocol | `/IRQ` release/rising edge sets `IRQ_FF`; no automatic PC vector |
+
+A pass means the two Verilog levels agree on the tested program-level CPU
+behavior. It is not a formal proof that every internal wire or delay matches
+cycle-by-cycle.
 
 ### IRQ Logical Behavior
 
