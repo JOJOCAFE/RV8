@@ -1,23 +1,25 @@
 # Session Handoff
 
-Updated: 2026-07-09
+Updated: 2026-07-10
 
 ## Current State
 
 - B-010 example ASM programs are implemented and assembler-verified.
 - B-007 non-physical verification report is available; physical B-007 remains blocked until hardware evidence exists.
-- Components netlist mapping expansion is verified and pushed at `a2ee62c Expand component netlist mappings`.
-- Components repo is pushed and clean at `a2ee62c Expand component netlist mappings`.
+- Components repo is pushed and clean at `87bcfdc Save Components student guide handoff`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
 - RV8 repo is pushed through `1470963 Fix RV8 README project status`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
-- RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`.
+- RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`; current work merges the latest Components skill/status into the RV8 team operating docs.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
+- Existing untracked file `RV8GR/doc/10_real_build_timing_log.md` was left untouched; do not stage it unless Jo explicitly asks.
 
 ## Components Library Facts
 
 - Shared library path: `/home/jo/kiro/Components`.
 - Python package path: `/home/jo/kiro/Components/python`.
+- Student guide: `/home/jo/kiro/Components/STUDENT_GUIDE.md`.
+- Service/CLI/API contract: `/home/jo/kiro/Components/SERVICE_CONTRACT.md`.
 - Python simulator uses DIP-style pin number/name access and propagation-delay scheduling.
 - `StimulusController` default channels: 64 inputs (`IN0..IN63`) and 8 clocks (`CLK0..CLK7`).
 - Clock stimulus is physical-pin and edge aware:
@@ -27,23 +29,31 @@ Updated: 2026-07-09
 - `chiplib.loader` preloads `.bin`, Intel HEX, or text-hex data into ROM/RAM `.data`.
 - Python and Verilog component behavior must remain compatible.
 - Python schematic backend now supports buses, pull-up/pull-down style normal states, probes/test logic, simple JSON-friendly schematics, and netlist/Verilog export paths for RV8GR-style chip-level work.
+- Virtual physical checker command:
+  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
+- Checker focus: pin-number/name/active-low mistakes, unsafe output-output wiring, missing edge polarity statements, and timing/noise risk on shared or stress nets.
+- Virtual R/C and delay-noise checks are early-risk instruments; physical build still needs real voltage, frequency, wiring, scope/logic-analyzer, and timing evidence.
 
 ## Verification Evidence
 
 Last green checks:
 
 ```sh
-cd /home/jo/kiro/Components/python && python3 -B -m tests.test_chips
-python3 -m py_compile /home/jo/kiro/Components/python/chiplib/*.py /home/jo/kiro/Components/python/tests/*.py
-cd /home/jo/kiro && iverilog -g2012 -Wall -o /tmp/tb_74hc_smoke.vvp Components/74HC/*.v Components/74HC/tests/tb_74hc_smoke.v && vvp /tmp/tb_74hc_smoke.vvp
-cd /home/jo/kiro && iverilog -g2012 -Wall -o /tmp/tb_memory_smoke.vvp Components/Memory/*.v Components/Memory/tests/tb_memory_smoke.v && vvp /tmp/tb_memory_smoke.vvp
+PYTHONPATH=python python3 -B -m chiplib.cli validate Examples/nand.json
+PYTHONPATH=python python3 -B -m chiplib.cli run Examples/nand.json
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+PYTHONPATH=python python3 -B -m chiplib.api --stdio
+PYTHONPATH=python python3 -B -m tests.test_cli
+PYTHONPATH=python python3 -B -m tests.test_api
+PYTHONPATH=python python3 -B -m tests.test_contracts
+git diff --check
 ```
 
 Expected pass markers:
 
-- `Components Python chip tests passed`
-- `74HC SMOKE TEST PASSED`
-- `MEMORY SMOKE TEST PASSED`
+- CLI/API tests pass.
+- `circuit-faults` accepts the RV8GR whole-system virtual circuit after documented timing/noise assumptions are present.
+- `git diff --check` reports no whitespace errors.
 
 ## Next Session
 
@@ -51,9 +61,10 @@ Expected pass markers:
 2. Use B-010 example ASM programs for ROM/programmer prep once the physical ROM workflow is ready.
 3. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
 4. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
-5. Use Components schematic backend as the reusable Python-first path for future UI/block/JSON/netlist work.
-6. When chip behavior changes, verify with Components Python tests first and run Verilog smoke tests.
-7. For RV8, do not stage unrelated dirty `RV8R/` or `rv8_memory.md` changes unless Jo explicitly asks.
+5. Use Components schematic backend and `circuit-faults` as the reusable Python-first path for future UI/block/JSON/netlist work.
+6. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
+7. Later Components task: review chip JSON/component definition output for student readability and document system wiring commands.
+8. For RV8, do not stage unrelated dirty files unless Jo explicitly asks.
 
 ## Known Follow-Ups
 
