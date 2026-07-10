@@ -491,7 +491,7 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | D0–D7 | Data out | DBUS0–DBUS7 |
 | /CE | Chip enable | ABUS15 (A15=0 selects ROM) |
 | /OE | Output enable | WR_DIR (U28-8) — disabled during store |
-| /WE | Write enable | RV8-Bus pin 27 (/WR) — Programmer only |
+| /WE | Write enable | VCC during CPU runtime; programmer write path only when CPU is stopped/reset-isolated |
 | VCC | Power | pin 28 |
 | GND | Ground | pin 14 |
 

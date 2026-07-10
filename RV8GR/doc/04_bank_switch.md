@@ -33,7 +33,8 @@ SETDP $80       ; page $80: registers ($8000-$80FF)
 SETDP $90       ; page $90: data at $9000-$90FF
 SETDP $FF       ; page $FF: RAM at $FF00-$FFFF (last RAM page)
 SETDP $00       ; page $00: ROM read at $0000-$00FF
-SETDP $7F       ; page $7F: ROM + I/O at $7F00-$7FFF
+SETDP $7F       ; page $7F: ROM read at $7F00-$7FFF
+; I/O slots are on page $FF: $FF10-$FF1F and $FF20-$FF2F
 ```
 
 Full 64KB accessible. No expansion chip needed.
@@ -41,8 +42,8 @@ Full 64KB accessible. No expansion chip needed.
 > ⚠️ **SB to ROM address = ไม่มีผล!**
 >
 > SETDP < $80 → A15=0 → RAM /CE=HIGH (disabled), ROM selected
-> ROM `/WE` is on `/WR` for programmer support, but normal CPU stores do not
-> perform the EEPROM/flash unlock sequence, so ROM contents do not change.
+> ROM `/WE` stays inactive during normal CPU runtime. A programmer may drive it
+> only in PROG/reset isolation, so CPU stores to ROM pages do not change ROM.
 > ใช้ LB อ่านจาก ROM ได้ (lookup table, string table) แต่เขียนไม่ได้
 
 ---
@@ -56,9 +57,9 @@ Full 64KB accessible. No expansion chip needed.
 | BANK width | 2 bits [1:0] | 4 banks × 32KB = 128KB. 1× 74HC74 = 1 chip |
 | Affected range | ROM only ($0000-$7FFF) | RAM unchanged — no impact on DP, SB, LB |
 | Reset value | BANK = 0 | Boot ROM must be deterministic |
-| Future IRQ vector | Always bank 0 | $FF00 is in RAM — unaffected by ROM banking if a vector design is built |
-| Chip budget | +1 (74HC74) | Within 3-package remaining budget |
-| Instruction | SETBANK imm (via I/O write) | No new opcode — uses SB to /SLOT address |
+| Future IRQ vector | Not banked | $FF00 is in RAM — unaffected by ROM banking if a vector design is built |
+| Chip budget | +1 (74HC74) | Outside the frozen 36-package v1.0 baseline; expansion-board only |
+| Software operation | SETBANK imm (via I/O write) | No new opcode — uses SB to /SLOT address |
 
 ```
 ROM physical address = {BANK[1:0], A14..A0} = 17 bits = 128KB
@@ -93,9 +94,9 @@ Physical ROM address: {BANK[1:0], A14..A0} = 17 bits
 
 Examples:
   BANK=0, CPU=$1234 → ROM physical $01234 (bank 0, offset $1234)
-  BANK=1, CPU=$1234 → ROM physical $11234 (bank 1, offset $1234)
-  BANK=2, CPU=$1234 → ROM physical $21234 (bank 2, offset $1234)
-  BANK=3, CPU=$1234 → ROM physical $31234 (bank 3, offset $1234)
+  BANK=1, CPU=$1234 → ROM physical $09234 (bank 1, offset $1234)
+  BANK=2, CPU=$1234 → ROM physical $11234 (bank 2, offset $1234)
+  BANK=3, CPU=$1234 → ROM physical $19234 (bank 3, offset $1234)
 
 RAM ($8000-$FFFF) is NOT affected — always maps to physical RAM directly.
 ```

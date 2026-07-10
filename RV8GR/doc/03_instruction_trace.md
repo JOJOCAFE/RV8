@@ -1,6 +1,12 @@
-# RV8-GR — Instruction Trace (Stable)
+# RV8-GR — Instruction Trace (Golden Debug Trace)
 
 **Pin-level traces for key instructions. Based on 02_wiring_guide.md (36 packages).**
+
+Use this file when single-stepping the real CPU or comparing simulator logs.
+It is not the ISA source of truth; `00_design_isa.md` owns the architecture and
+`02_wiring_guide.md` owns physical pin wiring. This file shows what students
+should expect to see on buses, control lines, and LEDs during important
+instructions.
 
 ---
 
@@ -27,7 +33,8 @@ PC → $0002
 XOR_MODE=0 → XOR B-mux=SUB=0 → XOR out = $05 XOR $00 = $05
 Adder: AC($10) + XOR($05) + Cin(0) = $15
 MUX_SEL=0 → AC mux = adder = $15
-ACC_CLK = NAND(T2=1, AC_WR=1) = 0 → AC latches $15
+ACC_CLK = NAND(T2=1, AC_WR=1) = 0 during T2
+At T2→T0 edge: ACC_CLK rises → U9 latches $15 and U21 updates Z
 ```
 **Result: AC = $15 ✓**
 
@@ -57,7 +64,7 @@ IR=$70: XOR_MODE=1, MUX_SEL=1, AC_WR=1
 XOR_MODE=1 → XOR B-mux=AC=$FF
 XOR: $55 ^ $FF = $AA
 MUX_SEL=1 → AC mux = XOR output = $AA
-AC latches $AA
+At T2→T0 edge: ACC_CLK rises → AC latches $AA
 ```
 **Result: AC = $AA ✓**
 
@@ -117,7 +124,7 @@ BUF_OE_N=0 → U7 enabled (DBUS→IBUS)
 U7 reads RAM → IBUS=$AA
 XOR_MODE=0 → XOR out = IBUS = $AA
 MUX_SEL=1 → AC mux = XOR out = $AA
-AC latches $AA
+At T2→T0 edge: ACC_CLK rises → AC latches $AA
 ```
 **Result: AC = $AA ✓**
 
@@ -131,7 +138,7 @@ IR=$40: XOR_MODE=1, MUX_SEL=0, AC_WR=0, SRC=0, STR=0
 ADDR_REQ = SRC|STR = 0
 /IRL_OE = NAND(T2=1, /ADDR_MODE=1) = 0 → U34 drives IBUS=$80
 DP_Load = T2(1) AND XOR_MODE(1) AND /ADDR_MODE(1) AND /AC_WR(1) = 1
-DP_Load: 0→1 at T2 end → U32 latches $80 on rising edge
+At T2 start: DP_Load rises after U33 delay → U32 latches $80 on rising edge
 
 Bus: ABUS=PC, IBUS=U34($80), DBUS=ROM(stale)
 Check: ✓ PG_CLK stays HIGH (MUX=0) ✓ AC unchanged (AC_WR=0)
@@ -191,7 +198,7 @@ T0: PC=$0000, ABUS=$0000, A15=0 → ROM selected
 T1: PC=$0001, DBUS=$80, U6 latches $80. PC→$0002
 T2: IR=$40: XOR_MODE=1, /ADDR_MODE=1, AC_WR=0
     /IRL_OE=0 → U34 drives IBUS=$80
-    DP_Load: 0→1 at T2 end → U32 latches $80
+    DP_Load rises after U33 delay near T2 start → U32 latches $80
     ✓ ABUS=PC (no data access) — DP=?? is harmless
 ```
 **Result: DP = $80 ✓ (RAM page selected for registers)**
@@ -215,7 +222,7 @@ T2: IR=$30: MUX_SEL=1, AC_WR=1, XOR_MODE=0
     /IRL_OE=0 → IBUS=$00
     XOR out = $00 XOR $00 = $00
     MUX_SEL=1 → AC mux = XOR out = $00
-    ACC_CLK pulse → AC=$00, Z=1
+    ACC_CLK rises at T2→T0 edge → AC=$00, Z=1
 ```
 **Result: AC=$00, Z=1 ✓ (all architectural state now defined)**
 

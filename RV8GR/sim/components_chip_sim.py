@@ -111,6 +111,9 @@ class ComponentsCPUSim(CPUSim):
         self.page_reg = 0x00
         self.data_page = 0x80
         self.z_flag = 1
+        self.ie = 0
+        self.irq_ff = 0
+        self.irq_n = 1
 
         self.chips["ROM"]._data = bytearray(32768)
         self.chips["RAM"]._data = bytearray(32768)

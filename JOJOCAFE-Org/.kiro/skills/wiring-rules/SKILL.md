@@ -19,7 +19,7 @@ When a wiring guide needs a 74HC, EEPROM, flash, or SRAM pinout, use the matchin
 ## Universal Rules (all variants)
 
 ### Bus Discipline
-- A15 chip select: ROM /CE = /A15, RAM /CE = A15 (active-low)
+- RV8GR A15 chip select: ROM `/CE = A15`, RAM `/CE = /A15` (both active-low)
 - Data bus: bidirectional, only ONE driver at a time
 - Address bus: output-only from CPU to memory
 - Never drive bus from two sources simultaneously
@@ -31,9 +31,10 @@ When a wiring guide needs a 74HC, EEPROM, flash, or SRAM pinout, use the matchin
 - Pins: reference by chip number + pin number (e.g., U7-3, U14-11)
 
 ### Critical Hazards
-- SRC+STR bus fight: if both register source and store are active, two drivers on IBUS
-- Fix pattern: guard with OR gate (BUF_OE_SAFE = BUF_OE OR STR)
-- 64 forbidden opcodes: (opcode & $0C) == $0C → both SRC and STR active
+- Pin-number mistakes: verify every U# pin against `RV8GR/doc/02_wiring_guide.md` and Components datasheet-backed pinouts.
+- Output-output wiring: legal data flow is output→input, or multiple outputs feeding one input only when enables prove they cannot drive simultaneously.
+- SRC+STR mixed opcodes: reserved but electrically safe in current RV8GR; STR dominates, U14 drives IBUS, U7 drives DBUS, ROM `/OE=WR_DIR` disables ROM output.
+- ROM `/WE`: inactive during CPU runtime; only the Programmer may own it in PROG/reset isolation.
 - Always verify: no two output-enable signals can be active simultaneously on same bus
 
 ### Timing
@@ -60,4 +61,5 @@ When reviewing any wiring change:
 - Horizontal control: opcode byte IS the control word
 - Encoding: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP
 - Data page: SETDP loads U32 (Data Page Register)
-- IRQ: polling latch, fixed vector $FF00
+- IRQ: v1.0 polling latch only. `/IRQ` release/rising edge sets IRQ_FF; no fixed vector or automatic PC save.
+- Student docs are derived. `00_design_isa.md` and `02_wiring_guide.md` remain the source of truth; `05_understand_by_module.md` is explanatory only.

@@ -13,6 +13,8 @@ Updated: 2026-07-10
 | 2026-07-09 | Updated RV8GR canonical docs/labs, README status, and team memory after pushes through `1470963` | ✅ Pushed |
 | 2026-07-10 | Merged latest Components student guide, CLI/API, and virtual physical checker skills into RV8 team docs | ✅ Documented |
 | 2026-07-10 | Routed all-ISA dual Verilog scoreboard work and pushed status through `622e41a` | ✅ Pushed |
+| 2026-07-10 | Routed Programmer B-012 from mock-test status into hardware field-test protocol | 🟡 Ready for field evidence |
+| 2026-07-10 | Saved RV8GR doc/source-of-truth audit and team skill refresh for design ISA, trace, bank switch, and module explanation | ✅ Saved |
 
 ## Bank (แบงค์) — Architect
 | Date | What | Result |
@@ -30,6 +32,8 @@ Updated: 2026-07-10
 | 2026-07-09 | Published B-007 non-physical verification report; physical B-007 remains blocked until hardware evidence exists | ⛔ Physical blocked |
 | 2026-07-10 | Added RV8 team responsibility for Components pin, bus, edge, timing, R/C, and delay-noise verification gates | ✅ Documented |
 | 2026-07-10 | Verified all-ISA dual Verilog scoreboard: 55 chip-level checkpoints matched behavioral checkpoints | ✅ All pass |
+| 2026-07-10 | Defined Programmer field-test evidence gates: ZIF Direct, RV8-Bus PROG/RUN release, readback hash, and hardware logs | 🟡 Hardware pending |
+| 2026-07-10 | Re-verified RV8GR docs against wiring, Components package checks, chip tests, wiring verifier, and 55-checkpoint four-model equivalence | ✅ All pass |
 
 ## Mint (มิ้นท์) — RTL Coder
 | Date | What | Result |
@@ -54,6 +58,7 @@ Updated: 2026-07-10
 | 2026-07-09 | Implemented and assembler-verified B-010 example ASM programs for blink, counter, and echo workflows | ✅ Verified |
 | 2026-07-10 | Added Components `circuit-faults` CLI/API test instrument ownership to RV8 team docs | ✅ Documented |
 | 2026-07-10 | Confirmed Python CPU, Components-backed CPU, assembler, wiring, and Components package checks still pass after Verilog timing fixes | ✅ All pass |
+| 2026-07-10 | Prepared Programmer field-test protocol and confirmed 51 mock tests are the virtual preflight baseline | ✅ Prepared |
 
 ## Noon (นุ่น) — Docs Writer
 | Date | What | Result |
@@ -63,6 +68,8 @@ Updated: 2026-07-10
 | 2026-07-09 | Updated team docs for B-010 verification, B-007 verification split, and Components mapping push `a2ee62c` | ✅ Current |
 | 2026-07-10 | Added student guide and future chip JSON / wiring-command clarity lane to RV8 team docs | ✅ Documented |
 | 2026-07-10 | Updated README and CPU logical protocol with the all-ISA dual Verilog standard-test matrix | ✅ Current |
+| 2026-07-10 | Added student-readable Programmer field-test procedure and safety rules for ZIF vs RV8-Bus modes | ✅ Current |
+| 2026-07-10 | Tightened student module docs: Z timing, I/O/RAM caveat, /SLOT example, 74HC574 wording, and regenerated packaged docs | ✅ Current |
 
 ---
 

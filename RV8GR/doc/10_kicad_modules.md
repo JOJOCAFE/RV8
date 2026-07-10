@@ -292,7 +292,7 @@ U30 (A12-A15):
   D0-D7  ↔ DBUS0-DBUS7
   /CE    ← ABUS15 (direct from U30-12; active when ABUS15=0)
   /OE    ← WR_DIR (U28-8; disables ROM output during CPU store)
-  /WE    ← /WR from RV8-Bus/programmer path
+  /WE    ← HIGH during CPU runtime; programmer path may drive only in PROG/reset isolation
 
 === RAM (62256) ===
   A0-A14 ← ABUS0-ABUS14

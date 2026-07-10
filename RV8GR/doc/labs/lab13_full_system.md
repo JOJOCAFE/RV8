@@ -49,7 +49,8 @@
 ตรวจสอบว่าสายเหล่านี้ต่อจากจริง (ไม่ใช่ temporary จาก lab ก่อน):
 
 ```
-จาก Lab 06: U6 pin 1 (/OE)  ← /IRL_OE (U26-3)      [ไม่ใช่ GND แล้ว!]
+จาก Lab 06: U6 pin 1 (/OE)  ← GND                  [U6 outputs feed IRL nets]
+จาก Lab 06: U34 pin 1,19 (/OE) ← /IRL_OE (U26-3)   [immediate buffer control]
 จาก Lab 08: U9 pin 11 (CLK) ← ACC_CLK (U27-11)   [ไม่ใช่ปุ่มแล้ว!]
 จาก Lab 08: U14 pin 1,19    ← /AC_BUF (U26-8)
 จาก Lab 05: U7 pin 19 (/OE) ← BUF_OE_N (U24-12)   [ไม่ใช่ GND แล้ว!]
@@ -273,7 +274,7 @@ python3 lab13_full_system.py
 
 ---
 
-## Chip Count (34 logic + ROM + RAM = 35):
+## Chip Count (34 logic + ROM + RAM = 36 packages):
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|

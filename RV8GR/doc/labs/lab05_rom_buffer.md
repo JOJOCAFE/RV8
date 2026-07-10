@@ -114,9 +114,9 @@ ROM ไฟเลี้ยง:
   pin 20 (/CE) ← A15 (ถ้ายังไม่มี ให้ต่อ GND = enable ตลอด)
   100nF คร่อม VCC-GND
 
-หมายเหตุสำหรับบอร์ดจริง: เมื่อถึงขั้น RV8-Bus/Programmer ให้ย้าย ROM pin 27
-(`/WE`) ไปที่ RV8-Bus pin 27 (`/WR`) เพื่อให้ Programmer เขียน ROM ได้
-ขณะ CPU ถูก hold reset.
+หมายเหตุสำหรับบอร์ดจริง: ระหว่าง CPU runtime ให้ ROM pin 27 (`/WE`) inactive
+(HIGH). Programmer เขียน ROM ได้เฉพาะตอน PROG/reset isolation ที่ CPU ถูก hold
+reset และ Programmer เป็นเจ้าของ `/WE`.
 
 ROM Address ← จาก ABUS (Lab 04):
   pin 10 (A0) ← A0 (U15 pin 4)

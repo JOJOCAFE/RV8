@@ -79,8 +79,8 @@ void setAddress(uint16_t addr) {
 
 // --- ROM Write/Read via Bus ---
 // ROM on CPU board: /CE = /A15 (addr < 0x8000 → selected)
-// ROM /OE tied to bus /RD on CPU board
-// ROM /WE tied to bus /WR on CPU board
+// In PROG mode only, the Programmer holds CPU reset and owns /RD and /WR.
+// During normal CPU runtime, ROM /WE must remain inactive.
 
 void romWriteByte(uint16_t addr, uint8_t data) {
   setAddress(addr);
@@ -88,7 +88,7 @@ void romWriteByte(uint16_t addr, uint8_t data) {
   dataBusWrite(data);
   delayMicroseconds(1);
 
-  // Pulse /WR low on bus → ROM sees write cycle
+  // Pulse /WR low in PROG mode → ROM sees write cycle.
   digitalWrite(PIN_nWR, LOW);
   delayMicroseconds(1);
   digitalWrite(PIN_nWR, HIGH);

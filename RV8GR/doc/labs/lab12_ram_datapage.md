@@ -284,8 +284,8 @@ LB $00      ; AC ← ROM[$0000] (read program byte as data)
 
 ใช้ทำ lookup table, constant table, string table ได้โดยไม่ต้องคำสั่งพิเศษ
 
-> ⚠️ **SB ไปที่ ROM address = ไม่มีผล** — ROM `/WE` is on `/WR` for programmer
-> support, but CPU stores do not perform the EEPROM/flash unlock sequence.
+> ⚠️ **SB ไปที่ ROM address = ไม่มีผล** — ระหว่าง CPU runtime ให้ ROM `/WE`
+> inactive; Programmer เท่านั้นที่ขับ `/WE` ได้ใน PROG/reset isolation.
 > ไม่ error แต่ข้อมูลหายไป — ระวังอย่า SETDP < $80 แล้ว SB
 
 **ผ่านทุกข้อ → ไป Lab 13!** 🎉

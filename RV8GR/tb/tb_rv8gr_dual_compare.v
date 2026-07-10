@@ -12,6 +12,7 @@ module tb_rv8gr_dual_compare;
   integer behavior_events;
   integer chip_events;
   reg [1023:0] dumpfile;
+  reg [1023:0] romfile;
 
   rv8gr_cpu behavioral(.clk(clk), .rst_n(rst_n), .irq_n(irq_n), .halted(behavioral_halted));
   rv8gr_chip_level chip();
@@ -51,81 +52,12 @@ module tb_rv8gr_dual_compare;
   reg [7:0] expected_dp [0:65535];
   reg chip_seen [0:65535];
 
-  task automatic load_rom_byte(input [14:0] addr, input [7:0] value);
-    begin
-      behavioral.rom[addr] = value;
-      chip.ROM1.memory[addr] = value;
-    end
-  endtask
-
   task automatic load_common_program;
     begin
-      load_rom_byte(15'h0000, 8'h30); load_rom_byte(15'h0001, 8'h00);
-      load_rom_byte(15'h0002, 8'h02); load_rom_byte(15'h0003, 8'h08);
-      load_rom_byte(15'h0004, 8'h01); load_rom_byte(15'h0005, 8'h04);
-      load_rom_byte(15'h0008, 8'h30); load_rom_byte(15'h0009, 8'h05);
-      load_rom_byte(15'h000A, 8'h82); load_rom_byte(15'h000B, 8'h10);
-      load_rom_byte(15'h000C, 8'h01); load_rom_byte(15'h000D, 8'h0C);
-      load_rom_byte(15'h0010, 8'h10); load_rom_byte(15'h0011, 8'h03);
-      load_rom_byte(15'h0012, 8'h90); load_rom_byte(15'h0013, 8'h08);
-      load_rom_byte(15'h0014, 8'h70); load_rom_byte(15'h0015, 8'hAA);
-      load_rom_byte(15'h0016, 8'h04); load_rom_byte(15'h0017, 8'h00);
-      load_rom_byte(15'h0018, 8'h30); load_rom_byte(15'h0019, 8'h00);
-      load_rom_byte(15'h001A, 8'h38); load_rom_byte(15'h001B, 8'h00);
-      load_rom_byte(15'h001C, 8'h90); load_rom_byte(15'h001D, 8'hAA);
-      load_rom_byte(15'h001E, 8'h02); load_rom_byte(15'h001F, 8'h22);
-      load_rom_byte(15'h0020, 8'h01); load_rom_byte(15'h0021, 8'h20);
-      load_rom_byte(15'h0022, 8'h30); load_rom_byte(15'h0023, 8'h55);
-      load_rom_byte(15'h0024, 8'h04); load_rom_byte(15'h0025, 8'h01);
-      load_rom_byte(15'h0026, 8'h18); load_rom_byte(15'h0027, 8'h01);
-      load_rom_byte(15'h0028, 8'h98); load_rom_byte(15'h0029, 8'h00);
-      load_rom_byte(15'h002A, 8'h02); load_rom_byte(15'h002B, 8'h2E);
-      load_rom_byte(15'h002C, 8'h01); load_rom_byte(15'h002D, 8'h2C);
-      load_rom_byte(15'h002E, 8'h30); load_rom_byte(15'h002F, 8'hFF);
-      load_rom_byte(15'h0030, 8'h04); load_rom_byte(15'h0031, 8'h02);
-      load_rom_byte(15'h0032, 8'h78); load_rom_byte(15'h0033, 8'h02);
-      load_rom_byte(15'h0034, 8'h02); load_rom_byte(15'h0035, 8'h38);
-      load_rom_byte(15'h0036, 8'h01); load_rom_byte(15'h0037, 8'h36);
-      load_rom_byte(15'h0038, 8'h20); load_rom_byte(15'h0039, 8'h10);
-      load_rom_byte(15'h003A, 8'h01); load_rom_byte(15'h003B, 8'h00);
-      load_rom_byte(15'h1000, 8'h20); load_rom_byte(15'h1001, 8'h7F);
-      load_rom_byte(15'h1002, 8'h01); load_rom_byte(15'h1003, 8'h00);
-      load_rom_byte(15'h7F00, 8'h20); load_rom_byte(15'h7F01, 8'h00);
-      load_rom_byte(15'h7F02, 8'h01); load_rom_byte(15'h7F03, 8'h40);
-      load_rom_byte(15'h0040, 8'h30); load_rom_byte(15'h0041, 8'h00);
-      load_rom_byte(15'h0042, 8'h04); load_rom_byte(15'h0043, 8'h04);
-      load_rom_byte(15'h0044, 8'h28); load_rom_byte(15'h0045, 8'h04);
-      load_rom_byte(15'h0046, 8'h20); load_rom_byte(15'h0047, 8'h00);
-      load_rom_byte(15'h0048, 8'h30); load_rom_byte(15'h0049, 8'h5E);
-      load_rom_byte(15'h004A, 8'h04); load_rom_byte(15'h004B, 8'h07);
-      load_rom_byte(15'h004C, 8'h01); load_rom_byte(15'h004D, 8'h90);
-      load_rom_byte(15'h005E, 8'h38); load_rom_byte(15'h005F, 8'h05);
-      load_rom_byte(15'h0060, 8'h90); load_rom_byte(15'h0061, 8'h42);
-      load_rom_byte(15'h0062, 8'h02); load_rom_byte(15'h0063, 8'h66);
-      load_rom_byte(15'h0064, 8'h01); load_rom_byte(15'h0065, 8'h64);
-      // SETDP cross-page memory checks before final pass.
-      load_rom_byte(15'h0066, 8'h40); load_rom_byte(15'h0067, 8'h90); // SETDP $90
-      load_rom_byte(15'h0068, 8'h30); load_rom_byte(15'h0069, 8'hA5); // LI $A5
-      load_rom_byte(15'h006A, 8'h04); load_rom_byte(15'h006B, 8'h00); // SB $00 -> RAM[$9000]
-      load_rom_byte(15'h006C, 8'h30); load_rom_byte(15'h006D, 8'h00); // LI $00
-      load_rom_byte(15'h006E, 8'h38); load_rom_byte(15'h006F, 8'h00); // LB $00 -> $A5
-      load_rom_byte(15'h0070, 8'h90); load_rom_byte(15'h0071, 8'hA5); // SUBI $A5
-      load_rom_byte(15'h0072, 8'h02); load_rom_byte(15'h0073, 8'h76); // BEQ $76
-      load_rom_byte(15'h0074, 8'h01); load_rom_byte(15'h0075, 8'h74); // FAIL halt
-      load_rom_byte(15'h0076, 8'h40); load_rom_byte(15'h0077, 8'h00); // SETDP $00
-      load_rom_byte(15'h0078, 8'h38); load_rom_byte(15'h0079, 8'h00); // LB $00 -> ROM[$0000]=$30
-      load_rom_byte(15'h007A, 8'h90); load_rom_byte(15'h007B, 8'h30); // SUBI $30
-      load_rom_byte(15'h007C, 8'h02); load_rom_byte(15'h007D, 8'h80); // BEQ $80
-      load_rom_byte(15'h007E, 8'h01); load_rom_byte(15'h007F, 8'h7E); // FAIL halt
-      load_rom_byte(15'h0080, 8'h08); load_rom_byte(15'h0081, 8'h00); // EI
-      load_rom_byte(15'h0082, 8'h48); load_rom_byte(15'h0083, 8'h00); // DI is inert
-      load_rom_byte(15'h0084, 8'h00); load_rom_byte(15'h0085, 8'h00); // NOP
-      load_rom_byte(15'h0086, 8'h01); load_rom_byte(15'h0087, 8'h86); // PASS halt
-      // Subroutine at $0090.
-      load_rom_byte(15'h0090, 8'h30); load_rom_byte(15'h0091, 8'h42);
-      load_rom_byte(15'h0092, 8'h04); load_rom_byte(15'h0093, 8'h05);
-      load_rom_byte(15'h0094, 8'h20); load_rom_byte(15'h0095, 8'h00);
-      load_rom_byte(15'h0096, 8'h01); load_rom_byte(15'h0097, 8'h5E);
+      if (!$value$plusargs("romfile=%s", romfile))
+        $fatal(1, "Missing +romfile=<all_isa_equivalence.memh>");
+      $readmemh(romfile, behavioral.rom);
+      $readmemh(romfile, chip.ROM1.memory);
     end
   endtask
 
@@ -140,6 +72,10 @@ module tb_rv8gr_dual_compare;
         expected_pg[behavioral.pc] = behavioral.page_reg;
         expected_dp[behavioral.pc] = behavioral.data_page_reg;
         behavior_events = behavior_events + 1;
+        $display("VERILOG_CHECKPOINT idx=%0d pc=%04h ac=%02h z=%0d ie=%0d irq=%0d pg=%02h dp=%02h",
+                 behavior_events, behavioral.pc, behavioral.ac, behavioral.z_flag,
+                 behavioral.ie, behavioral.irq_ff, behavioral.page_reg,
+                 behavioral.data_page_reg);
       end
     end
   endtask

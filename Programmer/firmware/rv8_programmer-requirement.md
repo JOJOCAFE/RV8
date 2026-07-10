@@ -70,9 +70,12 @@ const uint8_t DATA_PINS[] = {13, 12, 14, 27, 26, 25, 33, 32};
 
 ## ROM Access via Bus
 
-**Write**: A15=0 (595 bit15) → ROM /CE active. Pulse /WR → ROM latches data.
+**Write**: A15=0 (595 bit15) → ROM /CE active. In PROG mode only, pulse /WR
+so ROM latches data.
 **Read**: A15=0 → ROM /CE active. Pulse /RD → ROM outputs data (/OE).
 **CPU isolation**: /RST=LOW keeps CPU in reset, tri-states its bus drivers.
+**Runtime rule**: during normal CPU runtime, ROM /WE must stay inactive. The
+Programmer write path owns ROM /WE only while intentionally programming.
 
 ---
 
@@ -133,4 +136,4 @@ const uint8_t DATA_PINS[] = {13, 12, 14, 27, 26, 25, 33, 32};
 - [x] RUN mode releases /WR and /RD_O as inputs
 - [x] PROG mode reclaims /RD_O as output
 - [x] Compiles clean (286KB)
-- [x] 31 Python tests pass
+- [x] 51 Python mock tests pass across flash, terminal, and RAM boot tools

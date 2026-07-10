@@ -48,7 +48,7 @@ Opcode = Control Word (no decoder, no microcode ROM)
 | Data access | 64KB (SETDP) |
 | System bus | 40-pin |
 | Forbidden opcodes | 64 (guarded) |
-| Testbenches | 6 (full, IRQ, tasks, SETDP, asm, opcode sweep) |
+| Testbenches | 9 in `run_all_verilog_tb.sh` (behavioral, opcode sweep, SETDP, tasks, IRQ, chip-level, full chip-level, dual compare) |
 
 ---
 
@@ -72,7 +72,7 @@ $FF30-$FFFF  RAM (available)
 |:-:|------|:--------:|------------|
 | 1 | ROM timing after data-access instruction (LB/SB/ADD/SUB/XOR) | 🟡 | Start at 1-2 MHz, step up to 5 MHz. PC stable during T2 ensures correctness. |
 | 2 | IRQ return burden on programmer | 🟡 | v1.0 uses software save/restore. v2.0 adds RTI (+2-3 chips). |
-| 3 | SB to ROM address ignored | 🟢 | By design: ROM `/WE` is on `/WR` for programmer support, but CPU stores lack the EEPROM/flash unlock sequence. |
+| 3 | SB to ROM address ignored | 🟢 | By design: ROM `/WE` stays inactive during CPU runtime; programmer ownership is PROG/reset-only. |
 
 ### Timing Verification Plan
 
@@ -121,7 +121,7 @@ Hardware Design Frozen.
 | Architecture | 🔒 FROZEN | Design ISA + Wiring Guide signed off |
 | ISA | 🔒 FROZEN | 18 instructions, opcode allocation locked |
 | Wiring | 🔒 FROZEN | Pin-level wiring guide, gate-level sim |
-| Simulation | ✅ PASS | Verilog full/IRQ/tasks/SETDP/asm/opcode-sweep, chip_sim 8 CPU tests, sim_lab 01-14 |
+| Simulation | ✅ PASS | Python CPU sims, Components-backed CPU sim, 55-checkpoint Python/Verilog equivalence, full Verilog suite, assembler tests |
 | Physical Build | ⏳ PENDING | Breadboard bring-up not started |
 | 1 MHz | ✅ VERIFIED (analysis) | 700ns+ margin proven by timing calculation |
 | 5 MHz | ⏳ PROJECTED | Timing analysis only — needs oscilloscope proof |

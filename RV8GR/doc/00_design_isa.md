@@ -85,9 +85,10 @@ Byte 1 (Operand): immediate, RAM address, or jump target
 DP = Data Page Register (8 bits). Data address = {DP, operand} = 16-bit (full 64KB).
 - DP=$00-$7F → ROM read only ($0000-$7FFF)
 - DP=$80-$FF → RAM read/write ($8000-$FFFF)
-- **Note: SB to ROM address = ignored by ROM write protection**. ROM `/WE`
-  is on `/WR` for programmer support, but normal CPU stores do not perform the
-  EEPROM/flash unlock sequence.
+- **Note: SB to ROM address = ignored in normal CPU runtime**. The verified
+  chip-level CPU model keeps ROM `/WE` inactive during runtime; a programmer may
+  own ROM `/WE` only in PROG/reset isolation. CPU stores to DP<$80 do not change
+  ROM contents.
 
 > ⚠️ **สำคัญ: DP ต้อง ≥ $80 เพื่อเข้าถึง RAM**
 >
@@ -272,7 +273,7 @@ Software polls IRQ_FF only if an external /SLOT peripheral exposes the latch
 ```
 
 **How it works**:
-- External device pulls /IRQ LOW → U31 latches IRQ_FF=1
+- External device pulls /IRQ LOW, then releases it HIGH → U31 latches IRQ_FF=1 on the release/rising edge
 - Main loop reads IRQ_FF through an external /SLOT status device, or observes the LED/test point during bring-up
 - If set: branch to handler; avoid calling `EI` again unless software wants IE=1
 - Games/TV: use fixed timing loop, poll input during vblank
@@ -290,7 +291,7 @@ Required functions:
 - Convert acknowledge into active-low clears for U31 IE and IRQ_FF if auto-clear is kept
 ```
 
-> ⚠️ **$FF00 อยู่ใน RAM — ต้อง initialize ISR ก่อน EI!**
+> ⚠️ **Future hardware-vector design only:** `$FF00` อยู่ใน RAM — ต้อง initialize ISR ก่อน EI!
 >
 > Power-on: RAM มีค่า garbage → ถ้า EI แล้ว IRQ fire จะกระโดดไป garbage
 >
@@ -501,15 +502,21 @@ See `04_bank_switch.md` for ROM banking contract (v2.x, +1 chip).
 
 | Test | Result |
 |------|--------|
-| `tb_rv8gr_full.v` | ALL PASS (127 cycles) |
-| `tb_rv8gr_irq.v` | ALL PASS (6 tests) |
-| `tb_rv8gr_tasks.v` | ALL PASS |
-| Assembler | `rv8gr_asm.py` + test ROM |
+| Assembler | `tools/test_rv8gr_asm.py` covers frozen opcodes, aliases, labels, `.org`, bounds, overlap, and page-safe branches |
+| Python CPU sim | `sim/chip_sim.py` covers ISA smoke, SETDP, ROM reads, RAM reads/writes, SETPG, and polling IRQ state |
+| Components-backed Python sim | `sim/components_chip_sim.py` runs the same CPU-level checks through Components chip adapters |
+| TTL chip definitions | `sim/chips/test_chips.py` verifies the 14 chip types used by the RV8GR model |
+| Wiring verifier | `sim/verify_wiring.py` checks package count, bus ownership, ROM `/WE` inactive, and representative programs |
+| Components package verifier | `sim/verify_components.py` checks 16 part types and 36 packages |
+| Behavioral Verilog | `tools/run_all_verilog_tb.sh` runs the behavioral RTL regression benches |
+| Behavioral vs TTL-chip Verilog | `tools/run_dual_verilog_compare.sh` compares `rtl/rv8gr_cpu.v` with `rtl/rv8gr_chip_level.v` |
+| Four-model equivalence | `tools/check_python_verilog_equivalence.py` compares both Python sims and both Verilog models over the shared all-ISA ROM with 55 checkpoints |
 
 Source of Truth:
 - `00_design_isa.md` — Architectural spec (this file)
 - `02_wiring_guide.md` — Physical wiring spec (pin-level)
-- `06_debug_plan.md` — Verification spec (build steps)
+- `11_cpu_logical_test_protocol.md` — CPU logical verification protocol
+- `06_debug_plan.md` — Physical debug/build verification steps
 
 ---
 

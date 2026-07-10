@@ -288,8 +288,8 @@ Clock 16: $10
 - ROM D0-D7 -> DBUS.
 - ROM `/CE` <- A15.
 - ROM `/OE` temporarily -> GND for this isolated fetch test.
-- ROM `/WE` -> `/WR` / programmer write path. During CPU-only bring-up, hold
-  `/WR` HIGH unless you are specifically testing store timing.
+- ROM `/WE` -> HIGH during CPU runtime. Connect the programmer write path only
+  when the CPU is held reset in PROG isolation.
 
 **Test ROM bytes**
 ```text
@@ -665,9 +665,8 @@ all others 0
 **Pass**
 - RAM read/write works.
 - ROM read through data access works.
-- SB to ROM page does not corrupt ROM and does not cause DBUS fight. ROM `/WE`
-  may see `/WR`, but normal CPU stores do not perform the EEPROM/flash unlock
-  sequence.
+- SB to ROM page does not corrupt ROM and does not cause DBUS fight because ROM
+  `/WE` is inactive during normal CPU runtime.
 
 **Remove temporary wiring**
 - Any forced `DP_Load`, DP DIP input, RAM `/WE`, or RAM `/OE` test controls

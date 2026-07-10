@@ -10,6 +10,9 @@ package evidence.
 
 Both are required, but they answer different questions.
 
+For a shorter student-facing explanation of the two Python sims, two Verilog
+models, and the shared all-ISA test, see `doc/13_four_model_equivalence.md`.
+
 ## External Practices Adapted
 
 This protocol borrows proven verification ideas and makes them small enough for
@@ -42,6 +45,7 @@ clear pass/fail signals.
 | RTL behavioral comparison | RV8GR | Compare optimized/behavioral HDL against CPU expectations | `tools/run_all_verilog_tb.sh` behavioral benches |
 | TTL-chip HDL system | RV8GR + Components | Prove chip-level Verilog netlist runs using Components TTL models | `tools/run_chip_level_*.sh` |
 | Behavioral vs chip-level HDL scoreboard | RV8GR + Components | Prove both Verilog levels agree at architectural checkpoints on the same ROM image | `tools/run_dual_verilog_compare.sh` |
+| Python vs Verilog equivalence | RV8GR + Components | Prove both Python CPU sims and both Verilog CPU models agree on the same all-ISA ROM source | `tools/check_python_verilog_equivalence.py` |
 | Virtual physical screen | Components | Check pin truth, bus contention, edge polarity, and delay/noise assumptions | `chiplib.cli circuit-faults` |
 | Physical signoff | RV8GR physical build | Prove the real breadboard works | Lab/debug plan evidence |
 
@@ -58,6 +62,12 @@ Every virtual CPU test must begin from the v1.0 boot contract:
   initializes them for convenience.
 - Test ROMs must initialize architectural state before relying on it:
   `SETDP $80`, `SETPG $00`, then a known AC/Z setup such as `LI $00`.
+
+The all-ISA equivalence fixture is an exception because it is a simulator
+scoreboard fixture, not a physical boot ROM. `tb_rv8gr_dual_compare.v` forces
+the same reset-visible state into both Verilog models before release, and the
+Python checker starts from the simulator reset contract. Physical ROMs and
+student programs must still initialize state explicitly.
 
 ### Assembler
 
@@ -134,12 +144,16 @@ Run:
 ```bash
 cd RV8GR
 tools/run_dual_verilog_compare.sh
+python3 -B tools/check_python_verilog_equivalence.py
 ```
 
 This bench runs both Verilog versions together:
 
 - `rtl/rv8gr_cpu.v` is the behavioral/logical CPU model.
 - `rtl/rv8gr_chip_level.v` is the KiCad/Components TTL-chip netlist.
+- `programs/all_isa_equivalence.asm` is the single shared source for the
+  all-ISA equivalence program. The Verilog runner assembles it to a temporary
+  `.memh`; the Python checker assembles the same source in memory.
 
 The behavioral model records architectural checkpoints. The chip-level model
 must later reach the same checkpoints with matching `PC`, `AC`, `Z`, `PG`, `DP`,
@@ -159,6 +173,17 @@ The dual comparison program must cover every frozen ISA command at least once:
 A pass means the two Verilog levels agree on the tested program-level CPU
 behavior. It is not a formal proof that every internal wire or delay matches
 cycle-by-cycle.
+
+The Python equivalence checker then verifies:
+
+- `tb_rv8gr_dual_compare.v` exports the Verilog architectural checkpoints as
+  `VERILOG_CHECKPOINT` lines.
+- `sim/chip_sim.py` matches the exported Verilog checkpoint stream.
+- `sim/components_chip_sim.py` matches the exported Verilog checkpoint stream
+  while using Components `chiplib` adapters for chip objects. It is not an
+  independent net-level Python CPU algorithm.
+- Both Python sims also match the final Verilog architectural state and the RAM
+  checkpoints used by the Verilog dual comparison.
 
 ### IRQ Logical Behavior
 
@@ -193,6 +218,7 @@ python3 -B tools/test_rv8gr_asm.py
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
 python3 -B sim/test_cpu_logical_protocol.py
+python3 -B tools/check_python_verilog_equivalence.py
 python3 -B sim/verify_wiring.py
 python3 -B sim/verify_components.py
 tools/run_all_verilog_tb.sh

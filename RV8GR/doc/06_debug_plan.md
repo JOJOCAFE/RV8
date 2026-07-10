@@ -477,9 +477,8 @@ DP_Load = T2 & XOR_MODE & /ADDR_MODE & /AC_WR
 - [ ] SETDP $00, LB $00 → AC = ROM[$0000] = first opcode
 
 > 📌 **Architectural Contract**: LB can read ROM (DP < $80).
-> SB to ROM address is ignored by ROM protection. ROM `/WE` is on `/WR` for
-> programmer support, but CPU stores do not perform the EEPROM/flash unlock
-> sequence.
+> SB to ROM address is ignored during normal CPU runtime. ROM `/WE` stays
+> inactive unless the Programmer owns it in PROG/reset isolation.
 
 **ทดสอบ boundary (ROM/RAM split at $8000)**:
 - [ ] SETDP $7F, LB $FF → reads ROM[$7FFF] (A15=0 → ROM)

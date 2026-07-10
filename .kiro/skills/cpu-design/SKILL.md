@@ -20,11 +20,11 @@ description: RV8 8-bit RISC-V style CPU design patterns. 64K address space, RAM-
 | **RV8** | 27 | Yes | 35 | 1.25 | Proven, full ISA |
 | **RV8-R** | 18 | Yes | 35 | 1.0 | Fewest + full ISA |
 | **RV8-G** | 38 | No | 35 | 2.5 | Full ISA, no microcode |
-| **RV8-GR** | 30 | No | 17 | 3.3 | Fastest, execute RAM |
+| **RV8-GR** | 34 logic + ROM + RAM | No | 18 | 0.33 @1MHz | Active student baseline, execute RAM |
 
-### RV8-GR (current — BUILDING)
+### RV8-GR (current — physical build pending)
 
-- **33 logic chips** + ROM + RAM = 35 packages
+- **34 logic chips** + ROM + RAM = 36 packages
 - **No microcode** — direct-encoded control bytes
 - **3-cycle execution**: T0=fetch control, T1=fetch operand, T2=execute
 - **Full 64K**: A15 chip select (ROM $0000-$7FFF, RAM $8000-$FFFF)
@@ -32,8 +32,8 @@ description: RV8 8-bit RISC-V style CPU design patterns. 64K address space, RAM-
 - **16-bit jump**: Page Register for full address space
 - **Execute from RAM**: PC in $8000-$FFFF fetches from RAM
 - **Reset**: PC=$0000 → boots directly from ROM (standalone, no Programmer needed)
-- **Registers**: $8000-$8007 via default DP=$80
-- **IRQ**: v1.0=polling (U31), v1.1=hardware vector $FF00 (+2 chips)
+- **Registers**: $8000-$8007 via software boot `SETDP $80`
+- **IRQ**: v1.0=polling latch only. No hardware vector, no PC save, DI inert.
 - **Memory layout**:
   - $0000-$7FFF: ROM (program, lookup tables)
   - $8000-$8007: RAM (registers r0-r7)
@@ -55,7 +55,7 @@ Bit 1: BRANCH     — 0=no branch, 1=conditional PC load (check Z)
 Bit 0: JUMP       — 0=no jump, 1=unconditional PC load
 ```
 
-### Instructions (17 total)
+### Instructions (18 total)
 
 | Hex | Mnemonic | Operation |
 |-----|----------|-----------|
@@ -74,40 +74,19 @@ Bit 0: JUMP       — 0=no jump, 1=unconditional PC load
 | $01 | J addr | PC = {PG, addr} |
 | $20 | SETPG imm | PG = imm |
 | $28 | SETPG_R rs | PG = RAM[rs] |
+| $40 | SETDP imm | DP = imm |
 | $08 | EI | IE = 1 (enable interrupts) |
-| $48 | DI | IE = 0 (disable interrupts) |
+| $48 | DI | inert marker in v1.0; IE clears only on reset |
 
-## IRQ Design (RV8-GR)
+## IRQ Design (RV8-GR v1.0)
 
-### Hardware (1 chip: 74HC74)
-
-- **U31-A (IE FF)**: Set by EI decode, cleared by DI or IRQ-ack
-- **U31-B (IRQ FF)**: Set by /IRQ falling edge, cleared by IRQ-ack
-- **IRQ-ack**: T2 AND IE AND IRQ_FF AND NOT(pc_load)
-
-### Behavior
-
-1. Falling edge of /IRQ latches IRQ_FF=1
-2. At end of T2, if IRQ_FF=1 AND IE=1 AND no jump in progress:
-   - Save PC to RAM[$800E] (low) and RAM[$800F] (high)
-   - Jump to vector $FF00 (in RAM — user must set up ISR before EI)
-   - Clear IE (prevent nesting)
-   - Clear IRQ_FF
-3. If a jump is in progress, IRQ is deferred to next instruction
-
-### ISR Pattern
-
-```asm
-; ISR at $FF00
-    SB $08          ; save AC
-    ; ... handle device ...
-    LB $08          ; restore AC
-    ; Return:
-    LB $0F
-    SETPG_R $0F     ; restore page
-    LB $0E
-    J $0E           ; jump to saved PC
-```
+- **U31-A (IE FF)**: Set by EI decode, cleared by `/RST`.
+- **U31-B (IRQ FF)**: Set by `/IRQ` release/rising edge, cleared by `/RST`.
+- No IRQ acknowledge hardware in v1.0.
+- No hardware vector to `$FF00`.
+- No automatic PC save.
+- DI (`$48`) is an inert software marker in the 36-package build.
+- Software may poll IRQ_FF only if an external `/SLOT` status device exposes it.
 
 ## Chip Selection (RV8-GR)
 
@@ -136,6 +115,7 @@ Bit 0: JUMP       — 0=no jump, 1=unconditional PC load
 | U31 | 74HC74 | IRQ_FF + IE_FF |
 | U32 | 74HC574 | Data Page Register |
 | U33 | 74HC21 | SETDP decode + EI decode |
+| U34 | 74HC541 | IRL immediate buffer to IBUS |
 
 ## Verilog Conventions
 
@@ -171,10 +151,11 @@ wire [7:0] mem_read = pc[15] ? ram[pc[14:0]] : rom[pc[14:0]];
 
 ### 2. IBUS During T2
 ```verilog
-wire [7:0] ibus = source_type ? ram[{7'b0, ir_low}] : ir_low;
+wire [15:0] data_addr_full = {data_page_reg, ir_low};
+wire [7:0] ibus = source_type ? (data_addr_full[15] ? ram[data_addr_full[14:0]] : rom[data_addr_full[14:0]]) : ir_low;
 ```
 - SRC=0: IBUS = immediate (IR_LO)
-- SRC=1: IBUS = RAM[IR_LO]
+- SRC=1: IBUS = memory at `{DP, IR_LO}`; DP<$80 reads ROM, DP>=$80 reads RAM
 
 ### 3. ALU with XOR Sharing
 ```verilog
@@ -192,8 +173,9 @@ wire [7:0] ac_mux = mux_sel ? xor_out : adder_sum;
 
 ### 4. WR_DIR Gating
 ```verilog
-// U7 DIR = T2 AND STORE
-// Prevents bus conflict during fetch after STORE
+// WR_DIR = NOT(/AC_BUF)
+// U7 DIR = WR_DIR, ROM /OE = WR_DIR
+// Store direction disables ROM output and prevents DBUS contention.
 ```
 
 ## Subroutine Pattern (Software CALL/RET)

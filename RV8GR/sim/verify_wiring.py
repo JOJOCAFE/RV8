@@ -113,14 +113,13 @@ def verify_wiring(sim: CPUSim, verbose=False):
         fails += 1
         failures.append(f"  ❌ ROM-25={actual_rom_oe}, expected WR_DIR={expected_rom_oe}")
 
-    # ROM /WE is on /WR for physical programmer support. During CPU STORE,
-    # /WR follows /AC_BUF and pulses low; ROM contents remain protected by the
-    # EEPROM/flash unlock requirement, but the pin-level wire must match.
-    expected_rom_we = sim.chips['U26'].get(8)
+    # ROM /WE is inactive during CPU runtime. A programmer may drive it only
+    # with explicit ownership while the CPU is stopped/reset-isolated.
+    expected_rom_we = 1
     actual_rom_we = sim.chips['ROM'].get(26)
     if actual_rom_we != expected_rom_we:
         fails += 1
-        failures.append(f"  ❌ ROM-26={actual_rom_we}, expected /WR=/AC_BUF={expected_rom_we}")
+        failures.append(f"  ❌ ROM-26={actual_rom_we}, expected runtime-inactive /WE={expected_rom_we}")
 
     # Store phase physical contract:
     # U14 drives IBUS, U7 remains enabled and reverses to IBUS→DBUS, ROM is off.
@@ -131,7 +130,7 @@ def verify_wiring(sim: CPUSim, verbose=False):
             'U7-19 /OE': sim.chips['U7'].get(19) == 0,
             'U7-1 DIR': sim.chips['U7'].get(1) == 1,
             'ROM-25 /OE': sim.chips['ROM'].get(25) == 1,
-            'ROM-26 /WE': sim.chips['ROM'].get(26) == 0,
+            'ROM-26 /WE': sim.chips['ROM'].get(26) == 1,
         }
         for name, ok in expected.items():
             if not ok:

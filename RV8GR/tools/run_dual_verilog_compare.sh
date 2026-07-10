@@ -7,6 +7,11 @@ OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
 
 mkdir -p "$OUTDIR"
 
+python3 "$ROOT/tools/rv8gr_asm.py" \
+  "$ROOT/programs/all_isa_equivalence.asm" \
+  -o "$OUTDIR/all_isa_equivalence.memh" \
+  -f memh
+
 iverilog -g2012 -Wall \
   -o "$OUTDIR/rv8gr_dual_compare.vvp" \
   "$COMPONENTS/Verilog/74xx/74hc00.v" \
@@ -30,4 +35,6 @@ iverilog -g2012 -Wall \
   "$ROOT/tb/tb_rv8gr_dual_compare.v"
 
 cd "$OUTDIR"
-vvp "$OUTDIR/rv8gr_dual_compare.vvp" "+dumpfile=$OUTDIR/rv8gr_dual_compare.vcd"
+vvp "$OUTDIR/rv8gr_dual_compare.vvp" \
+  "+dumpfile=$OUTDIR/rv8gr_dual_compare.vcd" \
+  "+romfile=$OUTDIR/all_isa_equivalence.memh"

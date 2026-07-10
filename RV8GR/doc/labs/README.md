@@ -45,7 +45,7 @@
 
 ---
 
-## Chip Checklist (34 logic + ROM + RAM = 35)
+## Chip Checklist (34 logic + ROM + RAM = 36 packages)
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|

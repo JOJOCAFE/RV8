@@ -27,6 +27,8 @@ Recommended reading order:
 | Wiring | `doc/02_wiring_guide.md` | Official pin-level source of truth |
 | KiCad | `doc/10_kicad_modules.md` | Schematic sheet/module split |
 | CPU logic test | `doc/11_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
+| Equivalence | `doc/13_four_model_equivalence.md` | Why two Python sims and two Verilog models must agree |
+| Doc audit | `doc/14_doc_integrity_audit.md` | Integrity check of every doc file against Python/Verilog truth |
 
 ---
 
@@ -180,6 +182,9 @@ python3 -B sim/components_chip_sim.py
 python3 -B sim/test_cpu_logical_protocol.py
 # protocol unittest suite passes on both Python CPU simulators
 
+python3 -B tools/check_python_verilog_equivalence.py
+# both Python CPU simulators match both Verilog CPU models on all_isa_equivalence.asm
+
 python3 -B sim/verify_wiring.py
 # ALL WIRING VERIFIED
 
@@ -226,6 +231,14 @@ Verilog signoff must include the TTL-chip system:
   checkpoints: `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM
   writes. This dual bench covers every frozen ISA command at least once,
   including jump/branch, ALU, memory, page/data-page control, and IRQ polling.
+- `programs/all_isa_equivalence.asm` is the shared all-ISA source for this
+  comparison. Verilog assembles it to `.memh`; Python assembles the same source
+  in memory through `tools/check_python_verilog_equivalence.py`.
+- `tb_rv8gr_dual_compare.v` exports `VERILOG_CHECKPOINT` lines, and
+  `tools/check_python_verilog_equivalence.py` verifies both Python CPU sims
+  match that checkpoint stream, final state, and RAM checkpoints.
+- `sim/components_chip_sim.py` is a Components-backed adapter runner for the
+  same RV8GR Python CPU logic, not a separate net-level Python CPU algorithm.
 - Do not replace this signoff with an optimized gate/behavioral model.
 
 Generated Verilog artifacts default to `/tmp/rv8gr-verilog`. Set
