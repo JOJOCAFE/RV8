@@ -177,6 +177,9 @@ python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
 # ALL 8 COMPONENTS-BACKED CPU TESTS PASSED
 
+python3 -B sim/test_cpu_logical_protocol.py
+# protocol unittest suite passes on both Python CPU simulators
+
 python3 -B sim/verify_wiring.py
 # ALL WIRING VERIFIED
 

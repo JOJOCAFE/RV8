@@ -84,6 +84,7 @@ Run:
 cd RV8GR
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
+python3 -B sim/test_cpu_logical_protocol.py
 ```
 
 Minimum pass cases:
@@ -95,6 +96,8 @@ Minimum pass cases:
 - `SETPG` plus `J` reaches another ROM page.
 - `BEQ` taken when Z=1.
 - Halt loop is detected as `J self`.
+- The same directed programs must pass on both `CPUSim` and
+  `ComponentsCPUSim`.
 
 ### Full Program Tests
 
@@ -155,6 +158,7 @@ cd /home/jo/kiro/RV8/RV8GR
 python3 -B tools/test_rv8gr_asm.py
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
+python3 -B sim/test_cpu_logical_protocol.py
 python3 -B sim/verify_wiring.py
 python3 -B sim/verify_components.py
 tools/run_all_verilog_tb.sh

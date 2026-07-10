@@ -15,6 +15,7 @@ Updated: 2026-07-10
 - RV8GR Python chip behavior tests now run from repo root with `python3 -B RV8GR/sim/chips/test_chips.py`.
 - RV8GR now separates CPU logical tests from Components virtual physical tests. CPU logic is documented in `RV8GR/doc/11_cpu_logical_test_protocol.md`; Components remains responsible for pin/bus/edge/delay/noise screens.
 - `RV8GR/sim/components_chip_sim.py` is the standalone Components-backed Python CPU runner using vendored `chiplib` chip definitions.
+- `RV8GR/sim/test_cpu_logical_protocol.py` is the executable protocol test suite. It assembles directed CPU programs and scoreboards both `CPUSim` and `ComponentsCPUSim`.
 - RV8GR Verilog signoff rule: behavioral `rtl/rv8gr_cpu.v` benches are comparison only. Shipping confidence must include `rtl/rv8gr_chip_level.v` compiled with Components TTL-chip Verilog models (`ttl_74hc*`, `62256`, `at28c256`) through the chip-level runner scripts.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
 - Existing untracked file `RV8GR/doc/10_real_build_timing_log.md` was left untouched; do not stage it unless Jo explicitly asks.
@@ -47,6 +48,7 @@ Last green checks:
 cd /home/jo/kiro/RV8
 python3 -B RV8GR/sim/chip_sim.py
 python3 -B RV8GR/sim/components_chip_sim.py
+python3 -B RV8GR/sim/test_cpu_logical_protocol.py
 python3 -B RV8GR/sim/verify_wiring.py
 python3 -B RV8GR/sim/soft_debug.py
 python3 -B RV8GR/tools/test_rv8gr_asm.py
