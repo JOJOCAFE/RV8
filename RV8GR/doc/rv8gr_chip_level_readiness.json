@@ -1,0 +1,208 @@
+{
+  "schema": "components.rv8gr.chip_level_readiness",
+  "version": 1,
+  "policy": "RV8GR circuit-level testing is gated by chip definition evidence and chip-level split records. Functional circuit tests may run after truth/timing/tri-state/bus-fight/propagation records pass; physical timing claims require datasheet-backed or measured chip timing and electrical evidence.",
+  "required_split_records": [
+    "truth_table",
+    "timing",
+    "tri_state",
+    "bus_fight",
+    "propagation"
+  ],
+  "required_physical_voltage_test_points_v": [
+    4.5,
+    5.0,
+    5.5
+  ],
+  "required_physical_clock_profiles": [
+    {
+      "name": "manual_push_switch_100_ticks",
+      "mode": "manual",
+      "ticks": 100
+    },
+    {
+      "name": "50khz",
+      "mode": "oscillator",
+      "frequency_hz": 50000
+    },
+    {
+      "name": "1mhz",
+      "mode": "oscillator",
+      "frequency_hz": 1000000
+    },
+    {
+      "name": "2mhz",
+      "mode": "oscillator",
+      "frequency_hz": 2000000
+    },
+    {
+      "name": "5mhz",
+      "mode": "oscillator",
+      "frequency_hz": 5000000
+    }
+  ],
+  "parts": [
+    {
+      "part": "74HC00",
+      "rv8gr_role": "NAND gates for control decode and glue logic.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; keep selected vendor and speed row visible during physical build."
+    },
+    {
+      "part": "74HC04",
+      "rv8gr_role": "Inverters for active-low control and reset/clock glue.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; keep selected vendor and speed row visible during physical build."
+    },
+    {
+      "part": "74HC21",
+      "rv8gr_role": "Dual 4-input AND gates for decode and control qualification.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V timing points."
+    },
+    {
+      "part": "74HC32",
+      "rv8gr_role": "OR gates for control composition.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; keep selected vendor and speed row visible during physical build."
+    },
+    {
+      "part": "74HC74",
+      "rv8gr_role": "Positive-edge D flip-flops for flags, IRQ latch, and synchronous state.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V timing points."
+    },
+    {
+      "part": "74HC86",
+      "rv8gr_role": "XOR gates for ALU and compare/control paths.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V timing points."
+    },
+    {
+      "part": "74HC157",
+      "rv8gr_role": "Quad muxes for address and data path selection.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; keep selected vendor and speed row visible during physical build."
+    },
+    {
+      "part": "74HC161",
+      "rv8gr_role": "Positive-edge program counter and counter-style state.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; verify selected package markings match the modeled timing row."
+    },
+    {
+      "part": "74HC164",
+      "rv8gr_role": "Serial-in parallel-out ring/control sequencing support.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V timing points."
+    },
+    {
+      "part": "74HC245",
+      "rv8gr_role": "Bidirectional bus transceiver for shared bus isolation.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; scope /OE disable-to-Z during physical bus turnaround."
+    },
+    {
+      "part": "74HC283",
+      "rv8gr_role": "4-bit binary adders for the ALU.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V ALU timing points."
+    },
+    {
+      "part": "74HC541",
+      "rv8gr_role": "Octal buffers for unidirectional bus and LED/probe-visible outputs.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V bus-release timing points."
+    },
+    {
+      "part": "74HC574",
+      "rv8gr_role": "Positive-edge octal registers for IR, AC, page, and data-path latches.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; verify setup/hold row against selected vendor during physical build."
+    },
+    {
+      "part": "74HC688",
+      "rv8gr_role": "8-bit equality comparator for branch/page/control decisions.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still measure 4.5 V, 5.0 V, and 5.5 V compare timing points."
+    },
+    {
+      "part": "62256",
+      "rv8gr_role": "Generic 32K x 8 SRAM-compatible RAM footprint.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None if the installed SRAM is Samsung KM62256C-compatible; physical build must still confirm 55 ns or 70 ns speed marking at 4.5 V, 5.0 V, and 5.5 V."
+    },
+    {
+      "part": "AS6C62256",
+      "rv8gr_role": "Alliance 32K x 8 SRAM option for RAM.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still confirm AS6C62256-55 marking and measure 4.5 V, 5.0 V, and 5.5 V RAM timing points."
+    },
+    {
+      "part": "AT28C256",
+      "rv8gr_role": "32K x 8 EEPROM option for program ROM.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; selected AT28C256 speed grade must match the row used in the RV8GR timing budget."
+    },
+    {
+      "part": "SST39SF010A",
+      "rv8gr_role": "Flash ROM option for program storage.",
+      "definition_timing_status": "datasheet_backed",
+      "definition_electrical_status": "datasheet_backed",
+      "chip_level_gate": "ready_for_circuit_functional",
+      "physical_timing_allowed": true,
+      "next_datasheet_action": "None; physical build must still confirm the installed 55 ns or 70 ns speed grade at 4.5 V, 5.0 V, and 5.5 V."
+    }
+  ]
+}
