@@ -207,6 +207,15 @@ tools/run_all_verilog_tb.sh
 # behavioral, opcode sweep, SETDP, task, IRQ, and chip-level benches pass
 ```
 
+The behavioral `rtl/rv8gr_cpu.v` benches are only a comparison path. RV8GR
+Verilog signoff must include the TTL-chip system:
+
+- `rtl/rv8gr_chip_level.v` is the chip-level netlist.
+- `tools/run_chip_level_verilog.sh` and
+  `tools/run_chip_level_full_verilog.sh` compile it with the Components
+  `ttl_74hc*`, `62256`, and `at28c256` Verilog models.
+- Do not replace this signoff with an optimized gate/behavioral model.
+
 Generated Verilog artifacts default to `/tmp/rv8gr-verilog`. Set
 `RV8GR_BUILD_DIR=/path/to/output` if you need a different generated-output
 directory.
