@@ -1,6 +1,6 @@
 # Lab 06: IR Latch — จำคำสั่งที่อ่านมา
 
-**เป้าหมาย**: ต่อ U5 (IR High = control byte) + U6 (IR Low = operand byte) จับค่าจาก IBUS ตอน T0/T1
+**เป้าหมาย**: ต่อ U5 (IR High = control byte), U6 (IR Low = operand byte), และ U34 (IRL immediate buffer) ให้จับคำสั่งจาก IBUS ตอน T0/T1 และเตรียม operand path สำหรับ T2
 
 ---
 
@@ -33,10 +33,11 @@ U6 จับค่าตอน T1↑ (rising edge ของ T1)
 |:----:|------|:-----:|
 | 1 | 74HC574 (U5, IR High) | 1 |
 | 2 | 74HC574 (U6, IR Low) | 1 |
-| 3 | LED สีแดง 3mm | 8 |
-| 4 | LED สีเขียว 3mm | 8 |
-| 5 | 330Ω resistor | 16 |
-| 6 | 100nF capacitor | 2 |
+| 3 | 74HC541 (U34, IRL immediate buffer) | 1 |
+| 4 | LED สีแดง 3mm | 8 |
+| 5 | LED สีเขียว 3mm | 8 |
+| 6 | 330Ω resistor | 16 |
+| 7 | 100nF capacitor | 3 |
 
 ---
 
@@ -92,7 +93,7 @@ U5 (IR High — control byte):
 U6 (IR Low — operand byte):
   pin 20 (VCC) → 5V
   pin 10 (GND) → GND
-  pin 1  (/OE) → GND (สำหรับ lab นี้ ให้ output ตลอด, จริงๆ ต่อ /IRL_OE)
+  pin 1  (/OE) → GND (output ตลอด; U6 ขับเฉพาะ IRL nets ไม่ขับ IBUS ตรง)
   pin 11 (CLK) ← T1 (U8 pin 4 จาก Lab 02)
   100nF คร่อม VCC-GND
 ```
@@ -124,6 +125,24 @@ U6 (IR Low — operand byte):
     pin 14 (Q6) → IRL5 → 330Ω → LED → GND
     pin 13 (Q7) → IRL6 → 330Ω → LED → GND
     pin 12 (Q8) → IRL7 → 330Ω → LED → GND
+
+U34 (IRL-to-IBUS immediate buffer — เตรียมไว้สำหรับ T2 immediate):
+  pin 20 (VCC) → 5V
+  pin 10 (GND) → GND
+  pin 1  (/OE1) → VCC ชั่วคราว (disabled จนกว่า Lab 10 จะมี /IRL_OE)
+  pin 19 (/OE2) → VCC ชั่วคราว (disabled จนกว่า Lab 10 จะมี /IRL_OE)
+  100nF คร่อม VCC-GND
+
+  A inputs ← IRL outputs จาก U6:
+    pin 2 ← IRL0    pin 3 ← IRL1    pin 4 ← IRL2    pin 5 ← IRL3
+    pin 6 ← IRL4    pin 7 ← IRL5    pin 8 ← IRL6    pin 9 ← IRL7
+
+  Y outputs → IBUS:
+    pin 18 → IBUS0  pin 17 → IBUS1  pin 16 → IBUS2  pin 15 → IBUS3
+    pin 14 → IBUS4  pin 13 → IBUS5  pin 12 → IBUS6  pin 11 → IBUS7
+
+  ห้ามเปิด U34 พร้อม U7 ใน lab นี้. ตอน fetch ให้ U34 disabled ไว้ก่อน.
+  Lab 10 จะเปลี่ยน U34 /OE1,/OE2 จาก VCC ไปเป็น /IRL_OE (U26-3).
 ```
 
 ---
@@ -179,17 +198,18 @@ $0005: $00  ← operand byte (address 0)
 
 ### Bus Ownership Verification
 
-Single-step ตรวจว่า IBUS driver active ทีละตัวเท่านั้น:
+Final integration check หลัง Lab 10: single-step ตรวจว่า IBUS driver active ทีละตัวเท่านั้น:
 
 | Phase | IBUS driver | ตรวจ |
 |:-----:|:-----------:|------|
 | T0 | U7 (DBUS→IBUS) | U7-19=LOW, U34-1/19=HIGH, U14-1=HIGH |
 | T1 | U7 (DBUS→IBUS) | (เหมือน T0) |
 | T2 immediate | U34 (IRL→IBUS) | U34-1/19=LOW, U7-19=HIGH |
-| T2 store | U14 (AC→IBUS), U7 writes IBUS→DBUS | U14-1=LOW, U7-19=LOW, U7-1=HIGH |
+| T2 store | U14 (AC→IBUS), U7 writes IBUS→DBUS | U14-1/19=LOW, U7-19=LOW, U7-1=HIGH, ROM /OE=HIGH |
 
 ### Bus Float Test
-- [ ] ปิด U7, U34, U14 ทั้งหมด (/OE=HIGH) → วัด IBUS ต้องไม่สุ่มค่า
+- [ ] ปิด U7, U34, U14 ทั้งหมด (/OE=HIGH) → logic probe ต้องไม่เห็น driver active
+- [ ] ถ้าไม่มี pull-up/pull-down อ่อน LED อาจลอยหรือสุ่มค่าได้; นั่นคือ Hi-Z ไม่ใช่ PASS/FAIL หลัก
 
 ---
 
@@ -265,6 +285,7 @@ PC → Address Bus → ROM → IBUS → U5/U6
 
 - ✅ U5 จับ control byte ตอน T0 (บอก CPU ว่าทำอะไร)
 - ✅ U6 จับ operand byte ตอน T1 (บอก CPU ว่าค่า/ที่อยู่อะไร)
+- ✅ U34 เตรียมทาง IRL→IBUS สำหรับ immediate mode โดยยัง disabled จนกว่า Lab 10 จะมี /IRL_OE
 - ✅ IR bits ไปควบคุมส่วนอื่นของ CPU โดยตรง!
 - ✅ ตอนนี้ CPU อ่านคำสั่งจาก ROM ได้แล้ว (fetch complete!)
 

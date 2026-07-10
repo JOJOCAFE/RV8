@@ -163,7 +163,8 @@ LED 3 ดวงที่เห็นใน lab นี้ = สัญญาณจ
 > 📌 **Illegal State Recovery**: หาก power-up ได้สถานะผิด
 > วงจรจะเข้าสู่ลูป T0→T1→T2 ได้เองภายในไม่กี่ clock cycles
 > (feedback A AND B = NOT(Q0) AND NOT(Q1) ทำหน้าที่ self-correct)
-> ถ้ารอ 5-6 clocks แล้วยังไม่วนปกติ → กด Reset → กลับ T0 ทันที
+> ถ้ารอ 5-6 clocks แล้วยังไม่วนปกติ → กด Reset ให้ Q0-Q2=000
+> แล้วปล่อย clock 1 ครั้งเพื่อเข้า T0
 
 ### State Machine (ภาพรวมหัวใจ CPU)
 

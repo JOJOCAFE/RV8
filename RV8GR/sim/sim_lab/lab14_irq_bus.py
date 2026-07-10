@@ -11,14 +11,22 @@ import sys
 print("Lab 14: IRQ + RV8-Bus")
 print("=" * 40)
 
-# Simulate IRQ logic (U31: dual 74HC74)
+# Simulate IRQ logic (U31: dual 74HC74) plus U33 gate-2 EI_decode.
 ie_ff = 0   # Interrupt Enable flip-flop
 irq_ff = 0  # IRQ pending flip-flop
 pc = 0x0000
 
-def ei():
+def ei_decode(opcode, t2=1):
+    """U33 gate 2: T2 AND SRC AND /XOR_MODE AND /AC_WR."""
+    src = (opcode >> 3) & 1
+    xor_mode = (opcode >> 6) & 1
+    ac_wr = (opcode >> 4) & 1
+    return int(bool(t2 and src and (not xor_mode) and (not ac_wr)))
+
+def clock_ie(opcode=0x08):
     global ie_ff
-    ie_ff = 1
+    if ei_decode(opcode):
+        ie_ff = 1
 
 def di():
     """DI has no v1.0 hardware effect."""
@@ -55,8 +63,8 @@ else:
 irq_ff = 0  # reset between tests
 
 # Test 2: EI then IRQ becomes poll-visible
-print("  Test 2: EI + IRQ trigger")
-ei()
+print("  Test 2: EI_decode + IRQ trigger")
+clock_ie(0x08)
 irq_assert()
 if irq_ff != 0:
     print("    FAIL: IRQ_FF should wait for /IRQ release")
@@ -82,7 +90,7 @@ else:
 print("  Test 4: DI has no v1.0 hardware effect")
 pc = 0x8010
 irq_ff = 0
-ei()
+clock_ie(0x08)
 di()
 irq_assert()
 irq_release()
@@ -92,6 +100,23 @@ if pending and ie_ff == 1 and pc == 0x8010:
 else:
     print("    FAIL: DI should be inert in v1.0")
     errors += 1
+
+# Test 5: U33 EI_decode only accepts opcode $08 in T2.
+print("  Test 5: EI_decode gate selectivity")
+decode_tests = {
+    0x08: 1,  # EI
+    0x18: 0,  # ADD uses SRC but AC_WR blocks
+    0x38: 0,  # LB uses SRC but AC_WR blocks
+    0x48: 0,  # DI has XOR bit, so /XOR_MODE blocks
+    0x78: 0,  # XOR has XOR and AC_WR set
+}
+for opcode, expected in decode_tests.items():
+    got = ei_decode(opcode)
+    if got != expected:
+        print(f"    FAIL: opcode ${opcode:02X} EI_decode={got}, expected {expected}")
+        errors += 1
+if errors == 0:
+    print("    OK: only EI opcode clocks U31 IE")
 
 print()
 if errors == 0:

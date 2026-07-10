@@ -61,7 +61,7 @@ U31 ไฟเลี้ยง: pin 14=VCC, pin 7=GND, 100nF คร่อม VCC-G
 FF-A (IE flag — Interrupt Enable):
   pin 1 (/CLR1) ← /RST (reset clears IE → interrupts disabled at boot)
   pin 2 (D1) → VCC (D=1, so CLK↑ sets IE=1)
-  pin 3 (CLK1) ← EI_decode
+  pin 3 (CLK1) ← EI_decode (U33-8)
     [EI_decode = T2 AND specific opcode pattern for EI]
     [สำหรับ lab: ใช้ปุ่มกดจำลอง EI]
   pin 4 (/PR1) → VCC (ไม่ preset)
@@ -97,6 +97,18 @@ DI ($48):
   [v1.0: no hardware effect; IE clears only via /RST]
 ```
 
+EI_decode (U33 gate 2, replace Lab 12 temporary tie-high wiring):
+```
+U33-9  ← T2 (U8-5)
+U33-10 ← SRC (U5-16)
+U33-12 ← /XOR_MODE (U28-11)
+U33-13 ← /AC_WR (U24-10)
+U33-8  → EI_decode → U31-3
+```
+
+Manual EI button is allowed only for isolated U31 testing. Final CPU wiring uses
+U33-8, so executing opcode `$08` sets IE.
+
 ### RV8-Bus (40-pin IDC connector)
 
 ```
@@ -116,7 +128,7 @@ Pin 21: D4  ↔ DBUS4       Pin 22: D5  ↔ DBUS5
 Pin 23: D6  ↔ DBUS6       Pin 24: D7  ↔ DBUS7
 Pin 25: CLK ← oscillator   Pin 26: /RST ← reset circuit
 Pin 27: /WR ← /AC_BUF (U26-8)
-Pin 28: /RD ← GND (always read when /CE active; or NOT(T2))
+Pin 28: /RD ← /T2 (U28-6; read/fetch indicator)
 Pin 29: /IRQ → U31-11 (input from peripheral)
 Pin 30: /SLOT1 ← address decode ($FF1x)
 Pin 31: /SLOT2 ← address decode ($FF2x)
@@ -188,6 +200,7 @@ $0007: $04
 | 25 | CLK | probe / LED | กระพริบ (full speed) | ☐ |
 | 26 | /RST | กด reset | LOW แล้วกลับ HIGH | ☐ |
 | 27 | /WR | execute SB | pulse LOW 1 cycle | ☐ |
+| 28 | /RD | fetch/read phase | LOW outside T2, HIGH during T2 | ☐ |
 | 29 | /IRQ | กดแล้วปล่อยปุ่ม IRQ | LOW then rising edge → IRQ_FF LED latches | ☐ |
 
 ### Test 5: Programmer via bus

@@ -15,6 +15,8 @@ Use this document with:
 - `doc/01_wiring_guide.md` for exact pin wiring.
 - `doc/05_debug_plan.md` for deeper fault checks.
 - `doc/06_kicad_modules.md` for KiCad sheet/module names.
+- `doc/07_real_build_timing_log.md` for voltage, clock, bus-race, edge, and
+  propagation-delay evidence after the staged build works.
 - `doc/build_plan/02_student_worksheet.md` for student-facing stage cards.
 
 Recommended software checks before a class or build session:
@@ -308,7 +310,8 @@ $0003 = $00
 - DBUS shows the programmed bytes.
 
 **Before full CPU wiring**
-- Change ROM `/OE` to `WR_DIR` from U28-8.
+- Remove the temporary ROM `/OE` to GND wire and connect ROM `/OE` to
+  `WR_DIR` from U28-8.
 - This is required so ROM turns off during STORE direction.
 
 **Remove temporary wiring**
@@ -795,11 +798,17 @@ Use a ROM that tests:
 Use this only after every stage above has passed on the real hardware:
 
 - VCC is 4.8V to 5.2V at the farthest chips while running.
+- Record voltage evidence at 4.5V, 5.0V, and 5.5V if the supply and parts allow
+  the sweep safely.
 - Reset always returns PC to `$0000` and T-state to T0.
 - Single-step clock advances exactly one state per press.
 - No chip is hot and no bus-fight current spike is observed.
 - Golden Bring-up passes at 1 MHz.
 - Full Instruction Smoke Test reaches the pass loop.
+- Repeat timing checks at 50 kHz, 1 MHz, 2 MHz, and 5 MHz, plus the 100-tick
+  push-switch test, and record any failing frequency separately.
+- Record bus ownership, rising/falling edge behavior, and propagation-delay
+  findings in `doc/07_real_build_timing_log.md`.
 - One-hour burn-in stays in the pass loop.
 - Clock sweep result is recorded for this exact build.
 

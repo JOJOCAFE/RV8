@@ -36,6 +36,12 @@ ComponentsCPUSim matches Verilog checkpoint stream, final state, and RAM checkpo
 RV8GR Python/Verilog equivalence PASS
 ```
 
+Python lab scripts under `sim/sim_lab/` were rechecked against the lab sheets.
+They now cover the corrected `/ADDR_MODE` convention, physical U7
+A=IBUS/B=DBUS teaching boundary, U34 immediate buffer, BNE via
+`Z_flag XOR ALU_SUB`, page-register jump formation, Lab 13 boot/RAM/page tests,
+and Lab 14 U33 `EI_decode`.
+
 ## Integrity Rules Used
 
 | Rule | Current truth |
@@ -69,9 +75,9 @@ RV8GR Python/Verilog equivalence PASS
 | `01_wiring_guide.md` | Official pin-level physical source | Matches current simulator truth for U6, U34, U32/U33, ROM `/OE`, ROM `/WE`, IRQ, and 36 packages. |
 | `02_instruction_trace.md` | Golden debug traces for single-step student bring-up | Kept as a useful derived doc because `05_debug_plan.md` points students to it for trace comparison. Updated wording to make `00_design_isa.md`/`01_wiring_guide.md` the source of truth and to clarify ACC/DP edge-trigger timing. |
 | `03_bank_switch.md` | Future ROM banking and built-in data page | Updated ROM write wording, corrected page `$7F` as ROM-only, fixed 17-bit banked-address examples, and clarified that the +1 bank latch is outside the frozen 36-package v1.0 baseline. |
-| `04_understand_by_module.md` | Student module explanation | Updated to clarify that it is a module-understanding guide, not the pin-level wiring source; ring-counter reset wording now points students to the lab/debug convention while preserving the raw 74HC164 clear behavior. Corrected Z flag timing, RV8-Bus `/SLOT` examples, RAM-vs-I/O caveat, 74HC574 `/OE` wording, and gate-budget notes. Consistent with 34 logic chips, U34 immediate path, SETDP, polling IRQ, DI inert behavior, and ROM `/OE=WR_DIR`. |
+| `04_understand_by_module.md` | Student module explanation | Updated to clarify that it is a module-understanding guide, not the pin-level wiring source; ring-counter reset wording now points students to the lab/debug convention while preserving the raw 74HC164 clear behavior. Corrected Z flag timing, RV8-Bus `/SLOT` examples, RAM-vs-I/O caveat, 74HC574 `/OE` wording, bus chapter U7/U14/U34 labels, and gate-budget notes. Consistent with 34 logic chips, U34 immediate path, SETDP, polling IRQ, DI inert behavior, and ROM `/OE=WR_DIR`. |
 | `05_debug_plan.md` | Physical debug plan | Updated ROM write wording; remains physical-build protocol, not virtual signoff. |
-| `06_kicad_modules.md` | KiCad module split | Kept as a six-sheet/module guide for KiCad and student chunking, not a replacement for `01_wiring_guide.md`; module ownership matches current U1-U34 architecture. |
+| `06_kicad_modules.md` | KiCad module split | Kept as a six-sheet/module guide for KiCad and student chunking, not a replacement for `01_wiring_guide.md`; module ownership matches current U1-U34 architecture. Added explicit build-plan stage mapping and corrected the IR_BUF chip list to include U34. |
 | `07_real_build_timing_log.md` | Physical timing evidence log template | Kept separate from `05_debug_plan.md`: debug plan tells students what to do; timing log records real-board voltage/frequency, bus-race, edge, propagation-delay, fix, and retest evidence. |
 | `08_cpu_logical_test_protocol.md` | CPU logical verification protocol | Kept as the canonical virtual CPU logic regression and signoff protocol; distinct from the student four-model guide and the physical debug/timing docs. |
 | `09_future_upgrades.md` | Future-only feature parking lot | Kept separate from `03_bank_switch.md`: bank switching has its own focused expansion contract, while this file parks non-baseline timing, reset, DI, I/O, and vector ideas. Updated stale chip-count and U34/IBUS wording; U34 is already part of v1.0. |
@@ -79,23 +85,23 @@ RV8GR Python/Verilog equivalence PASS
 | `11_four_model_equivalence.md` | Student four-model guide | Kept separate from `08_cpu_logical_test_protocol.md`: this short guide answers why RV8GR has two Python sims, two Verilog models, and one shared ASM equivalence source, while the protocol doc remains the maintainer signoff checklist. Verified against `tools/check_python_verilog_equivalence.py` and the 55-checkpoint output. |
 | `12_doc_integrity_audit.md` | Maintainer doc-integrity signoff record | Kept as the record of which docs were checked, which docs are source-of-truth or derived, and why each derived doc remains separate after cleanup. Not a student lesson or wiring guide. |
 | `B-007_verification_report_2026-07-09.md` | Historical B-007 non-physical evidence report | Kept because backlog, sprint, handoff, and project-state files still cite B-007 as physically blocked with non-physical evidence available. Marked as historical and not current signoff; use `08_cpu_logical_test_protocol.md`, `11_four_model_equivalence.md`, `05_debug_plan.md`, and `07_real_build_timing_log.md` for current protocol. |
-| `build_plan/01_student_incremental_build_plan.md` | Teacher build plan | Updated ROM `/WE`; matches 36-package baseline, U34, SETDP, IRQ polling, and physical signoff boundary. |
-| `build_plan/02_student_worksheet.md` | Student worksheet | Consistent with staged build, U34, WR_DIR, SETDP, IRQ polling, boot tests, and fault map. |
-| `labs/README.md` | Lab index | Chip checklist heading corrected to 36 packages. |
-| `labs/lab01_power_clock.md` | Power and manual clock | Consistent with rising-edge/manual-clock build assumptions. |
-| `labs/lab02_ring_counter.md` | T0/T1/T2 timing | Consistent with one-hot 3-phase model. |
+| `build_plan/01_student_incremental_build_plan.md` | Teacher build plan | Updated ROM `/WE`; matches 36-package baseline, U34, SETDP, IRQ polling, `04_understand_by_module.md`, `06_kicad_modules.md`, and physical signoff boundary. Now links to the real-build timing log and requires voltage/frequency, edge, bus-race, and propagation-delay evidence after staged bring-up. |
+| `build_plan/02_student_worksheet.md` | Student worksheet | Consistent with staged build, U34, WR_DIR, SETDP, IRQ polling, boot tests, and fault map. Clarifies that temporary ROM `/OE=LOW` must be removed before store/RAM tests and that the teacher records timing evidence after board pass. |
+| `labs/README.md` | Lab index | Chip checklist heading corrected to 36 packages; now links labs to module understanding, debug plan, KiCad module map, build plan, real-build timing log, and U34 in the Lab 06 chip list. |
+| `labs/lab01_power_clock.md` | Power and manual clock | Consistent with rising-edge/manual-clock build assumptions; button-hold LED wording matches the pull-up clock circuit. |
+| `labs/lab02_ring_counter.md` | T0/T1/T2 timing | Consistent with one-hot 3-phase model; reset wording now distinguishes cleared `000` from first-clock T0. |
 | `labs/lab03_pc_counter.md` | Program counter | Consistent with PC increment/load staging. |
-| `labs/lab04_address_mux.md` | Address mux | Consistent with PC vs IRL/DP address selection and `/ADDR_MODE` notes. |
-| `labs/lab05_rom_buffer.md` | ROM and U7 buffer | Updated ROM `/WE` programmer-only note; U7 direction remains correct. |
-| `labs/lab06_ir_latch.md` | IR high/low latch | Consistent: U6 output differs between isolated lab simplification and final U34-controlled CPU path. |
+| `labs/lab04_address_mux.md` | Address mux | Consistent with PC vs IRL/DP address selection, `$0000` reset, and `/ADDR_MODE` notes. |
+| `labs/lab05_rom_buffer.md` | ROM and U7 buffer | Updated ROM `/WE` programmer-only note and clarified that forcing ROM `/CE=GND` is isolated-only; final wiring uses A15 before RAM is added. U7 direction remains correct. |
+| `labs/lab06_ir_latch.md` | IR high/low latch | Consistent: U6 output stays enabled on IRL nets, U34 is introduced as the disabled-until-controlled immediate buffer, and Hi-Z bus test avoids treating floating LEDs as a logic failure. |
 | `labs/lab07_alu.md` | Adder/subtractor | Consistent with ADD/SUB/XOR building blocks and no overflow flag. |
-| `labs/lab08_accumulator.md` | AC, mux, U14 buffer | Consistent with AC feedback, U14 bus isolation, and ALU mux. |
+| `labs/lab08_accumulator.md` | AC, mux, U14 buffer | Consistent with AC feedback, U14 bus isolation, ALU mux, and the fact that AC starts unknown until explicitly cleared. |
 | `labs/lab09_z_flag.md` | Z flag | Consistent with current async preset Z behavior and branch use. |
-| `labs/lab10_branch_jump.md` | Branch/jump control | Consistent with absolute page/low-byte branch behavior, `/PC_LD`, and SETDP/EI decode helper gates. |
+| `labs/lab10_branch_jump.md` | Branch/jump control | Consistent with absolute page/low-byte branch behavior, `/PC_LD`, known page-zero lab setup before U23, SETDP/EI decode helper gates, and `WR_DIR` driving both U7 direction and ROM `/OE`. |
 | `labs/lab11_page_register.md` | Page register | Consistent with SETPG and `{PG, IRL}` jump target formation. |
-| `labs/lab12_ram_datapage.md` | RAM and data page | Updated ROM write wording; SETDP, RAM/ROM split, and alias behavior remain consistent. |
-| `labs/lab13_full_system.md` | Full-system lab | Corrected final U6/U34 wiring and chip-count heading; full-system tests remain aligned with simulator truth. |
-| `labs/lab14_irq_bus.md` | IRQ and RV8-Bus | Consistent with polling IRQ, sticky IRQ_FF, DI inert behavior, and no hardware vector. |
+| `labs/lab12_ram_datapage.md` | RAM and data page | Updated ROM write wording; SETDP, RAM/ROM split, alias behavior, and U33 gate-2 handoff to Lab 14 remain consistent. |
+| `labs/lab13_full_system.md` | Full-system lab | Corrected final U6/U34 wiring, ROM `/OE=WR_DIR`, boot-init requirement before PG-dependent branches, chip-count heading, and real-build timing-log checkpoint; full-system tests remain aligned with simulator truth. |
+| `labs/lab14_irq_bus.md` | IRQ and RV8-Bus | Consistent with polling IRQ, sticky IRQ_FF, DI inert behavior, U33 gate-2 EI decode, `/RD=/T2` bus pin, and no hardware vector. |
 
 ## Non-Markdown Artifact
 

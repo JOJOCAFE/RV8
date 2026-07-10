@@ -37,7 +37,7 @@ In KiCad, place U24 on the CTRL sheet with hierarchical pins for NOT_T0/NOT_T1 b
 
 ---
 
-## Alignment with Debug Plan & Labs
+## Alignment with Debug Plan, Labs, and Build Plan
 
 | Debug Step | Lab | What's tested | KiCad Module |
 |:----------:|:---:|---------------|:------------:|
@@ -60,6 +60,20 @@ In KiCad, place U24 on the CTRL sheet with hierarchical pins for NOT_T0/NOT_T1 b
 > **Lab 08 spans two modules** (U14 in IR_BUF, muxes in ALU_AC).
 > This is unavoidable — some chips interact across boundaries.
 > The KiCad sheets define **signal ownership**, not physical placement.
+
+`build_plan/01_student_incremental_build_plan.md` is more granular than the six
+KiCad sheets. It intentionally builds partial modules first:
+
+| Build-plan stages | Main chips | KiCad module boundary |
+|---|---|---|
+| 0-1 | Power, reset, U8, U24 gates 1-2 | CLK_RST |
+| 2-3 | U1-U4 | PC |
+| 4-6 | U15, U16, U29, U30, ROM | ADDR_MEM partial |
+| 7-9 | U5, U6, U7, U34, early U24/U25/U26 control | IR_BUF + CTRL partial |
+| 10-13 | U9-U14, U17-U22 | ALU_AC + IR_BUF(U14) |
+| 14-17 | U23-U28, U31-U33, RAM | CTRL + ADDR_MEM(RAM) |
+| 18-20 | RV8-Bus, boot ROM, full smoke test | All modules |
+| Physical signoff | Voltage, clock, bus-race, edge, delay evidence | All modules + `07_real_build_timing_log.md` |
 
 ---
 
@@ -330,7 +344,7 @@ Never both active — complementary by design.
 
 ## Module 4: IR_BUF (Instruction Register + Bus Buffers)
 
-**Chips**: U5 (74HC574), U6 (74HC574), U7 (74HC245), U14 (74HC541)
+**Chips**: U5 (74HC574), U6 (74HC574), U7 (74HC245), U14 (74HC541), U34 (74HC541)
 
 **Debug Steps**: 5 (U7 buffer with ROM), 6 (IR latch), 8 (U14 AC buffer)
 
