@@ -39,7 +39,7 @@ Shared knowledge for all agents. Update when significant facts change.
 | What | Where |
 |------|-------|
 | ISA + design | `doc/00_design_isa.md` |
-| Wiring (pin-level) | `doc/02_wiring_guide.md` |
+| Wiring (pin-level) | `doc/01_wiring_guide.md` |
 | Verilog CPU | `rtl/rv8gr_cpu.v` |
 | Testbenches | `tb/tb_rv8gr_*.v` |
 | Gate sim | `sim/chip_sim.py` |

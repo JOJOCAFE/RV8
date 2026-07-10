@@ -5,6 +5,19 @@ Updated: 2026-07-10
 RV8GR keeps four virtual CPU models because each one answers a different
 question. They must agree before we trust a CPU logic change.
 
+This is the short student-facing explanation. The full maintainer checklist and
+required regression commands live in `08_cpu_logical_test_protocol.md`.
+
+## Why This File Exists
+
+Keep this file separate because it answers the first student question: "Why are
+there four simulators?" It should stay short enough to read before running the
+test.
+
+Do not put the full regression protocol here. Use
+`08_cpu_logical_test_protocol.md` for coverage rules, signoff lanes, exact
+maintainer commands, and pass/fail policy.
+
 ## The Four Models
 
 | Model | File | What it proves |
@@ -83,6 +96,7 @@ Run the four-model equivalence check after changing:
 For full virtual CPU signoff, run:
 
 ```bash
+cd /home/jo/kiro/RV8/RV8GR
 python3 -B tools/test_rv8gr_asm.py
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py

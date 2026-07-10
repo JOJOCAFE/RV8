@@ -2,8 +2,21 @@
 
 **Split the 36-chip CPU into 6 sub-schematics for easier wiring and debugging.**
 
-Each module = 1 KiCad hierarchical sheet. Matches `06_debug_plan.md` build order.
-Wire one module at a time on breadboard, test before connecting the next.
+This file is **not** the pin-level source of truth. Use
+`01_wiring_guide.md` for exact chip pins and electrical wiring. Use this file
+to understand how the same CPU is split into smaller KiCad sheets and smaller
+student build/debug chunks.
+
+Each module = 1 KiCad hierarchical sheet. The module order follows
+`05_debug_plan.md` and the hardware labs. Wire one module or partial module at a
+time on breadboard, test it, then connect the next module.
+
+Why keep this doc:
+- It shows the real KiCad sheet boundary for each group of chips.
+- It helps students see the CPU as six smaller systems instead of one large
+  schematic.
+- It identifies cross-module signals so sheet pins and labels stay consistent.
+- It points back to the wiring guide whenever exact pin truth matters.
 
 ---
 
@@ -144,12 +157,12 @@ U8 (74HC164):
   Pin 3 (Q0)   → T0
   Pin 4 (Q1)   → T1
   Pin 5 (Q2)   → T2
-  Pin 6-7      → NC (Q3 unused)
+  Pin 6 (Q3)   → NC
+  Pin 7 (GND)  → GND
   Pin 8 (CLK)  ← CLK
   Pin 9 (/CLR) ← /RST
   Pin 10-13    → NC
   Pin 14 (VCC) → VCC
-  Pin 7 (GND)  → GND
 
 Reset Circuit:
   VCC → 10kΩ → NODE → 10µF → GND
@@ -392,13 +405,17 @@ Only ONE IBUS driver active at T2:
   SRC=0, STR=0 → U34 drives IBUS (immediate from IRL)
   SRC=1, STR=0 → U7 drives IBUS (RAM/ROM data)
   SRC=0, STR=1 → U14 drives IBUS (AC value for store)
-  SRC=1, STR=1 → FORBIDDEN (64 illegal opcodes)
+  SRC=1, STR=1 → reserved horizontal encoding; store-dominant bus ownership
 
 Store safety:
   U7 /OE = BUF_OE_N
   ROM /OE = WR_DIR
   During STORE, U7 writes IBUS→DBUS and ROM output is disabled
 ```
+
+For valid student programs, use only the frozen ISA in `00_design_isa.md`.
+Reserved horizontal encodings are not teaching instructions; they are only
+checked to avoid unsafe bus ownership.
 
 ---
 
@@ -732,7 +749,7 @@ PC_LOAD_COND  U27-6
 | U31 | 74HC74 | CTRL | 13 |
 | U32 | 74HC574 | CTRL | 12 |
 | U33 | 74HC21 | CTRL | 12 |
-| U34 | 74HC541 | IR_BUF | 10 |
+| U34 | 74HC541 | IR_BUF | 6, 8 |
 | ROM | AT28C256 | ADDR_MEM | 5 |
 | RAM | 62256 | ADDR_MEM | 11 |
 

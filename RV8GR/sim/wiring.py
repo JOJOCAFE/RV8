@@ -1,5 +1,5 @@
 """
-RV8-GR Wiring — Pin-by-pin, matching 02_wiring_guide.md exactly.
+RV8-GR Wiring — Pin-by-pin, matching 01_wiring_guide.md exactly.
 
 Format: (chip, pin, source_chip, source_pin)  or  (chip, pin, 'SIGNAL_NAME')
         (chip, pin, 'VCC')  (chip, pin, 'GND')
@@ -526,4 +526,4 @@ if __name__ == '__main__':
     print(f"IBUS: {len(IBUS_PINS['drivers'])} drivers, {len(IBUS_PINS['readers'])} reader groups")
     print(f"DBUS: {len(DBUS_PINS['connections'])} connections")
     print(f"ABUS: {len(ABUS_PINS['sources'])} source groups")
-    print(f"\n✅ Wiring definition matches 02_wiring_guide.md style")
+    print(f"\n✅ Wiring definition matches 01_wiring_guide.md style")

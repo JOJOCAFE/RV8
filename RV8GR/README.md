@@ -23,12 +23,12 @@ Recommended reading order:
 |------|------------|---------|
 | Student | `doc/labs/README.md` | Lab-by-lab physical build |
 | Teacher | `doc/build_plan/01_student_incremental_build_plan.md` | Supervised stage plan |
-| Debug | `doc/06_debug_plan.md` | Probe points and fault tracing |
-| Wiring | `doc/02_wiring_guide.md` | Official pin-level source of truth |
-| KiCad | `doc/10_kicad_modules.md` | Schematic sheet/module split |
-| CPU logic test | `doc/11_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
-| Equivalence | `doc/13_four_model_equivalence.md` | Why two Python sims and two Verilog models must agree |
-| Doc audit | `doc/14_doc_integrity_audit.md` | Integrity check of every doc file against Python/Verilog truth |
+| Wiring | `doc/01_wiring_guide.md` | Official pin-level source of truth |
+| Debug | `doc/05_debug_plan.md` | Probe points and fault tracing |
+| KiCad | `doc/06_kicad_modules.md` | Schematic sheet/module split |
+| CPU logic test | `doc/08_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
+| Equivalence | `doc/11_four_model_equivalence.md` | Why two Python sims and two Verilog models must agree |
+| Doc audit | `doc/12_doc_integrity_audit.md` | Integrity check of every doc file against Python/Verilog truth |
 
 ---
 
@@ -275,14 +275,18 @@ RV8GR/
 │   └── gate_sim.py             Python gate-level simulation
 └── doc/
     ├── 00_design_isa.md        Design + ISA reference
-    ├── 02_wiring_guide.md      SOURCE OF TRUTH (wiring)
-    ├── 03_instruction_trace.md Pin-level traces
-    ├── 04_bank_switch.md       Memory expansion
-    ├── 05_understand_by_module.md  Thai tutorial
-    ├── 06_debug_plan.md        Physical build debug steps
-    ├── 07_risk_analysis.md     Hazard analysis
-    ├── 08_design_signoff.md    Sign-off v1.0
-    └── 09_task_test_plan.md    Test milestones
+    ├── 01_wiring_guide.md      SOURCE OF TRUTH (wiring)
+    ├── 02_instruction_trace.md Pin-level traces
+    ├── 03_bank_switch.md       Memory expansion
+    ├── 04_understand_by_module.md  Thai tutorial
+    ├── 05_debug_plan.md        Physical build debug steps
+    ├── 06_kicad_modules.md     KiCad sheet/module split
+    ├── 07_real_build_timing_log.md  Physical evidence log
+    ├── 08_cpu_logical_test_protocol.md  CPU logical verification
+    ├── 09_future_upgrades.md   Future-only feature parking lot
+    ├── 10_netlist.md           Text netlist
+    ├── 11_four_model_equivalence.md Student equivalence guide
+    └── 12_doc_integrity_audit.md Maintainer doc audit
 ```
 
 ---
@@ -330,6 +334,6 @@ sim/
 ├── soft_debug.py           — High-level trace (4 tests)
 ├── gate_sim.py             — Simplified educational sim
 ├── verify_wiring.py        — Pin-level wiring checker (11K+ checks)
-├── wiring.py               — 247 pin connections (02_wiring_guide)
+├── wiring.py               — 247 pin connections (01_wiring_guide)
 └── sim_lab/lab01-14.py     — 14 step-by-step labs
 ```

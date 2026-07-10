@@ -51,7 +51,8 @@ Timeline:
 > 3. **Z path มี margin ที่ 5 MHz** — Z flag settle ภายใน ~100ns, แต่ถูก sample ที่ T2
 >    ของคำสั่งถัดไป (200ns+ ทีหลัง)
 >
-> ⚠️ ถ้าต้องการ >20 MHz ควรเปลี่ยนเป็น synchronous (ดู 07_risk_analysis.md)
+> ⚠️ ถ้าจะทดลองความเร็วสูงกว่าขอบเขต RV8GR v1.0 ให้กลับไปดู timing ใน
+> `../01_wiring_guide.md` และบันทึกผลจริงใน `../07_real_build_timing_log.md`.
 >
 > สำหรับ CPU ทั้งเครื่อง: breadboard target คือ 1 MHz; 5 MHz เป็น PCB-only experiment.
 

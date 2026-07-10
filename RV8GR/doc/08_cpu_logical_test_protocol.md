@@ -11,7 +11,23 @@ package evidence.
 Both are required, but they answer different questions.
 
 For a shorter student-facing explanation of the two Python sims, two Verilog
-models, and the shared all-ISA test, see `doc/13_four_model_equivalence.md`.
+models, and the shared all-ISA test, see `doc/11_four_model_equivalence.md`.
+
+## Relationship To Other Test Docs
+
+Keep this document separate. It is the maintainer protocol for virtual CPU
+logic signoff, not a student lab sheet and not a physical evidence log.
+
+| Document | Purpose |
+|---|---|
+| `08_cpu_logical_test_protocol.md` | Canonical CPU logic regression lanes, coverage, commands, and signoff boundary. |
+| `11_four_model_equivalence.md` | Short student explanation of why two Python sims and two Verilog models must agree. |
+| `05_debug_plan.md` | Physical build procedure students follow on the bench. |
+| `07_real_build_timing_log.md` | Real-board voltage/frequency, timing, bus-race, edge, propagation-delay, fix, and retest evidence. |
+
+Merging these would hide the main distinction: RV8GR owns CPU behavior, while
+Components and the physical build own pin truth, bus contention, edge polarity,
+delay/noise assumptions, and measured hardware evidence.
 
 ## External Practices Adapted
 

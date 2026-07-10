@@ -12,9 +12,9 @@ This plan follows the v1.0 34-logic-chip wiring guide:
 - U31 IRQ latch uses Q2 on U31-9 and `/IRQ` clock on U31-11.
 
 Use this document with:
-- `doc/02_wiring_guide.md` for exact pin wiring.
-- `doc/06_debug_plan.md` for deeper fault checks.
-- `doc/10_kicad_modules.md` for KiCad sheet/module names.
+- `doc/01_wiring_guide.md` for exact pin wiring.
+- `doc/05_debug_plan.md` for deeper fault checks.
+- `doc/06_kicad_modules.md` for KiCad sheet/module names.
 - `doc/build_plan/02_student_worksheet.md` for student-facing stage cards.
 
 Recommended software checks before a class or build session:

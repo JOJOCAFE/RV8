@@ -13,11 +13,11 @@ Updated: 2026-07-10
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`; current work merges the latest Components skill/status into the RV8 team operating docs.
 - RV8GR verification tooling now writes Verilog `.vvp/.vcd` artifacts to `RV8GR_BUILD_DIR` or `/tmp/rv8gr-verilog`, so source folders stay clean while testbenches still support manual local VCD names.
 - RV8GR Python chip behavior tests now run from repo root with `python3 -B RV8GR/sim/chips/test_chips.py`.
-- RV8GR now separates CPU logical tests from Components virtual physical tests. CPU logic is documented in `RV8GR/doc/11_cpu_logical_test_protocol.md`; Components remains responsible for pin/bus/edge/delay/noise screens.
-- `RV8GR/doc/13_four_model_equivalence.md` is the student-facing guide explaining why RV8GR has two Python sims, two Verilog models, and one shared all-ISA equivalence source.
-- `RV8GR/doc/14_doc_integrity_audit.md` records the doc-by-doc integrity pass against Python/Verilog truth. `RV8GR/doc/RV8GR-Doc.zip` has been regenerated from the current 34 Markdown docs.
-- `RV8GR/doc/00_design_isa.md`, `03_instruction_trace.md`, `04_bank_switch.md`, and `05_understand_by_module.md` were carefully checked and corrected against the wiring guide, chip-level Verilog, Python sims, and four-model equivalence stream.
-- RV8 team skills were refreshed so future agents preserve current v1.0 truth: 36 packages, 18 instructions, `SETDP`, ROM `/WE` runtime-inactive, `DI` inert, polling IRQ only, `/IRQ` release/rising-edge latch, and student docs derived from `00_design_isa.md` + `02_wiring_guide.md`.
+- RV8GR now separates CPU logical tests from Components virtual physical tests. CPU logic is documented in `RV8GR/doc/08_cpu_logical_test_protocol.md`; Components remains responsible for pin/bus/edge/delay/noise screens.
+- `RV8GR/doc/11_four_model_equivalence.md` is the student-facing guide explaining why RV8GR has two Python sims, two Verilog models, and one shared all-ISA equivalence source.
+- `RV8GR/doc/12_doc_integrity_audit.md` records the doc-by-doc integrity pass against Python/Verilog truth. No packaged doc zip is used for now; Markdown files remain the source of truth.
+- `RV8GR/doc/00_design_isa.md`, `02_instruction_trace.md`, `03_bank_switch.md`, and `04_understand_by_module.md` were carefully checked and corrected against the wiring guide, chip-level Verilog, Python sims, and four-model equivalence stream.
+- RV8 team skills were refreshed so future agents preserve current v1.0 truth: 36 packages, 18 instructions, `SETDP`, ROM `/WE` runtime-inactive, `DI` inert, polling IRQ only, `/IRQ` release/rising-edge latch, and student docs derived from `00_design_isa.md` + `01_wiring_guide.md`.
 - `RV8GR/sim/components_chip_sim.py` is the standalone Components-backed Python CPU runner using vendored `chiplib` chip definitions.
 - `RV8GR/sim/test_cpu_logical_protocol.py` is the executable protocol test suite. It assembles directed CPU programs and scoreboards both `CPUSim` and `ComponentsCPUSim`.
 - RV8GR Verilog signoff rule: behavioral `rtl/rv8gr_cpu.v` benches are comparison only. Shipping confidence must include `rtl/rv8gr_chip_level.v` compiled with Components TTL-chip Verilog models (`ttl_74hc*`, `62256`, `at28c256`) through the chip-level runner scripts.
@@ -25,7 +25,7 @@ Updated: 2026-07-10
 - `RV8GR/tb/tb_rv8gr_dual_compare.v` exports `VERILOG_CHECKPOINT` lines. `RV8GR/tools/check_python_verilog_equivalence.py` assembles the same `all_isa_equivalence.asm` source and verifies both Python CPU sims (`CPUSim`, `ComponentsCPUSim`) match the 55-checkpoint Verilog stream, final state, and RAM checkpoints.
 - Programmer B-012 is prepared for field testing in `Programmer/FIELD_TEST_PROTOCOL.md`. Current virtual preflight is 51 mock tests across `rv8flash`, `rv8term`, and `rv8ram-boot`; physical ZIF Direct and RV8-Bus evidence is still required before B-012 is DONE.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
-- `RV8GR/doc/10_real_build_timing_log.md` is now part of the saved RV8GR physical timing/bus-race/edge/propagation-delay protocol. Use it during real build evidence capture and mirror reusable chip/circuit findings into Components.
+- `RV8GR/doc/07_real_build_timing_log.md` is now part of the saved RV8GR physical timing/bus-race/edge/propagation-delay protocol. Use it during real build evidence capture and mirror reusable chip/circuit findings into Components.
 
 ## Components Library Facts
 
@@ -94,8 +94,8 @@ Expected pass markers:
 2. Use B-010 example ASM programs for ROM/programmer prep once the physical ROM workflow is ready.
 3. When Programmer hardware exists, execute `Programmer/FIELD_TEST_PROTOCOL.md` and record command transcripts, readback hashes, and PROG/RUN bus-release evidence.
 4. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
-5. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/02_wiring_guide.md`.
-5a. When editing student docs, keep them explanatory: do not let `05_understand_by_module.md` override `00_design_isa.md` or `02_wiring_guide.md`; mention bus contention, active-low polarity, edge-trigger timing, and physical-vs-virtual limits explicitly.
+5. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/01_wiring_guide.md`.
+5a. When editing student docs, keep them explanatory: do not let `04_understand_by_module.md` override `00_design_isa.md` or `01_wiring_guide.md`; mention bus contention, active-low polarity, edge-trigger timing, and physical-vs-virtual limits explicitly.
 6. Use Components schematic backend and `circuit-faults` as the reusable Python-first path for future UI/block/JSON/netlist work.
 7. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests and `tools/run_dual_verilog_compare.sh` when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
 8. Later Components task: review chip JSON/component definition output for student readability and document system wiring commands.

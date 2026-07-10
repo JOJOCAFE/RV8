@@ -1,7 +1,7 @@
 # RV8GR KiCad Netlist - Generated Files
 
 **Generated**: 2026-07-09
-**Source**: `gen_kicad.py` based on `doc/12_netlist.md`
+**Source**: `gen_kicad.py` based on `doc/10_netlist.md`
 
 ## Files Generated
 
@@ -107,7 +107,7 @@ kicad-cli sch export pdf --black-and-white --output RV8GR-CPU-paul.pdf RV8GR.kic
 
 ## Verification
 
-All nets have been verified against `doc/12_netlist.md`:
+All nets have been verified against `doc/10_netlist.md`:
 - ✓ All 36 chips have connections
 - ✓ VCC/GND pins match datasheets
 - ✓ Signal routing matches wiring guide

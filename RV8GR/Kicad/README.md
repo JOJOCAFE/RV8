@@ -75,7 +75,8 @@ To complete the schematic:
 
 ## Reference
 
-See `doc/10_kicad_modules.md` and `doc/02_wiring_guide.md` for complete pin-level wiring details.
+See `doc/06_kicad_modules.md` for the six-sheet module split and
+`doc/01_wiring_guide.md` for complete pin-level wiring truth.
 
 ## Current PDF/EDF Files
 

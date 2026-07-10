@@ -42,7 +42,7 @@ RV8GR is the active physical-build target.
 - Every instruction uses T0, T1, T2.
 - Build one module, test it, then continue.
 - Start with `RV8GR/doc/labs/README.md` for student labs.
-- Use `RV8GR/doc/02_wiring_guide.md` as the official pin-level source.
+- Use `RV8GR/doc/01_wiring_guide.md` as the official pin-level source.
 
 ### RV8 vs RV8-R Analysis
 

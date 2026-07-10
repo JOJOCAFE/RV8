@@ -483,7 +483,7 @@ Hardware vector: future/unfrozen; not part of the 36-package wiring guide
 ```
 
 Any feature proposal must justify chip cost against this budget.
-See `04_bank_switch.md` for ROM banking contract (v2.x, +1 chip).
+See `03_bank_switch.md` for ROM banking contract (v2.x, +1 chip).
 
 ---
 
@@ -514,9 +514,9 @@ See `04_bank_switch.md` for ROM banking contract (v2.x, +1 chip).
 
 Source of Truth:
 - `00_design_isa.md` — Architectural spec (this file)
-- `02_wiring_guide.md` — Physical wiring spec (pin-level)
-- `11_cpu_logical_test_protocol.md` — CPU logical verification protocol
-- `06_debug_plan.md` — Physical debug/build verification steps
+- `01_wiring_guide.md` — Physical wiring spec (pin-level)
+- `08_cpu_logical_test_protocol.md` — CPU logical verification protocol
+- `05_debug_plan.md` — Physical debug/build verification steps
 
 ---
 

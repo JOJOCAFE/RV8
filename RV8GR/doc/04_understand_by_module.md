@@ -6,7 +6,7 @@
 > ใช้อ่านก่อนหรือระหว่างทำ lab เพื่อรู้ว่าแต่ละโมดูลทำอะไร.
 > ตอนต่อวงจรจริงให้ใช้ `doc/labs/README.md`,
 > `doc/build_plan/01_student_incremental_build_plan.md`, และ
-> `doc/02_wiring_guide.md` เป็นแหล่งอ้างอิงขาและสายจริง.
+> `doc/01_wiring_guide.md` เป็นแหล่งอ้างอิงขาและสายจริง.
 
 ---
 
@@ -790,11 +790,11 @@ Clock  Phase  PC    AC   Z   เกิดอะไร
 |-----------|--------|
 | เริ่มต่อวงจรจริงแบบนักเรียน | `doc/labs/README.md` |
 | แผนครู/พี่เลี้ยงสำหรับต่อทีละ stage | `doc/build_plan/01_student_incremental_build_plan.md` |
-| ดูสายต่อทุกขา | `doc/02_wiring_guide.md` |
-| ไล่ fault ตอนวงจรไม่ผ่าน | `doc/06_debug_plan.md` |
+| ดูสายต่อทุกขา | `doc/01_wiring_guide.md` |
+| ไล่ fault ตอนวงจรไม่ผ่าน | `doc/05_debug_plan.md` |
 | เขียนโปรแกรมให้ CPU | `tools/rv8gr_asm.py` |
 | ดูตัวอย่างโปรแกรม .asm | `programs/` |
-| เทียบ trace กับ simulator | `doc/03_instruction_trace.md` |
+| เทียบ trace กับ simulator | `doc/02_instruction_trace.md` |
 
 ### วิธีใช้เอกสารนี้ตอนเรียน
 

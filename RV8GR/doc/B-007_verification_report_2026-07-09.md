@@ -5,6 +5,14 @@ Workspace: `/home/jo/kiro/RV8`
 Branch observed: `team-setup...origin/team-setup`
 Scope: RV8GR verification/report/status only. Components were not edited.
 
+> Historical report, not current signoff.
+>
+> Keep this file as the dated B-007 non-physical evidence record. For current
+> CPU logical signoff, use `08_cpu_logical_test_protocol.md` and
+> `11_four_model_equivalence.md`. For current physical timing/build evidence,
+> use `05_debug_plan.md` and `07_real_build_timing_log.md`. For the current
+> doc-by-doc source-of-truth review, use `12_doc_integrity_audit.md`.
+
 ## Summary
 
 Status: PASS for all available non-physical RV8GR verification in this
@@ -161,7 +169,11 @@ precision. These warnings did not fail the benches.
 
 ## Physical Run Checklist
 
-Use this checklist before marking B-007 physically complete.
+This original checklist explains why B-007 stayed physically blocked on
+2026-07-09. Do not use it as the latest physical protocol. The current physical
+protocol also requires voltage sweep, frequency sweep, bus-race checks,
+edge-polarity checks, propagation-delay notes, and real evidence logging in
+`07_real_build_timing_log.md`.
 
 | Step | Required evidence | Pass/Fail | Notes |
 |------|-------------------|-----------|-------|

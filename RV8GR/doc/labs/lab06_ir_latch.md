@@ -100,7 +100,7 @@ U6 (IR Low — operand byte):
 > ⚠️ **หมายเหตุ: /OE ใน Lab vs CPU จริง**
 >
 > Lab นี้ต่อ /OE = GND (เปิด output ตลอด) เพื่อให้เห็น LED ได้ง่าย
-> แต่ใน CPU จริง (ดู 02_wiring_guide) U6 /OE ต่อ GND และ U34 /OE ถูกควบคุมด้วย control logic
+> แต่ใน CPU จริง (ดู 01_wiring_guide) U6 /OE ต่อ GND และ U34 /OE ถูกควบคุมด้วย control logic
 > เพื่อป้องกัน **Bus Contention** — หลาย chip ขับ IBUS พร้อมกัน
 > เรื่องนี้จะได้เรียนเมื่อต่อ datapath ครบใน Lab ถัด ๆ ไป
 

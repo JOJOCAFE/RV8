@@ -33,7 +33,13 @@ If the CPU jumps when `/IRQ` is asserted, that is a wiring mistake for v2.
 ## Virtual Check Before Wiring
 
 Before a student wires the full system, run the software checks from
-`RV8GR/README.md`, then run the Components virtual physical checker:
+`RV8GR/README.md`, then run the RV8GR soft debug trace and the Components
+virtual physical checker:
+
+```bash
+cd /home/jo/kiro/RV8/RV8GR
+python3 -B sim/soft_debug.py
+```
 
 ```bash
 cd /home/jo/kiro/Components
@@ -44,6 +50,11 @@ This checker is a virtual risk screen for pin-number mistakes, active-low
 mistakes, unsafe output-output wiring, and timing/noise assumptions in the
 whole-system circuit model. Passing it means the model is ready to compare
 against the bench. It does not prove that the physical breadboard is correct.
+
+> 📌 Simulator note: `sim/soft_debug.py` starts PG=$00, DP=$80, AC=$00, Z=1 so
+> its built-in tests are deterministic. Real 74HC574 registers PG/DP/AC and the
+> Z flag are not guaranteed after reset. The physical ROM must still start with
+> the boot initialization sequence below.
 
 ---
 
@@ -87,9 +98,9 @@ Mode 1: Single-step (debug)
   Button → debounce (RC + Schmitt) → CLK
   กดปุ่ม 1 ครั้ง = 1 clock = 1 state change
 
-Mode 2: Low speed (1-10 Hz)
-  555 timer → CLK
-  ดู LED กระพริบทีละ state
+Mode 2: Low speed / timing qualification
+  50 kHz first, then 1 MHz, 2 MHz, 5 MHz
+  Use 50 kHz for safe visible bring-up before MHz tests
 
 Mode 3: Full speed
   Crystal oscillator → CLK
@@ -163,6 +174,8 @@ J $06           ; loop here (HLT macro = J self)
 - [ ] กดปุ่มค้าง → LED ติดค้าง (ไม่กระพริบ = debounce ดี)
 - [ ] ปล่อยปุ่ม → LED ดับ (ไม่ bounce กลับ)
 - [ ] กดแล้วปล่อยเร็ว → นับได้ 1 pulse เท่านั้น (ดูจาก ring counter ใน Step 2)
+- [ ] 100-tick push-switch test: กด single-step 100 ครั้ง → ring counter ต้อง
+      วน T0→T1→T2 ครบ 33 รอบ + T0 โดยไม่ข้าม state
 
 > ⚠️ ถ้า clock bounce → ring counter จะ advance หลาย state ในปุ่มเดียว
 > แก้: เพิ่ม RC debounce (10kΩ + 100nF) + 74HC14 Schmitt trigger
@@ -360,7 +373,7 @@ U28-8  → U7-1 (WR_DIR) and ROM /OE
 - [ ] T1: DBUS($42) → IBUS → U6 latch → IR_LOW=$42
 - [ ] ดูค่า U5 Q outputs (control signals) ตรง
 
-**LED**: 8 ดวงบน IBUS (U7 B-side) หรือ U5 Q outputs
+**LED**: 8 ดวงบน IBUS (U7 A-side) หรือ U5 Q outputs
 
 ```
 After T0: U5-15(AC_WR)=1, U5-14(MUX)=1 → ถูกต้องสำหรับ LI!
@@ -553,17 +566,18 @@ LB $01 → should be $02
 
 ### Clock Sweep (Timing Qualification)
 
-รัน Golden Bring-up ที่ความถี่ต่าง ๆ บันทึกผล:
+รัน Golden Bring-up ที่ความถี่ต่าง ๆ บันทึกผล. เริ่มจาก slow/safe แล้วค่อยเพิ่ม:
 
-| MHz | Result | Notes |
-|:---:|:------:|-------|
-| 1 | | Official target |
-| 2 | | Breadboard achievable |
-| 3 | | |
-| 4 | | |
-| 5 | | PCB only (experimental) |
+| Clock | Result | Notes |
+|:-----:|:------:|-------|
+| 100-tick push switch | | One pulse per press, no skipped T-state |
+| 50 kHz | | Slow electronic clock sanity check |
+| 1 MHz | | Official target |
+| 2 MHz | | Breadboard achievable |
+| 5 MHz | | PCB only (experimental) |
 
 - [ ] บันทึก max frequency ที่ pass → เป็น spec ของเครื่องตัวนี้
+- [ ] บันทึกผลจริงและปัญหาที่เจอใน `07_real_build_timing_log.md`
 - [ ] ถ้า fail ที่ 2 MHz → ตรวจ: long wires, missing bypass cap, stray capacitance
 
 ### Physical Signoff Boundary
@@ -590,13 +604,16 @@ required pre-checks, but they are not a replacement for these bench results.
 
 **v1.0: Polling IRQ** (ไม่มี hardware vector)
 
-U31 ทำหน้าที่ latch สัญญาณ /IRQ — software poll แล้ว branch เอง:
+U31 ทำหน้าที่ latch สัญญาณ /IRQ เพื่อให้เห็น event ด้วย LED/probe. CPU core
+ไม่ auto-read `IRQ_FF`, ไม่ auto-jump, และไม่มี vector fetch. ถ้าจะให้ software
+poll จริง ต้อง map peripheral/IRQ status ผ่าน I/O slot เพิ่มเติม; สำหรับ v1.0
+build แนะนำให้ poll input device โดยตรงผ่าน I/O slot:
 ```asm
 ; Main loop:
 loop:
   ; ... do work ...
-  ; poll IRQ flag (read via I/O slot or test)
-  ; if IRQ_FF set → branch to handler
+  ; poll input/status via I/O slot
+  ; if event visible in software → branch to handler
   J loop
 
 handler:
@@ -728,7 +745,7 @@ SB $10          ; write to $FF10 → /SLOT1 should go LOW
 |  12   | T2    |      |     |     |    |    |    |    |       |
 ```
 
-> เทียบกับ Golden Trace ใน `03_instruction_trace.md` — ถ้าไม่ตรง = bug
+> เทียบกับ Golden Trace ใน `02_instruction_trace.md` — ถ้าไม่ตรง = bug
 
 ---
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Executable tests for ``doc/11_cpu_logical_test_protocol.md``."""
+"""Executable tests for ``doc/08_cpu_logical_test_protocol.md``."""
 
 from __future__ import annotations
 

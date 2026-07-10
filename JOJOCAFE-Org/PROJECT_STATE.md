@@ -41,7 +41,7 @@ The team owns the entire RV8 project. All variants, all deliverables.
 | 2026-07-09 | B-010 example ASM programs implemented and assembler-verified; B-007 non-physical verification report available while physical B-007 remains blocked for hardware evidence; Components netlist mappings verified and pushed through `a2ee62c` | Pim |
 | 2026-07-10 | Components latest student guide, CLI/API contract, `circuit-faults` virtual physical checker, and future student-friendly chip JSON/wiring-command lane merged into RV8 team operating docs; Components pushed through `87bcfdc` | Pim |
 | 2026-07-10 | RV8GR all-ISA dual Verilog scoreboard added; behavioral `rv8gr_cpu.v` and chip-level `rv8gr_chip_level.v` now compare `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM writes; pushed through `622e41a` | Pim |
-| 2026-07-10 | RV8GR source-of-truth doc pass completed for design ISA, instruction trace, bank switch, and module-understanding docs; team skills refreshed to prevent stale IRQ/DI/bus/ROM assumptions; `RV8GR-Doc.zip` regenerated from 34 Markdown files | Pim |
+| 2026-07-10 | RV8GR source-of-truth doc pass completed for design ISA, instruction trace, bank switch, and module-understanding docs; team skills refreshed to prevent stale IRQ/DI/bus/ROM assumptions; packaged doc zip removed for now | Pim |
 | 2026-06-15 | Memory map swapped: ROM $0000-$7FFF, RAM $8000-$FFFF | architect |
 | 2026-06-14 | Architecture frozen v1.0 — no more changes until physical build | architect |
 | 2026-06-14 | Programmer design finalized (ESP32 + TXS0108E + 74HC595) | hw-coder |
@@ -66,5 +66,5 @@ Shared Components known follow-ups:
 
 Documentation follow-ups:
 
-- Treat `RV8GR/doc/00_design_isa.md` and `RV8GR/doc/02_wiring_guide.md` as source of truth. `05_understand_by_module.md` is a student explanation only.
-- Keep `RV8GR/doc/RV8GR-Doc.zip` regenerated whenever Markdown docs change before a handoff or packaged release.
+- Treat `RV8GR/doc/00_design_isa.md` and `RV8GR/doc/01_wiring_guide.md` as source of truth. `04_understand_by_module.md` is a student explanation only.
+- Do not use `RV8GR/doc/RV8GR-Doc.zip` for now; keep Markdown docs as the live source of truth.

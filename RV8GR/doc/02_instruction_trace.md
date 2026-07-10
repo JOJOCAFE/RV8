@@ -1,10 +1,10 @@
 # RV8-GR — Instruction Trace (Golden Debug Trace)
 
-**Pin-level traces for key instructions. Based on 02_wiring_guide.md (36 packages).**
+**Pin-level traces for key instructions. Based on 01_wiring_guide.md (36 packages).**
 
 Use this file when single-stepping the real CPU or comparing simulator logs.
 It is not the ISA source of truth; `00_design_isa.md` owns the architecture and
-`02_wiring_guide.md` owns physical pin wiring. This file shows what students
+`01_wiring_guide.md` owns physical pin wiring. This file shows what students
 should expect to see on buses, control lines, and LEDs during important
 instructions.
 
@@ -247,7 +247,7 @@ T2: IR=$30: MUX_SEL=1, AC_WR=1, XOR_MODE=0
 | 10 | Mixed SRC+STR | $0C | WR_DIR=1, ROM /OE=1 | Store wins, no conflict |
 | 11 | Boot Seq | $40→$20→$30 | DP_Load, PG_CLK, AC_WR | All state defined |
 
-All 11 traces verified pin-by-pin against 02_wiring_guide.md. ✓
+All 11 traces verified pin-by-pin against 01_wiring_guide.md. ✓
 
 ---
 

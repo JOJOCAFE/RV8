@@ -14,7 +14,7 @@ Compared:
 - Updated PDF file: `RV8GR-CPU-paul.pdf`
 - Updated EDIF/EDF file: `RV8GR-CPU-paul.EDF`
 - Current generated KiCad source: `RV8GR.kicad_pro`, `RV8GR.kicad_sch`, `RV8GR.net`, and module sheets
-- Current source-of-truth docs: `../doc/02_wiring_guide.md` and `../doc/12_netlist.md`
+- Current source-of-truth docs: `../doc/01_wiring_guide.md` and `../doc/10_netlist.md`
 
 ## Method
 
@@ -63,7 +63,7 @@ schematic.
 | 2 | RAM designator | `U35` is 62256 RAM | RAM is `RAM1`; no `U35` component exists | Major designator conflict. |
 | 3 | ROM designator | ROM is `U34` and value text is `28C256` | ROM is `ROM1` and value is `AT28C256` | Same part family intent, different reference naming. |
 | 4 | Immediate buffer | No visible separate U34 74HC541 immediate buffer in the PDF | Current design has U34 74HC541 controlled by `/IRL_OE` and connected IRL -> IBUS | Major baseline-version mismatch. Current RV8GR uses U34 to avoid immediate/IBUS ownership ambiguity. |
-| 5 | RV8-Bus connector | PDF has `P1` labeled RV8Bus with A0-A15, D0-D7, CLK/RST/WRn/RDn/IRQn/SLT pins | Current generated KiCad netlist has no `P1` component; RV8-Bus pins are documented in `doc/12_netlist.md` but not instantiated in `RV8GR.net` | Schematic capture mismatch. A physical KiCad schematic should add P1 if it is meant to match the PDF. |
+| 5 | RV8-Bus connector | PDF has `P1` labeled RV8Bus with A0-A15, D0-D7, CLK/RST/WRn/RDn/IRQn/SLT pins | Current generated KiCad netlist has no `P1` component; RV8-Bus pins are documented in `doc/10_netlist.md` but not instantiated in `RV8GR.net` | Schematic capture mismatch. A physical KiCad schematic should add P1 if it is meant to match the PDF. |
 | 6 | NAND family label | PDF labels several NAND gates as `74AHC00` | Current KiCad uses `74HC00` for U26/U27 | Family mismatch. Check whether Paul intended AHC for timing or this is a symbol/library label choice. |
 | 7 | Control signal naming | PDF uses names such as `IRLoe`, `ACbuff`, `BUFFoeN`, `WRDIR`/`WRDIRn`, `WRn`, `RDn`, `IRQn` | Current docs/netlist use `/IRL_OE`, `/AC_BUF`, `BUF_OE_N`, `WR_DIR`, `/WR`, `/RD`, `/IRQ` | Naming mismatch only if electrical polarity is equivalent. Needs a net-name mapping table before manual schematic reconciliation. |
 | 8 | Schematic organization | PDF is a complete one-page schematic with symbols and drawn wiring | Current generated KiCad top sheet is a generated scaffold/global-label view plus separate module sheets and machine-readable netlist | Form mismatch. Current KiCad is not a hand-drawn one-page schematic matching Paul’s PDF layout. |

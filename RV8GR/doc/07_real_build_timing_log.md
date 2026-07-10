@@ -5,6 +5,19 @@ from the physical RV8GR build. This file is the main CPU project record. If a
 finding changes reusable chip/circuit proof, mirror it into
 `/home/jo/kiro/Components`.
 
+This file is an **evidence log**, not a build tutorial and not a wiring source:
+
+- Use `01_wiring_guide.md` for official pin-level wiring and timing estimates.
+- Use `05_debug_plan.md` for the student-facing step-by-step physical tests.
+- Use `08_cpu_logical_test_protocol.md` and `11_four_model_equivalence.md` for
+  virtual CPU logic signoff.
+- Use this file to record measured real-board results, failures, fixes, and
+  retest evidence.
+
+Keep this file separate from the debug plan. Merging real build entries into the
+student debug instructions would make the instructions noisy and would make it
+harder to see which physical board actually passed which test.
+
 ## Current Rule
 
 Do not accept a whole-system hardware result until these four hazards are
@@ -18,6 +31,25 @@ checked at the relevant build stage:
 Software simulation can prepare the test. Physical timing signoff needs real
 evidence from the build.
 
+## Required Evidence Matrix
+
+Record these conditions when each stage is ready for timing qualification:
+
+| Condition | Required evidence |
+|---|---|
+| 100-tick push switch | One clean state advance per press; no skipped T-state |
+| 50 kHz | Slow electronic clock pass before MHz testing |
+| 1 MHz | Official target pass |
+| 2 MHz | Breadboard stress pass/fail with notes |
+| 5 MHz | PCB/short-wire experiment only; record as pass/fail, not baseline |
+| 4.5 V | Low-voltage margin observation |
+| 5.0 V | Nominal-voltage result |
+| 5.5 V | High-voltage margin observation |
+
+For each voltage/frequency run, record at least: build stage, clock source,
+observed pass/fail state, worst suspicious signal, instrument used, and any
+change made before rerun.
+
 ## Build Stage Checklist
 
 ### 1. Clock, Reset, And Ring Counter
@@ -28,7 +60,7 @@ evidence from the build.
 - Bus-race focus: none yet.
 - Propagation focus: ring feedback settles before the next active clock.
 - Pass evidence: one-hot `T0/T1/T2` for at least 100 ticks.
-- If failed, update: `doc/06_debug_plan.md`, lab 01/02 docs, KiCad clock/reset
+- If failed, update: `doc/05_debug_plan.md`, lab 01/02 docs, KiCad clock/reset
   wiring, and Components `RV8GR_ResetClockBringup` or `RV8GR_RingCounter`.
 
 ### 2. Program Counter And Branch/Jump Load
@@ -41,7 +73,7 @@ evidence from the build.
 - Propagation focus: branch/jump control to `/PC_LD`; RCO cascade to the next
   nibble.
 - Pass evidence: count, hold, load, BEQ/BNE/J all happen on the correct edge.
-- If failed, update: `doc/02_wiring_guide.md`, lab 03/10 docs, RTL/KiCad if
+- If failed, update: `doc/01_wiring_guide.md`, lab 03/10 docs, RTL/KiCad if
   wiring changed, and Components `RV8GR_PC16` or `RV8GR_BranchJumpControl`.
 
 ### 3. ROM/RAM, DBUS, IBUS, And Address Mux
@@ -55,7 +87,7 @@ evidence from the build.
   IBUS.
 - Pass evidence: no overlap between old bus driver disable and new driver
   enable; selected memory speed grade is recorded.
-- If failed, update: `doc/02_wiring_guide.md`, lab 04/05/12 docs, KiCad, RTL
+- If failed, update: `doc/01_wiring_guide.md`, lab 04/05/12 docs, KiCad, RTL
   if generated wiring changed, and Components `RV8GR_AddressMux16`,
   `RV8GR_BusOwnership`, `RV8GR_RomDbusRead`, `RV8GR_StorePath`, or
   `RV8GR_DataPageMemory`.
@@ -70,7 +102,7 @@ evidence from the build.
   settle before branch use.
 - Pass evidence: LI/ADDI/SUBI/XORI and branch-after-Z tests pass by
   single-step.
-- If failed, update: `doc/02_wiring_guide.md`, lab 06-09 docs, RTL/KiCad if
+- If failed, update: `doc/01_wiring_guide.md`, lab 06-09 docs, RTL/KiCad if
   wiring changed, and Components `RV8GR_InstructionLatch` or
   `RV8GR_AluAccumulator`.
 
@@ -86,7 +118,7 @@ evidence from the build.
   setup before `/WE`; RAM read to AC setup.
 - Pass evidence: boot sequence, Lab 13 `$AA` marker, RAM read/write marker,
   and page jump marker all pass.
-- If failed, update: `doc/03_instruction_trace.md`, lab 11-13 docs, RTL/KiCad
+- If failed, update: `doc/02_instruction_trace.md`, lab 11-13 docs, RTL/KiCad
   if wiring changed, and Components `RV8GR_PageDataRegisters`,
   `RV8GR_PageJumpTrace`, `RV8GR_StoreLoadBranchTrace`, or relevant lower-level
   package.
@@ -113,6 +145,9 @@ Build stage:
 Hazard: timing_margin | bus_race | edge_trigger_polarity | propagation_delay
 Module/circuit:
 Signal(s):
+Voltage:
+Clock/frequency:
+Instrument:
 Expected:
 Observed:
 Root cause:

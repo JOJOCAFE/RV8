@@ -79,7 +79,7 @@ CHIPS = {
 }
 
 # ============================================================================
-# NETLIST DATA - COMPLETE FROM 12_netlist.md
+# NETLIST DATA - COMPLETE FROM 10_netlist.md
 # Format: "NET_NAME": [(ref, pin), (ref, pin), ...]
 # ============================================================================
 NETLIST = {
