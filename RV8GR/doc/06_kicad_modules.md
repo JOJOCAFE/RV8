@@ -125,6 +125,8 @@ PG_CLK        U25-11   → CTRL internal (U23)
 DP_Load       U33-6    → CTRL internal (U32)
 ```
 
+`/ADDR_MODE` polarity: HIGH selects PC; LOW selects data address `{DP, IRL}` through the A-side inputs.
+
 ### Data Paths (between modules)
 ```
 PC[15:0]      U1-U4 Q outputs → ADDR_MEM
@@ -145,7 +147,7 @@ Z_flag        U21-5 → CTRL (U28-1)
 
 ### Components on this sheet
 ```
-- Crystal oscillator module (1 MHz)
+- 1 MHz 5V CMOS oscillator module
 - Reset circuit: 10kΩ + 10µF + 74HC14 Schmitt + pushbutton
 - U8 (74HC164 ring counter)
 - 3× LED + 330Ω on T0, T1, T2

@@ -97,7 +97,8 @@ python3 -B tools/test_rv8gr_asm.py
 Must cover:
 
 - All frozen opcode encodings.
-- Aliases/macros: `MV`, `HLT`, `CLR`, `INC`, `DEC`, `SLL`, `JMP`.
+- Aliases/macros: `MV`, `HLT`, `CLR`, `INC`, `DEC`, `NOT`, `SLL`, `JMP`.
+- `NOT` is assembler-only and must emit `XORI $FF`; it is not a new frozen ISA opcode.
 - `.org`, `.db`, labels, `hi()` and `lo()`.
 - Page-safe branch and jump validation.
 - Output bounds and overlap errors.
@@ -112,11 +113,14 @@ cd RV8GR
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
 python3 -B sim/test_cpu_logical_protocol.py
+python3 -B sim/test_basic_min.py
 ```
 
 Minimum pass cases:
 
 - `LI`, `ADDI`, `SUBI`, `XORI`.
+- `NOT` pseudo-instruction truth table, assembled through `XORI $FF`, for
+  boundary values `$00`, `$01`, `$55`, `$7F`, `$80`, `$AA`, `$F0`, `$0F`, `$FF`.
 - Z flag set/clear from ALU results.
 - `SB` and `LB` through RAM page `$80`.
 - `SETDP` reads RAM page `$90` and ROM page `$00`.
@@ -137,6 +141,9 @@ Required virtual programs:
 - `programs/test_all.asm`: broader assembler-to-CPU behavior.
 - `programs/testrom.asm`: physical/virtual golden ROM.
 - `programs/test_setdp.asm`: data-page and RAM-page behavior.
+- `programs/test_not.asm`: assembler pseudo-instruction ROM test for `NOT`
+  (`XORI $FF`) across boundary bit patterns.
+- `programs/basic_min.asm`: B-011 phase 1 BASIC-style ROM runtime smoke.
 
 The pass condition is not "simulation ended." The pass condition is reaching
 the documented pass loop with expected AC/Z/PG/PC state.
@@ -234,6 +241,7 @@ python3 -B tools/test_rv8gr_asm.py
 python3 -B sim/chip_sim.py
 python3 -B sim/components_chip_sim.py
 python3 -B sim/test_cpu_logical_protocol.py
+python3 -B sim/test_basic_min.py
 python3 -B tools/check_python_verilog_equivalence.py
 python3 -B sim/verify_wiring.py
 python3 -B sim/verify_components.py

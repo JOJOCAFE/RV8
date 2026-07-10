@@ -1,7 +1,7 @@
 # Team Log
 
 Maintained by: **Pim (พิม)**  
-Updated: 2026-07-10
+Updated: 2026-07-11
 
 ---
 
@@ -15,6 +15,7 @@ Updated: 2026-07-10
 | 2026-07-10 | Routed all-ISA dual Verilog scoreboard work and pushed status through `622e41a` | ✅ Pushed |
 | 2026-07-10 | Routed Programmer B-012 from mock-test status into hardware field-test protocol | 🟡 Ready for field evidence |
 | 2026-07-10 | Saved RV8GR doc/source-of-truth audit and team skill refresh for design ISA, trace, bank switch, and module explanation | ✅ Saved |
+| 2026-07-11 | Saved RV8GR baseline sync, `NOT` pseudo-instruction tests, B-011 test ROM, and warning-free Verilog handoff | ✅ Saved |
 
 ## Bank (แบงค์) — Architect
 | Date | What | Result |
@@ -34,6 +35,7 @@ Updated: 2026-07-10
 | 2026-07-10 | Verified all-ISA dual Verilog scoreboard: 55 chip-level checkpoints matched behavioral checkpoints | ✅ All pass |
 | 2026-07-10 | Defined Programmer field-test evidence gates: ZIF Direct, RV8-Bus PROG/RUN release, readback hash, and hardware logs | 🟡 Hardware pending |
 | 2026-07-10 | Re-verified RV8GR docs against wiring, Components package checks, chip tests, wiring verifier, and 55-checkpoint four-model equivalence | ✅ All pass |
+| 2026-07-11 | Verified `NOT` ROM bench, B-011 BASIC-style smoke ROM, full Verilog suite, and whitespace checks | ✅ All pass |
 
 ## Mint (มิ้นท์) — RTL Coder
 | Date | What | Result |
@@ -42,6 +44,7 @@ Updated: 2026-07-10
 | 2026-07-09 | Aligned Components sequential chip edge behavior with Python simulator | ✅ Pushed |
 | 2026-07-10 | Linked Components edge-behavior compatibility to RV8 team skill docs | ✅ Documented |
 | 2026-07-10 | Added dual Verilog scoreboard covering every frozen ISA command, page/data-page control, and IRQ polling | ✅ Pushed |
+| 2026-07-11 | Removed behavioral Verilog timescale warning by matching `rv8gr_cpu.v` to `1ns/1ps` testbench convention | ✅ All pass |
 
 ## Ohm (โอม) — HW Coder
 | Date | What | Result |
@@ -59,6 +62,7 @@ Updated: 2026-07-10
 | 2026-07-10 | Added Components `circuit-faults` CLI/API test instrument ownership to RV8 team docs | ✅ Documented |
 | 2026-07-10 | Confirmed Python CPU, Components-backed CPU, assembler, wiring, and Components package checks still pass after Verilog timing fixes | ✅ All pass |
 | 2026-07-10 | Prepared Programmer field-test protocol and confirmed 51 mock tests are the virtual preflight baseline | ✅ Prepared |
+| 2026-07-11 | Added `NOT` as assembler-only `XORI $FF` pseudo-instruction and B-011 `basic_min.asm` test ROM | ✅ Verified |
 
 ## Noon (นุ่น) — Docs Writer
 | Date | What | Result |
@@ -70,6 +74,7 @@ Updated: 2026-07-10
 | 2026-07-10 | Updated README and CPU logical protocol with the all-ISA dual Verilog standard-test matrix | ✅ Current |
 | 2026-07-10 | Added student-readable Programmer field-test procedure and safety rules for ZIF vs RV8-Bus modes | ✅ Current |
 | 2026-07-10 | Tightened student module docs: Z timing, I/O/RAM caveat, /SLOT example, 74HC574 wording, and regenerated packaged docs | ✅ Current |
+| 2026-07-11 | Updated README, logical protocol, and B-011 note so test ROM scope is clear and not advertised as full BASIC | ✅ Current |
 
 ---
 

@@ -10,6 +10,8 @@ The team owns the entire RV8 project. All variants, all deliverables.
 - **Chips**: 34 logic + ROM + RAM = 36 packages
 - **ISA**: 18 instructions (17 + SETDP), all verified
 - **Verification**: behavioral + chip-level Verilog TBs pass, all-ISA dual Verilog scoreboard pass, 512-opcode sweep, gate-level sim 8/8
+- **ROM tests**: `NOT` pseudo-instruction ROM test and B-011 `basic_min.asm`
+  BASIC-style smoke ROM pass in current regression
 - **Labs**: 14 hardware labs written (Thai, middle school level)
 - **Clock**: 1 MHz breadboard target
 
@@ -23,6 +25,7 @@ The team owns the entire RV8 project. All variants, all deliverables.
 - [ ] Build Labs 01-14 on breadboard (sequential, verify each)
 - [ ] Flash test ROM via Programmer
 - [x] Write example .asm programs (B-010 implemented and assembler-verified)
+- [x] B-011 phase 1 BASIC-style ROM smoke test implemented
 - [ ] Full ISA test on physical hardware (B-007 blocked until hardware evidence exists; non-physical report available)
 
 ## Next Projects (queued)
@@ -42,6 +45,7 @@ The team owns the entire RV8 project. All variants, all deliverables.
 | 2026-07-10 | Components latest student guide, CLI/API contract, `circuit-faults` virtual physical checker, and future student-friendly chip JSON/wiring-command lane merged into RV8 team operating docs; Components pushed through `87bcfdc` | Pim |
 | 2026-07-10 | RV8GR all-ISA dual Verilog scoreboard added; behavioral `rv8gr_cpu.v` and chip-level `rv8gr_chip_level.v` now compare `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM writes; pushed through `622e41a` | Pim |
 | 2026-07-10 | RV8GR source-of-truth doc pass completed for design ISA, instruction trace, bank switch, and module-understanding docs; team skills refreshed to prevent stale IRQ/DI/bus/ROM assumptions; packaged doc zip removed for now | Pim |
+| 2026-07-11 | RV8GR baseline sync and test-ROM checkpoint: U34/BOM/clock docs aligned, `NOT` pseudo-instruction covered by Python/Verilog ROM tests, B-011 phase 1 BASIC-style ROM smoke added, and Verilog timescale warnings removed | Pim |
 | 2026-06-15 | Memory map swapped: ROM $0000-$7FFF, RAM $8000-$FFFF | architect |
 | 2026-06-14 | Architecture frozen v1.0 — no more changes until physical build | architect |
 | 2026-06-14 | Programmer design finalized (ESP32 + TXS0108E + 74HC595) | hw-coder |
@@ -52,6 +56,8 @@ No RV8-GR design blockers. Physical B-007 verification is blocked until
 hardware evidence exists; a non-physical B-007 verification report is available.
 Non-physical Verilog confidence now includes the all-ISA dual scoreboard, but
 that still does not replace measured physical build evidence.
+B-011 is currently a non-interactive test ROM only; a real BASIC interpreter
+still needs an RV8-Bus I/O device and runtime model decision.
 Shared Components removed `74hc150` and `74hc260`
 from the active catalog because manufacturer-verified HC-family DIP evidence
 was not available.

@@ -53,7 +53,7 @@
 | Write example .asm programs (blink, counter, echo) | B-010 | ✅ DONE | Implemented and assembler-verified |
 | Prep Programmer field test suite | B-012 | ✅ DONE | `Programmer/FIELD_TEST_PROTOCOL.md`; 51 mock tests define virtual preflight |
 | Flash test ROM onto physical hardware | B-006 | ⬜ TODO | After Ohm builds ROM module |
-| Start BASIC interpreter design | B-011 | ⬜ TODO | Background task |
+| Start BASIC interpreter design | B-011 | 🟡 PHASE 1 | `programs/basic_min.asm` and `sim/test_basic_min.py`; interactive interpreter needs I/O/runtime design |
 
 ### Noon (นุ่น) — Docs Writer
 | Task | Backlog | Status | Notes |
@@ -80,3 +80,4 @@
 | B-010 example ASM programs assembler-verified | 2026-07-09 | Bam + Fern |
 | B-012 Programmer field-test protocol prepared | 2026-07-10 | Bam + Fern |
 | RV8GR doc integrity/source-of-truth pass saved and packaged | 2026-07-10 | Pim + Noon + Fern |
+| B-011 minimal BASIC-style ROM phase 1 | 2026-07-10 | Bam + Fern |

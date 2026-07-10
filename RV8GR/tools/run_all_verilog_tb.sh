@@ -22,6 +22,7 @@ run_behavioral_tb() {
 run_behavioral_tb tb/tb_rv8gr_asm.v
 run_behavioral_tb tb/tb_rv8gr_full.v
 run_behavioral_tb tb/tb_rv8gr_irq.v
+run_behavioral_tb tb/tb_rv8gr_not.v
 run_behavioral_tb tb/tb_rv8gr_opcode_sweep.v
 run_behavioral_tb tb/tb_rv8gr_setdp.v
 run_behavioral_tb tb/tb_rv8gr_tasks.v

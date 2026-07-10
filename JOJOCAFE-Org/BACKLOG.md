@@ -27,7 +27,7 @@ Last updated: 2026-07-10
 | # | Task | Owner | Status |
 |---|------|-------|--------|
 | B-010 | Write example .asm programs (blink, counter, echo) | Bam | ✅ DONE — assembler-verified |
-| B-011 | Write BASIC interpreter ROM (minimal) | Bam | ⬜ TODO |
+| B-011 | Write BASIC interpreter ROM (minimal) | Bam | 🟡 PHASE 1 — `programs/basic_min.asm` runtime smoke + Python regression; interactive interpreter needs I/O/runtime design |
 | B-012 | Programmer field test protocol and hardware evidence | Bam + Fern | 🟡 READY FOR FIELD TEST — 51 mock tests pass; physical evidence required |
 | B-013 | Gate-level sim: add remaining .bin coverage | Mint + Fern | ✅ DONE — replaced by all-ISA dual Verilog scoreboard plus existing opcode sweep |
 | B-014 | Update wiring guide if physical build reveals discrepancies | Ohm + Noon | ⬜ TODO |

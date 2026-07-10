@@ -68,7 +68,7 @@ class CPUSim:
             if s['STR']:
                 return self.ac  # U14 drives
             elif not self._addr_mode(s):
-                return self.ir_low  # U6 drives (immediate)
+                return self.ir_low  # U34 drives IRL onto IBUS (immediate)
             else:
                 # U7 drives (ROM/RAM read)
                 addr = self._abus(s)

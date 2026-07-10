@@ -19,9 +19,9 @@ Clock: 1 MHz breadboard, up to 5 MHz on PCB
 ## Memory Map
 
 ```
-$0000-$7EFF  ROM 32KB (bankable to 128KB)
-$7F00-$7FFF  ROM (available)
-$8000-$FEFF  RAM 32KB (registers, data, executable)
+$0000-$7EFF  ROM application area
+$7F00-$7FFF  ROM reserved/available page
+$8000-$FEFF  RAM application/register/data area
 $FF00-$FF0F  RAM (available; future vector area)
 $FF10-$FF1F  I/O Slot 1 (via /SLOT1 on RV8-Bus)
 $FF20-$FF2F  I/O Slot 2 (via /SLOT2 on RV8-Bus)
@@ -254,7 +254,7 @@ These rules hold for **all** versions (v1.0, v1.1, future). Any change that viol
 
 | Condition | Driver | Source |
 |-----------|--------|--------|
-| SRC=0, STR=0 | U6 (IRL) | Immediate |
+| SRC=0, STR=0 | U34 (IRL buffer) | Immediate |
 | SRC=1, STR=0 | U7 (RAM) | RAM read |
 | STR=1 | U14 (AC buf) | AC value |
 

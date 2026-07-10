@@ -36,6 +36,7 @@ OPCODES = {
     'CLR':     None,  # macro: LI $00
     'INC':     None,  # macro: ADDI $01
     'DEC':     None,  # macro: SUBI $01
+    'NOT':     None,  # macro: XORI $FF
     'SLL':     None,  # macro: SB $00 + ADD $00
 }
 
@@ -141,7 +142,7 @@ def assemble(source, base_addr=0x0000):
         mnem = parts[0].upper()
         if mnem == 'JMP' or mnem == 'SLL':
             pc += 4
-        elif mnem in ('HLT', 'CLR', 'INC', 'DEC'):
+        elif mnem in ('HLT', 'CLR', 'INC', 'DEC', 'NOT'):
             pc += 2
         elif mnem == '.ORG':
             _args(parts, 1, line_num)
@@ -198,6 +199,12 @@ def assemble(source, base_addr=0x0000):
         if mnem == 'DEC':
             _args(parts, 0, line_num)
             code.append((pc, [0x90, 0x01], orig))
+            pc += 2
+            continue
+
+        if mnem == 'NOT':
+            _args(parts, 0, line_num)
+            code.append((pc, [0x70, 0xFF], orig))
             pc += 2
             continue
 

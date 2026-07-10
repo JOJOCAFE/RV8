@@ -244,6 +244,7 @@ SEL (pin 1 ทุกตัว) ← NOT T2
 > ⚠️ **หมายเหตุ: CPU จริงใช้ /ADDR_MODE ไม่ใช่ T2 ตรงๆ**
 >
 > RV8-GR จริง: `ADDR_REQ = SRC OR STR` (จาก U25)
+> `/ADDR_MODE = NAND(ADDR_REQ, T2)`: HIGH เลือก PC, LOW เลือก DP:IRL
 > ไม่ใช่ทุก T2 จะเปลี่ยน address — เฉพาะคำสั่ง LB/SB/ADD/SUB/XOR เท่านั้น
 > คำสั่ง LI, ADDI, SETPG ไม่มี SRC/STR → ABUS ยังเป็น PC แม้ใน T2
 >
