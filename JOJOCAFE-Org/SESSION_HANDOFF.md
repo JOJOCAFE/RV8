@@ -1,10 +1,13 @@
 # Session Handoff
 
-Updated: 2026-07-10
+Updated: 2026-07-11
 
 ## Current State
 
 - B-010 example ASM programs are implemented and assembler-verified.
+- B-011 is phase 1 only: `RV8GR/programs/basic_min.asm` is a BASIC-style ROM
+  smoke test with `sim/test_basic_min.py`; it is not an interactive BASIC
+  interpreter yet.
 - B-007 non-physical verification report is available; physical B-007 remains blocked until hardware evidence exists.
 - Components repo is pushed and clean at `87bcfdc Save Components student guide handoff`.
 - Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
@@ -26,6 +29,15 @@ Updated: 2026-07-10
 - Programmer B-012 is prepared for field testing in `Programmer/FIELD_TEST_PROTOCOL.md`. Current virtual preflight is 51 mock tests across `rv8flash`, `rv8term`, and `rv8ram-boot`; physical ZIF Direct and RV8-Bus evidence is still required before B-012 is DONE.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
 - `RV8GR/doc/07_real_build_timing_log.md` is now part of the saved RV8GR physical timing/bus-race/edge/propagation-delay protocol. Use it during real build evidence capture and mirror reusable chip/circuit findings into Components.
+- Current RV8GR baseline sync pass fixed ROM map wording, U34 immediate-buffer
+  ownership, `/ADDR_MODE` polarity notes, buildable oscillator-module clock
+  wording, canonical BOM quantities, DI inert status, and ROM `/WE` ownership
+  checks stayed consistent with CPU-runtime inactive/programmer-only ownership.
+- `NOT` is now an assembler pseudo-instruction only. It emits `XORI $FF` and is
+  covered by assembler, Python, and Verilog ROM tests through
+  `RV8GR/tb/tb_rv8gr_not.v`.
+- `RV8GR/rtl/rv8gr_cpu.v` now has explicit `` `timescale 1ns/1ps``; the previous
+  Icarus Verilog timescale warnings are gone.
 
 ## Components Library Facts
 
@@ -56,6 +68,7 @@ cd /home/jo/kiro/RV8
 python3 -B RV8GR/sim/chip_sim.py
 python3 -B RV8GR/sim/components_chip_sim.py
 python3 -B RV8GR/sim/test_cpu_logical_protocol.py
+python3 -B RV8GR/sim/test_basic_min.py
 python3 -B RV8GR/tools/check_python_verilog_equivalence.py
 python3 -B RV8GR/sim/verify_wiring.py
 python3 -B RV8GR/sim/soft_debug.py
@@ -92,14 +105,15 @@ Expected pass markers:
 
 1. Keep physical B-007 blocked until hardware photos/logs/test output exist; cite the non-physical report separately.
 2. Use B-010 example ASM programs for ROM/programmer prep once the physical ROM workflow is ready.
-3. When Programmer hardware exists, execute `Programmer/FIELD_TEST_PROTOCOL.md` and record command transcripts, readback hashes, and PROG/RUN bus-release evidence.
-4. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
-5. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/01_wiring_guide.md`.
-5a. When editing student docs, keep them explanatory: do not let `04_understand_by_module.md` override `00_design_isa.md` or `01_wiring_guide.md`; mention bus contention, active-low polarity, edge-trigger timing, and physical-vs-virtual limits explicitly.
-6. Use Components schematic backend and `circuit-faults` as the reusable Python-first path for future UI/block/JSON/netlist work.
-7. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests and `tools/run_dual_verilog_compare.sh` when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
-8. Later Components task: review chip JSON/component definition output for student readability and document system wiring commands.
-9. For RV8, do not stage unrelated dirty files unless Jo explicitly asks.
+3. Treat B-011 as a test ROM only until RV8-Bus I/O and a runtime model are chosen.
+4. When Programmer hardware exists, execute `Programmer/FIELD_TEST_PROTOCOL.md` and record command transcripts, readback hashes, and PROG/RUN bus-release evidence.
+5. Continue remaining Components full-catalog mappings only after checking module ports and pin docs.
+6. Keep RV8GR physical-build docs and lab scripts aligned with `RV8GR/doc/01_wiring_guide.md`.
+7. When editing student docs, keep them explanatory: do not let `04_understand_by_module.md` override `00_design_isa.md` or `01_wiring_guide.md`; mention bus contention, active-low polarity, edge-trigger timing, and physical-vs-virtual limits explicitly.
+8. Use Components schematic backend and `circuit-faults` as the reusable Python-first path for future UI/block/JSON/netlist work.
+9. When chip behavior changes, verify with Components Python tests first, run Verilog smoke tests and `tools/run_dual_verilog_compare.sh` when RTL behavior is touched, and rerun virtual physical checks before circuit/system signoff.
+10. Later Components task: review chip JSON/component definition output for student readability and document system wiring commands.
+11. For RV8, do not stage unrelated dirty files unless Jo explicitly asks.
 
 ## Known Follow-Ups
 

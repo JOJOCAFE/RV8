@@ -103,7 +103,7 @@ Mode 2: Low speed / timing qualification
   Use 50 kHz for safe visible bring-up before MHz tests
 
 Mode 3: Full speed
-  Crystal oscillator → CLK
+  1 MHz 5V CMOS oscillator module → 74HC14 buffer → CLK
   1 MHz = official target (ปลอดภัย, margin >700ns)
   2 MHz = achievable on short-wire breadboard
   5 MHz = PCB only (experimental, ~0ns margin)

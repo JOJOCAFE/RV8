@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 // RV8-GR CPU — Behavioral Verilog Model
 // Matches 01_wiring_guide.md: 34 logic chips (U1-U34 incl. U31 IRQ, U32 DP, U33 decode, U34 IRL buffer)
 // Memory: ROM $0000-$7FFF, RAM $8000-$FFFF, PC starts $0000

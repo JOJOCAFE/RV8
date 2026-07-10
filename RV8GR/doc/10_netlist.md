@@ -440,7 +440,7 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | Net | Source | Destinations | Function |
 |-----|--------|-------------|----------|
 | ADDR_REQ | U25-3 | U26-4 | SRC OR STR |
-| /ADDR_MODE | U26-6 | U15-1, U16-1, U29-1, U30-1, U26-2, U33-4 | NAND(ADDR_REQ, T2) |
+| /ADDR_MODE | U26-6 | U15-1, U16-1, U29-1, U30-1, U26-2, U33-4 | NAND(ADDR_REQ, T2); HIGH=PC, LOW={DP,IRL} |
 | PC_INC | U25-6 | U1-7, U1-10, U2-7, U3-7, U4-7 | T0 OR T1 |
 | /PC_LD | U26-11 | U1-9, U2-9, U3-9, U4-9 | NAND(T2, PC_LOAD_COND) |
 | /IRL_OE | U26-3 | U34-1, U34-19, U24-13 | NAND(T2, /ADDR_MODE) |

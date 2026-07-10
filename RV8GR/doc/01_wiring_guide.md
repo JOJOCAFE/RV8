@@ -7,9 +7,9 @@
 ## Memory Map
 
 ```
-$0000-$7EFF  ROM 32KB (bankable to 128KB)
-$7F00-$7FFF  ROM (available)  ## ********* For Future Use in Rom Switch*##
-$8000-$FEFF  RAM 32KB (registers at $8000-$8007, data, executable)
+$0000-$7EFF  ROM application area
+$7F00-$7FFF  ROM reserved/available page  ## ********* For Future Use in Rom Switch*##
+$8000-$FEFF  RAM application/register/data area (registers at $8000-$8007)
 $FF00-$FF0F  RAM (available; future vector area)
 $FF10-$FF1F  I/O Slot 1 (/SLOT1 on bus)
 $FF20-$FF2F  I/O Slot 2 (/SLOT2 on bus)

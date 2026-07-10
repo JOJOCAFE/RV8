@@ -23,10 +23,10 @@
 
 | ชิ้น | ชื่อ | จำนวน |
 |:----:|------|:-----:|
-| 1 | Crystal oscillator 5 MHz | 1 |
-| 2 | Crystal oscillator 1 MHz (สำรอง) | 1 |
+| 1 | 1 MHz 5V CMOS oscillator module | 1 |
+| 2 | 5 MHz 5V CMOS oscillator module (optional PCB test) | 1 |
 | 3 | 74HC14 (Schmitt trigger, clock switch) | 1 |
-| 4 | Slide switch (เลือก: ปุ่มกด / crystal) | 1 |
+| 4 | Slide switch (เลือก: ปุ่มกด / oscillator module) | 1 |
 | 5 | LED สีเหลือง 3mm (AC display) | 8 |
 | 6 | 330Ω resistor | 8 |
 
@@ -67,7 +67,7 @@
 ```
 Slide switch:
   position A → single-step button → debounce → CLK
-  position B → crystal oscillator 5 MHz → CLK
+  position B → 1 MHz oscillator module → 74HC14 buffer → CLK
 
 ทั้ง 2 ผ่าน 74HC14 (Schmitt trigger) เพื่อ clean edge
 ```
@@ -159,9 +159,9 @@ python3 ../Programmer/tools/rv8flash.py program test_full.bin --base 0x0000
 - [ ] ดู AC LED เปลี่ยนตาม pattern: $00→$10→$15→$00→$AA→ค้าง
 - [ ] PC LED (ถ้ามี) หยุดที่ $000E (loop)
 
-### Test 3: Full speed (5 MHz crystal)
+### Test 3: Baseline oscillator speed (1 MHz module)
 
-- [ ] สลับ clock switch ไป crystal
+- [ ] สลับ clock switch ไป 1 MHz oscillator module
 - [ ] AC LED ค้างที่ $AA (10101010) → ทุก LED สลับติด-ดับ
 - [ ] จับ IC ทุกตัว 10 วินาที → ไม่ร้อน
 - [ ] กด reset → CPU เริ่มใหม่ → AC กลับเป็น $AA (ถูกต้อง)
@@ -278,7 +278,7 @@ $0007: $04
 | PC ไม่ jump ที่ BEQ | Z=0 หรือ Z_match ผิด | เช็ค U21-5, U28-3 |
 | AC ได้ค่าผิด (ไม่ใช่ $AA) | ALU ผิด หรือ bus path ผิด | เช็ค BUF_OE_N / WR_DIR |
 | IC ร้อนมาก! | Bus fight | ถอด clock ทันที! เช็ค /OE ทุกตัว |
-| Crystal ไม่ oscillate | load cap ไม่มี | เพิ่ม 22pF ×2 ที่ crystal |
+| Oscillator ไม่มี clock output | module ไม่มีไฟเลี้ยงหรือ output ไม่ผ่าน buffer | เช็ค VCC/GND, วัด output, แล้วผ่าน 74HC14 buffer |
 | นับข้ามค่า | bounce (ปุ่มกดเท่านั้น) | ใช้ 74HC14 debounce |
 | T0/T1/T2 overlap (logic probe) | ring counter ผิด | เช็ค U8 connections, ดูว่าไม่มี 2 phase HIGH พร้อมกัน |
 

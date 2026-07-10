@@ -67,6 +67,7 @@ class AssemblerEncodingTest(unittest.TestCase):
             CLR
             INC
             DEC
+            NOT
             SLL
         """
         self.assertEqual(self.assembled_bytes(src), [
@@ -76,6 +77,7 @@ class AssemblerEncodingTest(unittest.TestCase):
             0x30, 0x00,          # CLR -> LI $00
             0x10, 0x01,          # INC -> ADDI $01
             0x90, 0x01,          # DEC -> SUBI $01
+            0x70, 0xFF,          # NOT -> XORI $FF
             0x04, 0x00, 0x18, 0x00,  # SLL -> SB $00 + ADD $00
         ])
 
@@ -154,6 +156,7 @@ class AssemblerEncodingTest(unittest.TestCase):
     def test_operand_validation(self):
         self.assert_asm_error("LI", "LI expects 1 operand")
         self.assert_asm_error("NOP $00", "NOP expects 0 operands")
+        self.assert_asm_error("NOT $00", "NOT expects 0 operands")
         self.assert_asm_error("MV a1,t0", "MV must be MV a0,src or MV dst,a0")
         self.assert_asm_error(".DB", ".DB expects at least one byte")
 

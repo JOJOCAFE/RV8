@@ -29,6 +29,7 @@ Recommended reading order:
 | CPU logic test | `doc/08_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
 | Equivalence | `doc/11_four_model_equivalence.md` | Why two Python sims and two Verilog models must agree |
 | Doc audit | `doc/12_doc_integrity_audit.md` | Integrity check of every doc file against Python/Verilog truth |
+| BASIC ROM test | `doc/13_basic_min_rom.md` | B-011 phase 1 BASIC-style ROM smoke test |
 
 ---
 
@@ -65,56 +66,62 @@ $82  BNE addr    $90  SUBI imm     $98  SUB rs
 
 Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 
+Note: `$48 DI` is encoded as one of the 18 mnemonics, but is reserved/inert in v1.0; IE clears only on reset.
+
+Assembler pseudo-instructions such as `NOT` do not add hardware opcodes. `NOT`
+emits `XORI $FF` and is covered by Python and Verilog ROM tests.
+
 ---
 
 ## BOM — Complete Order List
 
 ### Logic (34 packages)
 
-| Part | Qty | Package | Notes |    |count|
-|------|:---:|:-------:|-------|-----|-----|
-| 74HC161 | 4 | 16DIP | PC counter |✅ |   |
-| 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ | มี 6 ตัว|
-| 74HC245 | 1 | 20DIP | Bus buffer |✅ | มี 3 ตัว|
-| 74HC164 | 1 | 14DIP | Ring counter |✅ |   |
-| 74HC283 | 2 | 16DIP | Adder |✅ |มี 10 ตัว   |
-| 74HC86 | 3 | 14DIP | XOR |✅ |✅ |  |
-| 74HC541 | 1 | 20DIP | AC buffer |✅ |  |
-| 74HC157 | 8 | 16DIP | Muxes | ✅ |  มี 10 ตัว |
-| 74HC74 | 2 | 14DIP | Z flag, IRQ |✅ |  |
-| 74HC688 | 1 | 20DIP | Zero detect |✅ |  |
-| 74HC04 | 1 | 14DIP | Inverters |✅ |  |
-| 74HC32 | 1 | 14DIP | OR gates |✅ |  |
-| 74HC00 | 2 | 14DIP | NAND gates |✅ |  |
-| 74HC21 | 1 | 14DIP | SETDP decode | ✅ |มี 2 ตัว|
+| Part | Qty | Package | Notes | Status |
+|------|:---:|:-------:|-------|:------:|
+| 74HC161 | 4 | 16DIP | PC counter | ✅ |
+| 74HC574 | 5 | 20DIP | IR, AC, PG, DP | ✅ |
+| 74HC245 | 1 | 20DIP | Bus buffer | ✅ |
+| 74HC164 | 1 | 14DIP | Ring counter | ✅ |
+| 74HC283 | 2 | 16DIP | Adder | ✅ |
+| 74HC86 | 3 | 14DIP | XOR | ✅ |
+| 74HC541 | 2 | 20DIP | AC buffer + IRL immediate buffer | ✅ |
+| 74HC157 | 8 | 16DIP | Muxes | ✅ |
+| 74HC74 | 2 | 14DIP | Z flag, IRQ | ✅ |
+| 74HC688 | 1 | 20DIP | Zero detect | ✅ |
+| 74HC04 | 1 | 14DIP | Inverters | ✅ |
+| 74HC32 | 1 | 14DIP | OR gates | ✅ |
+| 74HC00 | 2 | 14DIP | NAND gates | ✅ |
+| 74HC21 | 1 | 14DIP | SETDP decode | ✅ |
 
 ### Memory
 
-| Part | Qty | Notes |
-|------|:---:|-------|
-| AT28C256-70 or SST39SF010A-70 | 1 | ROM 32KB, 70ns |waiting|  |
-| 62256-70 (or AS6C62256) | 1 | RAM 32KB, 70ns |waiting|  |
+| Part | Qty | Notes | Status |
+|------|:---:|-------|:------:|
+| AT28C256-70 or SST39SF010A-70 | 1 | ROM 32KB, 70ns | waiting |
+| 62256-70 (or AS6C62256) | 1 | RAM 32KB, 70ns | waiting |
 
 ### Clock & Reset
 
-| Part | Qty | Notes |
-|------|:---:|-------|
-| 5 MHz crystal (HC49S) | 1 | Start clock |waiting|  |
-| 22pF capacitor | 2 | Crystal load caps |waiting|  |
-| 10kΩ resistor | 1 | Reset pull-up |waiting|  |
-| 100nF capacitor | 1 | Reset RC |waiting|  |
-| Push button (NO) | 1 | Reset button |waiting|  |
+| Part | Qty | Notes | Status |
+|------|:---:|-------|:------:|
+| 1 MHz 5V CMOS oscillator module | 1 | Baseline breadboard clock | waiting |
+| 5 MHz 5V CMOS oscillator module | optional | PCB/wire-wrap experiment only | waiting |
+| 74HC14 Schmitt inverter | 1 | Clock/reset buffering | waiting |
+| 10kΩ resistor | 1 | Reset pull-up | waiting |
+| 10µF capacitor | 1 | Reset RC | waiting |
+| Push button (NO) | 1 | Reset button | waiting |
 
 ### Passives & Debug
 
-| Part | Qty | Notes |
-|------|:---:|-------|
-| 100nF capacitor (ceramic) | 35 | Bypass (1 per chip) |waiting|  |
-| 10µF capacitor | 2 | Power filter |waiting|  |
-| 330Ω resistor | 8 | LED current limit |waiting|  |
-| LED 3mm green | 8 | Bus probe |waiting|  |
-| LED 3mm red | 1 | Power |waiting|  |
-| DIP switch 8-bit | 1 | Debug input |waiting|  |
+| Part | Qty | Notes | Status |
+|------|:---:|-------|:------:|
+| 100nF capacitor (ceramic) | 35 | Bypass (1 per chip) | waiting |
+| 10µF capacitor | 2 | Power filter | waiting |
+| 330Ω resistor | 8 | LED current limit | waiting |
+| LED 3mm green | 8 | Bus probe | waiting |
+| LED 3mm red | 1 | Power | waiting |
+| DIP switch 8-bit | 1 | Debug input | waiting |
 
 ### Breadboard & Wiring
 
@@ -133,9 +140,9 @@ Encoding: `[7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP`
 ```
 Board 1: TIMING          Board 2: MEMORY         Board 3: ALU
 ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│ U8  U24          │    │ U15 U16 U29 U30 │    │ U5  U6  U14     │
+│ U8  U24          │    │ U15 U16 U29 U30 │    │ U5 U6 U34 U14  │
 │ U1  U2  U3  U4  │    │ ROM         RAM  │    │ U19 U20         │
-│ Crystal  Reset   │    │ U7               │    │ U12 U13         │
+│ Osc     Reset    │    │ U7               │    │ U12 U13         │
 └──────────────────┘    └──────────────────┘    │ U10 U11         │
   6 chips                 7 chips               └──────────────────┘
                                                   9 chips
@@ -181,6 +188,9 @@ python3 -B sim/components_chip_sim.py
 
 python3 -B sim/test_cpu_logical_protocol.py
 # protocol unittest suite passes on both Python CPU simulators
+
+python3 -B sim/test_basic_min.py
+# B-011 BASIC-style ROM smoke passes on both Python CPU simulators
 
 python3 -B tools/check_python_verilog_equivalence.py
 # both Python CPU simulators match both Verilog CPU models on all_isa_equivalence.asm
