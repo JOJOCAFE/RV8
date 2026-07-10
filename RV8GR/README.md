@@ -161,9 +161,11 @@ Board 4: CONTROL         Board 5: BUS + DEBUG
 
 ---
 
-## Simulation
+## Verification
 
-Run Python first for TTL/system behavior checks:
+Run these checks before using the docs for a build session. Python checks are
+the student-friendly first pass because they catch wiring and behavior errors
+without requiring HDL tools:
 
 ```bash
 cd RV8GR
@@ -180,31 +182,39 @@ python3 -B sim/soft_debug.py
 python3 -B tools/test_rv8gr_asm.py
 # 11 passed
 
-cd sim
-python3 -B chips/test_chips.py
+python3 -B sim/chips/test_chips.py
 # ALL 14 CHIP TYPES VERIFIED
 
-cd ..
 python3 -B sim/verify_components.py
 # RV8GR Components verification passed: 16 part types, 36 packages
+```
+
+Run the reusable Components virtual physical checker from the Components repo.
+This checks the RV8GR whole-system virtual circuit for pin mistakes, active-low
+mistakes, unsafe output-output wiring, and documented timing/noise risks:
+
+```bash
+cd /home/jo/kiro/Components
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+# circuit accepted when documented virtual timing/noise assumptions are present
 ```
 
 Use Verilog as the secondary HDL/RTL comparison path:
 
 ```bash
 cd RV8GR
-tools/run_chip_level_verilog.sh
-# RV8GR chip-level bring-up PASS
-
-tools/run_chip_level_full_verilog.sh
-# RV8GR chip-level full PASS
-
-iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
-# === ALL TESTS PASSED === (127 cycles)
-
-iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
-# ALL IRQ POLLING TESTS PASSED
+tools/run_all_verilog_tb.sh
+# behavioral, opcode sweep, SETDP, task, IRQ, and chip-level benches pass
 ```
+
+Generated Verilog artifacts default to `/tmp/rv8gr-verilog`. Set
+`RV8GR_BUILD_DIR=/path/to/output` if you need a different generated-output
+directory.
+
+Virtual checks, Python simulation, and Verilog comparison are not physical
+signoff. Physical signoff still requires the real board to show correct power
+rails, reset, clock, bus ownership, ROM/RAM behavior, 1 MHz full-system run,
+burn-in stability, and timing evidence from probes or a logic analyzer.
 
 ---
 

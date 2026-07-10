@@ -3,9 +3,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPONENTS="${COMPONENTS_ROOT:-$ROOT/third_party/Components}"
+OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
+
+mkdir -p "$OUTDIR"
 
 iverilog -g2012 -Wall \
-  -o "$ROOT/tb/rv8gr_chip_level.vvp" \
+  -o "$OUTDIR/rv8gr_chip_level.vvp" \
   "$COMPONENTS/Verilog/74xx/74hc00.v" \
   "$COMPONENTS/Verilog/74xx/74hc04.v" \
   "$COMPONENTS/Verilog/74xx/74hc21.v" \
@@ -25,5 +28,5 @@ iverilog -g2012 -Wall \
   "$ROOT/rtl/rv8gr_chip_level.v" \
   "$ROOT/tb/tb_rv8gr_chip_level.v"
 
-cd "$ROOT"
-vvp tb/rv8gr_chip_level.vvp
+cd "$OUTDIR"
+vvp "$OUTDIR/rv8gr_chip_level.vvp" "+dumpfile=$OUTDIR/rv8gr_chip_level.vcd"

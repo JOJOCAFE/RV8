@@ -11,6 +11,8 @@ Updated: 2026-07-10
 - RV8 repo is pushed through `1470963 Fix RV8 README project status`.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`; current work merges the latest Components skill/status into the RV8 team operating docs.
+- RV8GR verification tooling now writes Verilog `.vvp/.vcd` artifacts to `RV8GR_BUILD_DIR` or `/tmp/rv8gr-verilog`, so source folders stay clean while testbenches still support manual local VCD names.
+- RV8GR Python chip behavior tests now run from repo root with `python3 -B RV8GR/sim/chips/test_chips.py`.
 - `Programmer/KICAD/.history` is clean at its nested `master` checkout.
 - Existing untracked file `RV8GR/doc/10_real_build_timing_log.md` was left untouched; do not stage it unless Jo explicitly asks.
 
@@ -39,6 +41,17 @@ Updated: 2026-07-10
 Last green checks:
 
 ```sh
+cd /home/jo/kiro/RV8
+python3 -B RV8GR/sim/chip_sim.py
+python3 -B RV8GR/sim/verify_wiring.py
+python3 -B RV8GR/sim/soft_debug.py
+python3 -B RV8GR/tools/test_rv8gr_asm.py
+python3 -B RV8GR/sim/chips/test_chips.py
+python3 -B RV8GR/sim/verify_components.py
+cd /home/jo/kiro/RV8/RV8GR
+tools/run_all_verilog_tb.sh
+
+cd /home/jo/kiro/Components
 PYTHONPATH=python python3 -B -m chiplib.cli validate Examples/nand.json
 PYTHONPATH=python python3 -B -m chiplib.cli run Examples/nand.json
 PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
@@ -51,8 +64,9 @@ git diff --check
 
 Expected pass markers:
 
+- RV8GR Python, chip behavior, Components package coverage, and all Verilog benches pass.
 - CLI/API tests pass.
-- `circuit-faults` accepts the RV8GR whole-system virtual circuit after documented timing/noise assumptions are present.
+- `circuit-faults` accepts the RV8GR whole-system virtual circuit with zero pin, bus-contention, edge-polarity, or propagation-delay/deadband findings.
 - `git diff --check` reports no whitespace errors.
 
 ## Next Session

@@ -9,9 +9,12 @@ module tb_rv8gr_asm;
 
     always #5 clk = ~clk;
     integer cycle_count;
+    reg [1023:0] dumpfile;
 
     initial begin
-        $dumpfile("rv8gr_asm.vcd");
+        if (!$value$plusargs("dumpfile=%s", dumpfile))
+            dumpfile = "rv8gr_asm.vcd";
+        $dumpfile(dumpfile);
         $dumpvars(0, tb_rv8gr_asm);
 
         // Load ROM from assembled binary

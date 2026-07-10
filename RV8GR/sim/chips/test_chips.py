@@ -4,7 +4,10 @@ Combinational: [(inputs...), (expected_outputs...)]
 Sequential:    Clock-by-clock: [(inputs_before_edge...), (expected_outputs_after...)]
 """
 import sys
-sys.path.insert(0, '.')
+from pathlib import Path
+
+SIM_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SIM_DIR))
 from chips import create_cpu
 
 

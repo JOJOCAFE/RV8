@@ -30,6 +30,23 @@ If the CPU jumps when `/IRQ` is asserted, that is a wiring mistake for v2.
 
 ---
 
+## Virtual Check Before Wiring
+
+Before a student wires the full system, run the software checks from
+`RV8GR/README.md`, then run the Components virtual physical checker:
+
+```bash
+cd /home/jo/kiro/Components
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+```
+
+This checker is a virtual risk screen for pin-number mistakes, active-low
+mistakes, unsafe output-output wiring, and timing/noise assumptions in the
+whole-system circuit model. Passing it means the model is ready to compare
+against the bench. It does not prove that the physical breadboard is correct.
+
+---
+
 ## Probe Point Map
 
 Use these points before guessing. A stage is not passed until the listed signal
@@ -549,6 +566,22 @@ LB $01 → should be $02
 
 - [ ] บันทึก max frequency ที่ pass → เป็น spec ของเครื่องตัวนี้
 - [ ] ถ้า fail ที่ 2 MHz → ตรวจ: long wires, missing bypass cap, stray capacitance
+
+### Physical Signoff Boundary
+
+Mark the build physically signed off only after the real hardware has evidence
+for all of these:
+
+- Stable VCC/GND at the farthest chips.
+- Clean reset and one-pulse single-step clock.
+- No observed IBUS/DBUS bus fight during fetch, immediate, load, and store.
+- ROM and RAM select lines never drive DBUS together.
+- Golden Bring-up passes at 1 MHz.
+- Burn-in holds the pass loop for 1 hour.
+- Clock sweep result is recorded for this exact build.
+
+Python simulation, Verilog tests, and the Components virtual checker are
+required pre-checks, but they are not a replacement for these bench results.
 
 ---
 

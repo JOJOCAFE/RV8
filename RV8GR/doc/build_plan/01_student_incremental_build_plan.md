@@ -17,6 +17,25 @@ Use this document with:
 - `doc/10_kicad_modules.md` for KiCad sheet/module names.
 - `doc/build_plan/02_student_worksheet.md` for student-facing stage cards.
 
+Recommended software checks before a class or build session:
+
+```bash
+cd /home/jo/kiro/RV8/RV8GR
+python3 -B sim/chip_sim.py
+python3 -B sim/verify_wiring.py
+python3 -B sim/soft_debug.py
+python3 -B tools/test_rv8gr_asm.py
+python3 -B sim/chips/test_chips.py
+python3 -B sim/verify_components.py
+
+cd /home/jo/kiro/Components
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+```
+
+These are virtual checks. They help find model, wiring-table, pin, active-low,
+and bus-owner mistakes before students touch hardware. They do not replace
+physical signoff on the real build.
+
 ---
 
 ## Student Baseline Contract
@@ -769,6 +788,24 @@ Use a ROM that tests:
 - Program reaches the pass loop, not the fail loop.
 - Suggested pass loop: PC=`$0010`.
 - Suggested fail loop: PC=`$0012`.
+
+---
+
+## Physical Signoff
+
+Use this only after every stage above has passed on the real hardware:
+
+- VCC is 4.8V to 5.2V at the farthest chips while running.
+- Reset always returns PC to `$0000` and T-state to T0.
+- Single-step clock advances exactly one state per press.
+- No chip is hot and no bus-fight current spike is observed.
+- Golden Bring-up passes at 1 MHz.
+- Full Instruction Smoke Test reaches the pass loop.
+- One-hour burn-in stays in the pass loop.
+- Clock sweep result is recorded for this exact build.
+
+Do not mark physical build complete from Python, Verilog, or Components virtual
+checker results alone.
 
 ---
 
