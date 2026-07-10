@@ -114,9 +114,9 @@ ROM ไฟเลี้ยง:
   pin 20 (/CE) ← A15 (ถ้ายังไม่มี ให้ต่อ GND = enable ตลอด)
   100nF คร่อม VCC-GND
 
-หมายเหตุสำหรับบอร์ดจริง: เมื่อถึงขั้น RV8-Bus/Programmer ให้ย้าย ROM pin 27
-(`/WE`) ไปที่ RV8-Bus pin 27 (`/WR`) เพื่อให้ Programmer เขียน ROM ได้
-ขณะ CPU ถูก hold reset.
+หมายเหตุสำหรับบอร์ดจริง: ระหว่าง CPU runtime ให้ ROM pin 27 (`/WE`) inactive
+(HIGH). Programmer เขียน ROM ได้เฉพาะตอน PROG/reset isolation ที่ CPU ถูก hold
+reset และ Programmer เป็นเจ้าของ `/WE`.
 
 ROM Address ← จาก ABUS (Lab 04):
   pin 10 (A0) ← A0 (U15 pin 4)
@@ -277,12 +277,13 @@ python3 lab05_rom_fetch.py
 
 > 📝 **เรื่อง Chip Select (A15)**
 >
-> Lab นี้ต่อ ROM /CE=GND (เปิดตลอด) เพื่อความง่าย
-> ใน CPU จริง ใช้ A15 เป็น chip select:
+> การต่อจริงของ baseline ใช้ A15 เป็น chip select:
 > ```
 > A15=0 ($0000-$7FFF): ROM เปิด, RAM ปิด
 > A15=1 ($8000-$FFFF): RAM เปิด, ROM ปิด
 > ```
-> จะได้เรียนใน Lab 12 เมื่อต่อ RAM เข้ามา
+> ถ้ายังไม่มี U24 inverter ใน lab แยก สามารถบังคับ ROM /CE=GND ชั่วคราวได้
+> เฉพาะตอน **ยังไม่ต่อ RAM**. ก่อนเข้า Lab 12 ต้องถอด shortcut นี้ออกและต่อ
+> ROM /CE กลับไปที่ A15 เพื่อป้องกัน ROM/RAM ขับ DBUS พร้อมกัน.
 
 **ผ่านทุกข้อ → ไป Lab 06!** 🎉

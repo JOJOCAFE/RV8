@@ -1,7 +1,18 @@
-# 11. Future Upgrades (v1.1 / v2.0)
+# RV8GR Future Upgrades Parking Lot (v1.1 / v2.0)
 
 Ideas extracted from the RV8GR-Codex experimental branch (June 2026).
 These require additional chips and are **not** part of the v1.0 frozen design (36 packages).
+
+This document is not a build guide and not a pin-level source of truth. Use:
+
+- `00_design_isa.md` for frozen ISA and CPU behavior.
+- `01_wiring_guide.md` for exact v1.0 chip wiring.
+- `03_bank_switch.md` for the ROM bank-switch expansion contract.
+- `07_real_build_timing_log.md` for real-board timing evidence.
+
+Keep future ideas here only when they would distract from the student baseline.
+Move an idea into the wiring guide only after it has a complete chip budget,
+pin plan, simulation/test coverage, and physical timing evidence.
 
 ---
 
@@ -49,7 +60,8 @@ All control signals (from U5 IR_HIGH) are valid throughout T2, but the RAM /WR a
 
 ### Cost
 - 1 × 74HC08 (quad AND), uses all 4 gates.
-- Total: 34 chips.
+- Outside the frozen 34-logic-chip / 36-package v1.0 baseline.
+- Requires a new chip budget and full re-verification before becoming real wiring.
 
 ### Risk
 - Medium — changes timing of every register load. Requires full re-verification.
@@ -69,6 +81,9 @@ All control signals (from U5 IR_HIGH) are valid throughout T2, but the RAM /WR a
 - Read $FF10 → returns {7'b0, IRQ_FF} so ISR can poll which device interrupted.
 - Allows multi-device IRQ without dedicated acknowledge pins.
 
+For the reserved ROM bank register address and expansion-board rules, see
+`03_bank_switch.md`. Do not duplicate the bank-switch wiring here.
+
 ---
 
 ## v2.0: Hardware Save-PC on IRQ (+2 chips)
@@ -84,16 +99,16 @@ v1.0 requires ISR to save PC via software (read $0E/$0F). This wastes cycles and
 
 ---
 
-## v2.0: IBUS Buffer Separation (+1 chip)
+## Already Resolved In v1.0: IBUS Buffer Separation
 
-### Current v1.0 Solution
 U6 is only the IR_LOW latch. Its outputs remain enabled to feed PC load,
 address mux inputs, and U34 inputs. U34 (74HC541) is the controlled
 IRL-to-IBUS buffer; `/IRL_OE` enables U34 only for immediate-style T2 cycles.
 
 - **Benefit**: Cleaner bus ownership; U6 never directly drives IBUS.
-- **Cost**: +1 chip already included in the 36-package baseline.
-- **Risk**: Low — U34 makes the immediate path explicit and easier to probe.
+- **Status**: Already included in the frozen v1.0 36-package baseline.
+- **Action**: No future-upgrade work remains here unless a later design changes
+  the immediate path again.
 
 ---
 
@@ -107,6 +122,7 @@ IRL-to-IBUS buffer; `/IRL_OE` enables U34 only for immediate-style T2 cycles.
 | Full clock qualification | +1 | LOW | v2.0 / PCB only |
 | I/O decode | +2 | MEDIUM | v2.0 |
 | Hardware save-PC | +2 | LOW | v2.0 |
-| IBUS buffer | +1 | LOW | v2.0 / 5MHz only |
+| ROM bank switch | +1 on expansion board | MEDIUM | v2.x; see `03_bank_switch.md` |
+| IBUS buffer | 0 | DONE | Already in v1.0 as U34 |
 
 **None of these are required for the v1.0 breadboard build.** The current 36-package design is verified and sufficient at 1 MHz.

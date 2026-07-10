@@ -29,6 +29,9 @@ class CPUSim:
         self.page_reg = 0x00
         self.data_page = 0x80
         self.z_flag = 1
+        self.ie = 0
+        self.irq_ff = 0
+        self.irq_n = 1
 
         # Load ROM into chip
         self.chips['ROM']._data = bytearray(32768)
@@ -139,7 +142,7 @@ class CPUSim:
         self.chips['U21'].update()
 
         # U31: IRQ (simplified)
-        self.chips['U31']._q = [0, 0]
+        self.chips['U31']._q = [self.irq_ff, 0]
         self.chips['U31'].update()
 
         # ROM/RAM data
@@ -150,7 +153,9 @@ class CPUSim:
         wr_dir = 1 if (self.phase == 2 and s['STR']) else 0
         self.chips['ROM'].set(24, a15)
         self.chips['ROM'].set(25, wr_dir)
-        self.chips['ROM'].set(26, 1 if not (self.phase==2 and s['STR']) else 0)
+        # ROM /WE stays inactive during CPU runtime. A physical programmer may
+        # own ROM /WE only when the CPU is stopped/reset-isolated.
+        self.chips['ROM'].set(26, 1)
         self.chips['RAM'].set(24, 1-a15)
         self.chips['RAM'].set(25, 0)
         self.chips['RAM'].set(26, 1 if not (self.phase==2 and s['STR']) else 0)
@@ -191,7 +196,7 @@ class CPUSim:
             for name in ['U24','U25','U26','U27','U28','U33',
                          'U19','U20','U12','U13','U10','U11',
                          'U15','U16','U17','U18','U29','U30',
-                         'U22','U14','U7']:
+                         'U22','U14','U34','U7']:
                 self.chips[name].update()
 
             # Re-set IBUS-driven inputs (tristate resolution)
@@ -245,6 +250,11 @@ class CPUSim:
             if s['XOR'] and not s['MUX'] and not s['AC_WR'] and not self._addr_mode(s):
                 self.data_page = self.ir_low
 
+            # EI sets the software-visible interrupt enable flag. DI is inert
+            # in the 36-package v1.0 build, matching the Verilog model.
+            if s['SRC'] and not s['XOR'] and not s['AC_WR']:
+                self.ie = 1
+
             # Jump/Branch
             z_match = self.z_flag ^ s['SUB']
             pc_load = s['JMP'] | (s['BR'] & z_match)
@@ -273,6 +283,19 @@ class CPUSim:
     def probe_z(self) -> int: return self.z_flag
     def probe_pg(self) -> int: return self.page_reg
     def probe_dp(self) -> int: return self.data_page
+    def probe_ie(self) -> int: return self.ie
+    def probe_irq_ff(self) -> int: return self.irq_ff
+
+    def set_irq_n(self, value: int):
+        """Drive active-low IRQ input; latch on release edge like U31."""
+        new_value = 1 if value else 0
+        if self.irq_n == 0 and new_value == 1:
+            self.irq_ff = 1
+        self.irq_n = new_value
+
+    def pulse_irq(self):
+        self.set_irq_n(0)
+        self.set_irq_n(1)
 
     # =========================================================================
     # RUN PROGRAM

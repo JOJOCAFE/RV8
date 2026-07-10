@@ -120,7 +120,7 @@ ESP32 resets when serial port opens (DTR). Tool waits 2s + drains buffer before 
 ```
 tools/
 ├── rv8flash.py              # Implementation
-├── test_rv8flash.py         # 16 tests (all passing)
+├── test_rv8flash.py         # 19 tests (all passing)
 └── rv8flash-requirement.md  # This document
 ```
 

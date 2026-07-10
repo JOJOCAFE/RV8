@@ -43,8 +43,9 @@ description: RV8 CPU architecture patterns. 64K address, RAM-backed registers, n
 | $01 | J | 00000001 | PC={PG,addr} |
 | $20 | SETPG | 00100000 | PG = imm |
 | $28 | SETPG_R | 00101000 | PG = RAM[rs] |
+| $40 | SETDP | 01000000 | DP = imm |
 | $08 | EI | 00001000 | IE=1 |
-| $48 | DI | 01001000 | IE=0 |
+| $48 | DI | 01001000 | inert marker in v1.0; IE clears only on reset |
 
 ## ALU Pattern (XOR sharing)
 
@@ -61,12 +62,11 @@ wire [7:0] ac_mux  = mux_sel ? xor_out : adder[7:0];
 
 ## Critical Hazards
 
-1. **SRC+STR bus fight**: opcodes with bit3 AND bit2 → two drivers on IBUS
-   - Fix: BUF_OE_SAFE = BUF_OE OR STR (U25 gate 3)
-   - 64 forbidden opcodes: `(opcode & $0C) == $0C`
-2. **WR_DIR timing**: U7 DIR = T2 AND STORE (prevent bus conflict during fetch)
-3. **Z-flag async**: U22→U21 /PR (preset), safe at ≤5MHz
-4. **IRQ during jump**: defer to next instruction
+1. **Bus ownership**: IBUS drivers are U34 immediate, U7 memory bridge, and U14 AC buffer; only one may drive at a time.
+2. **SRC+STR mixed opcodes**: reserved but electrically safe in the current 36-package design. STR dominates; U14 drives IBUS, U7 writes IBUS→DBUS, ROM `/OE=WR_DIR` disables ROM output.
+3. **ROM write boundary**: CPU runtime keeps ROM `/WE` inactive. Programmer may drive ROM `/WE` only in PROG/reset isolation.
+4. **Z-flag async preset**: U22→U21 `/PR` sets Z=1 when AC becomes zero; Z has T0/T1 of the next instruction to settle before BEQ/BNE uses it at T2.
+5. **IRQ v1.0**: polling latch only. `/IRQ` release/rising edge sets `IRQ_FF`; no hardware vector, no PC save, DI inert.
 
 ## Key Chip Roles
 
@@ -96,13 +96,16 @@ wire [7:0] ac_mux  = mux_sel ? xor_out : adder[7:0];
 ## IRQ
 
 - U31-A=IE_FF, U31-B=IRQ_FF
-- Trigger: /IRQ falling edge → IRQ_FF=1
-- Ack: T2 & IE & IRQ_FF & !pc_load → save PC, jump $FF00, clear IE+IRQ_FF
+- Trigger: `/IRQ` release/rising edge → IRQ_FF=1
+- v1.0: polling only. No automatic PC vector, no PC save, no bus override.
+- EI sets IE. DI is an inert software marker in the 36-package build.
+- IE and IRQ_FF clear by `/RST`; an external `/SLOT` status device may expose IRQ_FF to software.
 
 ## Design Rules
 
 - Chip budget: 34 logic (frozen). Adding a chip needs strong justification.
 - All 256 opcodes produce deterministic behavior (horizontal control).
-- Spare gates: U25 has free OR gates, U33 has spare AND inputs.
+- Gate budget: U28 gates are used for `Z_match`, `/T2`, `WR_DIR`, and `/XOR_MODE`; U25 gate 3 is spare in the current wiring.
 - Memory: ROM (AT28C256-70), RAM (62256-70 or CY7C199-15PC).
 - Clock: 1 MHz breadboard, 4-5 MHz PCB.
+- Four-model equivalence signoff uses `RV8GR/tools/check_python_verilog_equivalence.py`, which compares CPUSim, ComponentsCPUSim, behavioral Verilog, and TTL-chip Verilog over 55 checkpoints.

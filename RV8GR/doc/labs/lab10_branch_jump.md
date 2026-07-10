@@ -12,9 +12,9 @@ Branch/Jump ต้องตอบคำถาม: "โหลด PC ใหม่ 
 |--------|------|---------|
 | Z_match | Z_flag XOR ALU_SUB | BEQ: match เมื่อ Z=1. BNE: match เมื่อ Z=0 |
 | /BR_TAKEN | NAND(BR, Z_match) | LOW เมื่อ branch taken |
-| PC_LOAD_COND | NAND(/JMP, /BR_TAKEN) | LOW เมื่อ JMP หรือ branch taken |
+| PC_LOAD_COND | NAND(/JMP, /BR_TAKEN) | HIGH เมื่อ JMP หรือ branch taken |
 | /PC_LD | NAND(T2, PC_LOAD_COND) | LOW → PC loads new value |
-| PC_INC | T0 OR T1 (= NOT PC_LD during T2) | HIGH → PC counts up |
+| PC_INC | T0 OR T1 | HIGH → PC counts up during fetch only |
 
 **กฎ**: /PC_LD = LOW → U1-U4 โหลดค่าใหม่ (jump!)
          PC_INC = HIGH → U1-U4 นับขึ้น (fetch ปกติ)
@@ -46,15 +46,15 @@ PC[15:8] ← PG[7:0]   (U23 → U3-U4 D inputs)
 
 ตัวอย่าง:
 ```
-PG = $00 (default, ROM)
+PG = $00 (for this lab, tie PC high-load inputs low until U23 exists)
 J $06  → PC = $0006
 BEQ $20 → PC = $0020 (ถ้า Z=1)
 ```
 
-> ⚠️ **Lab นี้ PG ยังเป็น $00 (default หลัง reset)**
+> ⚠️ **Lab นี้ยังไม่มี U23 Page Register**
 >
-> ดังนั้น jump ได้เฉพาะภายใน page $00xx (ROM 256 bytes แรก)
-> Lab 11 จะเพิ่ม SETPG เพื่อเปลี่ยน PG → jump ได้ทั้ง 64KB!
+> U23 จะมาต่อใน Lab 11. ก่อนถึง Lab 11 ให้ tie U3/U4 D inputs เป็น GND
+> เพื่อให้ PC high byte = $00 ตอน jump/branch. อย่าปล่อยขา D ลอย.
 
 ---
 
@@ -109,7 +109,7 @@ U28 (XOR misc):
   Gate C: WR_DIR = NOT(/AC_BUF)
     pin 9 ← /AC_BUF (U26-8)
     pin 10← VCC
-    pin 8 → WR_DIR → U7-1
+    pin 8 → WR_DIR → U7-1 และ ROM /OE
 
   Gate D: /XOR_MODE = NOT(XOR_MODE) — used by SETDP/EI decode (Lab 12+)
     pin 12← XOR_MODE (U5-13), pin 13← VCC, pin 11→ /XOR_MODE → U33-12
@@ -192,6 +192,8 @@ U25 (OR gates):
 >
 > U28 gate B: T2 XOR 1 = NOT(T2)
 > U28 gate C: /AC_BUF XOR 1 = NOT(/AC_BUF)
+> ใช้เป็น `WR_DIR`: HIGH ระหว่าง store เพื่อให้ U7 เขียน IBUS→DBUS
+> และปิด ROM output ผ่าน ROM `/OE`
 >
 > ใช้ XOR gate เหลือจาก U28 แทน inverter ได้
 > เพราะ U24 (74HC04) ใช้ครบ 6 gate แล้ว
@@ -211,6 +213,7 @@ U25 (OR gates):
   U1-U4 pin 9 (/LD) ← /PC_LD (U26-11)
   U1 pin 7 (ENP) ← PC_INC (U25-6)
   U1 pin 10 (ENT) ← PC_INC (U25-6)
+  ก่อน Lab 11: U3/U4 D inputs → GND เพื่อให้ jump high byte = $00
 
 LED (ดู /PC_LD):
   U26-11 → 330Ω → LED → VCC  [LED ติดเมื่อ /PC_LD=LOW = jump!]

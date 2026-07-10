@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Pin-accurate simulation of 34 logic chips plus ROM/RAM. Verify wiring from 02_wiring_guide.md.
+Pin-accurate simulation of 34 logic chips plus ROM/RAM. Verify wiring from 01_wiring_guide.md.
 Probe any pin like attaching an LED. Step one clock at a time.
 
 The Python simulator is the preferred cross-check for RV8GR system behavior.
@@ -84,11 +84,11 @@ class Chip:
 
 ---
 
-## Bus Architecture (matches 02_wiring_guide)
+## Bus Architecture (matches 01_wiring_guide)
 
 ### Note: "Bus" = shared wires, not physical backplane
 
-In 02_wiring_guide, DBUS/IBUS/ABUS are **naming conventions** for groups of wires
+In 01_wiring_guide, DBUS/IBUS/ABUS are **naming conventions** for groups of wires
 that connect multiple chip pins together. They are NOT a separate bus backplane.
 
 In the simulator, a "bus" is simply a **set of wire nets** that multiple chips share.
@@ -136,7 +136,7 @@ class SharedWire:
 
 ```python
 # Each IBUS0-IBUS7 is a SharedWire
-# Connected pins (from 02_wiring_guide):
+# Connected pins (from 01_wiring_guide):
 #
 # IBUS0 wire connects to: U7-2, U34-18, U14-18, U12-1, U23-2, U5-2, U6-2, U32-2
 #   Drivers (tristate):
@@ -258,7 +258,7 @@ def step(self):
 
 ---
 
-## Wiring (from 02_wiring_guide.md)
+## Wiring (from 01_wiring_guide.md)
 
 Wiring defined as connection list:
 
@@ -279,7 +279,7 @@ def wire_cpu(sim):
         ('U7', 2), ('U34', 18), ('U14', 18),
         ('U12', 1), ('U23', 2), ('U5', 2), ('U6', 2), ('U32', 2)
     ])
-    # ... (all connections from 02_wiring_guide.md)
+    # ... (all connections from 01_wiring_guide.md)
 ```
 
 ---
@@ -370,7 +370,7 @@ sim/
 ├── soft_debug.py           # High-level trace sim + 4 tests
 ├── gate_sim.py             # Simplified gate model (educational)
 ├── verify_wiring.py        # Wiring correctness checker
-├── wiring.py               # 247 pin connections from 02_wiring_guide
+├── wiring.py               # 247 pin connections from 01_wiring_guide
 ├── chips/
 │   ├── __init__.py         # 34 logic chip classes plus ROM/RAM models
 │   └── test_chips.py       # Unit tests for each chip type (141 vectors)
@@ -388,7 +388,7 @@ sim/
 2. `sequential.py` — HC574 first (most used)
 3. `combinational.py` — HC04, HC00, HC32, HC86 first (simple gates)
 4. `memory.py` — ROM, RAM
-5. `wiring.py` — Connect everything per 02_wiring_guide
+5. `wiring.py` — Connect everything per 01_wiring_guide
 6. `chip_sim.py` — Main entry point + tests
 
 ---
@@ -396,7 +396,7 @@ sim/
 ## Acceptance Criteria
 
 - [x] All 34 logic chip objects plus ROM/RAM created with correct pin count
-- [x] All pins wired according to 02_wiring_guide.md (247 connections)
+- [x] All pins wired according to 01_wiring_guide.md (247 connections)
 - [x] `LI $42` executes correctly (3 clocks)
 - [x] `ADDI $05` gives correct AC
 - [x] `SB` writes RAM correctly

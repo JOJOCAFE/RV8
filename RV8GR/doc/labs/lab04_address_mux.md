@@ -161,7 +161,7 @@ LED (ดู A0-A7 output):
 
 ### ขั้นตอน
 
-1. Reset PC → $00 (Lab 03)
+1. Reset PC → $0000 (Lab 03)
 2. ตั้ง DIP switch = $A5 (10100101)
 3. สลับ /ADDR_MODE switch ดูผลลัพธ์
 

@@ -2,8 +2,21 @@
 
 **Split the 36-chip CPU into 6 sub-schematics for easier wiring and debugging.**
 
-Each module = 1 KiCad hierarchical sheet. Matches `06_debug_plan.md` build order.
-Wire one module at a time on breadboard, test before connecting the next.
+This file is **not** the pin-level source of truth. Use
+`01_wiring_guide.md` for exact chip pins and electrical wiring. Use this file
+to understand how the same CPU is split into smaller KiCad sheets and smaller
+student build/debug chunks.
+
+Each module = 1 KiCad hierarchical sheet. The module order follows
+`05_debug_plan.md` and the hardware labs. Wire one module or partial module at a
+time on breadboard, test it, then connect the next module.
+
+Why keep this doc:
+- It shows the real KiCad sheet boundary for each group of chips.
+- It helps students see the CPU as six smaller systems instead of one large
+  schematic.
+- It identifies cross-module signals so sheet pins and labels stay consistent.
+- It points back to the wiring guide whenever exact pin truth matters.
 
 ---
 
@@ -24,7 +37,7 @@ In KiCad, place U24 on the CTRL sheet with hierarchical pins for NOT_T0/NOT_T1 b
 
 ---
 
-## Alignment with Debug Plan & Labs
+## Alignment with Debug Plan, Labs, and Build Plan
 
 | Debug Step | Lab | What's tested | KiCad Module |
 |:----------:|:---:|---------------|:------------:|
@@ -47,6 +60,20 @@ In KiCad, place U24 on the CTRL sheet with hierarchical pins for NOT_T0/NOT_T1 b
 > **Lab 08 spans two modules** (U14 in IR_BUF, muxes in ALU_AC).
 > This is unavoidable — some chips interact across boundaries.
 > The KiCad sheets define **signal ownership**, not physical placement.
+
+`build_plan/01_student_incremental_build_plan.md` is more granular than the six
+KiCad sheets. It intentionally builds partial modules first:
+
+| Build-plan stages | Main chips | KiCad module boundary |
+|---|---|---|
+| 0-1 | Power, reset, U8, U24 gates 1-2 | CLK_RST |
+| 2-3 | U1-U4 | PC |
+| 4-6 | U15, U16, U29, U30, ROM | ADDR_MEM partial |
+| 7-9 | U5, U6, U7, U34, early U24/U25/U26 control | IR_BUF + CTRL partial |
+| 10-13 | U9-U14, U17-U22 | ALU_AC + IR_BUF(U14) |
+| 14-17 | U23-U28, U31-U33, RAM | CTRL + ADDR_MEM(RAM) |
+| 18-20 | RV8-Bus, boot ROM, full smoke test | All modules |
+| Physical signoff | Voltage, clock, bus-race, edge, delay evidence | All modules + `07_real_build_timing_log.md` |
 
 ---
 
@@ -144,12 +171,12 @@ U8 (74HC164):
   Pin 3 (Q0)   → T0
   Pin 4 (Q1)   → T1
   Pin 5 (Q2)   → T2
-  Pin 6-7      → NC (Q3 unused)
+  Pin 6 (Q3)   → NC
+  Pin 7 (GND)  → GND
   Pin 8 (CLK)  ← CLK
   Pin 9 (/CLR) ← /RST
   Pin 10-13    → NC
   Pin 14 (VCC) → VCC
-  Pin 7 (GND)  → GND
 
 Reset Circuit:
   VCC → 10kΩ → NODE → 10µF → GND
@@ -292,7 +319,7 @@ U30 (A12-A15):
   D0-D7  ↔ DBUS0-DBUS7
   /CE    ← ABUS15 (direct from U30-12; active when ABUS15=0)
   /OE    ← WR_DIR (U28-8; disables ROM output during CPU store)
-  /WE    ← /WR from RV8-Bus/programmer path
+  /WE    ← HIGH during CPU runtime; programmer path may drive only in PROG/reset isolation
 
 === RAM (62256) ===
   A0-A14 ← ABUS0-ABUS14
@@ -317,7 +344,7 @@ Never both active — complementary by design.
 
 ## Module 4: IR_BUF (Instruction Register + Bus Buffers)
 
-**Chips**: U5 (74HC574), U6 (74HC574), U7 (74HC245), U14 (74HC541)
+**Chips**: U5 (74HC574), U6 (74HC574), U7 (74HC245), U14 (74HC541), U34 (74HC541)
 
 **Debug Steps**: 5 (U7 buffer with ROM), 6 (IR latch), 8 (U14 AC buffer)
 
@@ -392,13 +419,17 @@ Only ONE IBUS driver active at T2:
   SRC=0, STR=0 → U34 drives IBUS (immediate from IRL)
   SRC=1, STR=0 → U7 drives IBUS (RAM/ROM data)
   SRC=0, STR=1 → U14 drives IBUS (AC value for store)
-  SRC=1, STR=1 → FORBIDDEN (64 illegal opcodes)
+  SRC=1, STR=1 → reserved horizontal encoding; store-dominant bus ownership
 
 Store safety:
   U7 /OE = BUF_OE_N
   ROM /OE = WR_DIR
   During STORE, U7 writes IBUS→DBUS and ROM output is disabled
 ```
+
+For valid student programs, use only the frozen ISA in `00_design_isa.md`.
+Reserved horizontal encodings are not teaching instructions; they are only
+checked to avoid unsafe bus ownership.
 
 ---
 
@@ -732,7 +763,7 @@ PC_LOAD_COND  U27-6
 | U31 | 74HC74 | CTRL | 13 |
 | U32 | 74HC574 | CTRL | 12 |
 | U33 | 74HC21 | CTRL | 12 |
-| U34 | 74HC541 | IR_BUF | 10 |
+| U34 | 74HC541 | IR_BUF | 6, 8 |
 | ROM | AT28C256 | ADDR_MEM | 5 |
 | RAM | 62256 | ADDR_MEM | 11 |
 

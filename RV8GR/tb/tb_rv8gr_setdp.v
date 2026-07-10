@@ -11,9 +11,12 @@ module tb_rv8gr_setdp;
 
     always #5 clk = ~clk;
     integer cycle_count;
+    reg [1023:0] dumpfile;
 
     initial begin
-        $dumpfile("rv8gr_setdp.vcd");
+        if (!$value$plusargs("dumpfile=%s", dumpfile))
+            dumpfile = "rv8gr_setdp.vcd";
+        $dumpfile(dumpfile);
         $dumpvars(0, tb_rv8gr_setdp);
 
         // Write phase: SETDP to RAM pages $90/$95/$A0/$A3

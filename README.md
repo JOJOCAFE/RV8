@@ -37,12 +37,19 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 RV8GR is the active physical-build target.
 
 - 34 logic chips + ROM + RAM = 36 packages.
+- Components package mapping checked: 36 board packages resolve to 16
+  board-used part types, all backed by current Components definitions and
+  package-local test records.
 - No microcode ROM.
 - No hardware IRQ vector; IRQ is a polling latch only.
 - Every instruction uses T0, T1, T2.
 - Build one module, test it, then continue.
 - Start with `RV8GR/doc/labs/README.md` for student labs.
-- Use `RV8GR/doc/02_wiring_guide.md` as the official pin-level source.
+- Use `RV8GR/doc/01_wiring_guide.md` as the official pin-level source.
+- Latest lab/doc pass keeps U34 as the 74HC541 IRL-to-IBUS immediate buffer,
+  ROM as `ROM1`, and RAM as `RAM1`.
+- Physical speed/signoff is still blocked until real voltage, clock,
+  bus-deadband, memory float/write timing, and scope evidence are logged.
 
 ### RV8 vs RV8-R Analysis
 
@@ -101,5 +108,14 @@ folder in this checkout.
 | Hardware Labs | ⬜ | ⬜ | ⬜ | ✅ (14 labs + student baseline contract) |
 | KiCad modules | ⬜ | ⬜ | ⬜ | ✅ (6 modules) |
 | Student build guardrails | ⬜ | ⬜ | ⬜ | ✅ |
+| Components package mapping | ⬜ | ⬜ | ⬜ | ✅ (36 packages -> 16 part types) |
 | Programmer | ⚠️ needs bus/pin audit | ⚠️ needs bus/pin audit | ⚠️ needs bus/pin audit | ✅ |
 | Physical build | ⬜ | ⬜ | ⬜ | ⬜ |
+
+### Latest RV8GR Checkpoint
+
+As of 2026-07-10, the RV8GR student labs, build plan, KiCad module guide, and
+sim-lab scripts have been rechecked against the current wiring guide and
+Components-backed chip behavior. The virtual/software gates are ready for
+continued build-along work, but hardware timing claims still require physical
+measurements on the real board.

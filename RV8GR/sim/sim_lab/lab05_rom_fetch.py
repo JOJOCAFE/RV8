@@ -5,10 +5,9 @@ Wiring:
   ROM A[14:0] ← ABUS
   ROM /CE ← 0 (enabled for test)
   ROM /OE ← 0
-  U7 DIR ← 0 (A→B = DBUS→IBUS direction)
+  Physical U7: A-side=IBUS, B-side=DBUS, DIR=0 means B→A = DBUS→IBUS
+  Local chip model has legacy inverted DIR semantics, so the script compensates.
   U7 /OE ← 0 (enabled)
-  U7 A-side ← ROM D[7:0]
-  U7 B-side → IBUS
 
 Test: set address, read ROM data through U7 to IBUS
 """
@@ -32,14 +31,16 @@ def fetch(addr):
     ROM.set(24, 0); ROM.set(25, 0)  # /CE=0, /OE=0
     ROM.update()
 
-    # ROM D[7:0] → U7 A-side
-    for i in range(8): U7.set(2+i, ROM.get(16+i))
-    U7.set(1, 0)   # DIR=0 (A→B)
+    # Physical wiring: ROM DBUS → U7 B-side, U7 A-side → IBUS.
+    # Legacy TTL_74hc245 model drives B→A when DIR=1, so set 1 here to
+    # represent physical DIR=0 read behavior.
+    for i in range(8): U7.set(18-i, ROM.get(16+i))
+    U7.set(1, 1)   # model B→A == physical DIR=0 read
     U7.set(19, 0)  # /OE=0
     U7.update()
 
-    # Read IBUS from U7 B-side
-    return sum(U7.get(18-i)<<i for i in range(8))
+    # Read IBUS from physical U7 A-side
+    return sum(U7.get(2+i)<<i for i in range(8))
 
 # Test: (address, expected_data)
 TEST_VECTORS = [

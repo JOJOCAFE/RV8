@@ -12,9 +12,12 @@ module tb_rv8gr;
 
     integer cycle_count;
     integer i;
+    reg [1023:0] dumpfile;
 
     initial begin
-        $dumpfile("rv8gr_test.vcd");
+        if (!$value$plusargs("dumpfile=%s", dumpfile))
+            dumpfile = "rv8gr_test.vcd";
+        $dumpfile(dumpfile);
         $dumpvars(0, tb_rv8gr);
 
         // Clear ROM and RAM

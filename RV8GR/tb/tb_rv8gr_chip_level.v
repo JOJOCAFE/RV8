@@ -7,6 +7,7 @@ module tb_rv8gr_chip_level;
   reg irq_n;
   integer cycle;
   integer i;
+  reg [1023:0] dumpfile;
 
   rv8gr_chip_level dut();
 
@@ -38,7 +39,9 @@ module tb_rv8gr_chip_level;
     dut.ROM1.memory[15'h0002] = 8'h01; // J $02 loop, useful once full checks exist
     dut.ROM1.memory[15'h0003] = 8'h02;
 
-    $dumpfile("rv8gr_chip_level.vcd");
+    if (!$value$plusargs("dumpfile=%s", dumpfile))
+      dumpfile = "rv8gr_chip_level.vcd";
+    $dumpfile(dumpfile);
     $dumpvars(0, tb_rv8gr_chip_level);
 
     clk = 1'b0;

@@ -5,6 +5,9 @@ Use this beside `01_student_incremental_build_plan.md`.
 The technical build plan tells the teacher exactly which pins to wire. This
 worksheet tells the student what to do, what to see, and when to stop.
 
+After all stage cards pass on the real board, the teacher records voltage,
+frequency, edge, bus, and delay evidence in `../07_real_build_timing_log.md`.
+
 Rules for every stage:
 - Build only this stage.
 - Add VCC, GND, and 100nF bypass capacitor before signal wires.
@@ -312,7 +315,8 @@ Stop if:
 - Address bits are swapped.
 
 Before full CPU wiring:
-- [ ] Later change ROM `/OE` to `WR_DIR`.
+- [ ] Remove temporary ROM `/OE=LOW`.
+- [ ] Connect ROM `/OE` to `WR_DIR` before any store/RAM test.
 
 Notes:
 
@@ -1118,6 +1122,7 @@ Pass:
 - [ ] Fail loop not reached.
 - [ ] Runs at slow clock.
 - [ ] Runs at 1 MHz after slow-clock pass.
+- [ ] Teacher recorded timing evidence in `../07_real_build_timing_log.md`.
 
 Stop if:
 - Any single-step trace differs from expected.

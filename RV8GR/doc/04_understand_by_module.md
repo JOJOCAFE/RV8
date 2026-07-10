@@ -1,6 +1,12 @@
 # RV8-GR — เข้าใจ CPU ทีละโมดูล (สำหรับน้อง ม.ต้น)
 
-**สอน CPU 34 logic chips + ROM + RAM ตัวนี้ทีละขั้น ใช้ภาษาง่ายๆ ไม่รีบ อ่านจบแล้วต่อวงจรได้เลย**
+**สอน CPU 34 logic chips + ROM + RAM ตัวนี้ทีละขั้น ใช้ภาษาง่ายๆ ไม่รีบ อ่านแล้วเข้าใจว่าแต่ละโมดูลทำงานอย่างไร**
+
+> 📌 เอกสารนี้คือ "แผนที่ความเข้าใจ" ไม่ใช่ wiring guide เต็ม.
+> ใช้อ่านก่อนหรือระหว่างทำ lab เพื่อรู้ว่าแต่ละโมดูลทำอะไร.
+> ตอนต่อวงจรจริงให้ใช้ `doc/labs/README.md`,
+> `doc/build_plan/01_student_incremental_build_plan.md`, และ
+> `doc/01_wiring_guide.md` เป็นแหล่งอ้างอิงขาและสายจริง.
 
 ---
 
@@ -10,7 +16,7 @@
 2. จังหวะนาฬิกา T0/T1/T2 (U8)
 3. Program Counter — ตัวชี้คำสั่ง (U1-U4)
 4. Instruction Register — ตัวจำคำสั่ง (U5, U6)
-5. DBUS, IBUS — ถนนข้อมูล (U7, U14)
+5. DBUS, IBUS — ถนนข้อมูล (U7, U14, U34)
 6. ALU — เครื่องคำนวณ (U10-U13, U19-U20)
 7. AC Mux — เลือกผลลัพธ์ (U17-U18)
 8. Address Mux — เลือกที่อยู่ (U15-U16, U29-U30)
@@ -142,7 +148,11 @@ State Diagram (หัวใจ CPU):
 ```
 
 > 📌 มีบิต "1" เพียงตัวเดียววิ่งวนในวงแหวน — เรียกว่า **one-hot encoding**
-> ถ้ารีเซ็ต จะกลับมาเป็น T0 เสมอ
+> ใน lab เราเรียกสถานะพร้อมเริ่มหลัง reset ว่า **T0**.
+> รายละเอียดทางไฟฟ้าของ 74HC164 คือ `/CLR` เคลียร์ Q ทั้งหมดเป็น 0 ก่อน,
+> แล้ววงจร feedback ทำให้ clock แรกเข้าสู่ T0 ที่ใช้งานได้.
+> ดังนั้นเวลา build/debug ให้ดูตาราง lab เป็นหลัก: reset แล้ว single-step
+> ต้องเห็น T0→T1→T2 วนสะอาด ไม่มีสอง phase ติดพร้อมกัน.
 
 **ที่ 1 MHz (breadboard, official target)**: 3 clock = 1 คำสั่ง → **333K คำสั่ง/วินาที**
 **ที่ 5 MHz (PCB only, experimental)**: → **1.67 ล้านคำสั่ง/วินาที!**
@@ -216,7 +226,7 @@ CPU อ่านคำสั่งจาก ROM มา 2 byte:
 
 ---
 
-## 5. DBUS, IBUS — ถนนข้อมูล (U7, U14)
+## 5. DBUS, IBUS — ถนนข้อมูล (U7, U14, U34)
 
 > 💡 **ยังไม่เข้าใจ Bus?** ไม่ต้องกังวล — ลองอ่านบท 6 (ALU) และ 7 (AC) ก่อนแล้วกลับมาอ่านบทนี้อีกครั้งก็ได้!
 > Bus เป็นแค่ "ถนน" ที่เชื่อมทุกอย่างเข้าด้วยกัน
@@ -389,8 +399,8 @@ SETDP $80     → กลับมาที่ registers ($8000-$80FF)
 
 **Chip Select จาก A15:**
 ```
-A15=0 → ROM ทำงาน (address $0000+) — อ่านได้อย่างเดียว
-A15=1 → RAM ทำงาน (address $8000+) — อ่านและเขียนได้
+A15=0 → ROM ทำงาน (address $0000-$7FFF) — อ่านได้อย่างเดียวตอน CPU run
+A15=1 → RAM ทำงาน (address $8000-$FFFF) — อ่านและเขียนได้
 ```
 
 ---
@@ -410,12 +420,14 @@ U22 (74HC688): เปรียบเทียบ AC กับ $00
   → ถ้า AC = $00: ส่งสัญญาณ LOW
 
 U21 (74HC74): เก็บผลลัพธ์
-  → U22 LOW → preset Z = 1 (ใช่! AC เป็นศูนย์)
-  → U22 HIGH → Z = 0 (ไม่ใช่)
+  → U22 LOW → /PR preset ทำให้ Z = 1 (ใช่! AC เป็นศูนย์)
+  → U22 HIGH → preset ปล่อย และ ACC_CLK จะ clock ค่า 0 เข้า Z (ไม่ใช่ศูนย์)
 ```
 
-> 📌 Z อัปเดต**ทันที**หลัง AC เปลี่ยนค่า (async preset — ไม่ต้องรอ clock)
-> แต่ BEQ/BNE จะ**ดูค่า Z ตอน T2** เท่านั้น — ไม่ใช่ระหว่าง T0/T1
+> 📌 Z เปลี่ยนรอบเดียวกับ AC write: `ACC_CLK` clock ทั้ง AC และ Z.
+> ถ้า AC ใหม่เป็น 0, U22 จะ preset Z เป็น 1 แบบ async หลัง comparator settle.
+> ถ้า AC ใหม่ไม่เป็น 0, U21 จะเก็บ 0 จาก D input.
+> BEQ/BNE จะดูค่า Z ตอน T2 ของคำสั่งถัดไป หลังค่า Z stable แล้ว.
 
 **ตัวอย่าง:**
 ```
@@ -573,20 +585,23 @@ SB $02      ; R2 = AC (เขียนลง RAM[$8002])
 $0000-$7FFF  ROM (โปรแกรม, อ่านอย่างเดียว)
 $8000-$FEFF  RAM (ข้อมูล, อ่าน+เขียน)
 $FF00-$FF0F  RAM (available; future vector)
-$FF10-$FF1F  I/O Slot 1 ← ไม่ใช่ RAM! เป็นช่องต่ออุปกรณ์
-$FF20-$FF2F  I/O Slot 2 ← ไม่ใช่ RAM! เป็นช่องต่ออุปกรณ์
+$FF10-$FF1F  I/O Slot 1 address ← reserved for external device
+$FF20-$FF2F  I/O Slot 2 address ← reserved for external device
 $FF30-$FFFF  RAM (เหลือใช้)
 ```
 
-> 📌 $FF10-$FF2F ดูเหมือน RAM address แต่จริงๆ ต่อไปที่อุปกรณ์ภายนอก (Memory-Mapped I/O)
+> 📌 $FF10-$FF2F เป็น address ที่ RV8-Bus ใช้เลือกอุปกรณ์ภายนอก.
+> ถ้ายังไม่ได้ต่อ peripheral พื้นที่นี้ยังอ่าน/เขียน RAM บน CPU board ได้ตาม A15.
+> ถ้าต่อ peripheral แล้ว ต้องออกแบบ /SLOT device ไม่ให้ขับ DBUS ชนกับ RAM.
 
 **Chip Select:**
 ```
-A15 = 0 → ROM active  (address $0000+)
-A15 = 1 → RAM active  (address $8000+)
+A15 = 0 → ROM active  (address $0000-$7FFF)
+A15 = 1 → RAM active  (address $8000-$FFFF)
 ```
 
-สายเส้นเดียว A15 ตัดสินทุกอย่าง!
+สำหรับ ROM/RAM บน CPU board สาย A15 เส้นเดียวตัดสินว่าเลือกชิปไหน.
+ส่วน /SLOT1 และ /SLOT2 เป็นสัญญาณเลือกอุปกรณ์ภายนอกบน RV8-Bus.
 
 ---
 
@@ -644,7 +659,15 @@ $FF10-$FF1F → /SLOT1 active (เช่น UART)
 $FF20-$FF2F → /SLOT2 active (เช่น LCD)
 ```
 
-CPU เขียน SB $00 ที่ page $FF → ข้อมูลไปถึง peripheral ผ่าน bus!
+ตัวอย่างเขียนไป /SLOT1:
+```asm
+SETDP $FF
+LI $41
+SB $10      ; address $FF10 → /SLOT1 active
+```
+
+ข้อมูลจะออกไปที่ RV8-Bus ระหว่าง STORE. Peripheral ต้องรับเฉพาะตอน /SLOT
+ของตัวเอง active และต้องไม่ขับ DBUS พร้อมกับ RAM.
 
 ---
 
@@ -765,11 +788,28 @@ Clock  Phase  PC    AC   Z   เกิดอะไร
 
 | ขั้นถัดไป | เอกสาร |
 |-----------|--------|
-| ต่อวงจรจริง (ทีละโมดูล) | `06_debug_plan.md` |
-| ดูสายต่อทุกขา | `02_wiring_guide.md` |
+| เริ่มต่อวงจรจริงแบบนักเรียน | `doc/labs/README.md` |
+| แผนครู/พี่เลี้ยงสำหรับต่อทีละ stage | `doc/build_plan/01_student_incremental_build_plan.md` |
+| ดูสายต่อทุกขา | `doc/01_wiring_guide.md` |
+| ไล่ fault ตอนวงจรไม่ผ่าน | `doc/05_debug_plan.md` |
 | เขียนโปรแกรมให้ CPU | `tools/rv8gr_asm.py` |
 | ดูตัวอย่างโปรแกรม .asm | `programs/` |
-| เทียบ trace กับ simulator | `03_instruction_trace.md` |
+| เทียบ trace กับ simulator | `doc/02_instruction_trace.md` |
+
+### วิธีใช้เอกสารนี้ตอนเรียน
+
+สำหรับแต่ละโมดูล ให้ตอบ 5 ข้อนี้ก่อนต่อวงจรถัดไป:
+
+| คำถาม | ตัวอย่างคำตอบ |
+|---|---|
+| โมดูลนี้ทำหน้าที่อะไร? | PC ชี้ address ของคำสั่งถัดไป |
+| ใช้ชิปอะไร? | U1-U4 = 74HC161 |
+| รับ input สำคัญอะไร? | CLK, `/RST`, `PC_INC`, `/PC_LD` |
+| ส่ง output อะไรต่อให้โมดูลอื่น? | `PC0..PC15` ไป address mux |
+| ทดสอบผ่านต้องเห็นอะไร? | single-step แล้ว PC นับตอน T0/T1 และ load ตอน jump |
+
+ถ้าตอบไม่ได้ ให้กลับไปอ่านโมดูลนั้นอีกครั้ง แล้วใช้ lab ที่ตรงกันทดสอบด้วย
+manual clock ก่อนเพิ่มโมดูลใหม่.
 
 > 💡 **Chapter Book (อนาคต)** — ถ้าจะทำเป็นหนังสือเต็ม:
 >
@@ -853,7 +893,7 @@ Clock  Phase  PC    AC   Z   เกิดอะไร
 **ทางเลือกอื่น**: 74HC374, 74HC273
 **ที่เลือก**: 74HC574 เพราะ:
 - Edge-triggered (latch ที่ rising edge ของ CLK)
-- มี /OE (ปิด output ได้) — ใช้กับ U14 และ U34 ตอนขับ IBUS
+- มี /OE (ปิด output ได้) — ใน RV8-GR ส่วนใหญ่ผูก enabled ตลอด; การขับ IBUS ใช้ U14/U34 ซึ่งเป็น 74HC541 แยกต่างหาก
 - Pinout เหมาะ: D1-D8 อยู่ด้านหนึ่ง, Q1-Q8 อยู่อีกด้าน → ต่อง่าย
 
 ### ทำไม XOR ทำหน้าที่ 3 อย่าง?
@@ -879,8 +919,8 @@ XOR(A, B) = A^B      → คำนวณ XOR (ใช้กับ XOR instruction
 
 **ปัญหา**: ต้องแยก ROM กับ RAM → ปกติใช้ address decoder (74HC138)
 **เคล็ดลับ**: ถ้าแบ่ง memory เป็น 2 ส่วนเท่าๆ กัน:
-- Lower half ($0000+) = ROM → ใช้ A15 ตรงๆ
-- Upper half ($8000+) = RAM → ใช้ NOT(A15)
+- Lower half ($0000-$7FFF) = ROM → ใช้ A15 ตรงๆ เป็น /CE
+- Upper half ($8000-$FFFF) = RAM → ใช้ NOT(A15)
 - ไม่ต้องมี decoder! ใช้แค่ inverter 1 gate (U24)
 
 ### ทำไม Data Access ใช้ Data Page Register?
@@ -908,7 +948,7 @@ Data address = {Data Page (8 bit), Operand (8 bit)} = 16 bit = 64KB!
 - U22 (688) ให้ /P=Q ที่ต่อ /PR ของ U21 ได้ตรงๆ
 - ไม่ต้องมี inverter เพิ่ม (688 output = active-low = /PR input)
 - ลด gate count 1 ตัว
-- Z settle ทันใน 200ns (2 clock cycles ก่อนถูก sample)
+- ค่า Z มีเวลา settle ตลอด T0/T1 ของคำสั่งถัดไป ก่อน BEQ/BNE ใช้ตอน T2
 
 ### ทำไม BNE ใช้ SUB bit?
 
@@ -928,14 +968,14 @@ BNE: SUB=1 → Z_match = NOT(Z) (jump เมื่อ Z=0)
 **อันตราย**: ถ้า STORE ไป page ROM, U7 อาจขับ DBUS พร้อมกับ ROM
 **วิธีแก้**: `ROM /OE = WR_DIR`
 - ถ้า STR=1 → U7 เขียน IBUS→DBUS และ ROM output ถูกปิด
-- 0 ชิปเพิ่ม (ใช้ gate ที่ว่างอยู่)
+- 0 ชิปเพิ่ม (ใช้ U28 gate หนึ่งตัวสร้าง `WR_DIR`)
 
 ### ทำไมใช้ 2 bus (DBUS + IBUS)?
 
 **ปัญหา**: ROM/RAM อยู่นอก CPU, ALU อยู่ใน CPU
 **ถ้าใช้ bus เดียว**: ต้อง tristate ทุกชิปที่ต่อ bus → ซับซ้อน, มี contention risk สูง
 **2 bus + bridge (U7)**:
-- DBUS: เชื่อม ROM, RAM เท่านั้น (3 ตัว)
+- DBUS: เชื่อม ROM, RAM, U7 และ RV8-Bus/peripheral อย่างมีเงื่อนไข
 - IBUS: เชื่อม IR, ALU, AC, PG (ภายใน)
 - U7 เป็นตัวกลาง — ควบคุมทิศ + enable/disable ได้
 
@@ -948,6 +988,6 @@ BNE: SUB=1 → Z_match = NOT(Z) (jump เมื่อ Z=0)
 | **Minimal decode** | A15 = chip select (no 74HC138) |
 | **Gate sharing** | SUB bit ใช้กับ BNE condition |
 | **Bus isolation** | 2 buses + bridge ป้องกัน conflict |
-| **Spare gates** | U25 gate 3, U28 gate D → ใช้ทำ guard |
+| **Spare/gate budget** | ใช้ gate ที่มีอยู่ให้คุ้ม เช่น U28 ทำ `WR_DIR`, `Z_match`, `/T2`, `/XOR_MODE`; U25 gate 3 เท่านั้นที่ spare |
 
 ทุกการตัดสินใจมุ่งไปที่: **ใช้ชิปน้อยที่สุด แต่ยังทำงานถูกต้อง**

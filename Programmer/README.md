@@ -108,6 +108,20 @@ python3 tools/rv8term.py
 python3 tools/rv8ram-boot.py program.bin
 ```
 
+## Field Test Protocol
+
+Before using the Programmer on real RV8GR hardware, run the field procedure in
+`FIELD_TEST_PROTOCOL.md`. The current virtual preflight is 51 mock tests:
+
+```bash
+python3 -B tools/test_rv8flash.py
+python3 -B tools/test_rv8term.py
+python3 -B tools/test_rv8ram-boot.py
+```
+
+The field protocol separates ZIF Direct testing from RV8-Bus in-system testing
+and records the evidence needed to close B-012.
+
 ---
 
 ## Safety
@@ -115,6 +129,10 @@ python3 tools/rv8ram-boot.py program.bin
 | ⚠️ Never connect BOTH Bus cable AND ROM in ZIF at the same time! |
 |:---:|
 | Data bus fight → chip damage |
+
+During normal CPU runtime, ROM `/WE` must stay inactive. The Programmer may own
+the ROM write path only in PROG mode with the CPU stopped, or when a bare ROM is
+installed in the ZIF socket.
 
 AT28C256 note: current firmware performs normal byte write cycles. Use ROM chips
 with software data protection disabled, or add/enable an SDP unlock sequence
@@ -128,5 +146,7 @@ before relying on protected AT28C256 parts.
 - ✅ Firmware (matches schematic pin assignments)
 - ✅ Tools (protocol matches firmware)
 - ✅ Schematic doc (Thai, Bus + ZIF, matches KiCad)
+- ✅ Virtual preflight defined (51 mock tests passing on 2026-07-10)
+- ⬜ Field-test evidence (see `FIELD_TEST_PROTOCOL.md`)
 - ⬜ Physical build
 - ⬜ PCB fabrication

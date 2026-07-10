@@ -204,7 +204,9 @@ U14 (AC output buffer):
 
 ### Test 1: ADDI — ใส่ค่า IBUS แล้ว clock AC
 
-เริ่ม: AC = unknown (74HC574 has no /CLR), MUX_SEL=0 (เลือก adder), XOR_MODE=0, ALU_SUB=0
+เริ่ม: AC = unknown (74HC574 has no /CLR). ให้ clear ก่อน:
+ตั้ง IBUS=$00, MUX_SEL=1, XOR_MODE=0, ALU_SUB=0 แล้วกด AC CLK 1 ครั้ง → AC=$00.
+จากนั้นตั้ง MUX_SEL=0 (เลือก adder), XOR_MODE=0, ALU_SUB=0.
 
 | ขั้น | IBUS (DIP) | ALU_SUB | MUX_SEL | กด AC CLK | AC LED (ผลลัพธ์) | ถูก? |
 |:----:|:----------:|:-------:|:-------:|:---------:|:----------------:|:----:|

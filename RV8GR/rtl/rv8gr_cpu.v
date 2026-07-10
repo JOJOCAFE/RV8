@@ -1,5 +1,5 @@
 // RV8-GR CPU — Behavioral Verilog Model
-// Matches 02_wiring_guide.md: 34 logic chips (U1-U34 incl. U31 IRQ, U32 DP, U33 decode, U34 IRL buffer)
+// Matches 01_wiring_guide.md: 34 logic chips (U1-U34 incl. U31 IRQ, U32 DP, U33 decode, U34 IRL buffer)
 // Memory: ROM $0000-$7FFF, RAM $8000-$FFFF, PC starts $0000
 // 3-cycle: T0=fetch ctrl, T1=fetch operand, T2=execute
 // 18 instructions (17 + SETDP)

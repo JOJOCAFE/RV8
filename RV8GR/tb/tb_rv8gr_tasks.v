@@ -7,6 +7,7 @@ module tb_rv8gr_tasks;
     rv8gr_cpu cpu(.clk(clk), .rst_n(rst_n), .irq_n(1'b1), .halted(halted));
     always #5 clk = ~clk;
     integer errors; integer i;
+    reg [1023:0] dumpfile;
 
     task clear_mem;
     begin for (i = 0; i < 32768; i = i + 1) begin cpu.rom[i] = 8'h00; cpu.ram[i] = 8'h00; end end endtask
@@ -17,7 +18,9 @@ module tb_rv8gr_tasks;
     task step; begin @(posedge clk); #1; end endtask
 
     initial begin
-        $dumpfile("rv8gr_tasks.vcd"); $dumpvars(0, tb_rv8gr_tasks); errors = 0;
+        if (!$value$plusargs("dumpfile=%s", dumpfile))
+            dumpfile = "rv8gr_tasks.vcd";
+        $dumpfile(dumpfile); $dumpvars(0, tb_rv8gr_tasks); errors = 0;
         clear_mem; reset_cpu;
 
         // Task 1: Reset

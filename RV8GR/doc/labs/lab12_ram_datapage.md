@@ -141,9 +141,12 @@ U33 (SETDP decode):
     pin 5 (1D) ← /AC_WR (U24-10)
     pin 6 (1Y) → DP_Load → U32-11
 
-  Gate 2 (unused):
+  Gate 2 (เตรียมไว้สำหรับ EI_decode ใน Lab 14):
     pin 9, 10, 12, 13 → VCC
     pin 8 → NC
+
+  ตอนต่อ Lab 14 ให้ถอด temporary VCC เหล่านี้ออก แล้วต่อเป็น:
+    pin 9←T2, pin 10←SRC, pin 12←/XOR_MODE, pin 13←/AC_WR, pin 8→EI_decode
 ```
 
 ---
@@ -284,8 +287,8 @@ LB $00      ; AC ← ROM[$0000] (read program byte as data)
 
 ใช้ทำ lookup table, constant table, string table ได้โดยไม่ต้องคำสั่งพิเศษ
 
-> ⚠️ **SB ไปที่ ROM address = ไม่มีผล** — ROM `/WE` is on `/WR` for programmer
-> support, but CPU stores do not perform the EEPROM/flash unlock sequence.
+> ⚠️ **SB ไปที่ ROM address = ไม่มีผล** — ระหว่าง CPU runtime ให้ ROM `/WE`
+> inactive; Programmer เท่านั้นที่ขับ `/WE` ได้ใน PROG/reset isolation.
 > ไม่ error แต่ข้อมูลหายไป — ระวังอย่า SETDP < $80 แล้ว SB
 
 **ผ่านทุกข้อ → ไป Lab 13!** 🎉

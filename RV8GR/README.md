@@ -23,9 +23,12 @@ Recommended reading order:
 |------|------------|---------|
 | Student | `doc/labs/README.md` | Lab-by-lab physical build |
 | Teacher | `doc/build_plan/01_student_incremental_build_plan.md` | Supervised stage plan |
-| Debug | `doc/06_debug_plan.md` | Probe points and fault tracing |
-| Wiring | `doc/02_wiring_guide.md` | Official pin-level source of truth |
-| KiCad | `doc/10_kicad_modules.md` | Schematic sheet/module split |
+| Wiring | `doc/01_wiring_guide.md` | Official pin-level source of truth |
+| Debug | `doc/05_debug_plan.md` | Probe points and fault tracing |
+| KiCad | `doc/06_kicad_modules.md` | Schematic sheet/module split |
+| CPU logic test | `doc/08_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
+| Equivalence | `doc/11_four_model_equivalence.md` | Why two Python sims and two Verilog models must agree |
+| Doc audit | `doc/12_doc_integrity_audit.md` | Integrity check of every doc file against Python/Verilog truth |
 
 ---
 
@@ -161,15 +164,26 @@ Board 4: CONTROL         Board 5: BUS + DEBUG
 
 ---
 
-## Simulation
+## Verification
 
-Run Python first for TTL/system behavior checks:
+Run these checks before using the docs for a build session. Python checks are
+the student-friendly first pass because they catch wiring and behavior errors
+without requiring HDL tools:
 
 ```bash
 cd RV8GR
 
 python3 -B sim/chip_sim.py
 # ALL 8 CPU TESTS PASSED
+
+python3 -B sim/components_chip_sim.py
+# ALL 8 COMPONENTS-BACKED CPU TESTS PASSED
+
+python3 -B sim/test_cpu_logical_protocol.py
+# protocol unittest suite passes on both Python CPU simulators
+
+python3 -B tools/check_python_verilog_equivalence.py
+# both Python CPU simulators match both Verilog CPU models on all_isa_equivalence.asm
 
 python3 -B sim/verify_wiring.py
 # ALL WIRING VERIFIED
@@ -180,31 +194,61 @@ python3 -B sim/soft_debug.py
 python3 -B tools/test_rv8gr_asm.py
 # 11 passed
 
-cd sim
-python3 -B chips/test_chips.py
+python3 -B sim/chips/test_chips.py
 # ALL 14 CHIP TYPES VERIFIED
 
-cd ..
 python3 -B sim/verify_components.py
 # RV8GR Components verification passed: 16 part types, 36 packages
+```
+
+Run the reusable Components virtual physical checker from the Components repo.
+This checks the RV8GR whole-system virtual circuit for pin mistakes, active-low
+mistakes, unsafe output-output wiring, and documented timing/noise risks:
+
+```bash
+cd /home/jo/kiro/Components
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+# circuit accepted when documented virtual timing/noise assumptions are present
 ```
 
 Use Verilog as the secondary HDL/RTL comparison path:
 
 ```bash
 cd RV8GR
-tools/run_chip_level_verilog.sh
-# RV8GR chip-level bring-up PASS
-
-tools/run_chip_level_full_verilog.sh
-# RV8GR chip-level full PASS
-
-iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_full.v && vvp /tmp/tb.vvp
-# === ALL TESTS PASSED === (127 cycles)
-
-iverilog -o /tmp/tb.vvp rtl/rv8gr_cpu.v tb/tb_rv8gr_irq.v && vvp /tmp/tb.vvp
-# ALL IRQ POLLING TESTS PASSED
+tools/run_all_verilog_tb.sh
+# behavioral, opcode sweep, SETDP, task, IRQ, chip-level, and dual-compare benches pass
 ```
+
+The behavioral `rtl/rv8gr_cpu.v` benches are only a comparison path. RV8GR
+Verilog signoff must include the TTL-chip system:
+
+- `rtl/rv8gr_chip_level.v` is the chip-level netlist.
+- `tools/run_chip_level_verilog.sh` and
+  `tools/run_chip_level_full_verilog.sh` compile it with the Components
+  `ttl_74hc*`, `62256`, and `at28c256` Verilog models.
+- `tools/run_dual_verilog_compare.sh` runs `rv8gr_cpu.v` and
+  `rv8gr_chip_level.v` on the same ROM program and compares architectural
+  checkpoints: `PC`, `AC`, `Z`, `PG`, `DP`, `IE`, `IRQ_FF`, and key RAM
+  writes. This dual bench covers every frozen ISA command at least once,
+  including jump/branch, ALU, memory, page/data-page control, and IRQ polling.
+- `programs/all_isa_equivalence.asm` is the shared all-ISA source for this
+  comparison. Verilog assembles it to `.memh`; Python assembles the same source
+  in memory through `tools/check_python_verilog_equivalence.py`.
+- `tb_rv8gr_dual_compare.v` exports `VERILOG_CHECKPOINT` lines, and
+  `tools/check_python_verilog_equivalence.py` verifies both Python CPU sims
+  match that checkpoint stream, final state, and RAM checkpoints.
+- `sim/components_chip_sim.py` is a Components-backed adapter runner for the
+  same RV8GR Python CPU logic, not a separate net-level Python CPU algorithm.
+- Do not replace this signoff with an optimized gate/behavioral model.
+
+Generated Verilog artifacts default to `/tmp/rv8gr-verilog`. Set
+`RV8GR_BUILD_DIR=/path/to/output` if you need a different generated-output
+directory.
+
+Virtual checks, Python simulation, and Verilog comparison are not physical
+signoff. Physical signoff still requires the real board to show correct power
+rails, reset, clock, bus ownership, ROM/RAM behavior, 1 MHz full-system run,
+burn-in stability, and timing evidence from probes or a logic analyzer.
 
 ---
 
@@ -231,14 +275,18 @@ RV8GR/
 │   └── gate_sim.py             Python gate-level simulation
 └── doc/
     ├── 00_design_isa.md        Design + ISA reference
-    ├── 02_wiring_guide.md      SOURCE OF TRUTH (wiring)
-    ├── 03_instruction_trace.md Pin-level traces
-    ├── 04_bank_switch.md       Memory expansion
-    ├── 05_understand_by_module.md  Thai tutorial
-    ├── 06_debug_plan.md        Physical build debug steps
-    ├── 07_risk_analysis.md     Hazard analysis
-    ├── 08_design_signoff.md    Sign-off v1.0
-    └── 09_task_test_plan.md    Test milestones
+    ├── 01_wiring_guide.md      SOURCE OF TRUTH (wiring)
+    ├── 02_instruction_trace.md Pin-level traces
+    ├── 03_bank_switch.md       Memory expansion
+    ├── 04_understand_by_module.md  Thai tutorial
+    ├── 05_debug_plan.md        Physical build debug steps
+    ├── 06_kicad_modules.md     KiCad sheet/module split
+    ├── 07_real_build_timing_log.md  Physical evidence log
+    ├── 08_cpu_logical_test_protocol.md  CPU logical verification
+    ├── 09_future_upgrades.md   Future-only feature parking lot
+    ├── 10_netlist.md           Text netlist
+    ├── 11_four_model_equivalence.md Student equivalence guide
+    └── 12_doc_integrity_audit.md Maintainer doc audit
 ```
 
 ---
@@ -286,6 +334,6 @@ sim/
 ├── soft_debug.py           — High-level trace (4 tests)
 ├── gate_sim.py             — Simplified educational sim
 ├── verify_wiring.py        — Pin-level wiring checker (11K+ checks)
-├── wiring.py               — 247 pin connections (02_wiring_guide)
+├── wiring.py               — 247 pin connections (01_wiring_guide)
 └── sim_lab/lab01-14.py     — 14 step-by-step labs
 ```

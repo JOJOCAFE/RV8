@@ -12,10 +12,31 @@ This plan follows the v1.0 34-logic-chip wiring guide:
 - U31 IRQ latch uses Q2 on U31-9 and `/IRQ` clock on U31-11.
 
 Use this document with:
-- `doc/02_wiring_guide.md` for exact pin wiring.
-- `doc/06_debug_plan.md` for deeper fault checks.
-- `doc/10_kicad_modules.md` for KiCad sheet/module names.
+- `doc/01_wiring_guide.md` for exact pin wiring.
+- `doc/05_debug_plan.md` for deeper fault checks.
+- `doc/06_kicad_modules.md` for KiCad sheet/module names.
+- `doc/07_real_build_timing_log.md` for voltage, clock, bus-race, edge, and
+  propagation-delay evidence after the staged build works.
 - `doc/build_plan/02_student_worksheet.md` for student-facing stage cards.
+
+Recommended software checks before a class or build session:
+
+```bash
+cd /home/jo/kiro/RV8/RV8GR
+python3 -B sim/chip_sim.py
+python3 -B sim/verify_wiring.py
+python3 -B sim/soft_debug.py
+python3 -B tools/test_rv8gr_asm.py
+python3 -B sim/chips/test_chips.py
+python3 -B sim/verify_components.py
+
+cd /home/jo/kiro/Components
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+```
+
+These are virtual checks. They help find model, wiring-table, pin, active-low,
+and bus-owner mistakes before students touch hardware. They do not replace
+physical signoff on the real build.
 
 ---
 
@@ -269,8 +290,8 @@ Clock 16: $10
 - ROM D0-D7 -> DBUS.
 - ROM `/CE` <- A15.
 - ROM `/OE` temporarily -> GND for this isolated fetch test.
-- ROM `/WE` -> `/WR` / programmer write path. During CPU-only bring-up, hold
-  `/WR` HIGH unless you are specifically testing store timing.
+- ROM `/WE` -> HIGH during CPU runtime. Connect the programmer write path only
+  when the CPU is held reset in PROG isolation.
 
 **Test ROM bytes**
 ```text
@@ -289,7 +310,8 @@ $0003 = $00
 - DBUS shows the programmed bytes.
 
 **Before full CPU wiring**
-- Change ROM `/OE` to `WR_DIR` from U28-8.
+- Remove the temporary ROM `/OE` to GND wire and connect ROM `/OE` to
+  `WR_DIR` from U28-8.
 - This is required so ROM turns off during STORE direction.
 
 **Remove temporary wiring**
@@ -646,9 +668,8 @@ all others 0
 **Pass**
 - RAM read/write works.
 - ROM read through data access works.
-- SB to ROM page does not corrupt ROM and does not cause DBUS fight. ROM `/WE`
-  may see `/WR`, but normal CPU stores do not perform the EEPROM/flash unlock
-  sequence.
+- SB to ROM page does not corrupt ROM and does not cause DBUS fight because ROM
+  `/WE` is inactive during normal CPU runtime.
 
 **Remove temporary wiring**
 - Any forced `DP_Load`, DP DIP input, RAM `/WE`, or RAM `/OE` test controls
@@ -769,6 +790,30 @@ Use a ROM that tests:
 - Program reaches the pass loop, not the fail loop.
 - Suggested pass loop: PC=`$0010`.
 - Suggested fail loop: PC=`$0012`.
+
+---
+
+## Physical Signoff
+
+Use this only after every stage above has passed on the real hardware:
+
+- VCC is 4.8V to 5.2V at the farthest chips while running.
+- Record voltage evidence at 4.5V, 5.0V, and 5.5V if the supply and parts allow
+  the sweep safely.
+- Reset always returns PC to `$0000` and T-state to T0.
+- Single-step clock advances exactly one state per press.
+- No chip is hot and no bus-fight current spike is observed.
+- Golden Bring-up passes at 1 MHz.
+- Full Instruction Smoke Test reaches the pass loop.
+- Repeat timing checks at 50 kHz, 1 MHz, 2 MHz, and 5 MHz, plus the 100-tick
+  push-switch test, and record any failing frequency separately.
+- Record bus ownership, rising/falling edge behavior, and propagation-delay
+  findings in `doc/07_real_build_timing_log.md`.
+- One-hour burn-in stays in the pass loop.
+- Clock sweep result is recorded for this exact build.
+
+Do not mark physical build complete from Python, Verilog, or Components virtual
+checker results alone.
 
 ---
 

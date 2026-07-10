@@ -4,7 +4,7 @@ RV8-GR Sim Lab — Step-by-step wiring and testing.
 Like physical breadboard: wire a few chips, test with DIP switch + LED,
 then treat tested group as a "black box" for the next step.
 
-Matches doc/labs/ and doc/06_debug_plan.md (14 steps).
+Matches doc/labs/ and doc/05_debug_plan.md (14 steps).
 
 Lab Files:
   lab01_power_clock.py    — Hardware only (no simulation)

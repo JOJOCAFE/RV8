@@ -1,7 +1,8 @@
 # RV8-GR Netlist
 
-**Source of truth**: `02_wiring_guide.md`  
+**Source of truth**: `01_wiring_guide.md`  
 **Generated**: 2026-06-30  
+**Reviewed**: 2026-07-10 against `01_wiring_guide.md` and wiring verifier
 **Chips**: 34 logic (U1-U34) + ROM + RAM = 36 packages
 
 This document lists every net (named signal) in the RV8-GR CPU with all
@@ -63,11 +64,11 @@ cross-checking.
 | U31 (74HC74) | 14 |
 | U32 (74HC574) | 20 |
 | U33 (74HC21) | 14 |
+| U34 (74HC541) | 20 |
 | ROM (AT28C256) | 28 |
 | RAM (62256) | 28 |
 
 Also tied to VCC:
-- U5-1 (/OE) — NO, tied to GND
 - U21-1 (/CLR1), U21-10 (/PR2), U21-13 (/CLR2) — VCC
 - U28-5, U28-10, U28-13 — VCC (XOR with VCC = invert)
 - U31-2 (D1), U31-4 (/PR1), U31-10 (/PR2), U31-12 (D2) — VCC
@@ -109,6 +110,7 @@ Also tied to VCC:
 | U31 (74HC74) | 7 |
 | U32 (74HC574) | 10 |
 | U33 (74HC21) | 7 |
+| U34 (74HC541) | 10 |
 | ROM (AT28C256) | 14 |
 | RAM (62256) | 14 |
 
@@ -252,19 +254,19 @@ Shared by: ROM data out, RAM data I/O, U7 B-side, RV8-Bus D[7:0]
 
 Drivers (tri-state — only one active at a time):
 - U7 A-side (fetch/load — DIR=0: B→A)
-- U6 Q outputs (immediate — /OE=LOW)
+- U34 Y outputs (immediate — U6 IR_LOW feeds U34 A inputs; U34 drives only when `/IRL_OE=LOW`)
 - U14 Y outputs (store — /OE=LOW)
 
-| Net | U7 | U6* | U14* | U12/U13 | U5 D | U6 D | U23 D | U32 D |
-|-----|:--:|:---:|:----:|:-------:|:----:|:----:|:-----:|:-----:|
-| IBUS0 | 2 | 19 | 18 | U12-1 | 2 | 2 | 2 | 2 |
-| IBUS1 | 3 | 18 | 17 | U12-4 | 3 | 3 | 3 | 3 |
-| IBUS2 | 4 | 17 | 16 | U12-9 | 4 | 4 | 4 | 4 |
-| IBUS3 | 5 | 16 | 15 | U12-12 | 5 | 5 | 5 | 5 |
-| IBUS4 | 6 | 15 | 14 | U13-1 | 6 | 6 | 6 | 6 |
-| IBUS5 | 7 | 14 | 13 | U13-4 | 7 | 7 | 7 | 7 |
-| IBUS6 | 8 | 13 | 12 | U13-9 | 8 | 8 | 8 | 8 |
-| IBUS7 | 9 | 12 | 11 | U13-12 | 9 | 9 | 9 | 9 |
+| Net | U7 | U34* | U14* | U12/U13 | U5 D | U6 D | U23 D | U32 D |
+|-----|:--:|:----:|:----:|:-------:|:----:|:----:|:-----:|:-----:|
+| IBUS0 | 2 | 18 | 18 | U12-1 | 2 | 2 | 2 | 2 |
+| IBUS1 | 3 | 17 | 17 | U12-4 | 3 | 3 | 3 | 3 |
+| IBUS2 | 4 | 16 | 16 | U12-9 | 4 | 4 | 4 | 4 |
+| IBUS3 | 5 | 15 | 15 | U12-12 | 5 | 5 | 5 | 5 |
+| IBUS4 | 6 | 14 | 14 | U13-1 | 6 | 6 | 6 | 6 |
+| IBUS5 | 7 | 13 | 13 | U13-4 | 7 | 7 | 7 | 7 |
+| IBUS6 | 8 | 12 | 12 | U13-9 | 8 | 8 | 8 | 8 |
+| IBUS7 | 9 | 11 | 11 | U13-12 | 9 | 9 | 9 | 9 |
 
 ---
 
@@ -491,7 +493,7 @@ Source: 74HC86 XOR outputs. Feeds: adder B-inputs (U10-U11), AC input mux B-inpu
 | D0–D7 | Data out | DBUS0–DBUS7 |
 | /CE | Chip enable | ABUS15 (A15=0 selects ROM) |
 | /OE | Output enable | WR_DIR (U28-8) — disabled during store |
-| /WE | Write enable | RV8-Bus pin 27 (/WR) — Programmer only |
+| /WE | Write enable | VCC during CPU runtime; programmer write path only when CPU is stopped/reset-isolated |
 | VCC | Power | pin 28 |
 | GND | Ground | pin 14 |
 

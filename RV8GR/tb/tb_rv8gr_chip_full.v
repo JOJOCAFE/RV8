@@ -7,6 +7,7 @@ module tb_rv8gr_chip_full;
   reg irq_n;
   integer cycle_count;
   integer i;
+  reg [1023:0] dumpfile;
 
   rv8gr_chip_level dut();
 
@@ -101,7 +102,9 @@ module tb_rv8gr_chip_full;
     dut.ROM1.memory[15'h0074] = 8'h20; dut.ROM1.memory[15'h0075] = 8'h00;
     dut.ROM1.memory[15'h0076] = 8'h01; dut.ROM1.memory[15'h0077] = 8'h5E;
 
-    $dumpfile("rv8gr_chip_full.vcd");
+    if (!$value$plusargs("dumpfile=%s", dumpfile))
+      dumpfile = "rv8gr_chip_full.vcd";
+    $dumpfile(dumpfile);
     $dumpvars(0, tb_rv8gr_chip_full);
 
     clk = 1'b0;

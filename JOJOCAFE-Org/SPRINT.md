@@ -26,15 +26,15 @@
 ### Fern (เฟิร์น) — Verifier
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
-| Verify Programmer field test | B-012 | ⬜ TODO | After Bam preps test suite |
+| Verify Programmer field test | B-012 | 🟡 READY | Use `Programmer/FIELD_TEST_PROTOCOL.md` when hardware is available |
 | Verify each lab module on hardware | B-007 | ⛔ BLOCKED | Waiting for physical hardware build evidence; non-physical B-007 report is available |
 | Run full ISA test on physical CPU | B-007 | ⛔ BLOCKED | Requires wired CPU and hardware evidence |
-| Gate-sim coverage check (remaining .bin) | B-013 | ⬜ TODO | Pair with Mint |
+| Gate-sim coverage check (remaining .bin) | B-013 | ✅ DONE | Replaced by all-ISA dual Verilog scoreboard plus opcode sweep |
 
 ### Mint (มิ้นท์) — RTL Coder
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
-| Add remaining .bin test coverage to gate-sim | B-013 | ⬜ TODO | Pair with Fern |
+| Add remaining .bin test coverage to gate-sim | B-013 | ✅ DONE | All-ISA dual Verilog scoreboard plus opcode sweep |
 | Support debug if hardware ≠ simulation | — | ⬜ STANDBY | Activate on discrepancy |
 | Maintain Verilog model if design tweaks needed | — | ⬜ STANDBY | Architecture frozen, unlikely |
 
@@ -51,7 +51,7 @@
 | Task | Backlog | Status | Notes |
 |------|---------|--------|-------|
 | Write example .asm programs (blink, counter, echo) | B-010 | ✅ DONE | Implemented and assembler-verified |
-| Prep Programmer field test suite | B-012 | ⬜ TODO | Before Fern verifies |
+| Prep Programmer field test suite | B-012 | ✅ DONE | `Programmer/FIELD_TEST_PROTOCOL.md`; 51 mock tests define virtual preflight |
 | Flash test ROM onto physical hardware | B-006 | ⬜ TODO | After Ohm builds ROM module |
 | Start BASIC interpreter design | B-011 | ⬜ TODO | Background task |
 
@@ -78,3 +78,5 @@
 |------|-----------|-----|
 | B-010 example ASM programs implemented | 2026-07-09 | Bam |
 | B-010 example ASM programs assembler-verified | 2026-07-09 | Bam + Fern |
+| B-012 Programmer field-test protocol prepared | 2026-07-10 | Bam + Fern |
+| RV8GR doc integrity/source-of-truth pass saved and packaged | 2026-07-10 | Pim + Noon + Fern |

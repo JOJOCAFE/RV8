@@ -1,5 +1,25 @@
 # RV8 Project — Development History
 
+## 2026-07-10 — v4.4: RV8GR Student Labs and Components Mapping Checkpoint
+
+- Rechecked RV8GR student labs, build-plan docs, KiCad module guide, and
+  sim-lab scripts against the current `RV8GR/doc/01_wiring_guide.md` source of
+  truth.
+- Preserved the frozen v1.0 baseline count: **34 logic chips + ROM + RAM = 36
+  packages**.
+- Confirmed the current designator boundary: `U34` is the 74HC541 IRL-to-IBUS
+  immediate buffer, ROM is `ROM1`, and RAM is `RAM1`.
+- Cross-checked the Components library mapping: the 36 RV8GR board packages
+  resolve to 16 board-used part types, and every board-used part has current
+  Components package files, Python behavior, Verilog model, generated artifacts,
+  and split test records.
+- Updated student-facing Components docs with a beginner route and stop
+  conditions for wrong pins, output-output conflicts, wrong clock edge, and
+  missing propagation/deadband margin.
+- Kept the physical-build boundary explicit: virtual tests can prove model
+  coherence, but hardware speed/signoff still needs real voltage, clock,
+  bus-deadband, memory float/write timing, and oscilloscope evidence.
+
 ## 2026-07-09 — v4.3: RV8GR Canonical Rename and Chip-Level Source
 
 - Renamed the active student baseline from `RV8GR-V2/` to `RV8GR/`

@@ -7,8 +7,13 @@ OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
 
 mkdir -p "$OUTDIR"
 
+python3 "$ROOT/tools/rv8gr_asm.py" \
+  "$ROOT/programs/all_isa_equivalence.asm" \
+  -o "$OUTDIR/all_isa_equivalence.memh" \
+  -f memh
+
 iverilog -g2012 -Wall \
-  -o "$OUTDIR/rv8gr_chip_full.vvp" \
+  -o "$OUTDIR/rv8gr_dual_compare.vvp" \
   "$COMPONENTS/Verilog/74xx/74hc00.v" \
   "$COMPONENTS/Verilog/74xx/74hc04.v" \
   "$COMPONENTS/Verilog/74xx/74hc21.v" \
@@ -25,8 +30,11 @@ iverilog -g2012 -Wall \
   "$COMPONENTS/Verilog/74xx/74hc688.v" \
   "$COMPONENTS/Verilog/Memory/62256.v" \
   "$COMPONENTS/Verilog/Memory/at28c256.v" \
+  "$ROOT/rtl/rv8gr_cpu.v" \
   "$ROOT/rtl/rv8gr_chip_level.v" \
-  "$ROOT/tb/tb_rv8gr_chip_full.v"
+  "$ROOT/tb/tb_rv8gr_dual_compare.v"
 
 cd "$OUTDIR"
-vvp "$OUTDIR/rv8gr_chip_full.vvp" "+dumpfile=$OUTDIR/rv8gr_chip_full.vcd"
+vvp "$OUTDIR/rv8gr_dual_compare.vvp" \
+  "+dumpfile=$OUTDIR/rv8gr_dual_compare.vcd" \
+  "+romfile=$OUTDIR/all_isa_equivalence.memh"

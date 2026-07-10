@@ -13,6 +13,7 @@ module tb_rv8gr_irq;
 
     integer errors;
     integer i;
+    reg [1023:0] dumpfile;
 
     task reset_cpu;
     begin
@@ -43,7 +44,9 @@ module tb_rv8gr_irq;
     endtask
 
     initial begin
-        $dumpfile("rv8gr_irq.vcd");
+        if (!$value$plusargs("dumpfile=%s", dumpfile))
+            dumpfile = "rv8gr_irq.vcd";
+        $dumpfile(dumpfile);
         $dumpvars(0, tb_rv8gr_irq);
         errors = 0;
 

@@ -26,6 +26,8 @@ Audience: Thai middle school students. Goal: buildable on breadboards.
 4. No code ships without verification from a non-author agent
 5. Every shared Components change → run the relevant Python and/or Verilog smoke tests before pushing
 6. Every simulator backend change → document the API contract for future web/Python UI use
+7. Every RV8GR doc change → check `RV8GR/doc/00_design_isa.md` and `RV8GR/doc/02_wiring_guide.md` first, then rerun the smallest relevant verification command.
+8. Before packaged doc release → regenerate `RV8GR/doc/RV8GR-Doc.zip` from current Markdown and check archive contents.
 
 ## Communication
 
@@ -43,6 +45,7 @@ Audience: Thai middle school students. Goal: buildable on breadboards.
 - `TEAM_MEMORY.md`: shared knowledge (read when context needed)
 - `.agent_state/<you>/MEMORY.md`: your personal memory (update after work)
 - `/home/jo/kiro/Components`: shared 74HC, memory, Verilog, Python chip simulator, pinout, and datasheet library
+- RV8GR source of truth: `RV8GR/doc/00_design_isa.md` for architecture, `RV8GR/doc/02_wiring_guide.md` for physical wiring, `RV8GR/doc/11_cpu_logical_test_protocol.md` for CPU logical verification.
 
 ## Economy
 
