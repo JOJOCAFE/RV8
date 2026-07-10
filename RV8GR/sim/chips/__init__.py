@@ -323,7 +323,7 @@ def MEM_62256(name):
 
 
 # =============================================================================
-# CREATE ALL 35 CHIPS
+# CREATE ALL 34 LOGIC CHIPS PLUS ROM/RAM
 # =============================================================================
 def create_cpu():
     chips = {}
@@ -344,6 +344,7 @@ def create_cpu():
     chips['U29']=TTL_74hc157('U29'); chips['U30']=TTL_74hc157('U30')
     chips['U31']=TTL_74hc74('U31'); chips['U32']=TTL_74hc574('U32')
     chips['U33']=TTL_74hc21('U33')
+    chips['U34']=TTL_74hc541('U34')
     chips['ROM']=MEM_AT28C256('ROM'); chips['RAM']=MEM_62256('RAM')
     return chips
 

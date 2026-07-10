@@ -1055,15 +1055,14 @@ ROM (AT28C256 / SST39SF010A)
   D[0:7]  → DBUS0..DBUS7
   /CE     ← ABUS15
   /OE     ← WR_DIR (U28-8; disables ROM output during CPU store)
-  /WE     ← /WR (RV8-Bus pin 27, from Programmer board only)
+  /WE     → VCC during CPU runtime (inactive)
 
-Note: Bus pin 27 (/WR) is driven by /AC_BUF during CPU STORE operations.
-ROM sees /WE pulse when SETDP<$80 + SB, but AT28C256 has built-in software data
-protection (SDP) — single pulses without unlock sequence are ignored.
-The current Programmer firmware performs normal byte write cycles while /RST=LOW
-and the CPU is stopped. Use an AT28C256 with SDP disabled, or add/enable an SDP
-unlock sequence in Programmer firmware before relying on protected chips.
+Runtime rule: CPU STORE never writes ROM. The structural chip-level Verilog
+ties ROM `/WE` inactive, and the physical build should hold the ROM write pin
+HIGH during normal CPU operation. A programmer may drive ROM `/WE` only when it
+has explicit ownership of the ROM/programmer path and the CPU is stopped.
 SETDP <$80 + LB = read from ROM (lookup tables, safe).
+SETDP <$80 + SB = no ROM write in normal CPU runtime.
 
 RAM (62256)
   A[0:7]  ← ABUS0..ABUS7

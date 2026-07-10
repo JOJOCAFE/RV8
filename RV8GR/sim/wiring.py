@@ -79,18 +79,30 @@ WIRING = [
     # =========================================================================
     # U6: IR_LOW — Operand (74HC574)
     # =========================================================================
-    ('U6', 1,  'U26', 3),         # /OE ← /IRL_OE (U26-3)
+    ('U6', 1,  'GND'),            # /OE → GND (IRL outputs always available)
     ('U6', 11, 'U8', 4),          # CLK ← T1 (U8-4)
     # D1-D8 (pins 2-9) ← IBUS
+
+    # =========================================================================
+    # U34: IRL-to-IBUS Immediate Buffer (74HC541)
+    # =========================================================================
+    ('U34', 1,  'U26', 3),        # /OE1 ← /IRL_OE
+    ('U34', 19, 'U26', 3),        # /OE2 ← /IRL_OE
+    ('U34', 2,  'U6', 19),        # A1 ← IRL0
+    ('U34', 3,  'U6', 18),        # A2 ← IRL1
+    ('U34', 4,  'U6', 17),        # A3 ← IRL2
+    ('U34', 5,  'U6', 16),        # A4 ← IRL3
+    ('U34', 6,  'U6', 15),        # A5 ← IRL4
+    ('U34', 7,  'U6', 14),        # A6 ← IRL5
+    ('U34', 8,  'U6', 13),        # A7 ← IRL6
+    ('U34', 9,  'U6', 12),        # A8 ← IRL7
 
     # =========================================================================
     # U7: Bus Buffer (74HC245) — DBUS ↔ IBUS
     # DIR=0: read (DBUS→IBUS, A→B in sim model)
     # DIR=1: write (IBUS→DBUS, B→A in sim model)
-    # NOTE: sim model DIR is inverted vs real 74HC245 datasheet.
-    #   Real chip: DIR=0→B→A, DIR=1→A→B
-    #   Physical build: connect A-side=IBUS, B-side=DBUS
-    #   Then DIR=0→B→A→DBUS→IBUS (read) matches WR_DIR=0 ✓
+    # Real 74HC245 datasheet: DIR=0→B→A, DIR=1→A→B.
+    # Physical build: connect A-side=IBUS, B-side=DBUS.
     # =========================================================================
     ('U7', 1,  'U28', 8),         # DIR ← WR_DIR (U28-8)
     ('U7', 19, 'U24', 12),        # /OE ← BUF_OE_N (U24-12)
@@ -182,29 +194,29 @@ WIRING = [
     # Y1=18→IBUS0, Y2=17→IBUS1, ... Y8=11→IBUS7
 
     # =========================================================================
-    # U15-U16: Address Mux A[7:0] — SEL=ADDR_MODE, A=PC, B=IRL
+    # U15-U16: Address Mux A[7:0] — SEL=/ADDR_MODE, A=IRL, B=PC
     # =========================================================================
-    ('U15', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U15', 1,  'U26', 6),        # SEL ← /ADDR_MODE
     ('U15', 15, 'GND'),           # /E → GND
-    ('U15', 2,  'U1', 14),        # 1A ← PC0
-    ('U15', 3,  'U6', 19),        # 1B ← IRL0
-    ('U15', 5,  'U1', 13),        # 2A ← PC1
-    ('U15', 6,  'U6', 18),        # 2B ← IRL1
-    ('U15', 11, 'U1', 12),        # 3A ← PC2
-    ('U15', 10, 'U6', 17),        # 3B ← IRL2
-    ('U15', 14, 'U1', 11),        # 4A ← PC3
-    ('U15', 13, 'U6', 16),        # 4B ← IRL3
+    ('U15', 2,  'U6', 19),        # 1A ← IRL0
+    ('U15', 3,  'U1', 14),        # 1B ← PC0
+    ('U15', 5,  'U6', 18),        # 2A ← IRL1
+    ('U15', 6,  'U1', 13),        # 2B ← PC1
+    ('U15', 11, 'U6', 17),        # 3A ← IRL2
+    ('U15', 10, 'U1', 12),        # 3B ← PC2
+    ('U15', 14, 'U6', 16),        # 4A ← IRL3
+    ('U15', 13, 'U1', 11),        # 4B ← PC3
 
-    ('U16', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U16', 1,  'U26', 6),        # SEL ← /ADDR_MODE
     ('U16', 15, 'GND'),
-    ('U16', 2,  'U2', 14),        # 1A ← PC4
-    ('U16', 3,  'U6', 15),        # 1B ← IRL4
-    ('U16', 5,  'U2', 13),        # 2A ← PC5
-    ('U16', 6,  'U6', 14),        # 2B ← IRL5
-    ('U16', 11, 'U2', 12),        # 3A ← PC6
-    ('U16', 10, 'U6', 13),        # 3B ← IRL6
-    ('U16', 14, 'U2', 11),        # 4A ← PC7
-    ('U16', 13, 'U6', 12),        # 4B ← IRL7
+    ('U16', 2,  'U6', 15),        # 1A ← IRL4
+    ('U16', 3,  'U2', 14),        # 1B ← PC4
+    ('U16', 5,  'U6', 14),        # 2A ← IRL5
+    ('U16', 6,  'U2', 13),        # 2B ← PC5
+    ('U16', 11, 'U6', 13),        # 3A ← IRL6
+    ('U16', 10, 'U2', 12),        # 3B ← PC6
+    ('U16', 14, 'U6', 12),        # 4A ← IRL7
+    ('U16', 13, 'U2', 11),        # 4B ← PC7
 
     # =========================================================================
     # U17-U18: AC Input Mux — SEL=MUX_SEL, A=Adder SUM, B=XOR output
@@ -333,7 +345,7 @@ WIRING = [
     # =========================================================================
     ('U26', 1,  'U8', 5),         # 1A ← T2
     ('U26', 2,  'U26', 6),        # 1B ← /ADDR_MODE (self gate 2 output)
-    # 1Y=3 → /IRL_OE → U6-1, U24-13
+    # 1Y=3 → /IRL_OE → U34-1/19, U24-13
     ('U26', 4,  'U25', 3),        # 2A ← ADDR_MODE
     ('U26', 5,  'U25', 3),        # 2B ← ADDR_MODE (NAND as NOT)
     # 2Y=6 → /ADDR_MODE → U26-2, U33-4
@@ -377,29 +389,29 @@ WIRING = [
     # 4Y=11 → /XOR_MODE → U33-12
 
     # =========================================================================
-    # U29-U30: Address Mux A[15:8] — SEL=ADDR_MODE, A=PC high, B=Data Page
+    # U29-U30: Address Mux A[15:8] — SEL=/ADDR_MODE, A=Data Page, B=PC high
     # =========================================================================
-    ('U29', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U29', 1,  'U26', 6),        # SEL ← /ADDR_MODE
     ('U29', 15, 'GND'),
-    ('U29', 2,  'U3', 14),        # 1A ← PC8
-    ('U29', 3,  'U32', 19),       # 1B ← DP0 (U32-19)
-    ('U29', 5,  'U3', 13),        # 2A ← PC9
-    ('U29', 6,  'U32', 18),       # 2B ← DP1
-    ('U29', 11, 'U3', 12),        # 3A ← PC10
-    ('U29', 10, 'U32', 17),       # 3B ← DP2
-    ('U29', 14, 'U3', 11),        # 4A ← PC11
-    ('U29', 13, 'U32', 16),       # 4B ← DP3
+    ('U29', 2,  'U32', 19),       # 1A ← DP0
+    ('U29', 3,  'U3', 14),        # 1B ← PC8
+    ('U29', 5,  'U32', 18),       # 2A ← DP1
+    ('U29', 6,  'U3', 13),        # 2B ← PC9
+    ('U29', 11, 'U32', 17),       # 3A ← DP2
+    ('U29', 10, 'U3', 12),        # 3B ← PC10
+    ('U29', 14, 'U32', 16),       # 4A ← DP3
+    ('U29', 13, 'U3', 11),        # 4B ← PC11
 
-    ('U30', 1,  'U25', 3),        # SEL ← ADDR_MODE
+    ('U30', 1,  'U26', 6),        # SEL ← /ADDR_MODE
     ('U30', 15, 'GND'),
-    ('U30', 2,  'U4', 14),        # 1A ← PC12
-    ('U30', 3,  'U32', 15),       # 1B ← DP4
-    ('U30', 5,  'U4', 13),        # 2A ← PC13
-    ('U30', 6,  'U32', 14),       # 2B ← DP5
-    ('U30', 11, 'U4', 12),        # 3A ← PC14
-    ('U30', 10, 'U32', 13),       # 3B ← DP6
-    ('U30', 14, 'U4', 11),        # 4A ← PC15
-    ('U30', 13, 'U32', 12),       # 4B ← DP7 (A15!)
+    ('U30', 2,  'U32', 15),       # 1A ← DP4
+    ('U30', 3,  'U4', 14),        # 1B ← PC12
+    ('U30', 5,  'U32', 14),       # 2A ← DP5
+    ('U30', 6,  'U4', 13),        # 2B ← PC13
+    ('U30', 11, 'U32', 13),       # 3A ← DP6
+    ('U30', 10, 'U4', 12),        # 3B ← PC14
+    ('U30', 14, 'U32', 12),       # 4A ← DP7
+    ('U30', 13, 'U4', 11),        # 4B ← PC15
     # 4Y=12 → A15 → ROM /CE, U24-5
 
     # =========================================================================
@@ -441,7 +453,9 @@ WIRING = [
     # =========================================================================
     ('ROM', 24, 'U30', 12),       # /CE ← A15 (U30-12) — ROM enabled when A15=0
     ('ROM', 25, 'U28', 8),        # /OE ← WR_DIR (disable ROM during store)
-    ('ROM', 26, 'U26', 8),        # /WE ← /WR=/AC_BUF (CPU stores pulse; ROM protection ignores normal stores)
+    # Simulator-logical memory model pins: A0-A14 use 1-15 and D0-D7 use 16-23.
+    # Physical AT28C256 DIP pin 26 is A13; chip-level Verilog maps KiCad pins
+    # through Components and ties ROM /WE high.
     # A0-A14 ← ABUS (connected via mux outputs)
     # D0-D7 → DBUS
 
@@ -460,10 +474,8 @@ WIRING = [
 # =============================================================================
 
 # IBUS0..IBUS7 shared wires
-# Drivers: U7 A-side (2-9), U6 Q (19-12)*, U14 Y (18-11)*
+# Drivers: U7 A-side (2-9), U34 Y (18-11)*, U14 Y (18-11)*
 # Readers: U12 A (1,4,9,12), U13 A (1,4,9,12), U5 D (2-9), U23 D (2-9), U32 D (2-9)
-# NOTE: Physical build has U7 A-side=IBUS, B-side=DBUS.
-#       Sim model keeps A=DBUS,B=IBUS with inverted DIR (legacy).
 IBUS_PINS = {
     'readers': [
         # (chip, pins[0..7]) — always connected as inputs
@@ -475,9 +487,8 @@ IBUS_PINS = {
     ],
     'drivers': [
         # (chip, pins[0..7], enable_signal_description)
-        # Sim uses B-side (18-11) as IBUS output (inverted convention)
-        ('U7',  [18, 17, 16, 15, 14, 13, 12, 11], 'BUF_OE_N=0'),
-        ('U6',  [19, 18, 17, 16, 15, 14, 13, 12], '/IRL_OE=0'),
+        ('U7',  [2, 3, 4, 5, 6, 7, 8, 9], 'BUF_OE_N=0'),
+        ('U34', [18, 17, 16, 15, 14, 13, 12, 11], '/IRL_OE=0'),
         ('U14', [18, 17, 16, 15, 14, 13, 12, 11], '/AC_BUF=0'),
     ],
 }
@@ -485,8 +496,7 @@ IBUS_PINS = {
 # DBUS0..DBUS7 shared wires
 DBUS_PINS = {
     'connections': [
-        # Sim uses A-side (2-9) as DBUS (inverted convention)
-        ('U7',  [2, 3, 4, 5, 6, 7, 8, 9]),       # U7 A-side (sim: DBUS)
+        ('U7',  [18, 17, 16, 15, 14, 13, 12, 11]), # U7 B-side
         ('ROM', [16, 17, 18, 19, 20, 21, 22, 23]), # ROM D0-D7
         ('RAM', [16, 17, 18, 19, 20, 21, 22, 23]), # RAM D0-D7
     ],

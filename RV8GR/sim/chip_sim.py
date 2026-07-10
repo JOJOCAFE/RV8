@@ -191,7 +191,7 @@ class CPUSim:
             for name in ['U24','U25','U26','U27','U28','U33',
                          'U19','U20','U12','U13','U10','U11',
                          'U15','U16','U17','U18','U29','U30',
-                         'U22','U14','U7']:
+                         'U22','U14','U34','U7']:
                 self.chips[name].update()
 
             # Re-set IBUS-driven inputs (tristate resolution)
