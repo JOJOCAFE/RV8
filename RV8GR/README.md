@@ -26,6 +26,7 @@ Recommended reading order:
 | Debug | `doc/06_debug_plan.md` | Probe points and fault tracing |
 | Wiring | `doc/02_wiring_guide.md` | Official pin-level source of truth |
 | KiCad | `doc/10_kicad_modules.md` | Schematic sheet/module split |
+| CPU logic test | `doc/11_cpu_logical_test_protocol.md` | Virtual CPU behavior and program regression |
 
 ---
 
@@ -172,6 +173,9 @@ cd RV8GR
 
 python3 -B sim/chip_sim.py
 # ALL 8 CPU TESTS PASSED
+
+python3 -B sim/components_chip_sim.py
+# ALL 8 COMPONENTS-BACKED CPU TESTS PASSED
 
 python3 -B sim/verify_wiring.py
 # ALL WIRING VERIFIED

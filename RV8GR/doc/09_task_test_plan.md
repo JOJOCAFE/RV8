@@ -2,6 +2,10 @@
 
 **Milestones from reset to full system. Matches Verilog testbenches.**
 
+For the current CPU logical regression standard, see
+`doc/11_cpu_logical_test_protocol.md`. This file keeps the older task-by-task
+mapping used by the Verilog benches.
+
 ## Shared Components Check
 
 RV8GR carries a small vendored Components runtime in
