@@ -55,7 +55,7 @@ Shared knowledge for all agents. Update when significant facts change.
 - Latest known pushed commit: `87bcfdc Save Components student guide handoff`
 - Contents: canonical chip definitions, reusable 74HC Verilog models, memory models, DIP/PDIP pinout docs, circuit libraries, student docs, CLI/API contract docs, smoke tests, virtual physical-system checkers, and retained manufacturer datasheet evidence.
 - Python library: `/home/jo/kiro/Components/python`, pin-level DIP-style chip models, ROM/RAM image loader, 64 input stimulus channels (`IN0..IN63`), 8 clocks (`CLK0..CLK7`), propagation-delay simulation, edge-aware clock dispatch, JSON-friendly schematics, buses, pull defaults, probes/test logic, netlist generation, Verilog export, and CLI/API workflows.
-- Student guide: `/home/jo/kiro/Components/STUDENT_GUIDE.md` explains Components for CLI and API use.
+- Student guide: `/home/jo/kiro/Components/docs/STUDENT_GUIDE.md` explains Components for CLI and API use.
 - Responsibility: Pim routes; Bank owns package/service/circuit-library boundaries and virtual checker architecture; Ohm owns physical pinout, DIP package evidence, and breadboard realism; Mint owns reusable Verilog models/tests and RTL edge compatibility; Bam owns Python backend, CLI/API, schematic JSON, and virtual test instruments; Fern verifies package evidence, source references, tests, bus-race/timing/edge proofs, and release confidence; Noon owns beginner clarity, student examples, and learner-facing docs.
 - `74HC150` and `74HC260` were removed from the active Components catalog because no manufacturer-verified HC-family DIP evidence was available.
 - Rule: pinout docs are physical wiring artifacts; do not create pin tables from memory. Require manufacturer datasheet evidence and explicit DIP/PDIP or equivalent through-hole package proof.
@@ -63,7 +63,7 @@ Shared knowledge for all agents. Update when significant facts change.
 - Python schematic backend supports buses, pull-up/pull-down style default states, probes/test logic, JSON-friendly script mapping, netlist generation, and Verilog export for chip-level workflows.
 - SST39SF010A Python/Verilog write-trigger semantics are aligned: the simplified flash model writes on the falling edge of `/WE` while selected with `/OE` high.
 - Virtual physical checker command:
-  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
+  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
 - The checker must catch four common AI/circuit mistakes before circuit/system-level work: wrong pin number/name/active-low marker; output-output wiring without bus/enable proof; missing positive/negative or rising/falling edge statement for edge-sensitive chips; and shared-bus or stress-net timing without R/C, delay-noise, setup/hold, float, or deadband coverage.
 - Virtual R/C and delay-noise components are test instruments for finding risk early. They do not replace physical voltage, frequency, scope/logic-analyzer, or breadboard wiring tests at 4.5 V, 5.0 V, 5.5 V and target clock rates.
 - Future Components lane: review chip JSON/component definition output for student readability and document the system wiring commands used by Components.

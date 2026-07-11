@@ -4,6 +4,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPONENTS="${COMPONENTS_ROOT:-$ROOT/third_party/Components}"
 OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
+VERILOG="$COMPONENTS/Verilog"
+if [[ -d "$COMPONENTS/verilog" ]]; then
+  VERILOG="$COMPONENTS/verilog"
+fi
 
 mkdir -p "$OUTDIR"
 
@@ -14,22 +18,22 @@ python3 "$ROOT/tools/rv8gr_asm.py" \
 
 iverilog -g2012 -Wall \
   -o "$OUTDIR/rv8gr_dual_compare.vvp" \
-  "$COMPONENTS/Verilog/74xx/74hc00.v" \
-  "$COMPONENTS/Verilog/74xx/74hc04.v" \
-  "$COMPONENTS/Verilog/74xx/74hc21.v" \
-  "$COMPONENTS/Verilog/74xx/74hc32.v" \
-  "$COMPONENTS/Verilog/74xx/74hc74.v" \
-  "$COMPONENTS/Verilog/74xx/74hc86.v" \
-  "$COMPONENTS/Verilog/74xx/74hc157.v" \
-  "$COMPONENTS/Verilog/74xx/74hc161.v" \
-  "$COMPONENTS/Verilog/74xx/74hc164.v" \
-  "$COMPONENTS/Verilog/74xx/74hc245.v" \
-  "$COMPONENTS/Verilog/74xx/74hc283.v" \
-  "$COMPONENTS/Verilog/74xx/74hc541.v" \
-  "$COMPONENTS/Verilog/74xx/74hc574.v" \
-  "$COMPONENTS/Verilog/74xx/74hc688.v" \
-  "$COMPONENTS/Verilog/Memory/62256.v" \
-  "$COMPONENTS/Verilog/Memory/at28c256.v" \
+  "$VERILOG/74xx/74hc00.v" \
+  "$VERILOG/74xx/74hc04.v" \
+  "$VERILOG/74xx/74hc21.v" \
+  "$VERILOG/74xx/74hc32.v" \
+  "$VERILOG/74xx/74hc74.v" \
+  "$VERILOG/74xx/74hc86.v" \
+  "$VERILOG/74xx/74hc157.v" \
+  "$VERILOG/74xx/74hc161.v" \
+  "$VERILOG/74xx/74hc164.v" \
+  "$VERILOG/74xx/74hc245.v" \
+  "$VERILOG/74xx/74hc283.v" \
+  "$VERILOG/74xx/74hc541.v" \
+  "$VERILOG/74xx/74hc574.v" \
+  "$VERILOG/74xx/74hc688.v" \
+  "$VERILOG/memory/62256.v" \
+  "$VERILOG/memory/at28c256.v" \
   "$ROOT/rtl/rv8gr_cpu.v" \
   "$ROOT/rtl/rv8gr_chip_level.v" \
   "$ROOT/tb/tb_rv8gr_dual_compare.v"

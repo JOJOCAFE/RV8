@@ -12,9 +12,9 @@ report. The machine-readable companions remain:
 
 - `RV8GR/doc/rv8gr_chip_level_readiness.json`
 - `RV8GR/doc/rv8gr_virtual_bench_plan.json`
-- `DB/VIRTUAL_TEST_GENERATOR_CONTRACT.json`
-- `Lib/Circuits/RV8GR_COVERAGE_INDEX.json`
-- `Lib/Circuits/RV8GR_END_TO_END_TEST_PLAN.md`
+- `lib/standard/VIRTUAL_TEST_GENERATOR_CONTRACT.json`
+- `examples/circuits/RV8GR_COVERAGE_INDEX.json`
+- `examples/circuits/RV8GR_END_TO_END_TEST_PLAN.md`
 
 ## Current Status
 
@@ -24,14 +24,14 @@ report. The machine-readable companions remain:
 | Chip-level behavior gate | PASS | `tests.test_generated_split_records` passed |
 | Circuit-level package gate | PASS | `tests.test_lib_circuits` passed |
 | Block UI/tooling gate | PASS | `tests.test_block_ui` passed |
-| RV8GR whole-system Verilog gate | PASS from recorded checkpoint | `Lib/Circuits/RV8GR_END_TO_END_TEST_PLAN.md` records `run_all_verilog_tb.sh` pass |
+| RV8GR whole-system Verilog gate | PASS from recorded checkpoint | `examples/circuits/RV8GR_END_TO_END_TEST_PLAN.md` records `run_all_verilog_tb.sh` pass |
 | Physical hardware signoff | BLOCKED | voltage/frequency/scope evidence still missing |
 
 | Item | Count | Status |
 |---|---:|---|
 | RV8GR required chips | 18 | all listed in `RV8GR/doc/rv8gr_chip_level_readiness.json` |
 | Chip split-record sets | 18 | all have truth/timing/tri-state/bus-fight/propagation records |
-| RV8GR circuit packages | 22 | all indexed in `Lib/Circuits/RV8GR_COVERAGE_INDEX.json` |
+| RV8GR circuit packages | 22 | all indexed in `examples/circuits/RV8GR_COVERAGE_INDEX.json` |
 | Indexed packages marked `Tested` | 22 | README/index/package/test checks pass |
 
 ## Required Chip Set
@@ -109,12 +109,12 @@ write/read control window and high-Z cases.
 
 ## Level 2: Circuit-Level Gate
 
-Each `Lib/Circuits/RV8GR_*` package must include:
+Each `examples/circuits/RV8GR_*` package must include:
 
 - `circuit.json`
 - `README.md`
 - at least one `tests/*.json` proof file
-- package entry in `Lib/Circuits/RV8GR_COVERAGE_INDEX.json`
+- package entry in `examples/circuits/RV8GR_COVERAGE_INDEX.json`
 - executable coverage in `python/tests/test_lib_circuits.py`
 
 Pass command:
@@ -161,7 +161,7 @@ boundaries.
 ## Virtual Bench Mapping
 
 Chip-level virtual bench generation is defined by
-`DB/VIRTUAL_TEST_GENERATOR_CONTRACT.json`; generated RV8GR coverage lives in
+`lib/standard/VIRTUAL_TEST_GENERATOR_CONTRACT.json`; generated RV8GR coverage lives in
 `RV8GR/doc/rv8gr_virtual_bench_plan.json`.
 
 Summary:

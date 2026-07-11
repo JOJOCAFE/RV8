@@ -31,7 +31,7 @@ python3 -B sim/chips/test_chips.py
 python3 -B sim/verify_components.py
 
 cd /home/jo/kiro/Components
-PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
 ```
 
 These are virtual checks. They help find model, wiring-table, pin, active-low,

@@ -4,8 +4,8 @@
   "purpose": "Generated plan/report mapping RV8GR chip split records to virtual test instruments.",
   "generated_from": {
     "chip_readiness": "RV8GR/doc/rv8gr_chip_level_readiness.json",
-    "generator_contract": "DB/VIRTUAL_TEST_GENERATOR_CONTRACT.json",
-    "instrument_catalog": "DB/VIRTUAL_TEST_INSTRUMENTS.json"
+    "generator_contract": "lib/standard/VIRTUAL_TEST_GENERATOR_CONTRACT.json",
+    "instrument_catalog": "lib/standard/VIRTUAL_TEST_INSTRUMENTS.json"
   },
   "claim_boundary": "Generated virtual benches prove model behavior and stress selected assumptions. Physical hardware still needs real voltage, timing, and oscilloscope evidence.",
   "delay_noise_policy": {
@@ -110,13 +110,13 @@
     {
       "part": "74HC00",
       "rv8gr_role": "NAND gates for control decode and glue logic.",
-      "package_root": "DB/74xx/74HC00",
+      "package_root": "lib/standard/74xx/74HC00",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC00/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC00/tests/truth_table.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "vectors",
@@ -137,7 +137,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC00/tests/timing.json",
+          "source": "lib/standard/74xx/74HC00/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -159,7 +159,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC00/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC00/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -180,7 +180,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC00/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC00/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -200,7 +200,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC00/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC00/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -227,13 +227,13 @@
     {
       "part": "74HC04",
       "rv8gr_role": "Inverters for active-low control and reset/clock glue.",
-      "package_root": "DB/74xx/74HC04",
+      "package_root": "lib/standard/74xx/74HC04",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC04/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC04/tests/truth_table.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "vectors",
@@ -254,7 +254,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC04/tests/timing.json",
+          "source": "lib/standard/74xx/74HC04/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -276,7 +276,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC04/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC04/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -297,7 +297,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC04/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC04/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -317,7 +317,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC04/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC04/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -344,13 +344,13 @@
     {
       "part": "74HC21",
       "rv8gr_role": "Dual 4-input AND gates for decode and control qualification.",
-      "package_root": "DB/74xx/74HC21",
+      "package_root": "lib/standard/74xx/74HC21",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC21/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC21/tests/truth_table.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "vectors",
@@ -371,7 +371,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC21/tests/timing.json",
+          "source": "lib/standard/74xx/74HC21/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -393,7 +393,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC21/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC21/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -414,7 +414,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC21/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC21/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -434,7 +434,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC21/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC21/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -461,13 +461,13 @@
     {
       "part": "74HC32",
       "rv8gr_role": "OR gates for control composition.",
-      "package_root": "DB/74xx/74HC32",
+      "package_root": "lib/standard/74xx/74HC32",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC32/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC32/tests/truth_table.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "vectors",
@@ -488,7 +488,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC32/tests/timing.json",
+          "source": "lib/standard/74xx/74HC32/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -510,7 +510,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC32/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC32/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -531,7 +531,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC32/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC32/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -551,7 +551,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC32/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC32/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -578,13 +578,13 @@
     {
       "part": "74HC74",
       "rv8gr_role": "Positive-edge D flip-flops for flags, IRQ latch, and synchronous state.",
-      "package_root": "DB/74xx/74HC74",
+      "package_root": "lib/standard/74xx/74HC74",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC74/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC74/tests/truth_table.json",
           "applicable": true,
           "entry_count": 5,
           "entry_kind": "vectors",
@@ -605,7 +605,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC74/tests/timing.json",
+          "source": "lib/standard/74xx/74HC74/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -627,7 +627,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC74/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC74/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -648,7 +648,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC74/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC74/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -668,7 +668,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC74/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC74/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -695,13 +695,13 @@
     {
       "part": "74HC86",
       "rv8gr_role": "XOR gates for ALU and compare/control paths.",
-      "package_root": "DB/74xx/74HC86",
+      "package_root": "lib/standard/74xx/74HC86",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC86/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC86/tests/truth_table.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "vectors",
@@ -722,7 +722,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC86/tests/timing.json",
+          "source": "lib/standard/74xx/74HC86/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -744,7 +744,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC86/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC86/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -765,7 +765,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC86/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC86/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -785,7 +785,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC86/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC86/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -812,13 +812,13 @@
     {
       "part": "74HC157",
       "rv8gr_role": "Quad muxes for address and data path selection.",
-      "package_root": "DB/74xx/74HC157",
+      "package_root": "lib/standard/74xx/74HC157",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC157/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC157/tests/truth_table.json",
           "applicable": true,
           "entry_count": 3,
           "entry_kind": "vectors",
@@ -839,7 +839,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC157/tests/timing.json",
+          "source": "lib/standard/74xx/74HC157/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -861,7 +861,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC157/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC157/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -882,7 +882,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC157/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC157/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -902,7 +902,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC157/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC157/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -929,13 +929,13 @@
     {
       "part": "74HC161",
       "rv8gr_role": "Positive-edge program counter and counter-style state.",
-      "package_root": "DB/74xx/74HC161",
+      "package_root": "lib/standard/74xx/74HC161",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC161/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC161/tests/truth_table.json",
           "applicable": true,
           "entry_count": 12,
           "entry_kind": "vectors",
@@ -956,7 +956,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC161/tests/timing.json",
+          "source": "lib/standard/74xx/74HC161/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -978,7 +978,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC161/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC161/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -999,7 +999,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC161/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC161/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1019,7 +1019,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC161/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC161/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -1046,13 +1046,13 @@
     {
       "part": "74HC164",
       "rv8gr_role": "Serial-in parallel-out ring/control sequencing support.",
-      "package_root": "DB/74xx/74HC164",
+      "package_root": "lib/standard/74xx/74HC164",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC164/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC164/tests/truth_table.json",
           "applicable": true,
           "entry_count": 5,
           "entry_kind": "vectors",
@@ -1073,7 +1073,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC164/tests/timing.json",
+          "source": "lib/standard/74xx/74HC164/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1095,7 +1095,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC164/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC164/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1116,7 +1116,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC164/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC164/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1136,7 +1136,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC164/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC164/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1163,13 +1163,13 @@
     {
       "part": "74HC245",
       "rv8gr_role": "Bidirectional bus transceiver for shared bus isolation.",
-      "package_root": "DB/74xx/74HC245",
+      "package_root": "lib/standard/74xx/74HC245",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC245/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC245/tests/truth_table.json",
           "applicable": true,
           "entry_count": 8,
           "entry_kind": "vectors",
@@ -1190,7 +1190,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC245/tests/timing.json",
+          "source": "lib/standard/74xx/74HC245/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -1212,7 +1212,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC245/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC245/tests/tri_state.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "checks",
@@ -1233,7 +1233,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC245/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC245/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 3,
           "entry_kind": "checks",
@@ -1253,7 +1253,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC245/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC245/tests/propagation.json",
           "applicable": true,
           "entry_count": 3,
           "entry_kind": "checks",
@@ -1280,13 +1280,13 @@
     {
       "part": "74HC283",
       "rv8gr_role": "4-bit binary adders for the ALU.",
-      "package_root": "DB/74xx/74HC283",
+      "package_root": "lib/standard/74xx/74HC283",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC283/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC283/tests/truth_table.json",
           "applicable": true,
           "entry_count": 5,
           "entry_kind": "vectors",
@@ -1307,7 +1307,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC283/tests/timing.json",
+          "source": "lib/standard/74xx/74HC283/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1329,7 +1329,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC283/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC283/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1350,7 +1350,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC283/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC283/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1370,7 +1370,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC283/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC283/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1397,13 +1397,13 @@
     {
       "part": "74HC541",
       "rv8gr_role": "Octal buffers for unidirectional bus and LED/probe-visible outputs.",
-      "package_root": "DB/74xx/74HC541",
+      "package_root": "lib/standard/74xx/74HC541",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC541/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC541/tests/truth_table.json",
           "applicable": true,
           "entry_count": 5,
           "entry_kind": "vectors",
@@ -1424,7 +1424,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC541/tests/timing.json",
+          "source": "lib/standard/74xx/74HC541/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1446,7 +1446,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC541/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC541/tests/tri_state.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1467,7 +1467,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC541/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC541/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1487,7 +1487,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC541/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC541/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1514,13 +1514,13 @@
     {
       "part": "74HC574",
       "rv8gr_role": "Positive-edge octal registers for IR, AC, page, and data-path latches.",
-      "package_root": "DB/74xx/74HC574",
+      "package_root": "lib/standard/74xx/74HC574",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC574/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC574/tests/truth_table.json",
           "applicable": true,
           "entry_count": 7,
           "entry_kind": "vectors",
@@ -1541,7 +1541,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC574/tests/timing.json",
+          "source": "lib/standard/74xx/74HC574/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -1563,7 +1563,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC574/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC574/tests/tri_state.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -1584,7 +1584,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC574/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC574/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1604,7 +1604,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC574/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC574/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -1631,13 +1631,13 @@
     {
       "part": "74HC688",
       "rv8gr_role": "8-bit equality comparator for branch/page/control decisions.",
-      "package_root": "DB/74xx/74HC688",
+      "package_root": "lib/standard/74xx/74HC688",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/74xx/74HC688/tests/truth_table.json",
+          "source": "lib/standard/74xx/74HC688/tests/truth_table.json",
           "applicable": true,
           "entry_count": 4,
           "entry_kind": "vectors",
@@ -1658,7 +1658,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/74xx/74HC688/tests/timing.json",
+          "source": "lib/standard/74xx/74HC688/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1680,7 +1680,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/74xx/74HC688/tests/tri_state.json",
+          "source": "lib/standard/74xx/74HC688/tests/tri_state.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1701,7 +1701,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/74xx/74HC688/tests/bus_fight.json",
+          "source": "lib/standard/74xx/74HC688/tests/bus_fight.json",
           "applicable": false,
           "entry_count": 0,
           "entry_kind": "checks",
@@ -1721,7 +1721,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/74xx/74HC688/tests/propagation.json",
+          "source": "lib/standard/74xx/74HC688/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1748,13 +1748,13 @@
     {
       "part": "62256",
       "rv8gr_role": "Generic 32K x 8 SRAM-compatible RAM footprint.",
-      "package_root": "DB/Memory/62256",
+      "package_root": "lib/standard/memory/62256",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/Memory/62256/tests/truth_table.json",
+          "source": "lib/standard/memory/62256/tests/truth_table.json",
           "applicable": true,
           "entry_count": 12,
           "entry_kind": "vectors",
@@ -1775,7 +1775,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/Memory/62256/tests/timing.json",
+          "source": "lib/standard/memory/62256/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1797,7 +1797,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/Memory/62256/tests/tri_state.json",
+          "source": "lib/standard/memory/62256/tests/tri_state.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1818,7 +1818,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/Memory/62256/tests/bus_fight.json",
+          "source": "lib/standard/memory/62256/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1838,7 +1838,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/Memory/62256/tests/propagation.json",
+          "source": "lib/standard/memory/62256/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1865,13 +1865,13 @@
     {
       "part": "AS6C62256",
       "rv8gr_role": "Alliance 32K x 8 SRAM option for RAM.",
-      "package_root": "DB/Memory/AS6C62256",
+      "package_root": "lib/standard/memory/AS6C62256",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/Memory/AS6C62256/tests/truth_table.json",
+          "source": "lib/standard/memory/AS6C62256/tests/truth_table.json",
           "applicable": true,
           "entry_count": 8,
           "entry_kind": "vectors",
@@ -1892,7 +1892,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/Memory/AS6C62256/tests/timing.json",
+          "source": "lib/standard/memory/AS6C62256/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1914,7 +1914,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/Memory/AS6C62256/tests/tri_state.json",
+          "source": "lib/standard/memory/AS6C62256/tests/tri_state.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1935,7 +1935,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/Memory/AS6C62256/tests/bus_fight.json",
+          "source": "lib/standard/memory/AS6C62256/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1955,7 +1955,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/Memory/AS6C62256/tests/propagation.json",
+          "source": "lib/standard/memory/AS6C62256/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -1982,13 +1982,13 @@
     {
       "part": "AT28C256",
       "rv8gr_role": "32K x 8 EEPROM option for program ROM.",
-      "package_root": "DB/Memory/AT28C256",
+      "package_root": "lib/standard/memory/AT28C256",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/Memory/AT28C256/tests/truth_table.json",
+          "source": "lib/standard/memory/AT28C256/tests/truth_table.json",
           "applicable": true,
           "entry_count": 12,
           "entry_kind": "vectors",
@@ -2009,7 +2009,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/Memory/AT28C256/tests/timing.json",
+          "source": "lib/standard/memory/AT28C256/tests/timing.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -2031,7 +2031,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/Memory/AT28C256/tests/tri_state.json",
+          "source": "lib/standard/memory/AT28C256/tests/tri_state.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -2052,7 +2052,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/Memory/AT28C256/tests/bus_fight.json",
+          "source": "lib/standard/memory/AT28C256/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -2072,7 +2072,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/Memory/AT28C256/tests/propagation.json",
+          "source": "lib/standard/memory/AT28C256/tests/propagation.json",
           "applicable": true,
           "entry_count": 2,
           "entry_kind": "checks",
@@ -2099,13 +2099,13 @@
     {
       "part": "SST39SF010A",
       "rv8gr_role": "Flash ROM option for program storage.",
-      "package_root": "DB/Memory/SST39SF010A",
+      "package_root": "lib/standard/memory/SST39SF010A",
       "chip_level_gate": "ready_for_circuit_functional",
       "physical_timing_allowed": true,
       "split_records": [
         {
           "record": "truth_table",
-          "source": "DB/Memory/SST39SF010A/tests/truth_table.json",
+          "source": "lib/standard/memory/SST39SF010A/tests/truth_table.json",
           "applicable": true,
           "entry_count": 8,
           "entry_kind": "vectors",
@@ -2126,7 +2126,7 @@
         },
         {
           "record": "timing",
-          "source": "DB/Memory/SST39SF010A/tests/timing.json",
+          "source": "lib/standard/memory/SST39SF010A/tests/timing.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -2148,7 +2148,7 @@
         },
         {
           "record": "tri_state",
-          "source": "DB/Memory/SST39SF010A/tests/tri_state.json",
+          "source": "lib/standard/memory/SST39SF010A/tests/tri_state.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -2169,7 +2169,7 @@
         },
         {
           "record": "bus_fight",
-          "source": "DB/Memory/SST39SF010A/tests/bus_fight.json",
+          "source": "lib/standard/memory/SST39SF010A/tests/bus_fight.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
@@ -2189,7 +2189,7 @@
         },
         {
           "record": "propagation",
-          "source": "DB/Memory/SST39SF010A/tests/propagation.json",
+          "source": "lib/standard/memory/SST39SF010A/tests/propagation.json",
           "applicable": true,
           "entry_count": 1,
           "entry_kind": "checks",
