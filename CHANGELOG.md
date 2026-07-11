@@ -1,5 +1,25 @@
 # RV8 Project — Changelog
 
+## 2026-07-12 — v4.5: RV8GR Release Gate and External Components Checkpoint
+
+### Release Gate
+- Updated behavioral Verilog benches and `sim/verify_wiring.py` so detected
+  mismatches exit nonzero and can block aggregate automation.
+
+### Reset and Physical Contract
+- Standardized the reset sequence: U8 is `000` while `/RST` is LOW; the first
+  active clock after reset release establishes T0 and starts opcode fetch.
+- Defined physical signoff clocks as 100 manual ticks, 50 kHz, and 1 MHz.
+  Kept 2 MHz as optional breadboard stress and 5 MHz as an optional PCB-only
+  experiment.
+
+### Components Verification
+- Re-ran RV8GR against the current external Components checkout.
+- Passed the 16 part-type, 36-package audit and the RV8GR whole-system virtual
+  fault screen with zero pin-truth, edge-polarity, output-contention, and
+  propagation-deadband findings.
+- Preserved the physical boundary: virtual results do not sign off the board.
+
 ## 2026-07-10 — v4.4: RV8GR Lab/Doc Verification and Components Mapping
 
 ### RV8GR Student Build Docs

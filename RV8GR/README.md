@@ -211,6 +211,15 @@ python3 -B sim/verify_components.py
 # RV8GR Components verification passed: 16 part types, 36 packages
 ```
 
+To verify against the current external Components library rather than the
+vendored compatibility snapshot:
+
+```bash
+cd RV8GR
+COMPONENTS_ROOT=/home/jo/kiro/Components python3 -B sim/verify_components.py
+# RV8GR Components verification passed: 16 part types, 36 packages
+```
+
 Run the reusable Components virtual physical checker from the Components repo.
 This checks the RV8GR whole-system virtual circuit for pin mistakes, active-low
 mistakes, unsafe output-output wiring, and documented timing/noise risks:
@@ -218,15 +227,21 @@ mistakes, unsafe output-output wiring, and documented timing/noise risks:
 ```bash
 cd /home/jo/kiro/Components
 PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
-# circuit accepted when documented virtual timing/noise assumptions are present
+# pass: no pin-truth, edge-polarity, output-contention, or deadband findings
 ```
+
+This virtual check passed against the current external Components checkout on
+2026-07-12. It is a model-level gate only; it does not replace physical-board
+measurements for reset release, bus turnaround, memory timing, or voltage
+margin.
 
 Use Verilog as the secondary HDL/RTL comparison path:
 
 ```bash
 cd RV8GR
-tools/run_all_verilog_tb.sh
-# behavioral, opcode sweep, SETDP, task, IRQ, chip-level, and dual-compare benches pass
+COMPONENTS_ROOT=/home/jo/kiro/Components tools/run_all_verilog_tb.sh
+# behavioral, opcode sweep, SETDP, task, IRQ, chip-level, and dual-compare
+# benches pass; detected behavioral mismatches exit nonzero
 ```
 
 The behavioral `rtl/rv8gr_cpu.v` benches are only a comparison path. RV8GR

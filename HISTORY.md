@@ -1,5 +1,22 @@
 # RV8 Project — Development History
 
+## 2026-07-12 — v4.5: RV8GR Release Gate and External Components Checkpoint
+
+- Hardened the behavioral Verilog benches and `sim/verify_wiring.py`: a
+  detected mismatch now exits nonzero instead of only printing a failure.
+- Corrected the reset contract across the wiring guide, logical protocol,
+  debug plan, student plans, and lab material: while `/RST` is LOW, U8 is
+  `000`; the first active clock after reset release establishes T0 and begins
+  the first opcode fetch.
+- Kept physical qualification aligned with the student baseline: 100 manual
+  ticks, 50 kHz, and 1 MHz are required; 2 MHz is optional breadboard stress
+  and 5 MHz is an optional PCB-only experiment.
+- Re-ran against the current external Components library: the RV8GR audit
+  passed for 16 part types and 36 packages, and the whole-system virtual fault
+  screen found no pin-truth, edge-polarity, bus-contention, or deadband issues.
+- Physical signoff remains open pending real-board evidence in
+  `RV8GR/doc/07_real_build_timing_log.md`.
+
 ## 2026-07-10 — v4.4: RV8GR Student Labs and Components Mapping Checkpoint
 
 - Rechecked RV8GR student labs, build-plan docs, KiCad module guide, and

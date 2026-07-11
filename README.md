@@ -114,8 +114,8 @@ folder in this checkout.
 
 ### Latest RV8GR Checkpoint
 
-As of 2026-07-10, the RV8GR student labs, build plan, KiCad module guide, and
-sim-lab scripts have been rechecked against the current wiring guide and
-Components-backed chip behavior. The virtual/software gates are ready for
-continued build-along work, but hardware timing claims still require physical
-measurements on the real board.
+As of 2026-07-12, RV8GR release gates fail hard on behavioral Verilog or
+wiring mismatches. The full external Components run passes the 16 part-type,
+36-package audit and the whole-system virtual fault screen with no pin-truth,
+edge-polarity, bus-contention, or propagation-deadband findings. Hardware
+timing claims still require physical measurements on the real board.
