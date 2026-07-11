@@ -156,7 +156,7 @@
 ## 2026-06-16 — v3.7: Documentation Freeze & Consistency Pass
 
 ### Architecture Documentation (ALL FROZEN 🔒)
-- **00_design_isa.md**: Added Architectural Invariants (7 rules), Hardware Freeze Policy (9 signals), Signal Naming Convention (suffix rules), Reset Contract, Forbidden Bus States, Instruction Trace Contract (13-field canonical format), Illegal Opcode Behavior (18/174/64 split with examples), Expansion Budget normalized (v1.0=35, v1.1=37, remaining=3)
+- **00_design_isa.md**: Added Architectural Invariants (7 rules), Hardware Freeze Policy (9 signals), Signal Naming Convention (suffix rules), Reset Contract, Forbidden Bus States, Instruction Trace Contract (13-field canonical format), Illegal Opcode Behavior (18/174/64 split with examples). Legacy expansion-budget wording was superseded; the frozen v1.0 baseline is 34 logic chips + ROM + RAM = 36 packages.
 - **02_wiring_guide.md**: Added Critical Timing Paths table (6 paths), Critical Nets Summary (12 key signals with source/dest pins), IRQ_FF clear wording fixed (v1.0 = /RST only)
 - **03_instruction_trace.md**: Added Trace 10 (Forbidden Opcode $0C), Trace 11 (Boot Sequence 9-clock), Golden Trace (12-cycle regression reference), all signal clarifications
 - **04_bank_switch.md**: Added v2.x Banking Contract (2-bit/128KB/74HC74), Banked Address Formula, Reserved I/O Table ($FF10), Compatibility Contract, Interrupt Safety Rule

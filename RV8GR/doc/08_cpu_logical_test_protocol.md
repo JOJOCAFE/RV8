@@ -233,7 +233,9 @@ Required checks:
 
 ## Regression Command
 
-Run this before saying RV8GR virtual CPU logic is current:
+Run this before saying RV8GR virtual CPU logic is current. These commands are
+the current non-physical CPU verification route; their PASS output is not
+physical-board evidence:
 
 ```bash
 cd /home/jo/kiro/RV8/RV8GR
@@ -248,7 +250,9 @@ python3 -B sim/verify_components.py
 tools/run_all_verilog_tb.sh
 ```
 
-Run this from Components for the separate virtual physical screen:
+Run this from the external Components checkout for the separate virtual
+physical screen. It is a model-level screen, not a substitute for the measured
+1 MHz breadboard baseline recorded in `07_real_build_timing_log.md`:
 
 ```bash
 cd /home/jo/kiro/Components

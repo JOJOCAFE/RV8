@@ -40,7 +40,7 @@ Recommended reading order:
 | Logic chips | 34 (74HC series, DIP) |
 | Total packages | 36 (34 logic + ROM + RAM) |
 | ISA | 18 instructions |
-| Clock | 1 MHz (breadboard), 5 MHz (PCB) |
+| Clock | 1 MHz breadboard baseline; 5 MHz PCB-only measured experiment |
 | Speed | 333K instr/sec @ 1 MHz |
 | Gate count | ~1,260 (logic only, excl. ROM/RAM) |
 | Address | 64KB (ROM $0000-$7FFF, RAM $8000-$FFFF) |
@@ -257,8 +257,10 @@ directory.
 
 Virtual checks, Python simulation, and Verilog comparison are not physical
 signoff. Physical signoff still requires the real board to show correct power
-rails, reset, clock, bus ownership, ROM/RAM behavior, 1 MHz full-system run,
-burn-in stability, and timing evidence from probes or a logic analyzer.
+rails, reset, clock, bus ownership, ROM/RAM behavior, a 1 MHz baseline
+full-system run, burn-in stability, and timing evidence from probes or a logic
+analyzer. A 5 MHz result is optional PCB-only experiment evidence, never a
+replacement for the 1 MHz breadboard baseline.
 
 ---
 

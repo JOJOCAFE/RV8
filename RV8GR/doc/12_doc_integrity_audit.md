@@ -1,6 +1,6 @@
 # RV8GR Documentation Integrity Audit
 
-Updated: 2026-07-10
+Updated: 2026-07-12
 
 This audit checks every Markdown file under `RV8GR/doc/` against the current
 CPU source of truth:
@@ -55,6 +55,7 @@ and Lab 14 U33 `EI_decode`.
 | ROM output | ROM `/OE = WR_DIR`; ROM output disabled during store direction |
 | ROM write | ROM `/WE` inactive during CPU runtime; programmer may drive it only in PROG/reset isolation |
 | Four-model signoff | Both Python sims and both Verilog models agree on 55 exported checkpoints |
+| Breadboard clock baseline | 1 MHz is required physical evidence; 5 MHz is an optional PCB-only measured experiment |
 
 ## Fixes Applied In This Pass
 
@@ -66,12 +67,13 @@ and Lab 14 U33 `EI_decode`.
 | Verilog bench count/status updated to include chip-level and dual-compare signoff | `README.md`, `08_cpu_logical_test_protocol.md`, `11_four_model_equivalence.md` |
 | Four-model equivalence explained for students | `11_four_model_equivalence.md`, linked from `README.md`, `08_cpu_logical_test_protocol.md`, and `JOJOCAFE-Org/SESSION_HANDOFF.md` |
 | Main numbered docs renumbered for readability | `01_wiring_guide.md` through `12_doc_integrity_audit.md`; `B-007_verification_report_2026-07-09.md` remains dated historical evidence |
+| Baseline/verification routing clarified | `00_design_isa.md`, `README.md`, `08_cpu_logical_test_protocol.md`, `14_components_verification_protocol.md`; virtual evidence remains separate from physical signoff, and 5 MHz is not a breadboard target |
 
 ## File-by-File Audit
 
 | File | Scope | Integrity status |
 |---|---|---|
-| `00_design_isa.md` | Main ISA and architecture reference | Updated ROM write wording; now matches 36-package, polling IRQ, U34 immediate path, SETDP, and bus-safety truth. |
+| `00_design_isa.md` | Main ISA and architecture reference | Updated ROM write wording; now matches the 36-package baseline, polling IRQ, U34 immediate path, SETDP, bus-safety truth, and 1 MHz breadboard boundary. |
 | `01_wiring_guide.md` | Official pin-level physical source | Matches current simulator truth for U6, U34, U32/U33, ROM `/OE`, ROM `/WE`, IRQ, and 36 packages. |
 | `02_instruction_trace.md` | Golden debug traces for single-step student bring-up | Kept as a useful derived doc because `05_debug_plan.md` points students to it for trace comparison. Updated wording to make `00_design_isa.md`/`01_wiring_guide.md` the source of truth and to clarify ACC/DP edge-trigger timing. |
 | `03_bank_switch.md` | Future ROM banking and built-in data page | Updated ROM write wording, corrected page `$7F` as ROM-only, fixed 17-bit banked-address examples, and clarified that the +1 bank latch is outside the frozen 36-package v1.0 baseline. |
@@ -79,7 +81,7 @@ and Lab 14 U33 `EI_decode`.
 | `05_debug_plan.md` | Physical debug plan | Updated ROM write wording; remains physical-build protocol, not virtual signoff. |
 | `06_kicad_modules.md` | KiCad module split | Kept as a six-sheet/module guide for KiCad and student chunking, not a replacement for `01_wiring_guide.md`; module ownership matches current U1-U34 architecture. Added explicit build-plan stage mapping and corrected the IR_BUF chip list to include U34. |
 | `07_real_build_timing_log.md` | Physical timing evidence log template | Kept separate from `05_debug_plan.md`: debug plan tells students what to do; timing log records real-board voltage/frequency, bus-race, edge, propagation-delay, fix, and retest evidence. |
-| `08_cpu_logical_test_protocol.md` | CPU logical verification protocol | Kept as the canonical virtual CPU logic regression and signoff protocol; distinct from the student four-model guide and the physical debug/timing docs. |
+| `08_cpu_logical_test_protocol.md` | CPU logical verification protocol | Kept as the canonical virtual CPU logic regression and signoff protocol; its current non-physical command route is explicit and distinct from the physical debug/timing docs. |
 | `09_future_upgrades.md` | Future-only feature parking lot | Kept separate from `03_bank_switch.md`: bank switching has its own focused expansion contract, while this file parks non-baseline timing, reset, DI, I/O, and vector ideas. Updated stale chip-count and U34/IBUS wording; U34 is already part of v1.0. |
 | `10_netlist.md` | Text netlist | Kept as a schematic-capture and breadboard cross-check artifact, derived from `01_wiring_guide.md`. Updated U34 power pins and IBUS driver table so the immediate path is U34-controlled, not U6-direct; remains consistent with 36 packages, U32/U33, ROM `/OE=WR_DIR`, and programmer-only ROM `/WE`. |
 | `11_four_model_equivalence.md` | Student four-model guide | Kept separate from `08_cpu_logical_test_protocol.md`: this short guide answers why RV8GR has two Python sims, two Verilog models, and one shared ASM equivalence source, while the protocol doc remains the maintainer signoff checklist. Verified against `tools/check_python_verilog_equivalence.py` and the 55-checkpoint output. |

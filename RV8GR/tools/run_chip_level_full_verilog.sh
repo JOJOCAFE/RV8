@@ -8,6 +8,10 @@ VERILOG="$COMPONENTS/Verilog"
 if [[ -d "$COMPONENTS/verilog" ]]; then
   VERILOG="$COMPONENTS/verilog"
 fi
+MEMORY="$VERILOG/Memory"
+if [[ -d "$VERILOG/memory" ]]; then
+  MEMORY="$VERILOG/memory"
+fi
 
 mkdir -p "$OUTDIR"
 
@@ -27,8 +31,8 @@ iverilog -g2012 -Wall \
   "$VERILOG/74xx/74hc541.v" \
   "$VERILOG/74xx/74hc574.v" \
   "$VERILOG/74xx/74hc688.v" \
-  "$VERILOG/memory/62256.v" \
-  "$VERILOG/memory/at28c256.v" \
+  "$MEMORY/62256.v" \
+  "$MEMORY/at28c256.v" \
   "$ROOT/rtl/rv8gr_chip_level.v" \
   "$ROOT/tb/tb_rv8gr_chip_full.v"
 

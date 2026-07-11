@@ -1,6 +1,6 @@
 # RV8-GR — Design & ISA Reference (Stable)
 
-**34 logic chips + ROM + RAM. No microcode. 64K. Polling IRQ. Verilog verified.**
+**34 logic chips + ROM + RAM = 36 packages. No microcode. 64K. Polling IRQ. Verilog verified.**
 
 ---
 
@@ -11,7 +11,8 @@
 Accumulator machine: AC hardwired to ALU A-input
 Registers in RAM ($8000-$8007, via DP=$80)
 Control byte bits → hardware signals (no microcode ROM)
-Clock: 1 MHz breadboard, up to 5 MHz on PCB
+Clock: 1 MHz is the breadboard baseline. 5 MHz is a PCB-only experiment that
+requires measured physical timing evidence; it is not a baseline claim.
 ```
 
 ---
@@ -511,6 +512,10 @@ See `03_bank_switch.md` for ROM banking contract (v2.x, +1 chip).
 | Behavioral Verilog | `tools/run_all_verilog_tb.sh` runs the behavioral RTL regression benches |
 | Behavioral vs TTL-chip Verilog | `tools/run_dual_verilog_compare.sh` compares `rtl/rv8gr_cpu.v` with `rtl/rv8gr_chip_level.v` |
 | Four-model equivalence | `tools/check_python_verilog_equivalence.py` compares both Python sims and both Verilog models over the shared all-ISA ROM with 55 checkpoints |
+
+These are virtual or HDL checks. They establish CPU and model behavior, not
+physical-board readiness. Record physical evidence and the 1 MHz baseline run
+in `07_real_build_timing_log.md`; use `05_debug_plan.md` for the bench procedure.
 
 Source of Truth:
 - `00_design_isa.md` — Architectural spec (this file)

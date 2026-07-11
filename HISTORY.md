@@ -84,7 +84,8 @@
 - All 9 RV8-GR docs reviewed, corrected, and frozen (design_isa, wiring_guide, instruction_trace, bank_switch, understand_by_module, debug_plan, risk_analysis, design_signoff, task_test_plan)
 - Added: Architectural Invariants, Hardware Freeze Policy, Instruction Trace Contract (13-field format), Golden Trace, Reset Contract, Forbidden Bus States, Illegal Opcode Behavior table
 - Fixed: IRQ_FF clear mechanism consistent across all docs (v1.0 = /RST only)
-- Fixed: Package count normalized (v1.0=35, v1.1=37)
+- Fixed: Legacy package-count wording was superseded. The current frozen v1.0
+  baseline is 34 logic chips + ROM + RAM = 36 packages.
 - Fixed: Memory map consistent (ROM $0000-$7FFF, RAM $8000-$FFFF) everywhere
 - Fixed: wiring.py missing U31 /RST connections
 - Enhanced: debug_plan with 15+ new tests (bus ownership, walking-1, RAM march, burn-in, clock sweep)

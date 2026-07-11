@@ -83,8 +83,8 @@ tools/run_dual_verilog_compare.sh
 tools/run_all_verilog_tb.sh
 
 cd /home/jo/kiro/Components
-PYTHONPATH=python python3 -B -m chiplib.cli validate Examples/nand.json
-PYTHONPATH=python python3 -B -m chiplib.cli run Examples/nand.json
+PYTHONPATH=python python3 -B -m chiplib.cli validate examples/circuits/nand.json
+PYTHONPATH=python python3 -B -m chiplib.cli run examples/circuits/nand.json
 PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
 PYTHONPATH=python python3 -B -m chiplib.api --stdio
 PYTHONPATH=python python3 -B -m tests.test_cli

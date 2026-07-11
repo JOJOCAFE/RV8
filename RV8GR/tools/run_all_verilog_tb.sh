@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
 
+# Keep the three chip-level gates on the caller-selected Components tree.
+export COMPONENTS_ROOT="${COMPONENTS_ROOT:-}"
+
 mkdir -p "$OUTDIR"
 ln -sfn "$ROOT/programs" "$OUTDIR/programs"
 
