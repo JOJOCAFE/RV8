@@ -43,8 +43,8 @@ Updated: 2026-07-11
 
 - Shared library path: `/home/jo/kiro/Components`.
 - Python package path: `/home/jo/kiro/Components/python`.
-- Student guide: `/home/jo/kiro/Components/STUDENT_GUIDE.md`.
-- Service/CLI/API contract: `/home/jo/kiro/Components/SERVICE_CONTRACT.md`.
+- Student guide: `/home/jo/kiro/Components/docs/STUDENT_GUIDE.md`.
+- Service/CLI/API contract: `/home/jo/kiro/Components/docs/SERVICE_CONTRACT.md`.
 - Python simulator uses DIP-style pin number/name access and propagation-delay scheduling.
 - `StimulusController` default channels: 64 inputs (`IN0..IN63`) and 8 clocks (`CLK0..CLK7`).
 - Clock stimulus is physical-pin and edge aware:
@@ -55,7 +55,7 @@ Updated: 2026-07-11
 - Python and Verilog component behavior must remain compatible.
 - Python schematic backend now supports buses, pull-up/pull-down style normal states, probes/test logic, simple JSON-friendly schematics, and netlist/Verilog export paths for RV8GR-style chip-level work.
 - Virtual physical checker command:
-  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
+  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
 - Checker focus: pin-number/name/active-low mistakes, unsafe output-output wiring, missing edge polarity statements, and timing/noise risk on shared or stress nets.
 - Virtual R/C and delay-noise checks are early-risk instruments; physical build still needs real voltage, frequency, wiring, scope/logic-analyzer, and timing evidence.
 
@@ -85,7 +85,7 @@ tools/run_all_verilog_tb.sh
 cd /home/jo/kiro/Components
 PYTHONPATH=python python3 -B -m chiplib.cli validate Examples/nand.json
 PYTHONPATH=python python3 -B -m chiplib.cli run Examples/nand.json
-PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
 PYTHONPATH=python python3 -B -m chiplib.api --stdio
 PYTHONPATH=python python3 -B -m tests.test_cli
 PYTHONPATH=python python3 -B -m tests.test_api

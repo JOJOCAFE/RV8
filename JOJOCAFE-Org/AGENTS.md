@@ -31,10 +31,10 @@
 - Local repo: `/home/jo/kiro/Components`
 - GitHub: `git@github.com:JOJOCAFE/Components.git`
 - Current checkpoint: `87bcfdc Save Components student guide handoff` on `main`.
-- Student guide: `/home/jo/kiro/Components/STUDENT_GUIDE.md`.
-- CLI/API guide and contract: `/home/jo/kiro/Components/SERVICE_CONTRACT.md`.
+- Student guide: `/home/jo/kiro/Components/docs/STUDENT_GUIDE.md`.
+- CLI/API guide and contract: `/home/jo/kiro/Components/docs/SERVICE_CONTRACT.md`.
 - Virtual physical checker:
-  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
+  `PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json`
 - Datasheet rule: manufacturer source only; DIP/PDIP package evidence required for breadboard pinout docs.
 - AllDatasheet may be used as a search/download helper, but final pin docs must cite the manufacturer PDF evidence.
 - RV8GR-derived circuits must carry wiring data, proof vectors, Python tests, student docs, and explicit timing/bus/edge assumptions together.

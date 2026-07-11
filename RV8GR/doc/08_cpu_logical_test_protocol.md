@@ -252,7 +252,7 @@ Run this from Components for the separate virtual physical screen:
 
 ```bash
 cd /home/jo/kiro/Components
-PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
 ```
 
 ## Scoreboard Rule

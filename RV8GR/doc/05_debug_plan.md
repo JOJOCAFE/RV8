@@ -43,7 +43,7 @@ python3 -B sim/soft_debug.py
 
 ```bash
 cd /home/jo/kiro/Components
-PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults Lib/Circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
+PYTHONPATH=python python3 -B -m chiplib.cli circuit-faults examples/circuits/RV8GR_WholeSystemChipLevelVirtual/circuit.json
 ```
 
 This checker is a virtual risk screen for pin-number mistakes, active-low
