@@ -99,14 +99,16 @@ Mode 1: Single-step (debug)
   กดปุ่ม 1 ครั้ง = 1 clock = 1 state change
 
 Mode 2: Low speed / timing qualification
-  50 kHz first, then 1 MHz, 2 MHz, 5 MHz
+  50 kHz first, then 1 MHz
   Use 50 kHz for safe visible bring-up before MHz tests
+  2 MHz = optional short-wire breadboard stress
+  5 MHz = optional PCB-only experiment
 
 Mode 3: Full speed
   1 MHz 5V CMOS oscillator module → 74HC14 buffer → CLK
   1 MHz = official target (ปลอดภัย, margin >700ns)
-  2 MHz = achievable on short-wire breadboard
-  5 MHz = PCB only (experimental, ~0ns margin)
+  2 MHz = optional short-wire breadboard stress
+  5 MHz = optional PCB-only experiment (~0ns margin)
 ```
 
 ---
@@ -117,8 +119,12 @@ Mode 3: Full speed
 
 **Reset state ที่ hardware รับประกัน:**
 - PC = $0000
-- T-state = T0
+- U8 Q2:Q0 = `000` while `/RST` is LOW
 - IE = 0, IRQ_FF = 0
+
+After `/RST` returns HIGH, the first active clock edge shifts the ring counter
+into T0 (`001`) and starts the first opcode fetch. Do not treat reset itself as
+a T0 clock edge.
 
 **State ที่ UNKNOWN หลัง reset** (ต้อง initialize ก่อนใช้):
 - PG, DP, AC, Z = ค่าไม่แน่นอน
@@ -164,7 +170,8 @@ J $06           ; loop here (HLT macro = J self)
 ### Reset Recovery Test
 
 - [ ] รันโปรแกรม loop ที่ 1 MHz (เช่น LI $55, ADDI $01, J $00)
-- [ ] กด RESET ขณะรัน → PC ต้องกลับ $0000, T-state=T0 ทุกครั้ง
+- [ ] กด RESET ขณะรัน → PC ต้องกลับ $0000 และ U8 ต้องเป็น `000`; หลังปล่อย
+      reset แล้ว clock active ครั้งแรกต้องเข้าสู่ T0 ทุกครั้ง
 - [ ] ลองกด RESET 10 ครั้งที่จังหวะต่างกัน → ต้องผ่านทุกครั้ง
 
 **LED**: 1 ดวงบน CLK output
@@ -187,10 +194,11 @@ J $06           ; loop here (HLT macro = J self)
 **ต่ออะไร**: U8 (74HC164), U24 pin 1-4 (inverters 2 ตัว)
 
 **ทดสอบ**:
-- [ ] Reset → T0=1, T1=0, T2=0
-- [ ] Clock 1 → T0=0, T1=1, T2=0
-- [ ] Clock 2 → T0=0, T1=0, T2=1
-- [ ] Clock 3 → T0=1, T1=0, T2=0 (wrap around)
+- [ ] Reset asserted → T0=0, T1=0, T2=0
+- [ ] First active clock after reset release → T0=1, T1=0, T2=0
+- [ ] Clock 2 → T0=0, T1=1, T2=0
+- [ ] Clock 3 → T0=0, T1=0, T2=1
+- [ ] Clock 4 → T0=1, T1=0, T2=0 (wrap around)
 - [ ] ทำซ้ำ 10 รอบ ไม่ skip ไม่ค้าง
 
 **Endurance test** (555 timer @ 1 Hz, ปล่อย 1000+ cycles):
@@ -199,7 +207,8 @@ J $06           ; loop here (HLT macro = J self)
 
 **Illegal State Recovery** (ตรวจว่า ring counter self-corrects):
 - [ ] ถอด /RST ชั่วคราว แล้วจ่าย noise เข้า U8 → state อาจเพี้ยน
-- [ ] ต่อ /RST กลับ → กด reset → ต้องกลับ T0=1,T1=0,T2=0 ทันที
+- [ ] ต่อ /RST กลับ → กด reset → U8 ต้องเป็น `000`; ปล่อย reset แล้ว clock
+      active ครั้งแรกต้องกลับ T0=1,T1=0,T2=0
 - [ ] ถ้า power-up ได้ state 000 (all-zero) → feedback NOT(Q0)&NOT(Q1) จะ inject 1 → recover ภายใน 3 clocks
 
 **Ring Counter State Matrix** (74HC164 behavior):
@@ -216,7 +225,8 @@ J $06           ; loop here (HLT macro = J self)
 | 1  1  1 | Illegal | Clears in 2-3 clocks |
 
 > 📌 All illegal states self-correct within 3 clocks — no hardware fix needed.
-> /RST forces immediate recovery to T0 (001).
+> /RST clears U8 immediately to `000`; the first active clock after reset
+> release recovers to T0 (`001`).
 
 **LED**: 3 ดวงบน T0 (U8-3), T1 (U8-4), T2 (U8-5)
 

@@ -72,7 +72,8 @@ clear pass/fail signals.
 Every virtual CPU test must begin from the v1.0 boot contract:
 
 - PC starts at `$0000`.
-- T-state starts at T0.
+- While reset is asserted, U8 is cleared to `000`; the first active clock after
+  reset release establishes T0 and begins the first opcode fetch.
 - IRQ latch and IE are clear after reset.
 - PG, DP, AC, and Z are treated as unknown on real hardware, even if a simulator
   initializes them for convenience.

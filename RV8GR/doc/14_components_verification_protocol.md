@@ -217,8 +217,12 @@ Required clock profiles:
 - 100 manual push-switch ticks
 - 50 kHz
 - 1 MHz
-- 2 MHz
-- 5 MHz (PCB-only experiment; not a breadboard baseline)
+
+Optional profiles, recorded separately and never used as breadboard signoff
+gates:
+
+- 2 MHz breadboard stress
+- 5 MHz PCB-only experiment
 
 Required physical evidence:
 

@@ -47,7 +47,10 @@ module tb_rv8gr_tasks;
 
         $display("\n========================================");
         if (errors == 0) $display("ALL TASK TESTS PASSED");
-        else $display("FAILED: %0d error(s)", errors);
+        else begin
+            $display("FAILED: %0d error(s)", errors);
+            $fatal(1, "Task-level milestone tests failed");
+        end
         $display("========================================");
         $finish;
     end

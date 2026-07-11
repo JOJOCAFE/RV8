@@ -128,10 +128,11 @@ Recommended debug tools:
 
 **Expected**
 ```text
-Reset: T0=1 T1=0 T2=0
-Clock 1: T0=0 T1=1 T2=0
-Clock 2: T0=0 T1=0 T2=1
-Clock 3: T0=1 T1=0 T2=0
+Reset asserted: T0=0 T1=0 T2=0
+Clock 1 after reset release: T0=1 T1=0 T2=0
+Clock 2: T0=0 T1=1 T2=0
+Clock 3: T0=0 T1=0 T2=1
+Clock 4: T0=1 T1=0 T2=0
 ```
 
 **Pass**
@@ -800,13 +801,15 @@ Use this only after every stage above has passed on the real hardware:
 - VCC is 4.8V to 5.2V at the farthest chips while running.
 - Record voltage evidence at 4.5V, 5.0V, and 5.5V if the supply and parts allow
   the sweep safely.
-- Reset always returns PC to `$0000` and T-state to T0.
+- Reset always returns PC to `$0000` and clears U8 to `000`; the first active
+  clock after reset release establishes T0.
 - Single-step clock advances exactly one state per press.
 - No chip is hot and no bus-fight current spike is observed.
 - Golden Bring-up passes at 1 MHz.
 - Full Instruction Smoke Test reaches the pass loop.
-- Repeat timing checks at 50 kHz, 1 MHz, 2 MHz, and 5 MHz, plus the 100-tick
-  push-switch test, and record any failing frequency separately.
+- Record the 50 kHz and 1 MHz checks plus the 100-tick push-switch test. Record
+  2 MHz separately only as optional breadboard stress. Record 5 MHz only as an
+  optional PCB/short-wire experiment; neither is a breadboard signoff gate.
 - Record bus ownership, rising/falling edge behavior, and propagation-delay
   findings in `doc/07_real_build_timing_log.md`.
 - One-hour burn-in stays in the pass loop.
