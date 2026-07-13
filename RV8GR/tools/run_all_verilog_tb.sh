@@ -38,3 +38,6 @@ RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_chip_level_full_verilog.sh"
 
 echo "=== tb_rv8gr_dual_compare ==="
 RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_dual_verilog_compare.sh"
+
+echo "=== memory and bus mutation kills ==="
+RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_memory_bus_mutation.sh"
