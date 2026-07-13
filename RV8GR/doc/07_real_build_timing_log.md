@@ -55,8 +55,9 @@ change made before rerun.
 ### 1. Clock, Reset, And Ring Counter
 
 - Signals: `CLK`, `/RST`, `T0`, `T1`, `T2`
-- Edge focus: one clean active clock edge per step; reset release must not
-  double-trigger.
+- Edge focus: one clean active clock edge per step. While `/RST` is LOW, U8
+  must read `000`; reset release must not double-trigger, and the first active
+  clock after release must establish T0 (`001`).
 - Bus-race focus: none yet.
 - Propagation focus: ring feedback settles before the next active clock.
 - Pass evidence: one-hot `T0/T1/T2` for at least 100 ticks.

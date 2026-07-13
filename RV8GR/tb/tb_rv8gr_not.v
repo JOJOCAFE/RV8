@@ -68,8 +68,10 @@ module tb_rv8gr_not;
 
         if (failures == 0)
             $display("=== NOT PSEUDO-INSTRUCTION TEST PASSED ===");
-        else
+        else begin
             $display("=== NOT PSEUDO-INSTRUCTION TEST FAILED: %0d failures ===", failures);
+            $fatal(1, "NOT pseudo-instruction test failed");
+        end
 
         $finish;
     end

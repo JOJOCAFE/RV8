@@ -166,8 +166,9 @@ python3 ../Programmer/tools/rv8flash.py program test_full.bin --base 0x0000
 - [ ] จับ IC ทุกตัว 10 วินาที → ไม่ร้อน
 - [ ] กด reset → CPU เริ่มใหม่ → AC กลับเป็น $AA (ถูกต้อง)
 
-> บอร์ดจริงต้องบันทึกผลที่ 50 kHz, 1 MHz, 2 MHz, 5 MHz และ 100-tick
-> push-switch test ใน `../07_real_build_timing_log.md`.
+> บอร์ดจริงต้องบันทึกผลที่ 50 kHz, 1 MHz และ 100-tick push-switch test ใน
+> `../07_real_build_timing_log.md`. 2 MHz เป็น optional breadboard stress;
+> 5 MHz เป็น optional PCB-only experiment ไม่ใช่เงื่อนไขผ่าน board.
 
 ### Test 4: Count program
 
@@ -331,7 +332,7 @@ python3 lab13_full_system.py
 | 5 | 1 MHz | AC=$BB (RAM) | ☐ |
 | 6 | 1 MHz | AC=$CC (Page) | ☐ |
 | 7 | 1 MHz | 1hr stable | ☐ |
-| 7 | 5 MHz | 1hr stable (optional) | ☐ |
-| timing log | 50 kHz/1/2/5 MHz + 100 ticks | recorded in `../07_real_build_timing_log.md` | ☐ |
+| optional PCB | 5 MHz | 1hr stable experiment only | ☐ |
+| timing log | 50 kHz/1 MHz + 100 ticks; 2 MHz stress and 5 MHz PCB experiment optional | recorded in `../07_real_build_timing_log.md` | ☐ |
 
 **ผ่าน Test 1-7 ที่ 1 MHz → ไป Lab 14!** 🎉

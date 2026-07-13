@@ -101,10 +101,13 @@ module tb_rv8gr_setdp;
             cycle_count = cycle_count + 1;
         end
 
-        if (!halted)
+        if (!halted) begin
             $display("FAIL: Timeout after %0d cycles", cycle_count);
-        else if (cpu.ac == 8'hFF)
+            $fatal(1, "SETDP test timed out");
+        end else if (cpu.ac == 8'hFF) begin
             $display("FAIL: Test failed at cycle %0d, PC=$%04X", cycle_count, cpu.pc);
+            $fatal(1, "SETDP test reached the fail halt");
+        end
         else begin
             $display("=== SETDP TEST PASSED === (%0d cycles)", cycle_count);
             $display("  5KB RAM write/read across pages $90-$A3: OK");

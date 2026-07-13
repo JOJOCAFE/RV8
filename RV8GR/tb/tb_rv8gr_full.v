@@ -107,6 +107,7 @@ module tb_rv8gr;
             $display("=== FAILED at PC=$%04X === (%0d cycles)", cpu.pc, cycle_count);
             $display("  AC=$%02X Z=%b PG=$%02X", cpu.ac, cpu.z_flag, cpu.page_reg);
             $display("  IR_HIGH=$%02X IR_LOW=$%02X", cpu.ir_high, cpu.ir_low);
+            $fatal(1, "Full ISA test did not reach the pass halt");
         end
 
         $finish;

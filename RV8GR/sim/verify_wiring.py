@@ -197,3 +197,4 @@ if __name__ == '__main__':
         print("=" * 60)
     else:
         print("⚠️ Some wiring mismatches found — check connections")
+        sys.exit(1)

@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTDIR="${RV8GR_BUILD_DIR:-/tmp/rv8gr-verilog}"
 
+# Keep the three chip-level gates on the caller-selected Components tree.
+export COMPONENTS_ROOT="${COMPONENTS_ROOT:-}"
+
 mkdir -p "$OUTDIR"
 ln -sfn "$ROOT/programs" "$OUTDIR/programs"
 
@@ -35,3 +38,6 @@ RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_chip_level_full_verilog.sh"
 
 echo "=== tb_rv8gr_dual_compare ==="
 RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_dual_verilog_compare.sh"
+
+echo "=== memory and bus mutation kills ==="
+RV8GR_BUILD_DIR="$OUTDIR" "$ROOT/tools/run_memory_bus_mutation.sh"

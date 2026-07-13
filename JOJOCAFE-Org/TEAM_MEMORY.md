@@ -26,11 +26,15 @@ Shared knowledge for all agents. Update when significant facts change.
 - Horizontal control: opcode byte = control word, no decoder
 - Encoding: [7]SUB [6]XOR [5]MUX [4]AC_WR [3]SRC [2]STR [1]BR [0]JMP
 - Chips: 34 logic (U1-U34) + AT28C256 ROM + 62256 RAM
-- Clock: 1 MHz breadboard, 4-5 MHz PCB
+- Clock: 1 MHz breadboard signoff; 2 MHz optional breadboard stress; 5 MHz
+  optional PCB-only experiment
 
 ## Verification Status
 
-- Verilog: 5 TBs pass (full, IRQ, SETDP, tasks, 512-opcode sweep)
+- Verilog: aggregate behavioral/chip-level suite passes, including 512-opcode
+  sweep and 55-checkpoint dual comparison; behavioral mismatch paths fail hard
+- External Components: 16 part types / 36 packages and whole-system virtual
+  fault screen pass with zero findings
 - Gate-level: chip_sim.py 8/8, soft_debug.py 4/4
 - Physical: NOT YET BUILT
 
@@ -52,7 +56,7 @@ Shared knowledge for all agents. Update when significant facts change.
 - GitHub: `git@github.com:JOJOCAFE/Components.git`
 - Branch: `main`
 - Initial pushed commit: `f674250 Initial shared component library`
-- Latest known pushed commit: `87bcfdc Save Components student guide handoff`
+- Latest known pushed commit: `498f684 Save team skills checkpoint`
 - Contents: canonical chip definitions, reusable 74HC Verilog models, memory models, DIP/PDIP pinout docs, circuit libraries, student docs, CLI/API contract docs, smoke tests, virtual physical-system checkers, and retained manufacturer datasheet evidence.
 - Python library: `/home/jo/kiro/Components/python`, pin-level DIP-style chip models, ROM/RAM image loader, 64 input stimulus channels (`IN0..IN63`), 8 clocks (`CLK0..CLK7`), propagation-delay simulation, edge-aware clock dispatch, JSON-friendly schematics, buses, pull defaults, probes/test logic, netlist generation, Verilog export, and CLI/API workflows.
 - Student guide: `/home/jo/kiro/Components/docs/STUDENT_GUIDE.md` explains Components for CLI and API use.

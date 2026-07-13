@@ -102,16 +102,18 @@ Look at:
 Expected:
 
 ```text
-Reset:  T0=1 T1=0 T2=0
-Clock:  T0=0 T1=1 T2=0
-Clock:  T0=0 T1=0 T2=1
-Clock:  T0=1 T1=0 T2=0
+Reset asserted: T0=0 T1=0 T2=0
+Clock 1 after reset release: T0=1 T1=0 T2=0
+Clock 2: T0=0 T1=1 T2=0
+Clock 3: T0=0 T1=0 T2=1
+Clock 4: T0=1 T1=0 T2=0
 ```
 
 Pass:
 - [ ] T0/T1/T2 rotate in order.
 - [ ] No skipped state.
-- [ ] Reset returns to T0.
+- [ ] Reset clears all three phase LEDs; the first active clock after reset
+      release enters T0.
 
 Stop if:
 - Two LEDs are ON at the same time.

@@ -24,7 +24,7 @@ report. The machine-readable companions remain:
 | Chip-level behavior gate | PASS | `tests.test_generated_split_records` passed |
 | Circuit-level package gate | PASS | `tests.test_lib_circuits` passed |
 | Block UI/tooling gate | PASS | `tests.test_block_ui` passed |
-| RV8GR whole-system Verilog gate | PASS from recorded checkpoint | `examples/circuits/RV8GR_END_TO_END_TEST_PLAN.md` records `run_all_verilog_tb.sh` pass |
+| RV8GR whole-system Verilog gate | Recorded virtual checkpoint | Run `RV8GR/tools/run_all_verilog_tb.sh` from this checkout for current evidence; the Components end-to-end plan is a separate external artifact |
 | Physical hardware signoff | BLOCKED | voltage/frequency/scope evidence still missing |
 
 | Item | Count | Status |
@@ -129,7 +129,7 @@ unless bench evidence exists.
 
 ## Level 3: System-Level Gate
 
-Components-side pass commands:
+Components-side pass commands, run from `/home/jo/kiro/Components`:
 
 ```sh
 PYTHONPATH=python python3 -B -m tests.test_lib_circuits
@@ -156,7 +156,9 @@ Required RV8GR pass markers:
 
 Pass condition: Components proofs and RV8GR benches agree on instruction
 behavior, bus ownership, reset/boot behavior, page/data behavior, and IRQ v1.0
-boundaries.
+boundaries. This is non-physical evidence only. The physical gate remains
+blocked until the real board records the 1 MHz baseline and required measured
+power, edge, bus-deadband, memory, and timing evidence.
 
 ## Virtual Bench Mapping
 
@@ -215,8 +217,12 @@ Required clock profiles:
 - 100 manual push-switch ticks
 - 50 kHz
 - 1 MHz
-- 2 MHz
-- 5 MHz
+
+Optional profiles, recorded separately and never used as breadboard signoff
+gates:
+
+- 2 MHz breadboard stress
+- 5 MHz PCB-only experiment
 
 Required physical evidence:
 
@@ -230,9 +236,10 @@ Required physical evidence:
 - breadboard R/C calibration for `CLK`, `/RST`, `IBUS`, `DBUS`, and memory
   control nets
 
-Pass condition: the real build passes the voltage/frequency sweep without bus
-fights, bad edge triggers, timing-window failures, or supply/edge-quality
-violations.
+Pass condition: the real build passes the 1 MHz breadboard baseline and its
+required measurements without bus fights, bad edge triggers, timing-window
+failures, or supply/edge-quality violations. Record 5 MHz separately only as
+an optional PCB-only experiment.
 
 Do not write "hardware ready" unless Level 4 passes.
 

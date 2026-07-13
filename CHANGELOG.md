@@ -1,5 +1,25 @@
 # RV8 Project — Changelog
 
+## 2026-07-12 — v4.5: RV8GR Release Gate and External Components Checkpoint
+
+### Release Gate
+- Updated behavioral Verilog benches and `sim/verify_wiring.py` so detected
+  mismatches exit nonzero and can block aggregate automation.
+
+### Reset and Physical Contract
+- Standardized the reset sequence: U8 is `000` while `/RST` is LOW; the first
+  active clock after reset release establishes T0 and starts opcode fetch.
+- Defined physical signoff clocks as 100 manual ticks, 50 kHz, and 1 MHz.
+  Kept 2 MHz as optional breadboard stress and 5 MHz as an optional PCB-only
+  experiment.
+
+### Components Verification
+- Re-ran RV8GR against the current external Components checkout.
+- Passed the 16 part-type, 36-package audit and the RV8GR whole-system virtual
+  fault screen with zero pin-truth, edge-polarity, output-contention, and
+  propagation-deadband findings.
+- Preserved the physical boundary: virtual results do not sign off the board.
+
 ## 2026-07-10 — v4.4: RV8GR Lab/Doc Verification and Components Mapping
 
 ### RV8GR Student Build Docs
@@ -156,7 +176,7 @@
 ## 2026-06-16 — v3.7: Documentation Freeze & Consistency Pass
 
 ### Architecture Documentation (ALL FROZEN 🔒)
-- **00_design_isa.md**: Added Architectural Invariants (7 rules), Hardware Freeze Policy (9 signals), Signal Naming Convention (suffix rules), Reset Contract, Forbidden Bus States, Instruction Trace Contract (13-field canonical format), Illegal Opcode Behavior (18/174/64 split with examples), Expansion Budget normalized (v1.0=35, v1.1=37, remaining=3)
+- **00_design_isa.md**: Added Architectural Invariants (7 rules), Hardware Freeze Policy (9 signals), Signal Naming Convention (suffix rules), Reset Contract, Forbidden Bus States, Instruction Trace Contract (13-field canonical format), Illegal Opcode Behavior (18/174/64 split with examples). Legacy expansion-budget wording was superseded; the frozen v1.0 baseline is 34 logic chips + ROM + RAM = 36 packages.
 - **02_wiring_guide.md**: Added Critical Timing Paths table (6 paths), Critical Nets Summary (12 key signals with source/dest pins), IRQ_FF clear wording fixed (v1.0 = /RST only)
 - **03_instruction_trace.md**: Added Trace 10 (Forbidden Opcode $0C), Trace 11 (Boot Sequence 9-clock), Golden Trace (12-cycle regression reference), all signal clarifications
 - **04_bank_switch.md**: Added v2.x Banking Contract (2-bit/128KB/74HC74), Banked Address Formula, Reserved I/O Table ($FF10), Compatibility Contract, Interrupt Safety Rule

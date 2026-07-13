@@ -1,5 +1,22 @@
 # RV8 Project — Development History
 
+## 2026-07-12 — v4.5: RV8GR Release Gate and External Components Checkpoint
+
+- Hardened the behavioral Verilog benches and `sim/verify_wiring.py`: a
+  detected mismatch now exits nonzero instead of only printing a failure.
+- Corrected the reset contract across the wiring guide, logical protocol,
+  debug plan, student plans, and lab material: while `/RST` is LOW, U8 is
+  `000`; the first active clock after reset release establishes T0 and begins
+  the first opcode fetch.
+- Kept physical qualification aligned with the student baseline: 100 manual
+  ticks, 50 kHz, and 1 MHz are required; 2 MHz is optional breadboard stress
+  and 5 MHz is an optional PCB-only experiment.
+- Re-ran against the current external Components library: the RV8GR audit
+  passed for 16 part types and 36 packages, and the whole-system virtual fault
+  screen found no pin-truth, edge-polarity, bus-contention, or deadband issues.
+- Physical signoff remains open pending real-board evidence in
+  `RV8GR/doc/07_real_build_timing_log.md`.
+
 ## 2026-07-10 — v4.4: RV8GR Student Labs and Components Mapping Checkpoint
 
 - Rechecked RV8GR student labs, build-plan docs, KiCad module guide, and
@@ -84,7 +101,8 @@
 - All 9 RV8-GR docs reviewed, corrected, and frozen (design_isa, wiring_guide, instruction_trace, bank_switch, understand_by_module, debug_plan, risk_analysis, design_signoff, task_test_plan)
 - Added: Architectural Invariants, Hardware Freeze Policy, Instruction Trace Contract (13-field format), Golden Trace, Reset Contract, Forbidden Bus States, Illegal Opcode Behavior table
 - Fixed: IRQ_FF clear mechanism consistent across all docs (v1.0 = /RST only)
-- Fixed: Package count normalized (v1.0=35, v1.1=37)
+- Fixed: Legacy package-count wording was superseded. The current frozen v1.0
+  baseline is 34 logic chips + ROM + RAM = 36 packages.
 - Fixed: Memory map consistent (ROM $0000-$7FFF, RAM $8000-$FFFF) everywhere
 - Fixed: wiring.py missing U31 /RST connections
 - Enhanced: debug_plan with 15+ new tests (bus ownership, walking-1, RAM march, burn-in, clock sweep)

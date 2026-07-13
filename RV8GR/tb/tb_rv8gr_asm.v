@@ -38,8 +38,10 @@ module tb_rv8gr_asm;
         // testrom.asm: pass has AC=$00 Z=1 from SUBI $77 test
         if (cpu.ac == 8'h00 && cpu.z_flag == 1'b1)
             $display("=== ASSEMBLER TEST PASSED ===");
-        else
+        else begin
             $display("=== FAILED ===");
+            $fatal(1, "Assembler test result mismatch");
+        end
 
         $finish;
     end

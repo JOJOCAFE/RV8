@@ -211,7 +211,9 @@ TRUE standalone boot supported — no Programmer needed at power-on.
 
 > 📌 **Standalone boot is native in v1.0.**
 > PC resets to $0000 which is in ROM space. No boot stub needed.
-> First instruction in ROM executes immediately after reset.
+> While reset is asserted U8 is cleared to `000`. The first active clock after
+> reset release establishes T0 and begins the first ROM opcode fetch; the
+> instruction completes after its normal T0, T1, T2 sequence.
 
 > 📌 **PG, DP, AC are indeterminate at power-on** (74HC574 has no /CLR).
 > Boot sequence handles this — see "Boot Requirements" above.

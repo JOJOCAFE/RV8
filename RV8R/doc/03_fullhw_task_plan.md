@@ -148,7 +148,7 @@ deterministic decode rather than extra ROM bits.
 **Goal:** Decide whether RV8-R FullHW is a teaching build or an advanced reference.
 
 **Work:**
-- Compare FullHW 53-package complexity against RV8GR-V2 35-package student baseline.
+- Compare FullHW 53-package complexity against RV8GR 36-package student baseline.
 - If FullHW remains advanced, document it as a teacher/reference path.
 - If building FullHW physically, create a staged build plan with manual-clock tests.
 
