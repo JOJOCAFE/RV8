@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Simulation and generated images
+*.vcd
+*.vvp
+*.bin
+
+# Operating-system metadata
+.DS_Store
+*:Zone.Identifier
