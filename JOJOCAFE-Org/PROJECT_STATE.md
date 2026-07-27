@@ -37,6 +37,9 @@ The team owns the entire RV8 project. All variants, all deliverables.
 
 | Date | Decision | By |
 |------|----------|----|
+| 2026-07-27 | Created `.codex/instructions.md` for both RV8 and Components repos — lean, job-scoped Codex agent instructions derived from JOJOCAFE-Org team skills | Pim |
+| 2026-07-27 | Pulled latest JOJOCAFE-Org skills from GitHub (5 merge PRs from team-setup branch); rebased local onto origin/main | Pim |
+| 2026-07-27 | Full RV8GR analysis confirmed: all verification virtual-only, 4-model equivalence pass, 14 TBs green, ready for physical build, no design blockers | Pim |
 | 2026-07-09 | Shared Components repo created and pushed to `git@github.com:JOJOCAFE/Components.git`; component-library skill added for agent ownership and datasheet workflow | Pim |
 | 2026-07-09 | Components Python simulator added/updated with DIP pin models, ROM/RAM image loading, 64 input stimulus channels, 8 clocks, and edge-aware clock dispatch; pushed through `f4ea985` | Pim |
 | 2026-07-09 | Components Python schematic backend, buses, pull defaults, probes/test logic, netlist, and Verilog export path added; pushed through `6bc7ee0` | Pim |

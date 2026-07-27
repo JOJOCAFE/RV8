@@ -1,28 +1,18 @@
 # Session Handoff
 
-Updated: 2026-07-12
+Updated: 2026-07-27 14:56 ICT
 
 ## Current State
 
-- RV8 `team-setup` is clean and pushed through `1351bf9 Document RV8GR release
-  gate checkpoint`; the preceding `3dc9c38` makes behavioral Verilog and
-  `sim/verify_wiring.py` fail nonzero on detected mismatches.
-- Components `main` is clean and pushed through `498f684 Save team skills
-  checkpoint`.
-- The current external Components run passes `sim/verify_components.py` for 16
-  part types and 36 packages, and the whole-system virtual fault screen has no
-  pin-truth, edge-polarity, output-contention, or deadband findings.
-- Reset is now explicit everywhere: U8 is `000` while `/RST` is LOW; the first
-  active clock after reset release establishes T0 and begins opcode fetch.
-- B-007 remains non-physical. Start physical Stage 1 next: board/BOM check,
-  ROM programming verification, rails, reset/clock capture, then 100 manual
-  T0/T1/T2 ticks recorded in `RV8GR/doc/07_real_build_timing_log.md`.
-- B-010 example ASM programs are implemented and assembler-verified.
-- B-011 is phase 1 only: `RV8GR/programs/basic_min.asm` is a BASIC-style ROM
-  smoke test with `sim/test_basic_min.py`; it is not an interactive BASIC
-  interpreter yet.
-- Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
+- RV8 `team-setup` rebased onto `origin/main` (5 new merge PRs from team-setup branch integrated).
+- `.codex/instructions.md` created for both RV8 (94 lines, CPU/wiring/RTL focused) and Components (103 lines, library/DB/models focused). These give OpenAI Codex job-scoped context without overloading.
+- JOJOCAFE-Org knowledge base re-indexed with latest pulled content.
+- Full RV8GR analysis performed 2026-07-27: all 14 Verilog TBs pass, 4-model equivalence on 55 checkpoints, mutation testing added Jul 13, VCD files gitignored, no CI needed for solo educational project.
+- Components `main` is clean at `3333691 Polish Board direct label properties`.
+- Board UI redesign attempted (new title bar, tabs, status bar, PCB Green #007C3D) but reverted — original 3-pane layout restored from git. The mockup reference images remain at `board/temp/ui/` for future use.
+- All 5 Board tests pass on restored code.
 - RV8 remote: `git@github.com:JOJOCAFE/RV8.git`, branch `team-setup`.
+- Components remote: `git@github.com:JOJOCAFE/Components.git`, branch `main`.
 - RV8 team/skill updates are in this repo under `JOJOCAFE-Org/`; current work merges the latest Components skill/status into the RV8 team operating docs.
 - RV8GR verification tooling now writes Verilog `.vvp/.vcd` artifacts to `RV8GR_BUILD_DIR` or `/tmp/rv8gr-verilog`, so source folders stay clean while testbenches still support manual local VCD names.
 - RV8GR Python chip behavior tests now run from repo root with `python3 -B RV8GR/sim/chips/test_chips.py`.
