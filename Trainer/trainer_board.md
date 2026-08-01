@@ -9,7 +9,7 @@ Uses ESP32 NodeMCU for ROM programming and serial communication.
 ```
 ┌──────────────┐  40-pin   ┌───────────────────────────────────────┐
 │  CPU Board   │◄─ribbon──►│            Trainer Board              │
-│  27 chips    │  cable    │                                       │
+│  34 chips    │  cable    │                                       │
 │  (5V)       │           │  ESP32 NodeMCU ──► USB to PC          │
 │              │           │       │ (3.3V)                        │
 │              │           │       ▼                               │
@@ -183,9 +183,9 @@ RxCLK  ← 1.8432MHz osc
 
 | Board | Chips | Cost |
 |-------|:-----:|:----:|
-| CPU board | 27 | ~$21 |
+| CPU board | 34 | ~$21 |
 | Trainer board | 8 + ESP32 | ~$23 |
-| **Total** | **35 + ESP32** | **~$44** |
+| **Total** | **42 + ESP32** | **~$44** |
 
 ## Workflow
 
