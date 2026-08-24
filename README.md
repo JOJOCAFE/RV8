@@ -36,7 +36,9 @@ Build real computers from 74HC chips. Run BASIC. Play games.
 
 RV8GR is the active physical-build target.
 
-- 34 logic chips + ROM + RAM = 36 packages.
+- CPU core: 34 logic chips + ROM + RAM = 36 packages.
+- Complete physical baseline: 37 IC packages including the 74HC14 clock/reset
+  support IC.
 - Components package mapping checked: 36 board packages resolve to 16
   board-used part types, all backed by current Components definitions and
   package-local test records.
@@ -108,7 +110,7 @@ folder in this checkout.
 | Hardware Labs | ⬜ | ⬜ | ⬜ | ✅ (14 labs + student baseline contract) |
 | KiCad modules | ⬜ | ⬜ | ⬜ | ✅ (6 modules) |
 | Student build guardrails | ⬜ | ⬜ | ⬜ | ✅ |
-| Components package mapping | ⬜ | ⬜ | ⬜ | ✅ (36 packages -> 16 part types) |
+| Components package mapping | ⬜ | ⬜ | ⬜ | ✅ (36 CPU-core packages -> 16 part types; clock/reset support is external) |
 | Programmer | ⚠️ needs bus/pin audit | ⚠️ needs bus/pin audit | ⚠️ needs bus/pin audit | ✅ |
 | Physical build | ⬜ | ⬜ | ⬜ | ⬜ |
 

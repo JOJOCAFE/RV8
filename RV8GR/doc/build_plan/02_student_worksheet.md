@@ -51,8 +51,8 @@ Goal: Make safe power, one clean clock pulse, and a reset signal.
 
 Build:
 - 5V and GND rails.
-- Reset button or reset circuit.
-- Slow clock button.
+- Reset circuit: 10kΩ to GND + 10µF to VCC + reset button. Produces `/RST`.
+- Clock circuit: push button + 10kΩ pull-up + 100nF debounce. Produces `CLK`.
 - LED on `CLK`.
 - LED or probe on `/RST`.
 
@@ -1098,22 +1098,28 @@ Notes:
 
 ---
 
-## Stage 20B: Full Instruction Smoke Test
+## Stage 20B: Frozen ISA Smoke Test
 
-Goal: Run the larger ROM that checks the important instructions.
+Goal: Run the larger ROM that checks all 18 frozen instructions.
 
 Test:
 - LI
 - ADDI
+- ADD
 - SUBI
+- SUB
 - BEQ
 - BNE
 - J
 - SETPG
+- SETPG_R
 - SETDP
 - SB
 - LB
-- EI/DI inert behavior if included
+- NOP
+- XORI
+- XOR
+- EI and DI inert behavior
 
 Expected:
 - Program reaches pass loop.

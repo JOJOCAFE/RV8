@@ -294,11 +294,11 @@ python3 lab13_full_system.py
 
 ---
 
-## Chip Count (34 logic + ROM + RAM = 36 packages):
+## Chip Count (34 logic + ROM + RAM = 36 packages)
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|
-| 01 | — | ไฟเลี้ยง + clock |
+| 01 | — | ไฟเลี้ยง + clock + reset |
 | 02 | U8, U24 | Ring counter |
 | 03 | U1-U4 | PC counter |
 | 04 | U15-U16, U29-U30 | Address mux |

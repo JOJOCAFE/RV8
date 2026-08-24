@@ -4,7 +4,8 @@ Build the CPU in small modules. Test each module before adding the next one.
 The goal is to reduce mistakes: fewer chips powered at once, fewer wires to
 debug, and one clear pass condition per stage.
 
-This plan follows the v1.0 34-logic-chip wiring guide:
+This plan follows the v1.0 34-logic-chip wiring guide (36 packages total
+including ROM and RAM):
 - IRQ is polling-only. No hardware vector.
 - DI has no hardware effect.
 - U7 `/OE` is `BUF_OE_N` from U24-12.
@@ -77,13 +78,16 @@ Recommended debug tools:
 
 ## Stage 0: Power, Clock, Reset
 
-**Chips added**: none of the CPU logic yet.
+**Chips added**: none (power and support circuits only).
 
 **Build**
 - 5V power rails.
 - Ground rails.
-- Reset circuit generating `/RST`.
-- Single-step clock or slow 555 clock.
+- Reset circuit: RC (10kΩ to GND + 10µF to VCC) with a reset button. This
+  produces `/RST` LOW at power-on for ~100ms, then HIGH for normal operation.
+- Single-step clock: push button with 10kΩ pull-up and 100nF debounce
+  capacitor. See `01_wiring_guide.md` appendix for an optional Schmitt-trigger
+  buffer that improves reliability.
 - LED on `CLK`.
 
 **Test**
@@ -444,7 +448,7 @@ all others 0
 
 **Chips added**: U10, U11, U12, U13, U19, U20.
 
-**Total logic chips now**: about 21 + ROM.
+**Total logic chips now**: 22 + ROM.
 
 **Build**
 - U19/U20 choose XOR B input:
@@ -471,7 +475,7 @@ all others 0
 
 **Chips added**: U17, U18, U9.
 
-**Total logic chips now**: about 24 + ROM.
+**Total logic chips now**: 25 + ROM.
 
 **Build**
 - U17/U18 select adder sum or XOR output.
@@ -505,7 +509,8 @@ all others 0
 
 ## Stage 12: AC Output Buffer and Store Direction
 
-**Chips added**: U14 if not already placed with IR_BUF.
+**Chips added**: U14 (AC output buffer). U34 is the separate IRL immediate
+buffer added in Stage 9; do not combine their roles.
 
 **Build**
 - U14 inputs <- AC0-AC7.
@@ -540,7 +545,7 @@ all others 0
 
 **Chips added**: U21, U22.
 
-**Total logic chips now**: about 26 + ROM.
+**Total logic chips now**: 28 + ROM.
 
 **Build**
 - U22 compares AC with zero.
@@ -633,7 +638,8 @@ all others 0
 
 **Chips added**: RAM, U32, U33.
 
-**Total packages now**: 34 logic + ROM + RAM if all previous stages are present.
+**Total packages now**: 33 logic + ROM + RAM = 35 packages. U31 is added in
+the next stage.
 
 **Build**
 - RAM:
@@ -681,6 +687,9 @@ all others 0
 ## Stage 17: EI and IRQ Polling Latch
 
 **Chips added**: U31, U33 gate 2.
+
+**Total after this stage**: 34 logic + ROM + RAM = 36 packages. This is the
+complete CPU.
 
 **Build**
 - U33 gate 2 makes EI_decode:
@@ -774,18 +783,16 @@ J $06
 
 ---
 
-## Stage 20: Full Instruction Smoke Test
+## Stage 20: Frozen ISA Smoke Test (all 18 instructions)
 
-Use a ROM that tests:
-- LI
-- ADDI
-- SUBI
-- BEQ
-- J
-- SETDP
-- SETPG
-- SB
-- LB
+Use a ROM that tests every frozen instruction with an observable pass/fail
+marker: `NOP`, `J`, `BEQ`, `SB`, `EI`, `ADDI`, `ADD`, `SETPG`, `SETPG_R`,
+`LI`, `LB`, `SETDP`, `DI`, `XORI`, `XOR`, `BNE`, `SUBI`, and `SUB`.
+
+Use `programs/all_isa_equivalence.asm` as the source coverage reference when
+preparing the physical test ROM. `DI` must be checked as inert in v1.0; `EI`
+and the `/IRQ` release test must show polling-latch behavior with no automatic
+PC vector.
 
 **Pass condition**
 - Program reaches the pass loop, not the fail loop.
@@ -806,7 +813,7 @@ Use this only after every stage above has passed on the real hardware:
 - Single-step clock advances exactly one state per press.
 - No chip is hot and no bus-fight current spike is observed.
 - Golden Bring-up passes at 1 MHz.
-- Full Instruction Smoke Test reaches the pass loop.
+- Frozen ISA Smoke Test reaches the pass loop.
 - Record the 50 kHz and 1 MHz checks plus the 100-tick push-switch test. Record
   2 MHz separately only as optional breadboard stress. Record 5 MHz only as an
   optional PCB/short-wire experiment; neither is a breadboard signoff gate.

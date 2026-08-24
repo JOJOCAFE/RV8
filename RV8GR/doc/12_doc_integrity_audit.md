@@ -1,6 +1,6 @@
 # RV8GR Documentation Integrity Audit
 
-Updated: 2026-07-12
+Updated: 2026-08-24
 
 This audit checks every Markdown file under `RV8GR/doc/` against the current
 CPU source of truth:
@@ -46,7 +46,7 @@ and Lab 14 U33 `EI_decode`.
 
 | Rule | Current truth |
 |---|---|
-| Package count | 34 logic chips + ROM + RAM = 36 packages |
+| Package count | 34 logic chips + ROM + RAM = 36 packages; 74HC14 clock/reset support (U35) is recommended but optional (see wiring guide appendix) |
 | ISA | 18 frozen instructions |
 | Timing model | 3 phases: T0 fetch opcode, T1 fetch operand, T2 execute |
 | IRQ | Polling latch only; no hardware vector, no automatic PC save, DI inert |
@@ -68,13 +68,14 @@ and Lab 14 U33 `EI_decode`.
 | Four-model equivalence explained for students | `11_four_model_equivalence.md`, linked from `README.md`, `08_cpu_logical_test_protocol.md`, and `JOJOCAFE-Org/SESSION_HANDOFF.md` |
 | Main numbered docs renumbered for readability | `01_wiring_guide.md` through `12_doc_integrity_audit.md`; `B-007_verification_report_2026-07-09.md` remains dated historical evidence |
 | Baseline/verification routing clarified | `00_design_isa.md`, `README.md`, `08_cpu_logical_test_protocol.md`, `14_components_verification_protocol.md`; virtual evidence remains separate from physical signoff, and 5 MHz is not a breadboard target |
+| Physical build-count, clock/reset, and full-ISA plan corrected | `01_wiring_guide.md`, `build_plan/01_student_incremental_build_plan.md`, `build_plan/02_student_worksheet.md`, `labs/README.md`, `labs/lab01_power_clock.md`, `labs/lab13_full_system.md`; U35 moved to a recommended-only appendix in the wiring guide, removed from stage counts and lab chip lists, build plan simplified for middle school students, 36-package headline restored, final smoke test covers all 18 instructions |
 
 ## File-by-File Audit
 
 | File | Scope | Integrity status |
 |---|---|---|
 | `00_design_isa.md` | Main ISA and architecture reference | Updated ROM write wording; now matches the 36-package baseline, polling IRQ, U34 immediate path, SETDP, bus-safety truth, and 1 MHz breadboard boundary. |
-| `01_wiring_guide.md` | Official pin-level physical source | Matches current simulator truth for U6, U34, U32/U33, ROM `/OE`, ROM `/WE`, IRQ, and 36 packages. |
+| `01_wiring_guide.md` | Official pin-level physical source | Matches current simulator truth for U6, U34, U32/U33, ROM `/OE`, ROM `/WE`, and IRQ. U35 clock/reset support is documented in a recommended appendix only; the CPU core headline is 36 packages. |
 | `02_instruction_trace.md` | Golden debug traces for single-step student bring-up | Kept as a useful derived doc because `05_debug_plan.md` points students to it for trace comparison. Updated wording to make `00_design_isa.md`/`01_wiring_guide.md` the source of truth and to clarify ACC/DP edge-trigger timing. |
 | `03_bank_switch.md` | Future ROM banking and built-in data page | Updated ROM write wording, corrected page `$7F` as ROM-only, fixed 17-bit banked-address examples, and clarified that the +1 bank latch is outside the frozen 36-package v1.0 baseline. |
 | `04_understand_by_module.md` | Student module explanation | Updated to clarify that it is a module-understanding guide, not the pin-level wiring source; ring-counter reset wording now points students to the lab/debug convention while preserving the raw 74HC164 clear behavior. Corrected Z flag timing, RV8-Bus `/SLOT` examples, RAM-vs-I/O caveat, 74HC574 `/OE` wording, bus chapter U7/U14/U34 labels, and gate-budget notes. Consistent with 34 logic chips, U34 immediate path, SETDP, polling IRQ, DI inert behavior, and ROM `/OE=WR_DIR`. |
@@ -87,7 +88,7 @@ and Lab 14 U33 `EI_decode`.
 | `11_four_model_equivalence.md` | Student four-model guide | Kept separate from `08_cpu_logical_test_protocol.md`: this short guide answers why RV8GR has two Python sims, two Verilog models, and one shared ASM equivalence source, while the protocol doc remains the maintainer signoff checklist. Verified against `tools/check_python_verilog_equivalence.py` and the 55-checkpoint output. |
 | `12_doc_integrity_audit.md` | Maintainer doc-integrity signoff record | Kept as the record of which docs were checked, which docs are source-of-truth or derived, and why each derived doc remains separate after cleanup. Not a student lesson or wiring guide. |
 | `B-007_verification_report_2026-07-09.md` | Historical B-007 non-physical evidence report | Kept because backlog, sprint, handoff, and project-state files still cite B-007 as physically blocked with non-physical evidence available. Marked as historical and not current signoff; use `08_cpu_logical_test_protocol.md`, `11_four_model_equivalence.md`, `05_debug_plan.md`, and `07_real_build_timing_log.md` for current protocol. |
-| `build_plan/01_student_incremental_build_plan.md` | Teacher build plan | Updated ROM `/WE`; matches 36-package baseline, U34, SETDP, IRQ polling, `04_understand_by_module.md`, `06_kicad_modules.md`, and physical signoff boundary. Now links to the real-build timing log and requires voltage/frequency, edge, bus-race, and propagation-delay evidence after staged bring-up. |
+| `build_plan/01_student_incremental_build_plan.md` | Teacher build plan | Matches the 36-package baseline with no U35 in stage counts; simplified Stage 0 as generic power/clock/reset for middle school students. References wiring guide appendix for optional Schmitt-trigger support. Exact staged chip counts, all 18 frozen instructions tested before physical completion. |
 | `build_plan/02_student_worksheet.md` | Student worksheet | Consistent with staged build, U34, WR_DIR, SETDP, IRQ polling, boot tests, and fault map. Clarifies that temporary ROM `/OE=LOW` must be removed before store/RAM tests and that the teacher records timing evidence after board pass. |
 | `labs/README.md` | Lab index | Chip checklist heading corrected to 36 packages; now links labs to module understanding, debug plan, KiCad module map, build plan, real-build timing log, and U34 in the Lab 06 chip list. |
 | `labs/lab01_power_clock.md` | Power and manual clock | Consistent with rising-edge/manual-clock build assumptions; button-hold LED wording matches the pull-up clock circuit. |

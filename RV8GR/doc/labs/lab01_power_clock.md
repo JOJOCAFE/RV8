@@ -10,12 +10,13 @@
 |:----:|------|:-----:|
 | 1 | Breadboard (830 จุด) | 1 |
 | 2 | USB 5V power supply | 1 |
-| 3 | Push button (ปุ่มกด NO) | 1 |
-| 4 | 10kΩ resistor | 1 |
+| 3 | Push button (ปุ่มกด NO) | 2 |
+| 4 | 10kΩ resistor | 2 |
 | 5 | 100nF capacitor | 1 |
-| 6 | LED สีแดง 3mm | 1 |
-| 7 | 330Ω resistor | 1 |
-| 8 | สายจัมเปอร์ | หลายเส้น |
+| 6 | 10µF capacitor | 1 |
+| 7 | LED สีแดง 3mm | 1 |
+| 8 | 330Ω resistor | 1 |
+| 9 | สายจัมเปอร์ | หลายเส้น |
 
 ---
 
@@ -45,7 +46,7 @@ USB GND → ราง - (ดำ) ด้านล่าง breadboard
                      │
                      └─→ 100nF → ราง - (GND)  [debounce]
                      │
-                     └─→ สาย CLK (เอาไว้ใช้ Lab ถัดไป)
+                     └─→ สาย CLK
 ```
 
 **วิธีทำงาน**:
@@ -61,8 +62,8 @@ USB GND → ราง - (ดำ) ด้านล่าง breadboard
 >
 > สรุป: **กดปุ่ม = เตรียม, ปล่อยปุ่ม = clock edge → CPU ทำงาน 1 ขั้น**
 >
-> (Lab ถัดไป ถ้าเพิ่ม 74HC14 Schmitt Trigger จะ invert สัญญาณให้
-> กดปุ่ม = rising edge ได้ แต่สำหรับ lab นี้ใช้แบบนี้ก่อนก็ได้)
+> (ถ้าต้องการ Schmitt trigger ให้ดู appendix ใน 01_wiring_guide.md —
+> ช่วยเรื่อง bounce ได้ดีขึ้น แต่ไม่จำเป็นสำหรับ lab นี้)
 
 > 💡 **เรื่อง Debounce**
 >
@@ -101,7 +102,7 @@ USB GND → ราง - (ดำ) ด้านล่าง breadboard
 > ⚠️ **Debounce ของ Lab นี้เป็นแบบเบื้องต้น**
 > RC (10kΩ + 100nF) ช่วยลด bounce ได้ ~80%
 > ถ้ายังเจอปัญหา "กด 1 ครั้ง นับ 2 ครั้ง" ใน Lab 02
-> → เพิ่ม 74HC14 Schmitt Trigger จะแก้ได้ 100%
+> → เพิ่ม 74HC14 Schmitt Trigger จะแก้ได้ (ดู appendix ใน 01_wiring_guide.md)
 
 > ⚠️ **สำคัญ: Bypass Capacitor**
 > ทุก IC ที่จะต่อใน Lab ถัดไป ต้องมี 100nF ceramic คร่อม VCC-GND ใกล้ขาชิป
@@ -161,9 +162,10 @@ LOW ◄── กดค้าง ──► HIGH
 > ถ้าอยากเตรียมล่วงหน้า สามารถต่อ Reset circuit ไว้ตอนนี้:
 > ```
 > ราง + (5V) → 10kΩ → จุด RST ← ปุ่ม Reset → ราง - (GND)
-> จุด RST → 100nF → ราง - (GND)  [debounce]
+> จุด RST → 10µF → ราง + (VCC) [positive side to VCC]
+> จุด RST → /RST
 > ```
-> จุด RST = สาย /RST (ปกติ HIGH, กดปุ่ม = LOW = reset)
+> จุด RST = สาย /RST (ปกติ LOW ตอนเปิดเครื่อง, แล้วขึ้น HIGH = ปกติ)
 
 ---
 

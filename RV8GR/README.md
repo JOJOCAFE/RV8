@@ -1,6 +1,8 @@
 # RV8-GR — No Microcode, Full 64K, IRQ (Stable)
 
-**34 logic chips + ROM + RAM = 36 packages. Verilog verified.**
+**CPU core: 34 logic chips + ROM + RAM = 36 packages. Complete physical
+baseline: 37 IC packages including one 74HC14 clock/reset support IC. Verilog
+verified.**
 
 ---
 
@@ -9,7 +11,9 @@
 This is the build target for RV8GR. Do not add future features while
 building the baseline CPU.
 
-- **34 logic chips + ROM + RAM = 36 packages**
+- **CPU core: 34 logic chips + ROM + RAM = 36 packages**
+- **Complete physical baseline: 37 IC packages including U35 (74HC14
+  clock/reset support)**
 - **No microcode ROM**
 - **No hardware IRQ vector**: IRQ is a polling latch only
 - **Every instruction is 3 phases**: T0 fetch opcode, T1 fetch operand, T2 execute
@@ -38,7 +42,8 @@ Recommended reading order:
 | Spec | Value |
 |------|-------|
 | Logic chips | 34 (74HC series, DIP) |
-| Total packages | 36 (34 logic + ROM + RAM) |
+| CPU-core packages | 36 (34 logic + ROM + RAM) |
+| Complete physical baseline | 37 IC packages (CPU core + U35 74HC14 support) |
 | ISA | 18 instructions |
 | Clock | 1 MHz breadboard baseline; 5 MHz PCB-only measured experiment |
 | Speed | 333K instr/sec @ 1 MHz |
@@ -75,7 +80,7 @@ emits `XORI $FF` and is covered by Python and Verilog ROM tests.
 
 ## BOM — Complete Order List
 
-### Logic (34 packages)
+### CPU-core logic (34 packages)
 
 | Part | Qty | Package | Notes | Status |
 |------|:---:|:-------:|-------|:------:|
@@ -107,7 +112,7 @@ emits `XORI $FF` and is covered by Python and Verilog ROM tests.
 |------|:---:|-------|:------:|
 | 1 MHz 5V CMOS oscillator module | 1 | Baseline breadboard clock | waiting |
 | 5 MHz 5V CMOS oscillator module | optional | PCB/wire-wrap experiment only | waiting |
-| 74HC14 Schmitt inverter | 1 | Clock/reset buffering | waiting |
+| 74HC14 Schmitt inverter (U35, support) | 1 | Clock/reset buffering; outside CPU-core count | waiting |
 | 10kΩ resistor | 1 | Reset pull-up | waiting |
 | 10µF capacitor | 1 | Reset RC | waiting |
 | Push button (NO) | 1 | Reset button | waiting |
@@ -116,7 +121,7 @@ emits `XORI $FF` and is covered by Python and Verilog ROM tests.
 
 | Part | Qty | Notes | Status |
 |------|:---:|-------|:------:|
-| 100nF capacitor (ceramic) | 35 | Bypass (1 per chip) | waiting |
+| 100nF capacitor (ceramic) | 37 | Bypass (1 per IC package, including ROM/RAM/U35) | waiting |
 | 10µF capacitor | 2 | Power filter | waiting |
 | 330Ω resistor | 8 | LED current limit | waiting |
 | LED 3mm green | 8 | Bus probe | waiting |
@@ -140,7 +145,7 @@ emits `XORI $FF` and is covered by Python and Verilog ROM tests.
 ```
 Board 1: TIMING          Board 2: MEMORY         Board 3: ALU
 ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│ U8  U24          │    │ U15 U16 U29 U30 │    │ U5 U6 U34 U14  │
+│ U8  U24  U35     │    │ U15 U16 U29 U30 │    │ U5 U6 U34 U14  │
 │ U1  U2  U3  U4  │    │ ROM         RAM  │    │ U19 U20         │
 │ Osc     Reset    │    │ U7               │    │ U12 U13         │
 └──────────────────┘    └──────────────────┘    │ U10 U11         │

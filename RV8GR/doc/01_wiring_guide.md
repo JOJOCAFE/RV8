@@ -65,7 +65,10 @@ T2→T0 edge (ring counter shifts)
 | 2 MHz | 500ns | 192ns | **+308ns ✅** |
 | 5 MHz | 200ns | 192ns | **+8ns ⚠️** |
 
-**Why 1 MHz is completely safe**: Even with 150ns ROM + breadboard stray capacitance (~50ns extra), total worst path ≈ 242ns. At 1 MHz each phase is 1000ns — over 700ns margin.
+**Why 1 MHz is the official target**: the estimated worst path, including
+150ns ROM + approximately 50ns breadboard stray capacitance, is approximately
+242ns. At 1 MHz each phase is 1000ns, leaving an estimated margin over 700ns.
+This estimate must be confirmed on the real board; it is not physical signoff.
 
 **Why 5 MHz is risky**: 200ns per phase, worst path 192ns on paper. Zero margin for breadboard capacitance. PCB-only.
 
@@ -101,8 +104,10 @@ This fits easily within 1 phase at 1 MHz (1000ns).
 
 ### Conclusion
 
-**1 MHz = no timing risk.** Use AT28C256-70ns or even 150ns ROM.
-Start breadboard at 1 MHz. Test up to 2 MHz if desired. 5 MHz = PCB/wire-wrap only.
+**1 MHz = official breadboard target with estimated margin.** Use
+AT28C256-70ns or even 150ns ROM. Start with a manual/slow clock, then qualify
+the exact board at 50 kHz and 1 MHz. Test up to 2 MHz only as optional stress;
+5 MHz = PCB/wire-wrap only.
 
 > 📌 **ROM/RAM recommendation: 70ns** (AT28C256-70, 62256-70 or CY7C199-15)
 > This gives maximum headroom for future clock increase.
@@ -168,7 +173,9 @@ Note: During T2+STR, U7 reverses direction (WR_DIR=1) to write DBUS from IBUS.
 
 ### Reset & Standalone Boot (boots from ROM at $0000)
 
-**Circuit**: RC (10kΩ + 10µF) → 74HC14 Schmitt → /RST LOW ~100ms at power-on.
+**Circuit**: RC (10kΩ + 10µF) → Schmitt trigger → `/RST` LOW for
+approximately 100ms at power-on. See the Recommended Support IC appendix
+for a clean 74HC14-based implementation.
 
 **Wiring**:
 ```
@@ -1217,3 +1224,38 @@ Not included in v1.0 BOM.
 
 **Reserved**: Any opcode with SRC+STR both set (bit3+bit2 = 11) is store-dominant and electrically safe, but not part of the ISA.
 Pattern: `(opcode & $0C) == $0C` → 64 reserved mixed opcodes.
+
+---
+
+## Appendix: Recommended Support IC (74HC14)
+
+The CPU core is complete with 34 logic chips + ROM + RAM = 36 packages. For
+reliable breadboard operation a single 74HC14 Schmitt-trigger inverter is
+recommended as a clock/reset support IC. This is optional — the CPU will
+function with a raw RC reset and a well-debounced manual clock — but it
+eliminates the most common student debugging issues.
+
+**Designation**: U35 (not part of the CPU-core logic count).
+
+**Wiring**:
+```
+U35 74HC14
+  U35-14 -> VCC, U35-7 -> GND, 100nF bypass cap
+
+  Reset: U35-1 <- RESET_RC, U35-2 -> /RST
+    RESET_RC -> 10k ohm -> GND
+    RESET_RC -> 10uF capacitor -> VCC (positive side to VCC)
+    RESET button (normally open): RESET_RC -> VCC
+
+  Clock buffer (two inversions preserve rising-edge polarity):
+    U35-3 <- debounced clock source
+    U35-4 -> U35-5
+    U35-6 -> CLK
+
+  Unused inputs (9, 11, 13) -> GND; leave outputs (8, 10, 12) unconnected.
+```
+
+**Why it helps**:
+- Schmitt threshold gives a clean `/RST` edge from the slow RC ramp.
+- Double inversion buffers the manual clock and removes contact bounce.
+- Spare gates available for future debug probes.

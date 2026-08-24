@@ -59,7 +59,7 @@
 
 | Lab | ชิป | หน้าที่ |
 |:---:|------|---------|
-| 01 | — | ไฟเลี้ยง + clock |
+| 01 | — | ไฟเลี้ยง + clock + reset |
 | 02 | U8 (74HC164), U24 (74HC04) | Ring counter T0/T1/T2 |
 | 03 | U1-U4 (74HC161 ×4) | PC counter 16-bit |
 | 04 | U15-U16, U29-U30 (74HC157 ×4) | Address mux |
