@@ -40,7 +40,7 @@ Last updated: 2026-07-10
 | B-021 | RV8-Bus connector finalization | Bank + Ohm | ⬜ TODO |
 | B-022 | Video/photo documentation of physical build | Noon | ⬜ TODO |
 | B-023 | Student workshop dry run (labs 01-14) | Noon + Pim | ⬜ TODO |
-| B-024 | Game ROM (simple Snake or Pong) | Bam | ⬜ TODO |
+| B-024 | Game ROM (simple Snake or Pong) | Bam | ✅ DONE — deterministic "Reaction Countdown" `programs/game.asm`, dual-sim regression `sim/test_game.py`, pushed `f2e9177` |
 
 ## 🟢 P3 — Future Projects
 

@@ -81,3 +81,4 @@
 | B-012 Programmer field-test protocol prepared | 2026-07-10 | Bam + Fern |
 | RV8GR doc integrity/source-of-truth pass saved and packaged | 2026-07-10 | Pim + Noon + Fern |
 | B-011 minimal BASIC-style ROM phase 1 | 2026-07-10 | Bam + Fern |
+| B-024 game ROM (deterministic "Reaction Countdown") + dual-sim test | 2026-08-30 | Bam + Fern |

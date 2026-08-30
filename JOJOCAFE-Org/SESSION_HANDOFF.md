@@ -1,6 +1,24 @@
 # Session Handoff
 
-Updated: 2026-07-12
+Updated: 2026-08-30
+
+## Latest This Session (B-024)
+
+- B-024 game ROM is DONE as a virtual deliverable. Pushed to
+  `git@github.com:JOJOCAFE/RV8.git` branch `main` as
+  `f2e9177 RV8GR B-024: deterministic reaction-countdown game ROM + dual-sim test`.
+- `RV8GR/programs/game.asm` is a fully deterministic "Reaction Countdown":
+  countdown 10->0, win latched exactly once at count 7, always halts at
+  game_over. Fixed a prior infinite win-latch loop that never terminated.
+- `RV8GR/sim/test_game.py` scoreboards the end state on both `CPUSim` and
+  `ComponentsCPUSim` (halt PC, DP=$80, countdown reached 0, win latch, final
+  copy, and $FF10/$FF20 mirrors). Passes on both sims.
+- Uses only existing assembler mnemonics/macros; no frozen file (assembler,
+  sim, RTL) was modified. Fern verified independently.
+- NOTE: this push went to branch `main`. Earlier handoff text referenced
+  `team-setup` as the RV8 branch; the live working branch is now `main`
+  (`aa5e313..f2e9177`). Confirm intended long-term branch with Jo.
+- Untracked `RV4-Tiny/` was intentionally NOT staged (unrelated to B-024).
 
 ## Current State
 

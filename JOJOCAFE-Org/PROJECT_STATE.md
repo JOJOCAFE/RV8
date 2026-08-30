@@ -37,6 +37,7 @@ The team owns the entire RV8 project. All variants, all deliverables.
 
 | Date | Decision | By |
 |------|----------|----|
+| 2026-08-30 | B-024 game ROM done as virtual deliverable: deterministic "Reaction Countdown" `RV8GR/programs/game.asm` + dual-sim regression `sim/test_game.py`; pushed RV8 `main` `f2e9177` | Pim |
 | 2026-07-09 | Shared Components repo created and pushed to `git@github.com:JOJOCAFE/Components.git`; component-library skill added for agent ownership and datasheet workflow | Pim |
 | 2026-07-09 | Components Python simulator added/updated with DIP pin models, ROM/RAM image loading, 64 input stimulus channels, 8 clocks, and edge-aware clock dispatch; pushed through `f4ea985` | Pim |
 | 2026-07-09 | Components Python schematic backend, buses, pull defaults, probes/test logic, netlist, and Verilog export path added; pushed through `6bc7ee0` | Pim |

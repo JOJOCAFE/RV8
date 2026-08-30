@@ -16,6 +16,7 @@ Updated: 2026-07-11
 | 2026-07-10 | Routed Programmer B-012 from mock-test status into hardware field-test protocol | 🟡 Ready for field evidence |
 | 2026-07-10 | Saved RV8GR doc/source-of-truth audit and team skill refresh for design ISA, trace, bank switch, and module explanation | ✅ Saved |
 | 2026-07-11 | Saved RV8GR baseline sync, `NOT` pseudo-instruction tests, B-011 test ROM, and warning-free Verilog handoff | ✅ Saved |
+| 2026-08-30 | Routed B-024 (Bam build, Fern verify), committed only the 3 B-024 files, pushed RV8 `main` `f2e9177`, updated handoff/state/backlog/sprint | ✅ Pushed |
 
 ## Bank (แบงค์) — Architect
 | Date | What | Result |
@@ -36,6 +37,7 @@ Updated: 2026-07-11
 | 2026-07-10 | Defined Programmer field-test evidence gates: ZIF Direct, RV8-Bus PROG/RUN release, readback hash, and hardware logs | 🟡 Hardware pending |
 | 2026-07-10 | Re-verified RV8GR docs against wiring, Components package checks, chip tests, wiring verifier, and 55-checkpoint four-model equivalence | ✅ All pass |
 | 2026-07-11 | Verified `NOT` ROM bench, B-011 BASIC-style smoke ROM, full Verilog suite, and whitespace checks | ✅ All pass |
+| 2026-08-30 | Independently verified B-024 game: assemble, dual-sim test OK, only-existing mnemonics, no frozen files touched, no regressions | ✅ VERIFIED |
 
 ## Mint (มิ้นท์) — RTL Coder
 | Date | What | Result |
@@ -63,6 +65,7 @@ Updated: 2026-07-11
 | 2026-07-10 | Confirmed Python CPU, Components-backed CPU, assembler, wiring, and Components package checks still pass after Verilog timing fixes | ✅ All pass |
 | 2026-07-10 | Prepared Programmer field-test protocol and confirmed 51 mock tests are the virtual preflight baseline | ✅ Prepared |
 | 2026-07-11 | Added `NOT` as assembler-only `XORI $FF` pseudo-instruction and B-011 `basic_min.asm` test ROM | ✅ Verified |
+| 2026-08-30 | B-024 game ROM: fixed non-terminating win-latch loop, deterministic countdown, dual-sim regression `sim/test_game.py` | ✅ Verified + pushed `f2e9177` |
 
 ## Noon (นุ่น) — Docs Writer
 | Date | What | Result |

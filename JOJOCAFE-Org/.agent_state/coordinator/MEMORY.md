@@ -13,7 +13,9 @@
 
 ## Dispatch History
 
-(Empty — populate as tasks are dispatched)
+- 2026-08-30 — B-024 game ROM: Bam implemented, Fern verified independently
+  (no self-verify). Fixed a non-terminating win-latch loop, added dual-sim
+  regression `sim/test_game.py`. Pushed to RV8 `main` as `f2e9177`.
 
 ## Active Work
 
