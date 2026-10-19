@@ -1,0 +1,30 @@
+name: Learning lab
+
+on:
+  push:
+    paths:
+      - "web/rv8-learn/**"
+      - ".github/workflows/learning-lab.yml"
+  pull_request:
+    paths:
+      - "web/rv8-learn/**"
+      - ".github/workflows/learning-lab.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  circuit-and-learning-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      - name: Check browser module syntax
+        run: |
+          for file in web/rv8-learn/dist/*.js web/rv8-learn/dist/*.mjs; do
+            node --check "$file"
+          done
+      - name: Check circuits and learning progression
+        run: node --test web/rv8-learn/test-*.mjs

@@ -2,6 +2,8 @@
 
 Build real computers from 74HC chips. Run BASIC. Play games.
 
+New to circuits? [Run the learning lab locally](web/rv8-learn/README.md). Start with an empty board, build your own wiring, predict and test what happens, then construct AND/OR behavior from switches. The notebook keeps the evidence from your experiments.
+
 ---
 
 ## The Family
