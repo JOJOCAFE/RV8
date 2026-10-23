@@ -505,6 +505,7 @@ summary {
   color: #9a9f91;
 }
 .circuit-part > svg {
+  display: block;
   width: 150px;
   height: 100px;
   pointer-events: none;
@@ -1231,5 +1232,420 @@ dialog h3 {
   }
   .lab-header .plain-button {
     max-width: 90px;
+  }
+}
+
+/* One working surface: the goal and explanation stay with the board. */
+.lab-intro {
+  margin-bottom: 16px;
+}
+.goal-banner {
+  border-left: 4px solid var(--accent);
+  background: #ecefe4;
+  border-radius: 0 9px 9px 0;
+  padding: 18px 22px;
+  margin-bottom: 15px;
+}
+.goal-banner > div > p {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.6;
+  margin: 7px 0 14px;
+  max-width: 1040px;
+}
+.goal-cases {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.goal-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.goal-case {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  border: 1px solid #d4ddc8;
+  border-radius: 5px;
+  background: #f6f8f0;
+}
+.goal-case small {
+  font-size: 10px;
+  color: #6d7d61;
+}
+.goal-case b {
+  font-size: 13px;
+  font-weight: 600;
+  color: #344d30;
+}
+.goal-case.next-goal {
+  border-color: #bd7c53;
+  box-shadow: inset 0 0 0 1px #bd7c5320;
+}
+.goal-case.done-goal {
+  background: #e3edd7;
+}
+.lesson-brief {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.lesson-brief > p {
+  flex: 1 1 520px;
+  font-size: 13px;
+  color: #637359;
+  line-height: 1.8;
+}
+.lesson-brief > details {
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.lesson-brief details[open] {
+  flex: 1 1 100%;
+  order: 3;
+  background: #eef1e7;
+  padding: 16px 20px;
+  border-radius: 7px;
+}
+.lesson-notes h2 {
+  margin: 13px 0 9px;
+  font-size: 21px;
+}
+.lesson-notes p {
+  max-width: 920px;
+  color: #66775d;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.circuit-canvas {
+  margin-inline: auto;
+}
+.circuit-part {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  border-radius: 8px;
+}
+.circuit-part.selected-part {
+  outline: 2px solid #bd4e2a80;
+  outline-offset: 7px;
+  background: #bd4e2a06;
+}
+.circuit-canvas.moving-part,
+.circuit-canvas.moving-part * {
+  cursor: grabbing !important;
+}
+.circuit-canvas.drawing-wire {
+  cursor: crosshair;
+}
+.terminal {
+  touch-action: none;
+  cursor: crosshair;
+}
+.terminal.snap-target::after {
+  background: #bfdc9f;
+  border-color: #426b35;
+  box-shadow: 0 0 0 7px #93b57745;
+  transform: scale(1.25);
+}
+.terminal.wire-source::after {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.draft-wire {
+  stroke: var(--accent);
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+.wire-decoration,
+.wire-decoration * {
+  pointer-events: none;
+}
+.wire-crossing path {
+  fill: none;
+  stroke-linecap: round;
+}
+.bridge-clear {
+  stroke: #fcfcf8;
+  stroke-width: 8;
+}
+.bridge-under,
+.bridge-line {
+  stroke: #718773;
+  stroke-width: 2.6;
+}
+.bridge-halo {
+  stroke: #fcfcf8;
+  stroke-width: 7;
+}
+.wire-crossing.selected .bridge-line,
+.wire-crossing.under-selected .bridge-under {
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+.wire-crossing.traced .bridge-line,
+.wire-crossing.under-traced .bridge-under {
+  stroke: #b57220;
+  stroke-width: 4;
+}
+.wire-junction {
+  fill: #718773;
+  stroke: #fcfcf8;
+  stroke-width: 1;
+}
+.wire-junction.selected {
+  fill: var(--accent);
+}
+.wiring-legend {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding: 10px 18px;
+  border-top: 1px solid #e0e5d8;
+  color: #78856e;
+  font-size: 10px;
+}
+.live-inputs {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding: 10px 18px;
+  border-bottom: 1px solid #e0e5d8;
+  background: #f7f9f1;
+}
+.live-inputs > span {
+  font: 9px var(--mono);
+  letter-spacing: 0.8px;
+  margin-right: 8px;
+  color: #7c8a71;
+}
+.live-inputs button {
+  font-size: 11px;
+  padding: 5px 11px;
+  min-height: 32px;
+  background: #fcfcf8;
+}
+.live-inputs button[aria-pressed="true"] {
+  border-color: #9ab781;
+  background: #e1ecd6;
+}
+.test-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(180px, 1fr) auto;
+  gap: 22px;
+  align-items: start;
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #d8e0ce;
+  background: #eff3e8;
+  border-radius: 9px;
+}
+.test-step-label {
+  display: block;
+  font: 9px var(--mono);
+  letter-spacing: 0.7px;
+  color: #6c7e5e;
+  margin-bottom: 12px;
+}
+.test-cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.test-cases button {
+  font-size: 10px;
+  min-height: 34px;
+  padding: 6px 10px;
+  background: #f9fbf4;
+}
+.test-cases button.picked {
+  border-color: #607d4e;
+  background: #dfead2;
+}
+.test-input-choice > small {
+  display: block;
+  font-size: 10px;
+  color: #7a866f;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.test-input-choice > p {
+  font-size: 13px;
+  color: #536c43;
+}
+.test-prediction .prediction-options button {
+  font-size: 12px;
+  min-height: 38px;
+}
+.test-apply > button {
+  padding: 9px 13px;
+  font-size: 12px;
+  min-height: 38px;
+}
+#test-feedback {
+  font-size: 12px;
+  color: #5e7450;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+.evidence-heading {
+  margin-top: 28px;
+}
+.evidence-heading h2 {
+  font-size: 23px;
+}
+.experiment-table {
+  margin-top: 14px;
+}
+.experiment-table td,
+.experiment-table th {
+  padding: 13px 12px 13px 7px;
+}
+.experiment-table thead {
+  font-size: 10px;
+}
+.experiment-table .case-link {
+  border: 0;
+  padding: 3px 0;
+  min-height: 25px;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+  color: #3e5733;
+}
+.experiment-table .live-case {
+  background: #edf2e5;
+}
+.experiment-table .planned-case th {
+  border-left: 3px solid #8a9e76;
+  padding-left: 10px;
+}
+.live-case-tag,
+.prediction-result {
+  display: block;
+  font-size: 10px;
+  color: #7b8a6e;
+  line-height: 1.8;
+  margin-top: 4px;
+  font-weight: 400;
+}
+@media (max-width: 760px) {
+  .goal-banner {
+    padding: 14px;
+  }
+  .goal-banner > div > p {
+    font-size: 15px;
+  }
+  .goal-cases {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .goal-case {
+    padding: 7px;
+  }
+  .goal-case small {
+    font-size: 8px;
+    line-height: 1.6;
+  }
+  .goal-case b {
+    font-size: 11px;
+  }
+  .goal-steps {
+    gap: 5px;
+  }
+  .lesson-brief {
+    gap: 10px 20px;
+  }
+  .lesson-brief > p {
+    font-size: 12px;
+  }
+  .lesson-brief > details {
+    font-size: 11px;
+  }
+  .test-console {
+    grid-template-columns: 1fr 1fr;
+    padding: 15px;
+    gap: 18px 12px;
+  }
+  .test-input-choice {
+    grid-column: 1 / -1;
+  }
+  .test-step-label {
+    font-size: 8px;
+    margin-bottom: 9px;
+  }
+  .test-apply > button {
+    font-size: 10px;
+    padding: 7px 10px;
+  }
+  .test-prediction .prediction-options button {
+    font-size: 10px;
+    padding: 7px 9px;
+  }
+  .wiring-legend {
+    padding: 9px 12px;
+    gap: 5px 14px;
+    font-size: 9px;
+  }
+  .live-inputs {
+    padding: 9px 12px;
+    gap: 6px;
+  }
+  .live-inputs > span {
+    flex: 1 1 100%;
+    font-size: 8px;
+  }
+  .live-inputs button {
+    min-height: 32px;
+    font-size: 10px;
+  }
+  .experiment-table {
+    display: table;
+    overflow: visible;
+  }
+  .experiment-table thead {
+    display: none;
+  }
+  .experiment-table tbody {
+    display: grid;
+    gap: 10px;
+  }
+  .experiment-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+    border: 1px solid #dce3d2;
+    border-radius: 7px;
+  }
+  .experiment-table td,
+  .experiment-table th {
+    min-width: 0 !important;
+    max-width: none !important;
+    display: block;
+    border: 0;
+    padding: 6px;
+    font-size: 11px !important;
+  }
+  .experiment-table th {
+    grid-column: 1 / -1;
+  }
+  .experiment-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 8px;
+    color: #849076;
+    margin-bottom: 4px;
+  }
+  .experiment-table .case-link {
+    font-size: 11px;
   }
 }

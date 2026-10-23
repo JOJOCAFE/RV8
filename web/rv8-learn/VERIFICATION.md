@@ -46,6 +46,16 @@ Used a separate private browser profile so test work did not replace a learner's
 - Checked the source diff for whitespace errors, unintended hosting metadata, and obsolete demos.
 - Added a GitHub Actions workflow that runs module syntax checks and the same Node 24 test suite for relevant changes.
 
+## Interaction follow-up · 2026-10-23
+
+Three further passes addressed the learner's reports about moving parts, drag wiring, Backspace, confusing predictions/evidence, hidden goals, the left column, and crossed wires.
+
+1. **Behavior and evidence:** separated the pending test from the board's actual inputs, kept recorded predictions immutable, separated prediction accuracy from circuit-goal success, and gave the required wire-break experiment an Off goal. Verified that removing two wires does not meet the one-wire goal, undo recovers matching observations, and older notebooks retain circuits and progress. The goal and required outcomes now sit above the full-width board; the left column and duplicate first-lesson checklist were removed.
+2. **Browser interactions and complete course:** in a separate test session, dragged a component by its symbol body; connected terminals by native mouse drag with live preview and magnetic targeting; used click and Enter wiring; removed selected wires and components with Backspace/Delete; undid removal with attached wires; edited notebook text with Backspace without deleting a circuit; cancelled moves with Escape and wires with Backspace; and verified evidence after reload. Completed all five lessons again, including every AND, OR, and combined-rule case and their transfer questions. Changing a draft did not rewrite the recorded prediction. Selecting future inputs did not change switch positions until applying the test; manual switch changes immediately updated live inputs.
+3. **Routing, narrow layouts, and final regression:** added tests for terminal endpoints, orthogonal segments, unchanged connectivity, separate-net line overlap, joined branch dots, crossing-hop metadata, compact parallel wiring, live drag tethers, and switch-button clearance. Visual review caught a route behind a switch control; the router now clears the full control. Checked every lesson at 320 px with no page-level horizontal overflow. Used Chromium touch emulation at 390 px to verify component-body dragging, magnetic wire drops, edge panning, cancellation, and panning stopping on release. Slowed edge panning and paused it over a wire target. Reserved terminal exits and required straight-through crossings after a 30-arrangement sweep found misleading hops at bends. Ran all **41 tests on Node 24**, browser-module syntax checks, asset/import checks, and whitespace checks.
+
+The T3 preview screenshot operation timed out twice, so these follow-up browser checks used the Playwright CLI in isolated test sessions. Touch results are browser emulation, not a physical-device test. The learner's default browser notebook was not reset or overwritten.
+
 ## Reproduce the automated checks
 
 ```sh

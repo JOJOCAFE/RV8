@@ -9,7 +9,11 @@ import {
   recordExperiment,
   designProven,
   restoreNotebook,
+  nextTestGoal,
+  currentCaseIndex,
+  recordedRowsForCircuit,
 } from "./dist/learning-state.mjs";
+import { evidenceMarkup } from "./dist/workbench-view.mjs";
 
 const positions = {
   BAT: [75, 230],
@@ -98,6 +102,78 @@ test("an incorrect prediction is preserved as useful evidence", () => {
   assert.equal(e.history[0].on, false);
   assert(designProven(labs[1], c, e));
 });
+test("draft predictions cannot rewrite the prediction paired with an observation", () => {
+  const c = control(),
+    e = newEvidence();
+  run(labs[1], c, e, 0, true);
+  const record = structuredClone(e.rows[0]);
+  e.predictions[0] = false;
+  const view = evidenceMarkup({
+    lab: labs[1],
+    evidence: e,
+    fingerprint: fingerprint(c),
+    currentCase: 0,
+    plannedCase: 0,
+  });
+  assert.deepEqual(e.rows[0], record);
+  assert.equal(e.history[0].prediction, true);
+  assert.match(view, /data-label="Recorded prediction">Lamp On/);
+  assert.match(view, /Prediction differed/);
+  assert.match(view, /✓ Goal met/);
+});
+test("the required break has an Off goal and must remove exactly one wire", () => {
+  const c = loop(),
+    e = newEvidence();
+  assert.equal(nextTestGoal(labs[0], e).target, true);
+  run(labs[0], c, e, 0, true);
+  assert.deepEqual(nextTestGoal(labs[0], e), {
+    phase: "break",
+    title: "Remove exactly one wire",
+    target: false,
+  });
+  const wires = c.wires;
+  c.wires = [];
+  assert.equal(run(labs[0], c, e, 0, false).goalMet, false);
+  c.wires = wires.slice(0, 1);
+  assert.equal(run(labs[0], c, e, 0, false).goalMet, true);
+  assert.equal(e.rows[0].target, false);
+  assert.equal(e.rows[0].phase, "break");
+  assert.equal(nextTestGoal(labs[0], e).phase, "repair");
+  c.wires = wires;
+  assert.equal(run(labs[0], c, e, 0, true).goalMet, true);
+  assert.deepEqual(
+    e.history.map((r) => r.phase),
+    ["build", "break", "break", "repair"],
+  );
+});
+test("live inputs follow actual switch contacts, independent of next test predictions", () => {
+  const c = both(),
+    e = newEvidence();
+  assert.equal(currentCaseIndex(labs[2], c), 0);
+  e.predictions[3] = true;
+  assert.equal(currentCaseIndex(labs[2], c), 0);
+  run(labs[2], c, e, 3, true);
+  assert.equal(currentCaseIndex(labs[2], c), 3);
+  c.parts.find((p) => p.id === "A").closed = false;
+  assert.equal(currentCaseIndex(labs[2], c), 1);
+  c.parts = c.parts.filter((p) => p.id !== "B");
+  assert.equal(currentCaseIndex(labs[2], c), -1);
+});
+test("undo restores evidence only for the matching wiring and recorded input case", () => {
+  const c = control(),
+    e = newEvidence();
+  run(labs[1], c, e, 0, false);
+  run(labs[1], c, e, 1, true);
+  const original = structuredClone(c);
+  c.wires.pop();
+  e.rows = recordedRowsForCircuit(labs[1], c, e);
+  assert.deepEqual(e.rows, {});
+  e.rows = recordedRowsForCircuit(labs[1], original, e);
+  assert.deepEqual(Object.keys(e.rows), ["0", "1"]);
+  assert(designProven(labs[1], original, e));
+  original.parts[0].x += 10;
+  assert.deepEqual(recordedRowsForCircuit(labs[1], original, e), e.rows);
+});
 test("lighting the lamp alone is not enough; a controlled break and repair is required", () => {
   const c = loop(),
     e = newEvidence();
@@ -169,6 +245,32 @@ test("a valid notebook restores wiring, observations, completion, and the learne
       restored.notebook.evidence.loop,
     ),
   );
+});
+test("notebooks from before phase-specific evidence retain their circuit and progress", () => {
+  const { c, e } = completeLoop(),
+    saved = newNotebook();
+  for (const r of e.history) {
+    delete r.phase;
+    r.target = true;
+  }
+  saved.circuits.loop = c;
+  saved.evidence.loop = e;
+  saved.done = ["loop"];
+  const restored = restoreNotebook(JSON.stringify(saved));
+  assert.equal(restored.recovered, false);
+  assert.deepEqual(restored.notebook.circuits.loop, c);
+  assert.deepEqual(restored.notebook.done, ["loop"]);
+  const evidence = restored.notebook.evidence.loop;
+  assert(designProven(labs[0], c, evidence));
+  const view = evidenceMarkup({
+    lab: labs[0],
+    evidence,
+    fingerprint: fingerprint(c),
+    currentCase: 0,
+    plannedCase: 0,
+  });
+  assert.match(view, /Earlier session/);
+  assert.doesNotMatch(view, /Prediction differed/);
 });
 test("invalid JSON and malformed top-level storage recover to an empty notebook", () => {
   for (const raw of [

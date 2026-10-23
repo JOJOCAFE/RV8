@@ -9,6 +9,7 @@
       content="Learn circuits by building your own wiring, predicting outcomes, and testing every switch setting."
     />
     <title>RV8 · Build, predict, investigate</title>
+    <link rel="icon" href="data:," />
     <link rel="stylesheet" href="workbench.css" />
     <script type="module" src="workbench.js"></script>
   </head>
@@ -42,8 +43,9 @@
       </p>
       <ol>
         <li>
-          A wire joins two terminals. Crossing lines do not join; use the same
-          terminal to create a branch.
+          A wire joins two terminals. Wires on the same electrical connection
+          may share a trunk; a dot marks a joined branch. A hop marks a crossing
+          without a connection. Use the same terminal to create a branch.
         </li>
         <li>A closed switch joins its two ends. An open switch does not.</li>
         <li>The battery provides two different terminal levels, + and −.</li>
@@ -84,10 +86,19 @@
       </p>
       <h3>Controls</h3>
       <p>
-        Add parts from the tray. Click one terminal, then another to draw a
-        wire. Click a wire and use Remove wire to disconnect it. Drag a part by
-        its name, or focus the name and use the arrow keys. Switch controls move
-        the visible contact. Undo restores your previous edit.
+        Add parts from the tray. Drag from one round terminal to another to draw
+        a wire; the target highlights when it will connect. You can also click
+        the two terminals, or focus each terminal and press Enter. Escape
+        cancels a wire or drag. Drag anywhere on a component’s body to move it,
+        or focus it and use the arrow keys. Select a wire or component and press
+        Backspace or Delete to remove it. Undo restores the part and its wires.
+        Text editing keeps its normal keyboard controls.
+      </p>
+      <p>
+        The input row shows the switch positions currently on the board. Choose
+        the inputs for your next test, make a prediction, then apply the test.
+        Recorded evidence keeps the inputs, prediction, and result from that
+        moment. A correct circuit can still surprise your prediction.
       </p>
     </dialog>
     <noscript

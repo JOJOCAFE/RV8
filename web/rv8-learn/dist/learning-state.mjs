@@ -27,6 +27,40 @@ const partId = (key) =>
   key === "battery" ? "BAT" : key === "lamp" ? "L" : key;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
+export function nextTestGoal(lab, evidence) {
+  if (lab.id !== "loop") return null;
+  if (!evidence.proof.lit)
+    return { phase: "build", title: "Complete the loop", target: true };
+  if (!evidence.proof.broken)
+    return { phase: "break", title: "Remove exactly one wire", target: false };
+  if (!evidence.proof.repaired)
+    return { phase: "repair", title: "Repair the loop", target: true };
+  return { phase: "explore", title: "Explore your circuit", target: true };
+}
+
+export function currentCaseIndex(lab, circuit) {
+  return configurations(lab.switches).findIndex((config) =>
+    lab.switches.every((id) => {
+      const part = circuit.parts.find((p) => p.id === id);
+      return part && part.closed === config[id];
+    }),
+  );
+}
+
+export function recordedRowsForCircuit(lab, circuit, evidence) {
+  const fp = fingerprint(circuit),
+    configs = configurations(lab.switches),
+    rows = {};
+  for (const record of evidence.history) {
+    if (record.fingerprint !== fp) continue;
+    const row = configs.findIndex(
+      (config) => JSON.stringify(config) === JSON.stringify(record.config),
+    );
+    if (row >= 0) rows[row] = record;
+  }
+  return rows;
+}
+
 function validCircuit(circuit, lab) {
   if (
     !object(circuit) ||
@@ -100,14 +134,20 @@ function cleanRecord(record, lab) {
   const config = Object.fromEntries(
     lab.switches.map((id) => [id, record.config[id]]),
   );
+  const phase =
+    lab.id === "loop" &&
+    ["build", "break", "repair", "explore"].includes(record.phase)
+      ? record.phase
+      : null;
   return {
     config,
     prediction: record.prediction,
     on: record.on,
     short: record.short,
     valid: record.valid,
-    target: targetFor(lab.id, config),
+    target: phase === "break" ? false : targetFor(lab.id, config),
     fingerprint: record.fingerprint,
+    ...(phase ? { phase } : {}),
   };
 }
 
@@ -199,6 +239,7 @@ export function recordExperiment(lab, circuit, evidence, row) {
     const part = circuit.parts.find((p) => p.id === id);
     if (part) part.closed = closed;
   }
+  const goal = nextTestGoal(lab, evidence);
   const result = simulate(circuit);
   const required = lab.parts.every((key) =>
     circuit.parts.some((p) => p.id === partId(key)),
@@ -210,8 +251,9 @@ export function recordExperiment(lab, circuit, evidence, row) {
     on: result.on,
     short: result.short,
     valid,
-    target: targetFor(lab.id, config),
+    target: goal ? goal.target : targetFor(lab.id, config),
     fingerprint: fingerprint(circuit),
+    ...(goal ? { phase: goal.phase } : {}),
   };
   evidence.rows[row] = record;
   evidence.history.push(record);
@@ -231,7 +273,11 @@ export function recordExperiment(lab, circuit, evidence, row) {
     )
       p.broken = true;
   }
-  return { result, required, prediction };
+  const goalMet =
+    valid &&
+    result.on === record.target &&
+    (goal?.phase !== "break" || evidence.proof.broken);
+  return { result, required, prediction, goalMet };
 }
 
 export function designProven(lab, circuit, evidence) {
