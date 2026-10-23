@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f6f5f0" />
+    <meta
+      name="description"
+      content="Learn circuits by building your own wiring, predicting outcomes, and testing every switch setting."
+    />
+    <title>RV8 · Build, predict, investigate</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="workbench.css" />
+    <script type="module" src="workbench.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#lab-main">Skip to experiment</a>
+    <header class="lab-header">
+      <a href="#lab-1" class="lab-brand"
+        ><b>r<span>v</span>8</b><span>LEARNING LAB</span></a
+      >
+      <div>
+        <span class="local-label">YOUR CIRCUITS · SAVED IN THIS BROWSER</span
+        ><button class="plain-button" id="download-notebook">
+          Download notebook</button
+        ><button class="plain-button" id="open-help">
+          How this workbench works
+        </button>
+      </div>
+    </header>
+    <p id="storage-message" role="status" hidden></p>
+    <div id="lab-app"></div>
+    <dialog id="help-dialog">
+      <div class="dialog-heading">
+        <h2>The rules of this workbench</h2>
+        <button class="plain-button" id="close-help" aria-label="Close help">
+          Close ×
+        </button>
+      </div>
+      <p>
+        You build the connections. The simulation checks those connections using
+        these rules:
+      </p>
+      <ol>
+        <li>
+          A wire joins two terminals. Wires on the same electrical connection
+          may share a trunk; a dot marks a joined branch. A hop marks a crossing
+          without a connection. Use the same terminal to create a branch.
+        </li>
+        <li>A closed switch joins its two ends. An open switch does not.</li>
+        <li>The battery provides two different terminal levels, + and −.</li>
+        <li>
+          The lamp glows when its two ends connect to different battery
+          terminals through wires and closed contacts.
+        </li>
+        <li>
+          A route directly from + to − that avoids the lamp is a short. The
+          model cuts power and reports it.
+        </li>
+      </ol>
+      <p>
+        The switch contact and lamp filament are drawn inside their parts. They
+        are the starting physical assumptions. There is no hidden AND gate,
+        adder, or completed circuit.
+      </p>
+      <p>
+        This is an ideal connectivity model for one battery, one lamp, and
+        switches. It does not calculate current, resistance, brightness,
+        component ratings, or real hardware safety.
+      </p>
+      <p>
+        After these experiments, continue with the
+        <a
+          href="https://github.com/JOJOCAFE/RV8/tree/main/RV8GR/doc/labs"
+          target="_blank"
+          rel="noopener"
+          >original RV8GR hardware labs</a
+        >
+        or
+        <a
+          href="https://github.com/JOJOCAFE/RV8/blob/main/RV8GR/doc/04_understand_by_module.md"
+          target="_blank"
+          rel="noopener"
+          >Thai module tutorial</a
+        >.
+      </p>
+      <h3>Controls</h3>
+      <p>
+        Add parts from the tray. Drag from one round terminal to another to draw
+        a wire; the target highlights when it will connect. You can also click
+        the two terminals, or focus each terminal and press Enter. Escape
+        cancels a wire or drag. Drag anywhere on a component’s body to move it,
+        or focus it and use the arrow keys. Select a wire or component and press
+        Backspace or Delete to remove it. Undo restores the part and its wires.
+        Text editing keeps its normal keyboard controls.
+      </p>
+      <p>
+        The input row shows the switch positions currently on the board. Choose
+        the inputs for your next test, make a prediction, then apply the test.
+        Recorded evidence keeps the inputs, prediction, and result from that
+        moment. A correct circuit can still surprise your prediction.
+      </p>
+    </dialog>
+    <noscript
+      >This circuit workbench needs JavaScript. The source learning material is
+      in RV8GR/doc/labs.</noscript
+    >
+  </body>
+</html>
